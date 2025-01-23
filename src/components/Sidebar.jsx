@@ -8,6 +8,9 @@ import {
   BellIcon,
   ChevronDownIcon,
   ChevronUpIcon,
+  UserMinusIcon,
+  Bars3Icon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 
 const Sidebar = ({ setSelectedPage, selectedPage }) => {
@@ -46,8 +49,6 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
 
   const handleInventoryToggle = () => {
     setIsInventoryOpen((prev) => !prev);
-    setSelectedMenuItem("Inventory");
-    setSelectedPage("Inventory");
   };
 
   // Close dropdowns when clicking outside
@@ -71,7 +72,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
   }, []);
 
   return (
-    <div className="w-64 bg-blue-800 text-white flex flex-col p-4">
+    <div className="w-64 bg-gray-800 text-white flex flex-col p-4">
       {/* User Info Section */}
       <div className="flex items-center mb-6 relative">
         <img
@@ -92,33 +93,35 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
           }}
         >
           {!isSvgChanged ? (
-            <ChevronDownIcon className="h-5 w-5" />
+            <Bars3Icon className="h-5 w-5" />
           ) : (
-            <ChevronUpIcon className="h-5 w-5" />
+            <XMarkIcon className="h-5 w-5" />
           )}
         </button>
 
         {isMenuOpen && (
           <div
             ref={menuRef}
-            className="absolute right-0 top-10 w-48 bg-white rounded shadow-lg"
+            className="absolute right-0 top-10 w-40 bg-white rounded shadow-lg"
           >
             <ul>
               <li
                 onClick={() => handleMenuItemClick("Profile")}
-                className={`p-2 hover:bg-gray-100 cursor-pointer text-blue-700 text-center ${
-                  selectedMenuItem === "Profile" ? "bg-gray-100" : ""
+                className={`p-2 hover:bg-gray-200 rounded cursor-pointer text-green-700 text-center ${
+                  selectedMenuItem === "Profile" ? "bg-white-100" : ""
                 }`}
               >
+                {/* Profile Icon */}
+                <HomeIcon className="h-5 w-5 inline mr-2" />
                 My Profile
               </li>
               <li
                 onClick={() => handleMenuItemClick("Logout")}
-                className={`p-2 hover:bg-gray-100 cursor-pointer text-red-700 text-center ${
-                  selectedMenuItem === "Logout" ? "bg-gray-100" : ""
+                className={`p-2 hover:bg-gray-200 rounded cursor-pointer text-red-700 text-center ${
+                  selectedMenuItem === "Logout" ? "bg-wite-100" : ""
                 }`}
               >
-                Logout
+                <UserMinusIcon className="h-5 w-5 mr-2 inline" /> Logout
               </li>
             </ul>
           </div>
@@ -128,51 +131,57 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
       {/* Menu Items */}
       <ul className="space-y-1">
         {menuItems.map(({ name, icon: Icon }) => (
-          <li
-            key={name}
-            onClick={() =>
-              name === "Inventory"
-                ? handleInventoryToggle()
-                : handlePageSelection(name)
-            }
-            className={`p-2 rounded cursor-pointer flex items-center hover:bg-blue-700 ${
-              selectedMenuItem === name ? "bg-blue-700 text-white" : ""
-            }`}
-          >
-            <Icon className="h-5 w-5 inline mr-2" />
-            {name}
-            {name === "Inventory" && (
-              <span className="ml-auto">
-                {isInventoryOpen ? (
-                  <ChevronUpIcon className="h-5 w-5" />
-                ) : (
-                  <ChevronDownIcon className="h-5 w-5" />
-                )}
-              </span>
-            )}
-          </li>
-        ))}
+          <React.Fragment key={name}>
+            <li
+              onClick={() =>
+                name === "Inventory"
+                  ? handleInventoryToggle()
+                  : handlePageSelection(name)
+              }
+              className={`p-2 rounded cursor-pointer flex items-center hover:bg-green-500 ${
+                selectedMenuItem === name ? "bg-green-500 text-white" : ""
+              }`}
+            >
+              <Icon className="h-5 w-5 inline mr-2" />
+              {name}
+              {name === "Inventory" && (
+                <span className="ml-auto">
+                  {isInventoryOpen ? (
+                    <ChevronUpIcon className="h-5 w-5" />
+                  ) : (
+                    <ChevronDownIcon className="h-5 w-5" />
+                  )}
+                </span>
+              )}
+            </li>
 
-        {isInventoryOpen && selectedMenuItem === "Inventory" && (
-          <>
-            <li
-              onClick={() => handlePageSelection("List of Medicine")}
-              className={`p-2 pl-8 hover:bg-blue-700 cursor-pointer ${
-                selectedPage === "List of Medicine" ? "bg-blue-700" : ""
-              }`}
-            >
-              List of Medicine
-            </li>
-            <li
-              onClick={() => handlePageSelection("Medicine Group")}
-              className={`p-2 pl-8 hover:bg-blue-700 cursor-pointer ${
-                selectedPage === "Medicine Group" ? "bg-blue-700" : ""
-              }`}
-            >
-              Medicine Group
-            </li>
-          </>
-        )}
+            {/* Sub-Items for Inventory */}
+            {isInventoryOpen && name === "Inventory" && (
+              <ul className="pl-6 space-y-1">
+                <li
+                  onClick={() => handlePageSelection("List of Medicine")}
+                  className={`p-2 rounded hover:bg-green-500 cursor-pointer ${
+                    selectedPage === "List of Medicine"
+                      ? "bg-green-500 text-white"
+                      : ""
+                  }`}
+                >
+                  List of Medicine
+                </li>
+                <li
+                  onClick={() => handlePageSelection("Medicine Group")}
+                  className={`p-2 rounded hover:bg-green-500 cursor-pointer ${
+                    selectedPage === "Medicine Group"
+                      ? "bg-green-500 text-white"
+                      : ""
+                  }`}
+                >
+                  Medicine Group
+                </li>
+              </ul>
+            )}
+          </React.Fragment>
+        ))}
       </ul>
     </div>
   );

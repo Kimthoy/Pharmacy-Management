@@ -12,6 +12,8 @@ import MoneyMgt from "./pages/MoneyMgt";
 
 import "./index.css";
 import Notifications from "./pages/Notifications";
+import ListOfMedicine from "./pages/subItemInventory/ListOfMedicine";
+import MedicineGroup from "./pages/subItemInventory/MedicineGroup";
 
 const App = () => {
   const [selectedPage, setSelectedPage] = useState("Dashboard"); // Default page is Dashboard
@@ -28,6 +30,10 @@ const App = () => {
         return <MoneyMgt />;
       case "Notifications":
         return <Notifications />;
+      case "List of Medicine": 
+        return <ListOfMedicine />;
+      case "Medicine Group":
+        return <MedicineGroup />;
       default:
         return <Dashboard />;
     }
