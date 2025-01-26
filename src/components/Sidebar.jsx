@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
+import { useNavigate } from "react-router-dom";
 import {
   HomeIcon,
   ClipboardDocumentListIcon,
@@ -11,6 +12,8 @@ import {
   UserMinusIcon,
   Bars3Icon,
   XMarkIcon,
+  ClipboardIcon, // New Icon
+  FolderIcon, // New Icon
 } from "@heroicons/react/24/outline";
 
 const Sidebar = ({ setSelectedPage, selectedPage }) => {
@@ -20,14 +23,14 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
   const [isInventoryOpen, setIsInventoryOpen] = useState(false);
   const buttonRef = useRef(null);
   const menuRef = useRef(null);
+  const navigate = useNavigate();
 
-  // Map menu items to icons for reusability
   const menuItems = [
-    { name: "Dashboard", icon: HomeIcon },
-    { name: "Inventory", icon: ClipboardDocumentListIcon },
-    { name: "Configuration", icon: Cog6ToothIcon },
-    { name: "MoneyMgt", icon: CurrencyRupeeIcon },
-    { name: "Notifications", icon: BellIcon },
+    { name: "Dashboard", icon: HomeIcon, path: "/" },
+    { name: "Inventory", icon: ClipboardDocumentListIcon, path: "/inventory" },
+    { name: "Configuration", icon: Cog6ToothIcon, path: "/configuration" },
+    { name: "Daily Management", icon: CurrencyRupeeIcon, path: "/money-mgt" },
+    { name: "Notifications", icon: BellIcon, path: "/notifications" },
   ];
 
   const toggleSvg = () => setIsSvgChanged((prev) => !prev);
@@ -42,16 +45,16 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
     }
   };
 
-  const handlePageSelection = (item) => {
+  const handlePageSelection = (item, path) => {
     setSelectedMenuItem(item);
     setSelectedPage(item);
+    navigate(path);
   };
 
   const handleInventoryToggle = () => {
     setIsInventoryOpen((prev) => !prev);
   };
 
-  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -73,16 +76,15 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
 
   return (
     <div className="w-64 bg-gray-800 text-white flex flex-col p-4">
-      {/* User Info Section */}
       <div className="flex items-center mb-6 relative">
         <img
-          src="profile.png"
+          src="user.jpg"
           alt="User"
           className="w-12 h-12 rounded-full mr-4"
         />
         <div>
-          <p className="text-lg font-semibold">John Doe</p>
-          <p className="text-sm text-blue-300">Pharma One</p>
+          <p className="text-lg font-semibold">Rathanak</p>
+          <p className="text-sm text-blue-300">Rathanak Pharmacy</p>
         </div>
         <button
           ref={buttonRef}
@@ -107,18 +109,17 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
             <ul>
               <li
                 onClick={() => handleMenuItemClick("Profile")}
-                className={`p-2 hover:bg-gray-200 rounded cursor-pointer text-green-700 text-center ${
+                className={`p-2 hover:bg-gray-200 rounded cursor-pointer text-blue-500 text-center ${
                   selectedMenuItem === "Profile" ? "bg-white-100" : ""
                 }`}
               >
-                {/* Profile Icon */}
                 <HomeIcon className="h-5 w-5 inline mr-2" />
                 My Profile
               </li>
               <li
                 onClick={() => handleMenuItemClick("Logout")}
-                className={`p-2 hover:bg-gray-200 rounded cursor-pointer text-red-700 text-center ${
-                  selectedMenuItem === "Logout" ? "bg-wite-100" : ""
+                className={`p-2 hover:bg-gray-200 rounded cursor-pointer text-red-500 text-center ${
+                  selectedMenuItem === "Logout" ? "bg-white-100" : ""
                 }`}
               >
                 <UserMinusIcon className="h-5 w-5 mr-2 inline" /> Logout
@@ -128,18 +129,17 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
         )}
       </div>
 
-      {/* Menu Items */}
       <ul className="space-y-1">
-        {menuItems.map(({ name, icon: Icon }) => (
+        {menuItems.map(({ name, icon: Icon, path }) => (
           <React.Fragment key={name}>
             <li
               onClick={() =>
                 name === "Inventory"
                   ? handleInventoryToggle()
-                  : handlePageSelection(name)
+                  : handlePageSelection(name, path)
               }
-              className={`p-2 rounded cursor-pointer flex items-center hover:bg-green-500 ${
-                selectedMenuItem === name ? "bg-green-500 text-white" : ""
+              className={`p-2 rounded cursor-pointer flex items-center hover:bg-blue-500 ${
+                selectedMenuItem === name ? "bg-blue-500 text-white" : ""
               }`}
             >
               <Icon className="h-5 w-5 inline mr-2" />
@@ -155,27 +155,32 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
               )}
             </li>
 
-            {/* Sub-Items for Inventory */}
             {isInventoryOpen && name === "Inventory" && (
               <ul className="pl-6 space-y-1">
                 <li
-                  onClick={() => handlePageSelection("List of Medicine")}
-                  className={`p-2 rounded hover:bg-green-500 cursor-pointer ${
+                  onClick={() =>
+                    handlePageSelection("List of Medicine", "/list-of-medicine")
+                  }
+                  className={`p-2 rounded hover:bg-blue-500 cursor-pointer flex items-center ${
                     selectedPage === "List of Medicine"
-                      ? "bg-green-500 text-white"
+                      ? "bg-blue-500 text-white"
                       : ""
                   }`}
                 >
+                  <ClipboardIcon className="h-5 w-5 inline mr-2" />
                   List of Medicine
                 </li>
                 <li
-                  onClick={() => handlePageSelection("Medicine Group")}
-                  className={`p-2 rounded hover:bg-green-500 cursor-pointer ${
+                  onClick={() =>
+                    handlePageSelection("Medicine Group", "/medicine-group")
+                  }
+                  className={`p-2 rounded hover:bg-blue-500 cursor-pointer flex items-center ${
                     selectedPage === "Medicine Group"
-                      ? "bg-green-500 text-white"
+                      ? "bg-blue-500 text-white"
                       : ""
                   }`}
                 >
+                  <FolderIcon className="h-5 w-5 inline mr-2" />
                   Medicine Group
                 </li>
               </ul>

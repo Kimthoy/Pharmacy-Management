@@ -1,53 +1,62 @@
-// App.jsx
-import React, { useState } from "react";
-import Sidebar from "./components/Sidebar";
-import TopBar from "./components/TopBar";
-import Footer from "./components/Footer";
+import React, { Suspense, lazy, useState } from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Loader from "./components/Loader";
 
-import Dashboard from "./pages/Dashboard";
-import Inventory from "./pages/Inventory";
-import Configuration from "./pages/Configuration";
-import MoneyMgt from "./pages/MoneyMgt";
-// Import other pages here...
+const Sidebar = lazy(() => import("./components/Sidebar"));
+const TopBar = lazy(() => import("./components/TopBar"));
+const Footer = lazy(() => import("./components/Footer"));
 
-import "./index.css";
-import Notifications from "./pages/Notifications";
-import ListOfMedicine from "./pages/subItemInventory/ListOfMedicine";
-import MedicineGroup from "./pages/subItemInventory/MedicineGroup";
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Inventory = lazy(() => import("./pages/Inventory"));
+const Configuration = lazy(() => import("./pages/Configuration"));
+const MoneyMgt = lazy(() => import("./pages/MoneyMgt"));
+const Notifications = lazy(() => import("./pages/Notifications"));
+const User = lazy(() => import("./pages/User"));
+const Customer = lazy(() => import("./pages/Customer"));
+const ListOfMedicine = lazy(() =>
+  import("./pages/subItemInventory/ListOfMedicine")
+);
+const MedicineGroup = lazy(() =>
+  import("./pages/subItemInventory/MedicineGroup")
+);
+const MedicineDetails = lazy(() =>
+  import("./pages/subItemInventory/medicineDetail/MedicineDetails")
+);
 
 const App = () => {
-  const [selectedPage, setSelectedPage] = useState("Dashboard"); // Default page is Dashboard
-
-  const renderPage = () => {
-    switch (selectedPage) {
-      case "Dashboard":
-        return <Dashboard />;
-      case "Inventory":
-        return <Inventory />;
-      case "Configuration":
-        return <Configuration />;
-      case "MoneyMgt":
-        return <MoneyMgt />;
-      case "Notifications":
-        return <Notifications />;
-      case "List of Medicine": 
-        return <ListOfMedicine />;
-      case "Medicine Group":
-        return <MedicineGroup />;
-      default:
-        return <Dashboard />;
-    }
-  };
+  const [selectedPage, setSelectedPage] = useState("Dashboard");
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      <Sidebar setSelectedPage={setSelectedPage} selectedPage={selectedPage} />
-      <div className="flex-1 flex flex-col">
-        <TopBar />
-        <div className="flex-1 p-4">{renderPage()}</div>
-        <Footer />
+    <Router>
+      <div className="flex h-screen bg-gray-100">
+        <Sidebar
+          setSelectedPage={setSelectedPage}
+          selectedPage={selectedPage}
+        />
+
+        <div className="flex-1 flex flex-col">
+          <TopBar />
+
+          <div className="flex-1 p-4">
+            <Suspense fallback={<Loader />}>
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/inventory" element={<Inventory />} />
+                <Route path="/configuration" element={<Configuration />} />
+                <Route path="/money-mgt" element={<MoneyMgt />} />
+                <Route path="/notifications" element={<Notifications />} />
+                <Route path="/list-of-medicine" element={<ListOfMedicine />} />
+                <Route path="/medicine-group" element={<MedicineGroup />} />
+                <Route path="/MedicineDetails" element={<MedicineDetails />} />
+                <Route path="/User" element={<User />}></Route>
+                <Route path="/Customer" element={<Customer />}></Route>
+              </Routes>
+            </Suspense>
+          </div>
+          <Footer />
+        </div>
       </div>
-    </div>
+    </Router>
   );
 };
 
