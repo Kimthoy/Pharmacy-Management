@@ -27,10 +27,10 @@ const TopBar = () => {
         placeholder="Search ..."
         className="border rounded-lg p-2 flex-grow max-w-sm"
       />
+      <img src="PANHARITH.jpg" alt="Phamacy" className="w-max " />
+
       <div className="flex items-center space-x-4">
-        {/* Language Dropdown with Flag Outside */}
         <div className="flex items-center space-x-2 cursor-pointer">
-          {/* Flag Image */}
           <img
             src={languageOptions.find((lang) => lang.value === language)?.flag}
             alt={language}

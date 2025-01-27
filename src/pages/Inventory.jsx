@@ -9,7 +9,7 @@ import {
 
 const Inventory = () => {
   return (
-    <div className="bg-gray-100 min-h-screen p-6">
+    <div className="bg-white min-h-screen p-6">
       {/* Header Section */}
       <div className="flex justify-between items-center mb-6">
         <div>

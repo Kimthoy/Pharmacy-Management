@@ -20,7 +20,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen p-6">
+    <div className="bg-white min-h-screen p-6">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
@@ -66,7 +66,7 @@ const Dashboard = () => {
             <ShieldCheckIcon className="h-8 w-8 text-green-800 mx-auto" />
             <h3 className="text-lg font-semibold text-green-800 mt-2">Good</h3>
             <p className="text-gray-700">Inventory Status</p>
-            <button className="mt-4 bg-green-200 px-4 py-2 text-green-800 rounded-lg hover:bg-green-300">
+            <button className="mt-4 bg-green-200 px-2 py-2 text-green-800 rounded-lg hover:bg-green-300">
               View Detailed Report
             </button>
           </div>
@@ -79,7 +79,7 @@ const Dashboard = () => {
               Rs. 8,55,875
             </h3>
             <p className="text-gray-700">Revenue · Jan 2022</p>
-            <button className="mt-4 bg-yellow-200 px-4 py-2 text-yellow-800 rounded-lg hover:bg-yellow-300">
+            <button className="mt-4 bg-yellow-200 px-2 py-2 text-yellow-800 rounded-lg hover:bg-yellow-300">
               View Detailed Report
             </button>
           </div>

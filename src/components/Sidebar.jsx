@@ -9,11 +9,12 @@ import {
   BellIcon,
   ChevronDownIcon,
   ChevronUpIcon,
-  UserMinusIcon,
+  
   Bars3Icon,
   XMarkIcon,
   ClipboardIcon, // New Icon
-  FolderIcon, // New Icon
+  FolderIcon,
+  PowerIcon,
 } from "@heroicons/react/24/outline";
 
 const Sidebar = ({ setSelectedPage, selectedPage }) => {
@@ -75,16 +76,12 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
   }, []);
 
   return (
-    <div className="w-64 bg-gray-800 text-white flex flex-col p-4">
+    <div className="w-72 bg-gray-800 text-white flex flex-col p-4">
       <div className="flex items-center mb-6 relative">
-        <img
-          src="user.jpg"
-          alt="User"
-          className="w-12 h-12 rounded-full mr-4"
-        />
+        <img src="logo.png" alt="User" className="w-12 rounded-full mr-4" />
         <div>
-          <p className="text-lg font-semibold">Rathanak</p>
-          <p className="text-sm text-blue-300">Rathanak Pharmacy</p>
+          <p className="text-lg font-semibold">KHOY ROTHANAK</p>
+          <p className="text-sm text-blue-300">PHANHARITH PHAMACY</p>
         </div>
         <button
           ref={buttonRef}
@@ -104,25 +101,35 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
         {isMenuOpen && (
           <div
             ref={menuRef}
-            className="absolute right-0 top-10 w-40 bg-white rounded shadow-lg"
+            className="absolute right-0 top-12 w-36 bg-white rounded shadow-lg"
           >
             <ul>
               <li
                 onClick={() => handleMenuItemClick("Profile")}
-                className={`p-2 hover:bg-gray-200 rounded cursor-pointer text-blue-500 text-center ${
+                className={`p-2 hover:bg-gray-200 rounded cursor-pointer text-blue-500 ${
                   selectedMenuItem === "Profile" ? "bg-white-100" : ""
                 }`}
               >
-                <HomeIcon className="h-5 w-5 inline mr-2" />
-                My Profile
+                <div className="flex justify-around">
+                  <div>
+                    <HomeIcon className="h-5 w-5 " />
+                  </div>
+                  <div className="font-bold">My Profile</div>
+                </div>
               </li>
+              <hr />
               <li
                 onClick={() => handleMenuItemClick("Logout")}
-                className={`p-2 hover:bg-gray-200 rounded cursor-pointer text-red-500 text-center ${
+                className={`p-2 hover:bg-gray-200 rounded cursor-pointer text-red-500  ${
                   selectedMenuItem === "Logout" ? "bg-white-100" : ""
                 }`}
               >
-                <UserMinusIcon className="h-5 w-5 mr-2 inline" /> Logout
+                <div className="flex justify-around">
+                  <div>
+                    <PowerIcon className="h-5 w-5 " />
+                  </div>
+                  <div className="font-bold">Logout</div>
+                </div>
               </li>
             </ul>
           </div>
@@ -188,6 +195,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
           </React.Fragment>
         ))}
       </ul>
+      
     </div>
   );
 };

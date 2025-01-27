@@ -37,7 +37,7 @@ const App = () => {
         <div className="flex-1 flex flex-col">
           <TopBar />
 
-          <div className="flex-1 p-4">
+          <div className="flex-1 p-4 bg-white">
             <Suspense fallback={<Loader />}>
               <Routes>
                 <Route path="/" element={<Dashboard />} />
@@ -53,7 +53,9 @@ const App = () => {
               </Routes>
             </Suspense>
           </div>
-          <Footer />
+        
+            <Footer />
+         
         </div>
       </div>
     </Router>
