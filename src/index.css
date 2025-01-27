@@ -1,5 +1,5 @@
 @tailwind base;
-@tailwind components; 
+@tailwind components;
 @tailwind utilities;
 body {
   margin: 0;
@@ -14,3 +14,29 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+#name_phamacy {
+  font-size: 10px;
+}
+#admin_name {
+  font-size: 13px;
+}
+@keyframes dot-blink {
+  0% {
+    content: '';
+  }
+  33% {
+    content: '.';
+  }
+  66% {
+    content: '..';
+  }
+  100% {
+    content: '...';
+  }
+}
+
+.animate-dot::after {
+  display: inline-block;
+  animation: dot-blink 0.5s infinite steps(1, end);
+}
+

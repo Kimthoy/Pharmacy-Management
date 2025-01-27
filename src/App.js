@@ -1,10 +1,14 @@
-import React, { Suspense, lazy, useState } from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import React, { Suspense, lazy, useState, useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
 import Loader from "./components/Loader";
-
-const Sidebar = lazy(() => import("./components/Sidebar"));
-const TopBar = lazy(() => import("./components/TopBar"));
-const Footer = lazy(() => import("./components/Footer"));
+import TopBar from "./components/TopBar";
+import Footer from "./components/Footer";
+import Sidebar from "./components/Sidebar";
 
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Inventory = lazy(() => import("./pages/Inventory"));
@@ -25,8 +29,35 @@ const MedicineDetails = lazy(() =>
 
 const App = () => {
   const [selectedPage, setSelectedPage] = useState("Dashboard");
+  const [isLoading, setIsLoading] = useState(true);
 
-  return (
+  // Simulate a loading delay
+  const simulateLoadingDelay = (delay) =>
+    new Promise((resolve) => setTimeout(resolve, delay));
+
+  useEffect(() => {
+    const savedPage = localStorage.getItem("selectedPage") || "Dashboard";
+    setSelectedPage(savedPage);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("selectedPage", selectedPage);
+  }, [selectedPage]);
+
+  useEffect(() => {
+    // Add a delay on the initial load
+    const loadContent = async () => {
+      await simulateLoadingDelay(600); // 1-second delay
+      setIsLoading(false);
+    };
+    loadContent();
+  }, []);
+
+  return isLoading ? (
+    <div className="flex items-center justify-center h-screen">
+      <Loader />
+    </div>
+  ) : (
     <Router>
       <div className="flex h-screen bg-gray-100">
         <Sidebar
@@ -48,14 +79,15 @@ const App = () => {
                 <Route path="/list-of-medicine" element={<ListOfMedicine />} />
                 <Route path="/medicine-group" element={<MedicineGroup />} />
                 <Route path="/MedicineDetails" element={<MedicineDetails />} />
-                <Route path="/User" element={<User />}></Route>
-                <Route path="/Customer" element={<Customer />}></Route>
+                <Route path="/User" element={<User />} />
+                <Route path="/Customer" element={<Customer />} />
+                {/* Redirect any invalid path to Dashboard */}
+                <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </Suspense>
           </div>
-        
-            <Footer />
-         
+
+          <Footer />
         </div>
       </div>
     </Router>

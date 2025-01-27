@@ -21,16 +21,16 @@ const TopBar = () => {
   ];
 
   return (
-    <div className="bg-white shadow p-4 flex items-center justify-between">
+    <div className="bg-white  shadow-lg p-4 flex items-center justify-between">
       <input
         type="text"
         placeholder="Search ..."
-        className="border rounded-lg p-2 flex-grow max-w-sm"
+        className="border-separate shadow-lg rounded-lg p-2 flex-grow max-w-sm"
       />
       <img src="PANHARITH.jpg" alt="Phamacy" className="w-max " />
 
       <div className="flex items-center space-x-4">
-        <div className="flex items-center space-x-2 cursor-pointer">
+        <div className="flex  items-center space-x-2 cursor-pointer">
           <img
             src={languageOptions.find((lang) => lang.value === language)?.flag}
             alt={language}
@@ -39,7 +39,7 @@ const TopBar = () => {
           <select
             value={language}
             onChange={handleLanguageChange}
-            className="border rounded-lg p-2 bg-white "
+            className=" shadow-lg rounded p-2 bg-white "
           >
             {languageOptions.map((lang) => (
               <option key={lang.value} value={lang.value}>
