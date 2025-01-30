@@ -9,6 +9,7 @@ import Loader from "./components/Loader";
 import TopBar from "./components/TopBar";
 import Footer from "./components/Footer";
 import Sidebar from "./components/Sidebar";
+import Report from "./pages/Report";
 
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Inventory = lazy(() => import("./pages/Inventory"));
@@ -42,7 +43,7 @@ const App = () => {
 
   useEffect(() => {
     localStorage.setItem("selectedPage", selectedPage);
-  }, [selectedPage]); 
+  }, [selectedPage]);
 
   useEffect(() => {
     // Add a delay on the initial load
@@ -68,7 +69,7 @@ const App = () => {
         <div className="flex-1 flex flex-col">
           <TopBar />
 
-          <div className="flex-1 p-4 bg-white">
+          <div className="flex-1 overflow-y-auto p-4 bg-white">
             <Suspense fallback={<Loader />}>
               <Routes>
                 <Route path="/" element={<Dashboard />} />
@@ -81,6 +82,7 @@ const App = () => {
                 <Route path="/MedicineDetails" element={<MedicineDetails />} />
                 <Route path="/User" element={<User />} />
                 <Route path="/Customer" element={<Customer />} />
+                <Route path="/Report" element={<Report />} />
                 {/* Redirect any invalid path to Dashboard */}
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>

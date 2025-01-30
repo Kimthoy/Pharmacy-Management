@@ -1,24 +1,7 @@
 import React, { useState } from "react";
-import {
-  ClipboardDocumentListIcon,
-  RectangleStackIcon,
-  ExclamationTriangleIcon,
-  PlusIcon,
-} from "@heroicons/react/24/outline";
+import { PlusIcon } from "@heroicons/react/24/outline";
 
 const Inventory = () => {
-  // State for pagination
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
-
-  // Calculate paginated data
-  const indexOfLastItem = currentPage * itemsPerPage;
-  // const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  // const currentItems = inventoryData.slice(indexOfFirstItem, indexOfLastItem);
-
-  // Change page
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
   // // Status badge styling
   // const getStatusBadge = (status) => {
   //   switch (status) {
@@ -53,10 +36,18 @@ const Inventory = () => {
             List of medicines available for sales.
           </p>
         </div>
-        <button className="bg-red-500 text-white px-4 py-2 rounded-md shadow hover:bg-red-600 flex items-center">
-          <PlusIcon className="h-5 w-5 mr-2" />
-          Add New Item
-        </button>
+        <div className="flex  space-x-4 ">
+          <button className="bg-gray-100  shadow-md text-blue-500 px-4 py-2 rounded-md  hover:bg-blue-200 flex items-center">
+            <span className="me-3">
+              <img src="images/graph.png" width="26px" alt="" />
+            </span>
+            Run stock Analysis
+          </button>
+          <button className="bg-red-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-red-600 flex items-center">
+            <PlusIcon className="h-5 w-5 mr-2" />
+            Add New Item
+          </button>
+        </div>
       </div>
 
       {/* Cards Section */}

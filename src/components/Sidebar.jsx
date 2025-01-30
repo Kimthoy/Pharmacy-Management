@@ -11,6 +11,7 @@ import {
   XMarkIcon,
   FolderIcon,
   PowerIcon,
+  FlagIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   ShoppingBagIcon,
@@ -40,13 +41,15 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
         icon: FolderIcon,
         path: "/medicine-group",
       },
-      { name: "Configuration", icon: Cog6ToothIcon, path: "/configuration" },
+
       {
-        name: "Daily Management",
+        name: "Expense",
         icon: CurrencyDollarIcon,
         path: "/money-mgt",
       },
       { name: "Notifications", icon: BellIcon, path: "/notifications" },
+      { name: "Report", icon: FlagIcon, path: "/report" },
+      { name: "Setting", icon: Cog6ToothIcon, path: "/configuration" },
     ],
     []
   );
@@ -99,8 +102,8 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
     <div className="flex">
       <div
         className={`${
-          isSidebarMinimized ? "w-15" : "w-72"
-        } bg-gray-800 text-white flex flex-col justify-between h-screen p-1 transition-all duration-300 `}
+          isSidebarMinimized ? "w-15" : "w-62"
+        } bg-gray-800 text-white flex flex-col justify-between h-screen p-1 transition-all duration-300 relative `}
       >
         <div>
           {/* Top Section with User Profile */}
@@ -109,10 +112,13 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
             {!isSidebarMinimized && (
               <>
                 <div>
-                  <h3 id="admin_name" className=" font-semibold">
+                  <h3 id="admin_name" className="font-thin  font-serif">
                     KHOY ROTHANAK
                   </h3>
-                  <p id="name_phamacy" className="font-semibold text-blue-300">
+                  <p
+                    id="name_phamacy"
+                    className="font-serif font-thin text-blue-300"
+                  >
                     PHANHARITH PHAMACY
                   </p>
                 </div>
@@ -192,7 +198,6 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
             ))}
           </ul>
         </div>
-
         <div className="mt-auto">
           <button
             onClick={toggleSidebar}
