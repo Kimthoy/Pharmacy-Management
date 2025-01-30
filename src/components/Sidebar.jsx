@@ -99,8 +99,8 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
     <div className="flex">
       <div
         className={`${
-          isSidebarMinimized ? "w-20" : "w-72"
-        } bg-gray-800 text-white flex flex-col justify-between h-screen p-3 transition-all duration-300 `}
+          isSidebarMinimized ? "w-15" : "w-72"
+        } bg-gray-800 text-white flex flex-col justify-between h-screen p-1 transition-all duration-300 `}
       >
         <div>
           {/* Top Section with User Profile */}

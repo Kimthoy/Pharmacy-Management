@@ -1,5 +1,4 @@
-// Inventory.jsx
-import React from "react";
+import React, { useState } from "react";
 import {
   ClipboardDocumentListIcon,
   RectangleStackIcon,
@@ -8,8 +7,44 @@ import {
 } from "@heroicons/react/24/outline";
 
 const Inventory = () => {
+  // State for pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  // Calculate paginated data
+  const indexOfLastItem = currentPage * itemsPerPage;
+  // const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  // const currentItems = inventoryData.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Change page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  // // Status badge styling
+  // const getStatusBadge = (status) => {
+  //   switch (status) {
+  //     case "Paid":
+  //       return (
+  //         <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm">
+  //           Paid
+  //         </span>
+  //       );
+  //     case "Not paid":
+  //       return (
+  //         <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-sm">
+  //           Not Paid
+  //         </span>
+  //       );
+  //     default:
+  //       return (
+  //         <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-sm">
+  //           Pending
+  //         </span>
+  //       );
+  //   }
+  // };
+
   return (
-    <div className="bg-white min-h-screen p-6">
+    <div className="bg-white min-h-screen p-1">
       {/* Header Section */}
       <div className="flex justify-between items-center mb-6">
         <div>
@@ -25,35 +60,208 @@ const Inventory = () => {
       </div>
 
       {/* Cards Section */}
-      <div className="grid grid-cols-3 gap-4">
-        {/* Medicines Available */}
-        <div className="bg-blue-100 border border-blue-300 p-4 rounded-lg text-center">
-          <ClipboardDocumentListIcon className="h-8 w-8 text-blue-800 mx-auto" />
-          <h3 className="text-2xl font-bold text-blue-800 mt-2">298</h3>
-          <p className="text-gray-700">Medicines Available</p>
-          <button className="mt-4 bg-blue-200 px-4 py-2 text-blue-800 rounded-lg hover:bg-blue-300">
-            View Full List »
-          </button>
+      <div className=" w-full mb-6 flex justify-evenly bg-gray-100 rounded-s shadow-md ">
+        <div className="p-3 flex justify-center   ">
+          <div className="me-4">
+            {" "}
+            <img src="images/outofstock.png" width="40px" alt="" />
+          </div>
+          <div className="block">
+            <p>Out of Stock</p>
+            <h2 className="font-bold text-2xl">4</h2>
+          </div>
+        </div>
+        <div className="p-3 flex justify-center ">
+          <div className="me-4">
+            {" "}
+            <img src="images/lowinstock.png" width="40px" alt="" />
+          </div>
+          <div className="block">
+            <div>Low in Stock</div>
+            <h2 className="font-bold  text-2xl">4</h2>
+          </div>
+        </div>
+        <div className="p-3 flex justify-center  ">
+          <div className="me-4">
+            {" "}
+            <img src="images/erasers.png" width="40px" alt="" />
+          </div>
+          <div className="block">
+            <div>Highest selling stock</div>
+            <p className="font-bold  text-2xl">Eraser</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Inventory Movement Table */}
+      <div className="bg-white p-6 rounded-lg shadow">
+        <h2 className="text-xl font-bold text-gray-800 mb-4">
+          Inventory Movement
+        </h2>
+
+        {/* Filter and Sort Section */}
+        <div className="flex flex-col md:flex-row justify-between items-center mb-4 space-y-4 md:space-y-0">
+          <input
+            type="text"
+            placeholder="Search ..."
+            className="w-full md:w-1/3 p-2 outline-none bg-gray-100  rounded-full shadow-md"
+          />
+          <div className="flex space-x-4 justify-center p-2">
+            <div className=" flex justify-center align-middle">
+              <p className="p-2 ">Filter by</p>
+              <select className="p-2 outline-none bg-gray-100 rounded-full shadow-md">
+                <option>Paid</option>
+                <option>Not Paid</option>
+                <option>Pending</option>
+              </select>
+            </div>
+
+            <div className="flex justify-center align-middle text-center bg-gray-100 rounded-full shadow-md">
+              <div>
+                <p className="p-3 ml-1">Sort by |</p>
+              </div>
+              <div>
+                <select className="p-3 bg-transparent rounded-lg font-bold outline-none">
+                  <option>Most Recent</option>
+                  <option>Oldest</option>
+                </select>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Medicine Groups */}
-        <div className="bg-green-100 border border-green-300 p-4 rounded-lg text-center">
-          <RectangleStackIcon className="h-8 w-8 text-green-800 mx-auto" />
-          <h3 className="text-2xl font-bold text-green-800 mt-2">02</h3>
-          <p className="text-gray-700">Medicine Groups</p>
-          <button className="mt-4 bg-green-200 px-4 py-2 text-green-800 rounded-lg hover:bg-green-300">
-            View Groups »
-          </button>
-        </div>
-
-        {/* Medicine Shortage */}
-        <div className="bg-red-100 border border-red-300 p-4 rounded-lg text-center">
-          <ExclamationTriangleIcon className="h-8 w-8 text-red-800 mx-auto" />
-          <h3 className="text-2xl font-bold text-red-800 mt-2">01</h3>
-          <p className="text-gray-700">Medicine Shortage</p>
-          <button className="mt-4 bg-red-200 px-4 py-2 text-red-800 rounded-lg hover:bg-red-300">
-            Resolve Now »
-          </button>
+        {/* Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="bg-gray-100">
+                <td className="p-4 m-2">
+                  <input type="checkbox" name="" id="" />
+                </td>
+                <td className="p-4 m-2">Channel</td>
+                <td className="p-4 m-2">Item</td>
+                <td className="p-4 m-2">Date</td>
+                <td className="p-4 m-2">Customer</td>
+                <td className="p-4 m-2">Quantity</td>
+                <td className="p-4 m-2">Quantity After</td>
+                <td className="p-4 m-2">Status</td>
+                <td className="p-4 m-2"></td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="border-b">
+                <td className="p-4 m-2">
+                  <input type="checkbox" name="" id="" />
+                </td>
+                <td className="p-4 m-2">
+                  <img src="images/medicine.png" width="30px" alt="" />
+                </td>
+                <td className="p-4 m-2">Glass Plate</td>
+                <td className="p-4 m-2">26 Jan 2024</td>
+                <td className="p-4 m-2">Vitu Khim</td>
+                <td className="p-4 m-2">+ 100.00</td>
+                <td className="p-4 m-2">+ 590.00</td>
+                <td className="p-4 m-2 text-green-500 ">
+                  <div className="bg-green-200 text-center d-flex align-middle p-2 rounded-full">
+                    Paid
+                  </div>
+                </td>
+                <td>
+                  <a href="#" target="_blank" rel="noopener noreferrer">
+                    {" "}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="size-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"
+                      />
+                    </svg>
+                  </a>
+                </td>
+              </tr>
+              <tr className="border-b">
+                <td className="p-4 m-2">
+                  <input type="checkbox" name="" id="" />
+                </td>
+                <td className="p-4 m-2">
+                  <img src="images/amazon.png" width="30px" alt="" />
+                </td>
+                <td className="p-4 m-2">Glass Plate</td>
+                <td className="p-4 m-2">26 Jan 2024</td>
+                <td className="p-4 m-2">Vitu Khim</td>
+                <td className="p-4 m-2">+ 100.00</td>
+                <td className="p-4 m-2">+ 590.00</td>
+                <td className="p-4 m-2 text-gray-500 ">
+                  <div className="bg-gray-200 text-center d-flex align-middle p-2 rounded-full">
+                    Pending
+                  </div>
+                </td>
+                <td>
+                  <a href="#" target="_blank" rel="noopener noreferrer">
+                    {" "}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="size-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"
+                      />
+                    </svg>
+                  </a>
+                </td>
+              </tr>
+              <tr className="border-b">
+                <td className="p-4 m-2">
+                  <input type="checkbox" name="" id="" />
+                </td>
+                <td className="p-4 m-2">
+                  <img src="images/amazon.png" width="30px" alt="" />
+                </td>
+                <td className="p-4 m-2">Glass Plate</td>
+                <td className="p-4 m-2">26 Jan 2024</td>
+                <td className="p-4 m-2">Vitu Khim</td>
+                <td className="p-4 m-2">+ 100.00</td>
+                <td className="p-4 m-2">+ 590.00</td>
+                <td className="p-4 m-2 text-red-500 ">
+                  <div className="bg-red-200 text-center d-flex align-middle p-2 rounded-full">
+                    Not Paid
+                  </div>
+                </td>
+                <td>
+                  <a href="#" target="_blank" rel="noopener noreferrer">
+                    {" "}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="size-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"
+                      />
+                    </svg>
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

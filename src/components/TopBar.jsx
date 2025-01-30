@@ -21,13 +21,13 @@ const TopBar = () => {
   ];
 
   return (
-    <div className="bg-white  shadow-lg p-4 flex items-center justify-between">
+    <div className="bg-gray-200  shadow-md p-4 flex items-center justify-between">
       <input
         type="text"
         placeholder="Search ..."
-        className="border-separate shadow-lg rounded-lg p-2 flex-grow max-w-sm"
+        className="border-separate shadow-lg rounded-lg p-2 flex-grow max-w-sm outline-none"
       />
-      <img src="PANHARITH.jpg" alt="Phamacy" className="w-max " />
+      {/* <img src="PANHARITH.jpg" alt="Phamacy" className="w-max " /> */}
 
       <div className="flex items-center space-x-4">
         <div className="flex  items-center space-x-2 cursor-pointer">
@@ -39,7 +39,7 @@ const TopBar = () => {
           <select
             value={language}
             onChange={handleLanguageChange}
-            className=" shadow-lg rounded p-2 bg-white "
+            className=" shadow-lg rounded p-2 bg-white outline-none"
           >
             {languageOptions.map((lang) => (
               <option key={lang.value} value={lang.value}>

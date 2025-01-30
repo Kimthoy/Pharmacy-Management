@@ -42,12 +42,12 @@ const App = () => {
 
   useEffect(() => {
     localStorage.setItem("selectedPage", selectedPage);
-  }, [selectedPage]);
+  }, [selectedPage]); 
 
   useEffect(() => {
     // Add a delay on the initial load
     const loadContent = async () => {
-      await simulateLoadingDelay(600); // 1-second delay
+      await simulateLoadingDelay(200); // 1-second delay
       setIsLoading(false);
     };
     loadContent();
