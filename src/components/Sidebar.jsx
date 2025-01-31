@@ -15,6 +15,10 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ShoppingBagIcon,
+  BanknotesIcon,
+  InformationCircleIcon,
+  CalculatorIcon,
+  CalendarDaysIcon,
 } from "@heroicons/react/24/outline";
 import { CurrencyDollarIcon } from "@heroicons/react/20/solid";
 
@@ -32,7 +36,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
       { name: "Dashboard", icon: HomeIcon, path: "/" },
       { name: "Inventory", icon: ShoppingBagIcon, path: "/inventory" },
       {
-        name: "List of Medicine",
+        name: "Stock",
         icon: ClipboardDocumentListIcon,
         path: "/list-of-medicine",
       },
@@ -46,6 +50,12 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
         name: "Expense",
         icon: CurrencyDollarIcon,
         path: "/money-mgt",
+      },
+      { name: "Daily Income", icon: BanknotesIcon, path: "/dailyincome" },
+      {
+        name: "Monthly Income",
+        icon: CalendarDaysIcon,
+        path: "/monthlyincome",
       },
       { name: "Notifications", icon: BellIcon, path: "/notifications" },
       { name: "Report", icon: FlagIcon, path: "/report" },
@@ -103,12 +113,16 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
       <div
         className={`${
           isSidebarMinimized ? "w-15" : "w-62"
-        } bg-gray-800 text-white flex flex-col justify-between h-screen p-1 transition-all duration-300 relative `}
+        } bg-gray-100 text-black flex flex-col shadow-md justify-between h-screen p-1 transition-all duration-300 relative `}
       >
         <div>
           {/* Top Section with User Profile */}
           <div className="flex items-center mb-6 relative">
-            <img src="logo.png" alt="User" className="w-12 rounded-full mr-4" />
+            <img
+              src="logo.png"
+              alt="User"
+              className="w-12 rounded-full mr-4 shadow-md"
+            />
             {!isSidebarMinimized && (
               <>
                 <div>
@@ -128,16 +142,16 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
               <>
                 <button
                   ref={buttonRef}
-                  className="ml-auto text-white hover:text-gray-300"
+                  className="ml-auto text-black  hover:text-gray-300"
                   onClick={() => {
                     toggleSvg();
                     toggleMenu();
                   }}
                 >
                   {!isSvgChanged ? (
-                    <Bars3Icon className="h-6 w-6" />
+                    <Bars3Icon className="h-3 w-3" />
                   ) : (
-                    <XMarkIcon className="h-6 w-6" />
+                    <XMarkIcon className="h-3 w-3" />
                   )}
                 </button>
               </>
@@ -210,6 +224,11 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
             )}
           </button>
         </div>
+        {/* <div className="absolute top-20 left-28 bg-gray-300 rounded-full shadow-slate-50000 w-9 h-9 flex justify-center align-middle">
+          <button>
+            <ChevronRightIcon className="h-6 w-6" />
+          </button>
+        </div> */}
       </div>
     </div>
   );

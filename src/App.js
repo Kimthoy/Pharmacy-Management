@@ -10,6 +10,8 @@ import TopBar from "./components/TopBar";
 import Footer from "./components/Footer";
 import Sidebar from "./components/Sidebar";
 import Report from "./pages/Report";
+import DailyIncome from "./pages/subIcome/DailyIncome";
+import MonthlyIncome from "./pages/subIcome/MonthlyIcome";
 
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Inventory = lazy(() => import("./pages/Inventory"));
@@ -76,6 +78,8 @@ const App = () => {
                 <Route path="/inventory" element={<Inventory />} />
                 <Route path="/configuration" element={<Configuration />} />
                 <Route path="/money-mgt" element={<MoneyMgt />} />
+                <Route path="/DailyIncome" element={<DailyIncome />} />
+                <Route path="/MonthlyIncome" element={<MonthlyIncome />} />
                 <Route path="/notifications" element={<Notifications />} />
                 <Route path="/list-of-medicine" element={<ListOfMedicine />} />
                 <Route path="/medicine-group" element={<MedicineGroup />} />
@@ -83,6 +87,7 @@ const App = () => {
                 <Route path="/User" element={<User />} />
                 <Route path="/Customer" element={<Customer />} />
                 <Route path="/Report" element={<Report />} />
+
                 {/* Redirect any invalid path to Dashboard */}
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>

@@ -1,6 +1,6 @@
 import React from "react";
 import { PlusIcon } from "@heroicons/react/24/outline";
-const MoneyMgt = () => {
+const DailyIncome = () => {
   return (
     <div className="bg-white p-6 rounded-lg shadow">
       <div className="flex justify-between items-center mb-6">
@@ -17,7 +17,7 @@ const MoneyMgt = () => {
           </button>
         </div>
       </div>
-      <h2 className="text-xl font-bold text-gray-800 mb-4">Expense Movement</h2>
+      <h2 className="text-xl font-bold text-gray-800 mb-4">Daily Income</h2>
 
       {/* Filter and Sort Section */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-4 space-y-4 md:space-y-0">
@@ -57,11 +57,14 @@ const MoneyMgt = () => {
               <td className="p-4 m-2">
                 <input type="checkbox" name="" id="" />
               </td>
-              <td className="p-4 m-2">Expense For</td>
-              <td className="p-4 m-2">spend/day</td>
-              <td className="p-4 m-2">Currency</td>
+              <td className="p-4 m-2">Medicine Name</td>
+              <td className="p-4 m-2">Unit Price</td>
+              <td className="p-4 m-2">Retails Price</td>
               <td className="p-4 m-2">Date</td>
-              <td className="p-4 m-2">Total</td>
+              <td className="p-4 m-2">Quantity</td>
+              <td className="p-4 m-2">Photo</td>
+              <td className="p-4 m-2">Total Price</td>
+              <td className="p-4 m-2">Status</td>
               <td className="p-4 m-2"></td>
             </tr>
           </thead>
@@ -72,9 +75,19 @@ const MoneyMgt = () => {
               </td>
               <td className="p-4 m-2">Glass Plate</td>
               <td className="p-4 m-2">100.00</td>
-              <td className="p-4 m-2">$5.00</td>
+              <td className="p-4 m-2">00.00</td>
               <td className="p-4 m-2">26 Jan 2024</td>
               <td className="p-4 m-2">1.00</td>
+
+              <td className="p-4 m-2">
+                <img src="images/qrcode.png" width="50px" alt="" />
+              </td>
+              <td className="p-4 m-2">+ 100.00</td>
+              <td className="p-4 m-2 text-green-500 ">
+                <div className="bg-green-200 text-center d-flex align-middle p-2 rounded-full">
+                  Paid
+                </div>
+              </td>
 
               <td>
                 <a href="#" target="_blank" rel="noopener noreferrer">
@@ -102,9 +115,59 @@ const MoneyMgt = () => {
               </td>
               <td className="p-4 m-2">Glass Plate</td>
               <td className="p-4 m-2">100.00</td>
-              <td className="p-4 m-2">៛5000.00</td>
+              <td className="p-4 m-2">00.00</td>
               <td className="p-4 m-2">26 Jan 2024</td>
               <td className="p-4 m-2">1.00</td>
+
+              <td className="p-4 m-2">
+                <img src="images/qrcode.png" width="50px" alt="" />
+              </td>
+              <td className="p-4 m-2">+ 100.00</td>
+              <td className="p-4 m-2 text-green-500 ">
+                <div className="bg-green-200 text-center d-flex align-middle p-2 rounded-full">
+                  Paid
+                </div>
+              </td>
+
+              <td>
+                <a href="#" target="_blank" rel="noopener noreferrer">
+                  {" "}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="size-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"
+                    />
+                  </svg>
+                </a>
+              </td>
+            </tr>
+            <tr className="border-b">
+              <td className="p-4 m-2">
+                <input type="checkbox" name="" id="" />
+              </td>
+              <td className="p-4 m-2">Glass Plate</td>
+              <td className="p-4 m-2">100.00</td>
+              <td className="p-4 m-2">00.00</td>
+              <td className="p-4 m-2">26 Jan 2024</td>
+              <td className="p-4 m-2">1.00</td>
+
+              <td className="p-4 m-2">
+                <img src="images/qrcode.png" width="50px" alt="" />
+              </td>
+              <td className="p-4 m-2">+ 100.00</td>
+              <td className="p-4 m-2 text-green-500 ">
+                <div className="bg-green-200 text-center d-flex align-middle p-2 rounded-full">
+                  Paid
+                </div>
+              </td>
 
               <td>
                 <a href="#" target="_blank" rel="noopener noreferrer">
@@ -133,4 +196,4 @@ const MoneyMgt = () => {
   );
 };
 
-export default MoneyMgt;
+export default DailyIncome;
