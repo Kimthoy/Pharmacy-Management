@@ -1,40 +1,342 @@
 import React from "react";
-import { PlusIcon } from "@heroicons/react/24/outline";
-const MonthlyIncome = () => {
-  return (
-    <div className="bg-white p-6 rounded-lg shadow">
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex  space-x-4 ">
-          <button className="bg-gray-100  shadow-md text-blue-500 px-4 py-2 rounded-md  hover:bg-blue-200 flex items-center">
-            <span className="me-3">
-              <img src="images/graph.png" width="26px" alt="" />
-            </span>
-            Run stock Analysis
-          </button>
-          <button className="bg-red-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-red-600 flex items-center">
-            <PlusIcon className="h-5 w-5 mr-2" />
-            Add New Item
-          </button>
-        </div>
-      </div>
-      <h2 className="text-xl font-bold text-gray-800 mb-4">Monthly</h2>
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/DeleteOutlined";
+import SaveIcon from "@mui/icons-material/Save";
+import CancelIcon from "@mui/icons-material/Close";
+import {
+  GridRowModes,
+  DataGrid,
+  GridToolbarContainer,
+  GridActionsCellItem,
+  GridRowEditStopReasons,
+  GridToolbarExport,
+} from "@mui/x-data-grid";
+import * as XLSX from "xlsx"; // For Excel export
+import jsPDF from "jspdf"; // For PDF export
+import "jspdf-autotable"; // Plugin for table support in jsPDF
+import {
+  randomCreatedDate,
+  randomTraderName,
+  randomId,
+  randomArrayItem,
+} from "@mui/x-data-grid-generator";
 
-      {/* Filter and Sort Section */}
+// Sample roles for the grid
+const roles = ["Paid", "Not Paid", "Pending"];
+
+// Function to generate random role
+const randomRole = () => {
+  return randomArrayItem(roles);
+};
+
+// Initial rows for the grid
+const initialRows = [
+  {
+    id: randomId(),
+    name: randomTraderName(),
+    usd: 20.5,
+    khr: 25000,
+    quantity: 2,
+    joinDate: randomCreatedDate(),
+    status: randomRole(),
+  },
+  {
+    id: randomId(),
+    name: randomTraderName(),
+    usd: 15.0,
+    khr: 10000,
+    quantity: 3,
+    joinDate: randomCreatedDate(),
+    status: randomRole(),
+  },
+];
+
+// Custom Toolbar Component
+function EditToolbar(props) {
+  const { setRows, setRowModesModel, rows } = props;
+
+  const handleClick = () => {
+    const id = randomId();
+    setRows((oldRows) => [
+      ...oldRows,
+      {
+        id,
+        name: "",
+        usd: 0, // Default value
+        khr: 0, // Default value
+        quantity: 0, // Default value
+        joinDate: randomCreatedDate(),
+        status: randomRole(),
+        isNew: true,
+      },
+    ]);
+    setRowModesModel((oldModel) => ({
+      ...oldModel,
+      [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
+    }));
+  };
+
+  // Export to Excel
+  const handleExportToExcel = () => {
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    XLSX.writeFile(workbook, "grid_data.xlsx");
+  };
+
+  // Export to PDF
+  const handleExportToPDF = () => {
+    const doc = new jsPDF();
+    doc.autoTable({
+      head: [["ID", "Name", "USD", "KHR", "Quantity", "Join Date", "Status"]],
+      body: rows.map((row) => [
+        row.id,
+        row.name,
+        row.usd,
+        row.khr,
+        row.quantity,
+        row.joinDate.toISOString().split("T")[0], // Format date
+        row.status,
+      ]),
+    });
+    doc.save("grid_data.pdf");
+  };
+
+  return (
+    <GridToolbarContainer>
+      <Button
+        color="primary"
+        startIcon={<AddIcon />}
+        onClick={handleClick}
+        sx={{ marginBottom: 2 }}
+      >
+        Add New Row
+      </Button>
+      {/* Built-in Export Buttons */}
+      <GridToolbarExport />
+      {/* Custom Export Buttons */}
+      <Button
+        variant="contained"
+        color="success"
+        onClick={handleExportToExcel}
+        sx={{ marginLeft: 2 }}
+      >
+        Export to Excel
+      </Button>
+      <Button
+        variant="contained"
+        color="error"
+        onClick={handleExportToPDF}
+        sx={{ marginLeft: 2 }}
+      >
+        Export to PDF
+      </Button>
+    </GridToolbarContainer>
+  );
+}
+
+// Main Component
+export default function FullFeaturedCrudGrid() {
+  const [rows, setRows] = React.useState(initialRows);
+  const [rowModesModel, setRowModesModel] = React.useState({});
+
+  // Handle row edit stop
+  const handleRowEditStop = (params, event) => {
+    if (params.reason === GridRowEditStopReasons.rowFocusOut) {
+      event.defaultMuiPrevented = true;
+    }
+  };
+
+  // Handle edit click
+  const handleEditClick = (id) => () => {
+    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
+  };
+
+  // Handle save click
+  const handleSaveClick = (id) => () => {
+    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
+  };
+
+  // Handle delete click
+  const handleDeleteClick = (id) => () => {
+    setRows(rows.filter((row) => row.id !== id));
+  };
+
+  // Handle cancel click
+  const handleCancelClick = (id) => () => {
+    setRowModesModel({
+      ...rowModesModel,
+      [id]: { mode: GridRowModes.View, ignoreModifications: true },
+    });
+    const editedRow = rows.find((row) => row.id === id);
+    if (editedRow.isNew) {
+      setRows(rows.filter((row) => row.id !== id));
+    }
+  };
+
+  // Process row update
+  const processRowUpdate = (newRow) => {
+    const updatedRow = { ...newRow, isNew: false };
+    setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
+    return updatedRow;
+  };
+
+  // Handle row modes model change
+  const handleRowModesModelChange = (newRowModesModel) => {
+    setRowModesModel(newRowModesModel);
+  };
+
+  // Group rows by month and calculate totals
+  const monthlyTotals = React.useMemo(() => {
+    const groupedByMonth = {};
+
+    rows.forEach((row) => {
+      const monthKey = row.joinDate.toLocaleString("default", {
+        month: "long",
+        year: "numeric",
+      });
+      if (!groupedByMonth[monthKey]) {
+        groupedByMonth[monthKey] = {
+          usdTotal: 0,
+          khrTotal: 0,
+          quantityTotal: 0,
+        };
+      }
+      groupedByMonth[monthKey].usdTotal += row.usd || 0;
+      groupedByMonth[monthKey].khrTotal += row.khr || 0;
+      groupedByMonth[monthKey].quantityTotal += row.quantity || 0;
+    });
+
+    return Object.entries(groupedByMonth).map(([month, totals]) => ({
+      month,
+      usdTotal: totals.usdTotal.toFixed(2),
+      khrTotal: totals.khrTotal.toFixed(2),
+      quantityTotal: totals.quantityTotal,
+    }));
+  }, [rows]);
+
+  // Columns definition
+  const columns = [
+    { field: "name", headerName: "Name", width: 150, editable: true },
+    {
+      field: "usd",
+      headerName: "USD",
+      type: "number",
+      width: 80,
+      align: "left",
+      headerAlign: "left",
+      editable: true,
+    },
+    {
+      field: "khr",
+      headerName: "KHR",
+      type: "number",
+      width: 80,
+      align: "left",
+      headerAlign: "left",
+      editable: true,
+    },
+    {
+      field: "quantity",
+      headerName: "Quantity",
+      type: "number",
+      width: 80,
+      align: "left",
+      headerAlign: "left",
+      editable: true,
+    },
+    {
+      field: "joinDate",
+      headerName: "Date",
+      type: "date",
+      width: 120,
+      editable: true,
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      width: 85,
+      editable: true,
+      type: "singleSelect",
+      valueOptions: ["Paid", "Not Paid", "Pending"],
+    },
+    {
+      field: "actions",
+      type: "actions",
+      headerName: "Actions",
+      width: 100,
+      cellClassName: "actions",
+      getActions: ({ id }) => {
+        const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+        if (isInEditMode) {
+          return [
+            <GridActionsCellItem
+              icon={<SaveIcon />}
+              label="Save"
+              sx={{
+                color: "primary.main",
+              }}
+              onClick={handleSaveClick(id)}
+            />,
+            <GridActionsCellItem
+              icon={<CancelIcon />}
+              label="Cancel"
+              className="textPrimary"
+              onClick={handleCancelClick(id)}
+              color="inherit"
+            />,
+          ];
+        }
+        return [
+          <GridActionsCellItem
+            icon={<EditIcon />}
+            label="Edit"
+            className="textPrimary"
+            onClick={handleEditClick(id)}
+            color="inherit"
+          />,
+          <GridActionsCellItem
+            icon={<DeleteIcon />}
+            label="Delete"
+            onClick={handleDeleteClick(id)}
+            color="inherit"
+          />,
+        ];
+      },
+    },
+  ];
+
+  return (
+    <Box
+      sx={{
+        height: 500,
+        width: "100%",
+        "& .actions": {
+          color: "text.secondary",
+        },
+        "& .textPrimary": {
+          color: "text.primary",
+        },
+      }}
+    >
+      {/* Filters and Search Section */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-4 space-y-4 md:space-y-0">
         <input
           type="text"
           placeholder="Search ..."
-          className="w-full md:w-1/3 p-2 outline-none bg-gray-100  rounded-full shadow-md"
+          className="w-full md:w-1/3 p-2 outline-none bg-gray-100 rounded-full shadow-md"
         />
         <div className="flex space-x-4 justify-center p-2">
-          <div className=" flex justify-center align-middle">
-            <p className="p-2 ">Pay by</p>
+          <div className="flex justify-center align-middle">
+            <p className="p-2">Pay by</p>
             <select className="p-2 outline-none bg-gray-100 rounded-full shadow-md">
               <option>QR Code</option>
               <option>Cash</option>
             </select>
           </div>
-
           <div className="flex justify-center align-middle text-center bg-gray-100 rounded-full shadow-md">
             <div>
               <p className="p-3 ml-1">Sort by |</p>
@@ -49,151 +351,25 @@ const MonthlyIncome = () => {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-left">
-          <thead>
-            <tr className="bg-gray-100">
-              <td className="p-4 m-2">
-                <input type="checkbox" name="" id="" />
-              </td>
-              <td className="p-4 m-2">Medicine Name</td>
-              <td className="p-4 m-2">Unit Price</td>
-              <td className="p-4 m-2">Retails Price</td>
-              <td className="p-4 m-2">Date</td>
-              <td className="p-4 m-2">Quantity</td>
-              <td className="p-4 m-2">Photo</td>
-              <td className="p-4 m-2">Total Price</td>
-              <td className="p-4 m-2">Status</td>
-              <td className="p-4 m-2"></td>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="border-b">
-              <td className="p-4 m-2">
-                <input type="checkbox" name="" id="" />
-              </td>
-              <td className="p-4 m-2">Glass Plate</td>
-              <td className="p-4 m-2">100.00</td>
-              <td className="p-4 m-2">00.00</td>
-              <td className="p-4 m-2">26 Jan 2024</td>
-              <td className="p-4 m-2">1.00</td>
+      {/* DataGrid */}
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        editMode="row"
+        rowModesModel={rowModesModel}
+        onRowModesModelChange={handleRowModesModelChange}
+        onRowEditStop={handleRowEditStop}
+        processRowUpdate={processRowUpdate}
+        slots={{ toolbar: EditToolbar }}
+        slotProps={{
+          toolbar: { setRows, setRowModesModel, rows },
+        }}
+        disableColumnFilter
+        disableColumnSelector
+        disableDensitySelector
+      />
 
-              <td className="p-4 m-2">
-                <img src="images/qrcode.png" width="50px" alt="" />
-              </td>
-              <td className="p-4 m-2">+ 100.00</td>
-              <td className="p-4 m-2 text-green-500 ">
-                <div className="bg-green-200 text-center d-flex align-middle p-2 rounded-full">
-                  Paid
-                </div>
-              </td>
-
-              <td>
-                <a href="#" target="_blank" rel="noopener noreferrer">
-                  {" "}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="size-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"
-                    />
-                  </svg>
-                </a>
-              </td>
-            </tr>
-            <tr className="border-b">
-              <td className="p-4 m-2">
-                <input type="checkbox" name="" id="" />
-              </td>
-              <td className="p-4 m-2">Glass Plate</td>
-              <td className="p-4 m-2">100.00</td>
-              <td className="p-4 m-2">00.00</td>
-              <td className="p-4 m-2">26 Jan 2024</td>
-              <td className="p-4 m-2">1.00</td>
-
-              <td className="p-4 m-2">
-                <img src="images/qrcode.png" width="50px" alt="" />
-              </td>
-              <td className="p-4 m-2">+ 100.00</td>
-              <td className="p-4 m-2 text-green-500 ">
-                <div className="bg-green-200 text-center d-flex align-middle p-2 rounded-full">
-                  Paid
-                </div>
-              </td>
-
-              <td>
-                <a href="#" target="_blank" rel="noopener noreferrer">
-                  {" "}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="size-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"
-                    />
-                  </svg>
-                </a>
-              </td>
-            </tr>
-            <tr className="border-b">
-              <td className="p-4 m-2">
-                <input type="checkbox" name="" id="" />
-              </td>
-              <td className="p-4 m-2">Glass Plate</td>
-              <td className="p-4 m-2">100.00</td>
-              <td className="p-4 m-2">00.00</td>
-              <td className="p-4 m-2">26 Jan 2024</td>
-              <td className="p-4 m-2">1.00</td>
-
-              <td className="p-4 m-2">
-                <img src="images/qrcode.png" width="50px" alt="" />
-              </td>
-              <td className="p-4 m-2">+ 100.00</td>
-              <td className="p-4 m-2 text-green-500 ">
-                <div className="bg-green-200 text-center d-flex align-middle p-2 rounded-full">
-                  Paid
-                </div>
-              </td>
-
-              <td>
-                <a href="#" target="_blank" rel="noopener noreferrer">
-                  {" "}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="size-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"
-                    />
-                  </svg>
-                </a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+     
+    </Box>
   );
-};
-
-export default MonthlyIncome;
+}
