@@ -14,6 +14,7 @@ import DailyIncome from "./pages/subIcome/DailyIncome";
 import MonthlyIncome from "./pages/subIcome/MonthlyIcome";
 
 const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Expense = lazy(() => import("./pages/subIcome/Expense"));
 const Inventory = lazy(() => import("./pages/Inventory"));
 const Configuration = lazy(() => import("./pages/Configuration"));
 const MoneyMgt = lazy(() => import("./pages/MoneyMgt"));
@@ -62,7 +63,7 @@ const App = () => {
     </div>
   ) : (
     <Router>
-      <div className="flex h-screen bg-gray-100">
+      <div className="flex h-screen bg-slate-100">
         <Sidebar
           setSelectedPage={setSelectedPage}
           selectedPage={selectedPage}
@@ -71,7 +72,7 @@ const App = () => {
         <div className="flex-1 flex flex-col">
           <TopBar />
 
-          <div className="flex-1 overflow-y-auto p-4 bg-white">
+          <div className="flex-1 overflow-y-auto p-4 bg-slate-100">
             <Suspense fallback={<Loader />}>
               <Routes>
                 <Route path="/" element={<Dashboard />} />
@@ -87,6 +88,7 @@ const App = () => {
                 <Route path="/User" element={<User />} />
                 <Route path="/Customer" element={<Customer />} />
                 <Route path="/Report" element={<Report />} />
+                <Route path="/expense" element={<Expense />} />
 
                 {/* Redirect any invalid path to Dashboard */}
                 <Route path="*" element={<Navigate to="/" />} />

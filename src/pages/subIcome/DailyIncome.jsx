@@ -9,10 +9,9 @@ import CancelIcon from "@mui/icons-material/Close";
 import {
   GridRowModes,
   DataGrid,
-  GridToolbarContainer,
+  // GridToolbarContainer,
   GridActionsCellItem,
   GridRowEditStopReasons,
-
 } from "@mui/x-data-grid";
 import * as XLSX from "xlsx"; // For Excel export
 import jsPDF from "jspdf"; // For PDF export
@@ -23,6 +22,10 @@ import {
   randomId,
   randomArrayItem,
 } from "@mui/x-data-grid-generator";
+// import { green } from "@mui/material/colors";
+
+// Exchange rate constant
+const EXCHANGE_RATE = 4100;
 
 // Sample roles for the grid
 const roles = ["Paid", "Not Paid", "Pending"];
@@ -38,27 +41,27 @@ const initialRows = [
     id: randomId(),
     name: randomTraderName(),
     usd: 20.5,
-    khr: 25000,
+    // khr: 25000,
     quantity: 2,
     joinDate: randomCreatedDate(),
-    total: (20.5 * 2 + (25000 / 4100) * 2).toFixed(2), // Initial total calculation
+    total: (20.5 * 2).toFixed(2), // Initial total calculation
     status: randomRole(),
   },
   {
     id: randomId(),
     name: randomTraderName(),
     usd: 15.0,
-    khr: 10000,
+    // khr: 10000,
     quantity: 3,
     joinDate: randomCreatedDate(),
-    total: (15.0 * 3 + (10000 / 4100) * 3).toFixed(2), // Initial total calculation
+    total: (15.0 * 3).toFixed(2), // Initial total calculation
     status: randomRole(),
   },
 ];
 
 // Custom Toolbar Component
 function EditToolbar(props) {
-  const { setRows, setRowModesModel, rows } = props;
+  const { setRows, setRowModesModel } = props;
 
   const handleClick = () => {
     const id = randomId();
@@ -68,7 +71,7 @@ function EditToolbar(props) {
         id,
         name: "",
         usd: 0, // Default value
-        khr: 0, // Default value
+        // khr: 0, // Default value
         quantity: 0, // Default value
         joinDate: randomCreatedDate(),
         total: "0.00", // Default total
@@ -84,10 +87,10 @@ function EditToolbar(props) {
 
   // Export to Excel
   const handleExportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(rows);
+    const worksheet = XLSX.utils.json_to_sheet(props.rows);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-    XLSX.writeFile(workbook, "grid_data.xlsx");
+    XLSX.writeFile(workbook, "report.xlsx");
   };
 
   // Export to PDF
@@ -99,57 +102,56 @@ function EditToolbar(props) {
           "ID",
           "Name",
           "USD",
-          "KHR",
+          //   "KHR",
           "Quantity",
           "Join Date",
           "Total Price",
           "Status",
         ],
       ],
-      body: rows.map((row) => [
+      body: props.rows.map((row) => [
         row.id,
         row.name,
         row.usd,
-        row.khr,
+        // row.khr,
         row.quantity,
         row.joinDate.toISOString().split("T")[0], // Format date
         row.total,
         row.status,
       ]),
     });
-    doc.save("grid_data.pdf");
+    doc.save("report.pdf");
   };
 
   return (
-    <GridToolbarContainer>
+    <Box sx={{ margin: 4 }}>
       <Button
-        color="primary"
-        startIcon={<AddIcon />}
         onClick={handleClick}
-        sx={{ marginBottom: 4 }}
+        startIcon={<AddIcon />}
+        variant="contained"
+        color="success"
       >
         Add New Row
       </Button>
-      {/* Built-in Export Buttons */}
-      {/* <GridToolbarExport /> */}
-      {/* Custom Export Buttons */}
       <Button
         variant="contained"
-        color="success"
+        color="primary"
         onClick={handleExportToExcel}
-        sx={{ marginBottom: 4 }}
+        startIcon={<SaveIcon />}
+        sx={{ marginLeft: 2 }}
       >
         Export to Excel
       </Button>
       <Button
         variant="contained"
-        color="error"
+        color="warning"
         onClick={handleExportToPDF}
-        sx={{ marginBottom: 4 }}
+        startIcon={<SaveIcon />}
+        sx={{ marginLeft: 2 }}
       >
         Export to PDF
       </Button>
-    </GridToolbarContainer>
+    </Box>
   );
 }
 
@@ -157,6 +159,50 @@ function EditToolbar(props) {
 export default function FullFeaturedCrudGrid() {
   const [rows, setRows] = React.useState(initialRows);
   const [rowModesModel, setRowModesModel] = React.useState({});
+  const [usdInput, setUsdInput] = React.useState(""); // USD input state
+  const [khrInput, setKhrInput] = React.useState("");
+  const [convertedValue, setConvertedValue] = React.useState(""); // Converted value state
+
+  const handleUsdInputChange = (event) => {
+    const usdValue = event.target.value;
+    // Ensure the value is not less than 0
+    if (parseFloat(usdValue) < 0) {
+      setUsdInput("0"); // Reset to 0 if the value is negative
+      setConvertedValue("0.00 KHR"); // Reset converted value as well
+      return;
+    }
+
+    // Update KHR input state
+
+    setUsdInput(usdValue);
+    if (usdValue.trim() === "") {
+      setConvertedValue("");
+      return;
+    }
+    const khrValue = (parseFloat(usdValue) * EXCHANGE_RATE).toFixed(2);
+    setConvertedValue(`${khrValue} KHR`);
+  };
+
+  // Handle KHR input change
+  const handleKhrInputChange = (event) => {
+    const khrValue = event.target.value;
+    // Ensure the value is not less than 0
+    if (parseFloat(khrValue) < 0) {
+      setKhrInput("0"); // Reset to 0 if the value is negative
+      setConvertedValue("0.00 USD"); // Reset converted value as well
+      return;
+    }
+
+    // Update KHR input state
+
+    setKhrInput(khrValue);
+    if (khrValue.trim() === "") {
+      setConvertedValue("");
+      return;
+    }
+    const usdValue = (parseFloat(khrValue) / EXCHANGE_RATE).toFixed(2);
+    setConvertedValue(`${usdValue} USD`);
+  };
 
   // Handle row edit stop
   const handleRowEditStop = (params, event) => {
@@ -191,10 +237,10 @@ export default function FullFeaturedCrudGrid() {
       setRows(rows.filter((row) => row.id !== id));
     }
   };
+
   // Group rows by month and calculate totals
   const monthlyTotals = React.useMemo(() => {
     const groupedByMonth = {};
-
     rows.forEach((row) => {
       const monthKey = row.joinDate.toLocaleString("default", {
         month: "long",
@@ -203,31 +249,28 @@ export default function FullFeaturedCrudGrid() {
       if (!groupedByMonth[monthKey]) {
         groupedByMonth[monthKey] = {
           usdTotal: 0,
-          khrTotal: 0,
+
           quantityTotal: 0,
         };
       }
       groupedByMonth[monthKey].usdTotal += row.usd || 0;
-      groupedByMonth[monthKey].khrTotal += row.khr || 0;
+
       groupedByMonth[monthKey].quantityTotal += row.quantity || 0;
     });
-
     return Object.entries(groupedByMonth).map(([month, totals]) => ({
       month,
       usdTotal: totals.usdTotal.toFixed(2),
-      khrTotal: totals.khrTotal.toFixed(2),
+
       quantityTotal: totals.quantityTotal,
     }));
   }, [rows]);
 
   // Process row update
   const processRowUpdate = (newRow) => {
-    // Calculate total dynamically
-    const total = (newRow.khr / 4100 + newRow.usd || 0) * newRow.quantity;
-
+    const total = (newRow.usd || 0) * newRow.quantity || newRow.usd.toFixed(2);
     const updatedRow = {
       ...newRow,
-      total: total.toFixed(2), // Update total with 2 decimal places
+      total,
       isNew: false,
     };
     setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
@@ -241,7 +284,12 @@ export default function FullFeaturedCrudGrid() {
 
   // Columns definition
   const columns = [
-    { field: "name", headerName: "Name", width: 150, editable: true },
+    {
+      field: "name",
+      headerName: "Name",
+      width: 150,
+      editable: true,
+    },
     {
       field: "usd",
       headerName: "USD",
@@ -251,15 +299,7 @@ export default function FullFeaturedCrudGrid() {
       headerAlign: "left",
       editable: true,
     },
-    {
-      field: "khr",
-      headerName: "KHR",
-      type: "number",
-      width: 80,
-      align: "left",
-      headerAlign: "left",
-      editable: true,
-    },
+
     {
       field: "quantity",
       headerName: "Quantity",
@@ -307,7 +347,7 @@ export default function FullFeaturedCrudGrid() {
               icon={<SaveIcon />}
               label="Save"
               sx={{
-                color: "primary.main",
+                color: "success.main",
               }}
               onClick={handleSaveClick(id)}
             />,
@@ -316,7 +356,7 @@ export default function FullFeaturedCrudGrid() {
               label="Cancel"
               className="textPrimary"
               onClick={handleCancelClick(id)}
-              color="inherit"
+              color="error"
             />,
           ];
         }
@@ -326,13 +366,13 @@ export default function FullFeaturedCrudGrid() {
             label="Edit"
             className="textPrimary"
             onClick={handleEditClick(id)}
-            color="inherit"
+            color="primary"
           />,
           <GridActionsCellItem
             icon={<DeleteIcon />}
             label="Delete"
             onClick={handleDeleteClick(id)}
-            color="inherit"
+            color="error"
           />,
         ];
       },
@@ -340,46 +380,64 @@ export default function FullFeaturedCrudGrid() {
   ];
 
   return (
-    <Box
-      sx={{
-        height: 400,
-        width: "100%",
-        "& .actions": {
-          color: "text.secondary",
-        },
-        "& .textPrimary": {
-          color: "text.primary",
-        },
-      }}
-    >
-      {/* Filters and Search Section */}
-      <div className="flex flex-col md:flex-row justify-between items-center mb-4 space-y-4 md:space-y-0">
-        <input
-          type="text"
-          placeholder="Search ..."
-          className="w-full md:w-1/3 p-2 outline-none bg-gray-100 rounded-full shadow-md"
-        />
-        <div className="flex space-x-4 justify-center p-2">
-          <div className="flex justify-center align-middle">
-            <p className="p-2">Pay by</p>
-            <select className="p-2 outline-none bg-gray-100 rounded-full shadow-md">
-              <option>QR Code</option>
-              <option>Cash</option>
-            </select>
-          </div>
-          <div className="flex justify-center align-middle text-center bg-gray-100 rounded-full shadow-md">
-            <div>
-              <p className="p-3 ml-1">Sort by |</p>
-            </div>
-            <div>
-              <select className="p-3 bg-transparent rounded-lg font-bold outline-none">
-                <option>Most Recent</option>
-                <option>Oldest</option>
-              </select>
-            </div>
-          </div>
+    <Box sx={{ height: "100%", width: "100%" }}>
+      {/* Currency Conversion Inputs */}
+      <Box sx={{ marginBottom: 4 }}>
+        <div className="flex justify-evenly">
+          <table className="shadow-md shadow-gray-200 rounded-m text-green-400 bg-green-50 outline-green-400 noto-sans-symbols">
+            <tr>
+              <th style={{ padding: "12px" }}>
+                <label>
+                  Enter USD :
+                  <input
+                    className="p-2 ml-2 rounded-md "
+                    type="number"
+                    value={usdInput}
+                    onChange={handleUsdInputChange}
+                    placeholder=" Enter USD"
+                  />
+                </label>
+              </th>
+            </tr>
+            <tr>
+              <th style={{ padding: "12px" }}>
+                <label>
+                  Enter KHR :
+                  <input
+                    className="p-2 ml-2 rounded-md"
+                    type="number"
+                    value={khrInput}
+                    onChange={handleKhrInputChange}
+                    placeholder=" Enter KHR"
+                  />
+                </label>
+              </th>
+            </tr>
+            <tr>
+              <td style={{ padding: "12px" }}>
+                <label>
+                  <div className="font-bold">Exchange Currency rate :</div>
+                  <div className="bg-white p-3 mt-4 rounded-md text-black">
+                    {convertedValue || "No exchange currency yet."}
+                  </div>
+                </label>
+              </td>
+            </tr>
+          </table>
+
+          <img
+            src="./images/logo.png"
+            width="230px"
+            height="140px"
+            alt="images"
+          />
         </div>
-      </div>
+      </Box>
+
+      {/* Filters and Search Section */}
+      <Box sx={{ marginBottom: 4 }}>
+        Pay by QR Code | Cash | Sort by Most Recent | Oldest
+      </Box>
 
       {/* DataGrid */}
       <DataGrid
@@ -387,17 +445,31 @@ export default function FullFeaturedCrudGrid() {
         columns={columns}
         editMode="row"
         rowModesModel={rowModesModel}
-        onRowModesModelChange={handleRowModesModelChange}
         onRowEditStop={handleRowEditStop}
         processRowUpdate={processRowUpdate}
-        slots={{ toolbar: EditToolbar }}
+        onRowModesModelChange={handleRowModesModelChange}
+        slots={{
+          toolbar: () => (
+            <EditToolbar
+              setRows={setRows}
+              setRowModesModel={setRowModesModel}
+              rows={rows}
+            />
+          ),
+        }}
         slotProps={{
           toolbar: { setRows, setRowModesModel, rows },
         }}
-        disableColumnFilter
-        disableColumnSelector
-        disableDensitySelector
+        initialState={{
+          pagination: {
+            paginationModel: { page: 0, pageSize: 5 },
+          },
+        }}
+        pageSizeOptions={[5, 10, 50]}
+        checkboxSelection
+        disableRowSelectionOnClick
       />
+
       {/* Monthly Totals Section */}
       <Box sx={{ marginTop: 2 }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -409,9 +481,7 @@ export default function FullFeaturedCrudGrid() {
               <th style={{ border: "1px solid #ddd", padding: "12px" }}>
                 USD Total
               </th>
-              <th style={{ border: "1px solid #ddd", padding: "12px" }}>
-                KHR Total
-              </th>
+
               <th style={{ border: "1px solid #ddd", padding: "12px" }}>
                 Quantity Total
               </th>
@@ -435,12 +505,12 @@ export default function FullFeaturedCrudGrid() {
                     <div>$</div>
                   </div>
                 </td>
-                <td style={{ border: "1px solid #ddd", padding: "12px" }}>
+                {/* <td style={{ border: "1px solid #ddd", padding: "12px" }}>
                   <div className="flex justify-between">
                     <div>{month.khrTotal}</div>
                     <p className="font-khr font-thin">៛</p>
                   </div>
-                </td>
+                </td> */}
                 <td
                   style={{
                     border: "1px solid #ddd",

@@ -21,7 +21,7 @@ const TopBar = () => {
   ];
 
   return (
-    <div className="bg-gray-200  shadow-md p-4 flex items-center justify-between">
+    <div className="bg-green-100  shadow-md p-4 flex items-center justify-between">
       <input
         type="text"
         placeholder="Search ..."
@@ -49,8 +49,8 @@ const TopBar = () => {
           </select>
         </div>
         <div className="text-right">
-          <p className="text-gray-800 font-medium">Good Morning</p>
-          <p className="text-gray-500 text-sm">14 January 2022 | 22:45:04</p>
+          <p className="text-green-600 font-medium">Good Morning</p>
+          <p className="text-green-500 text-sm">14 January 2022 | 22:45:04</p>
         </div>
       </div>
     </div>

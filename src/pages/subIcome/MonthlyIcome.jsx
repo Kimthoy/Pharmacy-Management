@@ -36,191 +36,36 @@ const randomRole = () => {
 const initialRows = [
   {
     id: randomId(),
-    name: randomTraderName(),
+    month: randomCreatedDate(),
     usd: 20.5,
     khr: 25000,
     quantity: 2,
-    joinDate: randomCreatedDate(),
     status: randomRole(),
   },
   {
     id: randomId(),
-    name: randomTraderName(),
+    month: randomCreatedDate(),
     usd: 15.0,
     khr: 10000,
     quantity: 3,
-    joinDate: randomCreatedDate(),
     status: randomRole(),
   },
 ];
-
-// Custom Toolbar Component
-function EditToolbar(props) {
-  const { setRows, setRowModesModel, rows } = props;
-
-  const handleClick = () => {
-    const id = randomId();
-    setRows((oldRows) => [
-      ...oldRows,
-      {
-        id,
-        name: "",
-        usd: 0, // Default value
-        khr: 0, // Default value
-        quantity: 0, // Default value
-        joinDate: randomCreatedDate(),
-        status: randomRole(),
-        isNew: true,
-      },
-    ]);
-    setRowModesModel((oldModel) => ({
-      ...oldModel,
-      [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
-    }));
-  };
-
-  // Export to Excel
-  const handleExportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(rows);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-    XLSX.writeFile(workbook, "grid_data.xlsx");
-  };
-
-  // Export to PDF
-  const handleExportToPDF = () => {
-    const doc = new jsPDF();
-    doc.autoTable({
-      head: [["ID", "Name", "USD", "KHR", "Quantity", "Join Date", "Status"]],
-      body: rows.map((row) => [
-        row.id,
-        row.name,
-        row.usd,
-        row.khr,
-        row.quantity,
-        row.joinDate.toISOString().split("T")[0], // Format date
-        row.status,
-      ]),
-    });
-    doc.save("grid_data.pdf");
-  };
-
-  return (
-    <GridToolbarContainer>
-      <Button
-        color="primary"
-        startIcon={<AddIcon />}
-        onClick={handleClick}
-        sx={{ marginBottom: 2 }}
-      >
-        Add New Row
-      </Button>
-      {/* Built-in Export Buttons */}
-      <GridToolbarExport />
-      {/* Custom Export Buttons */}
-      <Button
-        variant="contained"
-        color="success"
-        onClick={handleExportToExcel}
-        sx={{ marginLeft: 2 }}
-      >
-        Export to Excel
-      </Button>
-      <Button
-        variant="contained"
-        color="error"
-        onClick={handleExportToPDF}
-        sx={{ marginLeft: 2 }}
-      >
-        Export to PDF
-      </Button>
-    </GridToolbarContainer>
-  );
-}
 
 // Main Component
 export default function FullFeaturedCrudGrid() {
   const [rows, setRows] = React.useState(initialRows);
   const [rowModesModel, setRowModesModel] = React.useState({});
 
-  // Handle row edit stop
-  const handleRowEditStop = (params, event) => {
-    if (params.reason === GridRowEditStopReasons.rowFocusOut) {
-      event.defaultMuiPrevented = true;
-    }
-  };
-
-  // Handle edit click
-  const handleEditClick = (id) => () => {
-    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
-  };
-
-  // Handle save click
-  const handleSaveClick = (id) => () => {
-    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
-  };
-
-  // Handle delete click
-  const handleDeleteClick = (id) => () => {
-    setRows(rows.filter((row) => row.id !== id));
-  };
-
-  // Handle cancel click
-  const handleCancelClick = (id) => () => {
-    setRowModesModel({
-      ...rowModesModel,
-      [id]: { mode: GridRowModes.View, ignoreModifications: true },
-    });
-    const editedRow = rows.find((row) => row.id === id);
-    if (editedRow.isNew) {
-      setRows(rows.filter((row) => row.id !== id));
-    }
-  };
-
-  // Process row update
-  const processRowUpdate = (newRow) => {
-    const updatedRow = { ...newRow, isNew: false };
-    setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
-    return updatedRow;
-  };
-
-  // Handle row modes model change
-  const handleRowModesModelChange = (newRowModesModel) => {
-    setRowModesModel(newRowModesModel);
-  };
-
-  // Group rows by month and calculate totals
-  const monthlyTotals = React.useMemo(() => {
-    const groupedByMonth = {};
-
-    rows.forEach((row) => {
-      const monthKey = row.joinDate.toLocaleString("default", {
-        month: "long",
-        year: "numeric",
-      });
-      if (!groupedByMonth[monthKey]) {
-        groupedByMonth[monthKey] = {
-          usdTotal: 0,
-          khrTotal: 0,
-          quantityTotal: 0,
-        };
-      }
-      groupedByMonth[monthKey].usdTotal += row.usd || 0;
-      groupedByMonth[monthKey].khrTotal += row.khr || 0;
-      groupedByMonth[monthKey].quantityTotal += row.quantity || 0;
-    });
-
-    return Object.entries(groupedByMonth).map(([month, totals]) => ({
-      month,
-      usdTotal: totals.usdTotal.toFixed(2),
-      khrTotal: totals.khrTotal.toFixed(2),
-      quantityTotal: totals.quantityTotal,
-    }));
-  }, [rows]);
-
   // Columns definition
   const columns = [
-    { field: "name", headerName: "Name", width: 150, editable: true },
+    {
+      field: "month",
+      headerName: "Month",
+      visibility: true,
+      width: 150,
+      editable: true,
+    },
     {
       field: "usd",
       headerName: "USD",
@@ -248,65 +93,21 @@ export default function FullFeaturedCrudGrid() {
       headerAlign: "left",
       editable: true,
     },
-    {
-      field: "joinDate",
-      headerName: "Date",
-      type: "date",
-      width: 120,
-      editable: true,
-    },
-    {
-      field: "status",
-      headerName: "Status",
-      width: 85,
-      editable: true,
-      type: "singleSelect",
-      valueOptions: ["Paid", "Not Paid", "Pending"],
-    },
-    {
-      field: "actions",
-      type: "actions",
-      headerName: "Actions",
-      width: 100,
-      cellClassName: "actions",
-      getActions: ({ id }) => {
-        const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
-        if (isInEditMode) {
-          return [
-            <GridActionsCellItem
-              icon={<SaveIcon />}
-              label="Save"
-              sx={{
-                color: "primary.main",
-              }}
-              onClick={handleSaveClick(id)}
-            />,
-            <GridActionsCellItem
-              icon={<CancelIcon />}
-              label="Cancel"
-              className="textPrimary"
-              onClick={handleCancelClick(id)}
-              color="inherit"
-            />,
-          ];
-        }
-        return [
-          <GridActionsCellItem
-            icon={<EditIcon />}
-            label="Edit"
-            className="textPrimary"
-            onClick={handleEditClick(id)}
-            color="inherit"
-          />,
-          <GridActionsCellItem
-            icon={<DeleteIcon />}
-            label="Delete"
-            onClick={handleDeleteClick(id)}
-            color="inherit"
-          />,
-        ];
-      },
-    },
+    // {
+    //   field: "joinDate",
+    //   headerName: "Date",
+    //   type: "date",
+    //   width: 120,
+    //   editable: true,
+    // },
+    // {
+    //   field: "status",
+    //   headerName: "Status",
+    //   width: 85,
+    //   editable: true,
+    //   type: "singleSelect",
+    //   valueOptions: ["Paid", "Not Paid", "Pending"],
+    // },
   ];
 
   return (
@@ -354,13 +155,14 @@ export default function FullFeaturedCrudGrid() {
       {/* DataGrid */}
       <DataGrid
         rows={rows}
-        columns={columns}
+      
+         columns={columns}
         editMode="row"
         rowModesModel={rowModesModel}
-        onRowModesModelChange={handleRowModesModelChange}
-        onRowEditStop={handleRowEditStop}
-        processRowUpdate={processRowUpdate}
-        slots={{ toolbar: EditToolbar }}
+        // onRowModesModelChange={handleRowModesModelChange}
+        // onRowEditStop={handleRowEditStop}
+        // processRowUpdate={processRowUpdate}
+        // slots={{ toolbar: EditToolbar }}
         slotProps={{
           toolbar: { setRows, setRowModesModel, rows },
         }}
@@ -368,8 +170,6 @@ export default function FullFeaturedCrudGrid() {
         disableColumnSelector
         disableDensitySelector
       />
-
-     
     </Box>
   );
 }

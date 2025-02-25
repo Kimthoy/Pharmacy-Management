@@ -13,6 +13,7 @@ import {
   BanknotesIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
+
 import { CurrencyDollarIcon } from "@heroicons/react/20/solid";
 
 const Sidebar = ({ setSelectedPage, selectedPage }) => {
@@ -47,33 +48,39 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
   // Main menu items with sub-items
   const menuItems = [
     { name: "Dashboard", icon: HomeIcon, path: "/" },
+    // Inventory menu
     {
-      name: "Inventory",
+      name: "Medicine",
       icon: ShoppingBagIcon,
       path: "/inventory",
       subItems: [
-        { name: "Inventory", icon: ShoppingBagIcon, path: "/inventory" },
+        { name: "Add Medicine", icon: ShoppingBagIcon, path: "/inventory" },
         {
-          name: "Medicine Group",
+          name: "Medicine Detail",
           icon: FolderIcon,
           path: "/medicine-group",
         },
         {
-          name: "List of Medicine",
+          name: "List Medicine",
           icon: ClipboardDocumentListIcon,
           path: "/list-of-medicine",
         },
       ],
     },
     {
-      name: "Expense",
+      name: "Finance",
       icon: CurrencyDollarIcon,
-      path: "/money-mgt",
+
       subItems: [
-        { name: "Expense", icon: CurrencyDollarIcon, path: "/money-mgt" },
+        {
+          name: "MoneyMgt",
+          icon: CurrencyDollarIcon,
+          path: "/money-mgt",
+        },
+        { name: "Expense", icon: CurrencyDollarIcon, path: "/expense" },
         { name: "Daily Income", icon: BanknotesIcon, path: "/dailyincome" },
         {
-          name: "Monthly Income",
+          name: "Report Money",
           icon: CalendarDaysIcon,
           path: "/monthlyincome",
         },
@@ -90,7 +97,6 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
     navigate(path);
   };
 
-  // Handle opening the sub-sidebar and setting the active menu item
   const openSubSidebar = (menuItem) => {
     if (menuItem.subItems) {
       setActiveMenuItem(menuItem); // Set the active menu item
@@ -121,8 +127,8 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
               onClick={() =>
                 openSubSidebar({ name, icon: Icon, path, subItems })
               }
-              className={`relative p-2 rounded cursor-pointer flex items-center justify-center hover:bg-green-300 transition-all duration-300 ease-in-out ${
-                selectedPage === name ? "bg-green-500 text-white" : ""
+              className={`relative p-2 rounded cursor-pointer flex items-center justify-center hover:bg-green-300  transition-all duration-300 ease-in-out ${
+                selectedPage === name ? "bg-green-400 text-white" : ""
               } group`}
             >
               {/* Icon */}
@@ -135,21 +141,6 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
             </li>
           ))}
         </ul>
-
-        {/* Toggle Button for Sub-Sidebar */}
-        {/* <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
-          <button
-            onClick={() => setIsSubSidebarOpen(!isSubSidebarOpen)}
-            className="w-8 h-8 rounded-full shadow-md bg-gray-200 flex items-center justify-center cursor-pointer"
-            aria-label="Toggle Sub-Sidebar"
-          >
-            {isSubSidebarOpen ? (
-              <XMarkIcon className="h-4 w-4" />
-            ) : (
-              <XMarkIcon className="h-4 w-4" />
-            )}
-          </button>
-        </div> */}
       </div>
 
       {/* Fixed Sub-sidebar and Resize Handle */}

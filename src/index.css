@@ -46,3 +46,10 @@ code {
 .font-khr {
   font-size: 22px;
 }
+
+.noto-sans-symbols {
+  font-family: "Noto Sans Symbols";
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
