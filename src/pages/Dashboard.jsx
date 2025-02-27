@@ -75,7 +75,7 @@ const Dashboard = () => {
             </button>
           </div>
         </Link>
-        <Link to="/money-mgt">
+        <Link to="/dailyincome">
           <div className="bg-yellow-100 border border-yellow-300 p-4 rounded-lg text-center">
             <CurrencyRupeeIcon className="h-6 sm:h-8 w-6 sm:w-8 text-yellow-800 mx-auto" />
             <h3 className="text-sm sm:text-xl font-semibold text-yellow-800 mt-2">
@@ -84,6 +84,7 @@ const Dashboard = () => {
             <p className="text-xs sm:text-sm text-gray-700">
               Revenue · Jan 2022
             </p>
+
             <button className="mt-4 bg-yellow-200 px-2 py-1 sm:px-4 sm:py-2 text-yellow-800 rounded-lg hover:bg-yellow-300">
               View Detailed Report
             </button>

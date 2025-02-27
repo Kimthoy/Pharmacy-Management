@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import {
   ShieldCheckIcon,
   CurrencyRupeeIcon,
-  ClipboardDocumentListIcon,
+ 
   ExclamationTriangleIcon,
   Cog6ToothIcon,
   UserGroupIcon,

@@ -1,169 +1,204 @@
 import React, { useState } from "react";
-import { Card, CardContent } from "../../components/ui/Card";
-import { Input } from "../../components/ui/Input";
-import { Button } from "../../components/ui/Button";
-import { useNavigate } from "react-router-dom";
-import {
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-} from "../../components/ui/Table";
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-} from "../../components/ui/Select";
+import { FaEllipsisV } from "react-icons/fa";
 
-const ListOfMedicine = () => {
-  const navigate = useNavigate();
-  const [dropdownOpen, setDropdownOpen] = useState(false); // State for dropdown visibility
-  const [selectedGroup, setSelectedGroup] = useState(""); // State for selected option
+const medicines = [
+  {
+    name: "Zimax",
+    generic: "Azithromycin",
+    weight: "500mg",
+    category: "Tablet",
+    price: "20.55 USD",
+    stock: 100,
+    date: "2025-01-20",
+  },
+  {
+    name: "Oxidon",
+    generic: "Domperidon",
+    weight: "10mg",
+    category: "Tablet",
+    price: "15.00 USD",
+    stock: 50,
+    date: "2025-02-10",
+  },
+  {
+    name: "MED-1008",
+    generic: "Hydrazine",
+    weight: "200Doses",
+    category: "Inhaler",
+    price: "12.45 USD",
+    stock: 0,
+    date: "2025-03-21",
+  },
+];
 
-  const handleGroupChange = (value) => {
-    setSelectedGroup(value);
-    setDropdownOpen(false); // Close dropdown when an item is selected
-  };
+const MedicineTable = () => {
+  const [openMenu, setOpenMenu] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [category, setCategory] = useState("");
 
-  // Modified to pass medicine details via state
-  const handleViewDetails = (medicine) => {
-    navigate("/MedicineDetails", { state: { medicine } }); // Passing the entire medicine object
+  const toggleMenu = (index) => setOpenMenu(openMenu === index ? null : index);
+
+  const filteredMedicines = medicines.filter((med) => {
+    const matchesSearch = med.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesCategory = category ? med.category === category : true;
+    const matchesDate =
+      (!startDate || new Date(med.date) >= new Date(startDate)) &&
+      (!endDate || new Date(med.date) <= new Date(endDate));
+    return matchesSearch && matchesCategory && matchesDate;
+  });
+
+  const totalPages = Math.ceil(filteredMedicines.length / rowsPerPage);
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const selectedMedicines = filteredMedicines.slice(
+    startIndex,
+    startIndex + rowsPerPage
+  );
+  const getStatus = (stock) => {
+    if (stock === 0) return { text: "Out of Stock", color: "text-red-600" };
+    if (stock <= 50) return { text: "Low", color: "text-orange-500" };
+    return { text: "Available", color: "text-green-600" };
   };
 
   return (
-    <div className="p-4">
-      <Card className="shadow-md">
-        <CardContent>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold">List of Medicines (298)</h2>
-            <Button variant="primary">+ Add New Item</Button>
-          </div>
-          <p className="text-sm text-gray-600 mb-4">
-            List of medicines available for sales.
-          </p>
+    <div className="p-6 bg-white shadow-md rounded-md overflow-x-auto">
+      <h2 className="text-2xl font-bold mb-2">Medicine</h2>
+      <p className="text-gray-600 mb-4">Here is the medicine list.</p>
 
-          <div className="flex gap-4 mb-4">
-            <Input
-              placeholder="Search Medicine Inventory..."
-              className="flex-1"
-            />
-            <Select>
-              <SelectTrigger
-                className="w-52"
-                onClick={() => setDropdownOpen(!dropdownOpen)} // Toggle dropdown visibility
-              >
-                {selectedGroup || "- Select Group -"}
-              </SelectTrigger>
-              {dropdownOpen && (
-                <SelectContent>
-                  <SelectItem
-                    value="generic"
-                    onClick={() => handleGroupChange("Generic Medicine")}
-                  >
-                    Generic Medicine
-                  </SelectItem>
-                  <SelectItem
-                    value="diabetes"
-                    onClick={() => handleGroupChange("diabetes")}
-                  >
-                    Diabetes
-                  </SelectItem>
-                </SelectContent>
-              )}
-            </Select>
-          </div>
+      <div className="flex flex-wrap gap-4 mb-4">
+        <input
+          type="text"
+          placeholder="Search by name..."
+          className="border p-2 rounded-md focus:outline-green-500"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
 
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Medicine Name</TableCell>
-                <TableCell>Medicine ID</TableCell>
-                <TableCell>Group Name</TableCell>
-                <TableCell>Stock in Qty</TableCell>
-                <TableCell>Action</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {[
-                {
-                  name: "Augmentin 625 Duo Tablet",
-                  id: "D06ID232435454",
-                  group: "Generic Medicine",
-                  stock: 350,
-                },
-                {
-                  name: "Azithral 500 Tablet",
-                  id: "D06ID232435451",
-                  group: "Generic Medicine",
-                  stock: 20,
-                },
-                {
-                  name: "Ascoril LS Syrup",
-                  id: "D06ID232435452",
-                  group: "Diabetes",
-                  stock: 85,
-                },
-                {
-                  name: "Azee 500 Tablet",
-                  id: "D06ID232435450",
-                  group: "Generic Medicine",
-                  stock: 75,
-                },
-                {
-                  name: "Allegra 120mg Tablet",
-                  id: "D06ID232435455",
-                  group: "Diabetes",
-                  stock: 44,
-                },
-                {
-                  name: "Alex Syrup",
-                  id: "D06ID232435456",
-                  group: "Generic Medicine",
-                  stock: 65,
-                },
-                {
-                  name: "Amoxyclav 625 Tablet",
-                  id: "D06ID232435457",
-                  group: "Generic Medicine",
-                  stock: 150,
-                },
-                {
-                  name: "Avil 25 Tablet",
-                  id: "D06ID232435458",
-                  group: "Generic Medicine",
-                  stock: 270,
-                },
-              ].map((medicine, index) => (
-                <TableRow key={index}>
-                  <TableCell>{medicine.name}</TableCell>
-                  <TableCell>{medicine.id}</TableCell>
-                  <TableCell>{medicine.group}</TableCell>
-                  <TableCell>{medicine.stock}</TableCell>
-                  <TableCell>
-                    <Button
-                      variant="link"
-                      onClick={() => handleViewDetails(medicine)}
-                    >
-                      View Full Detail »
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+        <select
+          className="border p-2 rounded-md focus:outline-green-500"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        >
+          <option value="">All Categories</option>
+          <option value="Tablet">Tablet</option>
+          <option value="Vitamin">Vitamin</option>
+          <option value="Inhaler">Inhaler</option>
+        </select>
 
-          <div className="flex justify-between items-center mt-4">
-            <p className="text-sm">Showing 1 - 8 results of 298</p>
-            <div>
-              <Button variant="secondary ">Page 01</Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+        <div>
+          <label htmlFor="" className="me-2 text-gray-400">
+            Filter by Choose start date
+          </label>
+          <input
+            type="date"
+            className="border p-2 rounded-md focus:outline-green-500"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="" className="me-2 text-gray-400">
+            Choose end date
+          </label>
+          <input
+            type="date"
+            className="border p-2 rounded-md focus:outline-green-500"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+          />
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[600px] border-collapse bg-white shadow-md rounded-lg">
+          <thead className="bg-gray-100 text-gray-700 rounded">
+            <tr>
+              <td className="p-3 text-left">Name</td>
+              <td className="p-3 text-left">Generic Name</td>
+              <td className="p-3 text-left">Weight</td>
+              <td className="p-3 text-left">Category</td>
+              <td className="p-3 text-left">Price</td>
+              <td className="p-3 text-left">Stock</td>
+              <td className="p-3 text-left">Date</td>
+              <td className="p-3 text-left">Actions</td>
+            </tr>
+          </thead>
+          <tbody>
+            {selectedMedicines.map((med, index) => {
+              const { text, color } = getStatus(med.stock);
+              return (
+                <tr key={index} className="border-b text-sm sm:text-base">
+                  <td className="p-3 font-bold text-gray-600">{med.name}</td>
+                  <td className="p-3 text-gray-400">{med.generic}</td>
+                  <td className="p-3 text-gray-400">{med.weight}</td>
+                  <td className="p-3 text-gray-400">{med.category}</td>
+                  <td className="p-3 text-gray-400">{med.price}</td>
+                  <td className="p-3 text-gray-400">{med.stock}</td>
+                  <td className={`p-3 font-semibold ${color}`}>{text}</td>
+                  <td className="p-3 text-gray-400">{med.date}</td>
+                  <td className="p-3 relative">
+                    <button className="p-2 bg-gray-200 rounded-full hover:bg-gray-300">
+                      <FaEllipsisV />
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination Controls */}
+      <div className="flex flex-wrap items-center justify-between mt-4">
+        <div className="flex items-center space-x-2">
+          <span className="text-gray-600">Rows per page:</span>
+          <select
+            className="border p-2 rounded-md"
+            value={rowsPerPage}
+            onChange={(e) => {
+              setRowsPerPage(parseInt(e.target.value, 10));
+              setCurrentPage(1);
+            }}
+          >
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="15">15</option>
+          </select>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            className="px-3 py-1 border rounded-md"
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+
+          <span className="text-gray-700">
+            Page {currentPage} of {totalPages}
+          </span>
+
+          <button
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            className="px-3 py-1 border rounded-md"
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default ListOfMedicine;
+export default MedicineTable;

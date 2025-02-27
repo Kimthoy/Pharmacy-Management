@@ -1,25 +1,16 @@
 import React from "react";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import AddIcon from "@mui/icons-material/Add";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import SaveIcon from "@mui/icons-material/Save";
-import CancelIcon from "@mui/icons-material/Close";
+
 import {
-  GridRowModes,
+  
   DataGrid,
-  GridToolbarContainer,
-  GridActionsCellItem,
-  GridRowEditStopReasons,
-  GridToolbarExport,
+ 
 } from "@mui/x-data-grid";
-import * as XLSX from "xlsx"; // For Excel export
-import jsPDF from "jspdf"; // For PDF export
+
 import "jspdf-autotable"; // Plugin for table support in jsPDF
 import {
   randomCreatedDate,
-  randomTraderName,
+
   randomId,
   randomArrayItem,
 } from "@mui/x-data-grid-generator";
@@ -93,21 +84,7 @@ export default function FullFeaturedCrudGrid() {
       headerAlign: "left",
       editable: true,
     },
-    // {
-    //   field: "joinDate",
-    //   headerName: "Date",
-    //   type: "date",
-    //   width: 120,
-    //   editable: true,
-    // },
-    // {
-    //   field: "status",
-    //   headerName: "Status",
-    //   width: 85,
-    //   editable: true,
-    //   type: "singleSelect",
-    //   valueOptions: ["Paid", "Not Paid", "Pending"],
-    // },
+  
   ];
 
   return (

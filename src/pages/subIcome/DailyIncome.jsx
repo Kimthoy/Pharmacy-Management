@@ -8,58 +8,45 @@ import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
 import {
   GridRowModes,
-  DataGrid,
-  // GridToolbarContainer,
+  DataGrid, 
   GridActionsCellItem,
   GridRowEditStopReasons,
 } from "@mui/x-data-grid";
-import * as XLSX from "xlsx"; // For Excel export
-import jsPDF from "jspdf"; // For PDF export
-import "jspdf-autotable"; // Plugin for table support in jsPDF
+import * as XLSX from "xlsx"; 
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 import {
   randomCreatedDate,
   randomTraderName,
   randomId,
   randomArrayItem,
 } from "@mui/x-data-grid-generator";
-// import { green } from "@mui/material/colors";
 
-// Exchange rate constant
 const EXCHANGE_RATE = 4100;
-
-// Sample roles for the grid
 const roles = ["Paid", "Not Paid", "Pending"];
-
-// Function to generate random role
 const randomRole = () => {
   return randomArrayItem(roles);
 };
-
-// Initial rows for the grid
 const initialRows = [
   {
     id: randomId(),
     name: randomTraderName(),
     usd: 20.5,
-    // khr: 25000,
     quantity: 2,
     joinDate: randomCreatedDate(),
-    total: (20.5 * 2).toFixed(2), // Initial total calculation
+    total: (20.5 * 2).toFixed(2), 
     status: randomRole(),
   },
   {
     id: randomId(),
     name: randomTraderName(),
     usd: 15.0,
-    // khr: 10000,
     quantity: 3,
     joinDate: randomCreatedDate(),
-    total: (15.0 * 3).toFixed(2), // Initial total calculation
+    total: (15.0 * 3).toFixed(2),
     status: randomRole(),
   },
 ];
-
-// Custom Toolbar Component
 function EditToolbar(props) {
   const { setRows, setRowModesModel } = props;
 

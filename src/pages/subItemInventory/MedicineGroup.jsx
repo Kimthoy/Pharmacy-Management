@@ -1,7 +1,7 @@
 import React from "react";
 
 const MedicineGroup = () => {
-  return <div>Welcome to the MedicineGroup Page!</div>;
+  return <></>;
 };
 
 export default MedicineGroup;

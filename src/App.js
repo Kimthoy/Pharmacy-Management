@@ -12,6 +12,10 @@ import Sidebar from "./components/Sidebar";
 import Report from "./pages/Report";
 import DailyIncome from "./pages/subIcome/DailyIncome";
 import MonthlyIncome from "./pages/subIcome/MonthlyIcome";
+const Login = lazy(() => import("./pages/auth/Login"));
+const CustomerList = lazy(() => import("./pages/customer/ListCustomer"));
+const CustomerLedger = lazy(() => import("./pages/customer/CustomerLedger"));
+const InsertCustomer = lazy(() => import("./pages/customer/InsertCustomer"));
 
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Expense = lazy(() => import("./pages/subIcome/Expense"));
@@ -19,8 +23,6 @@ const Inventory = lazy(() => import("./pages/Inventory"));
 const Configuration = lazy(() => import("./pages/Configuration"));
 const MoneyMgt = lazy(() => import("./pages/MoneyMgt"));
 const Notifications = lazy(() => import("./pages/Notifications"));
-const User = lazy(() => import("./pages/User"));
-const Customer = lazy(() => import("./pages/Customer"));
 const ListOfMedicine = lazy(() =>
   import("./pages/subItemInventory/ListOfMedicine")
 );
@@ -35,7 +37,6 @@ const App = () => {
   const [selectedPage, setSelectedPage] = useState("Dashboard");
   const [isLoading, setIsLoading] = useState(true);
 
-  // Simulate a loading delay
   const simulateLoadingDelay = (delay) =>
     new Promise((resolve) => setTimeout(resolve, delay));
 
@@ -49,9 +50,8 @@ const App = () => {
   }, [selectedPage]);
 
   useEffect(() => {
-    // Add a delay on the initial load
     const loadContent = async () => {
-      await simulateLoadingDelay(200); // 1-second delay
+      await simulateLoadingDelay(200);
       setIsLoading(false);
     };
     loadContent();
@@ -76,21 +76,26 @@ const App = () => {
             <Suspense fallback={<Loader />}>
               <Routes>
                 <Route path="/" element={<Dashboard />} />
-                <Route path="/inventory" element={<Inventory />} />
                 <Route path="/configuration" element={<Configuration />} />
-                <Route path="/money-mgt" element={<MoneyMgt />} />
-                <Route path="/DailyIncome" element={<DailyIncome />} />
-                <Route path="/MonthlyIncome" element={<MonthlyIncome />} />
                 <Route path="/notifications" element={<Notifications />} />
+
+                <Route path="/inventory" element={<Inventory />} />
                 <Route path="/list-of-medicine" element={<ListOfMedicine />} />
                 <Route path="/medicine-group" element={<MedicineGroup />} />
                 <Route path="/MedicineDetails" element={<MedicineDetails />} />
-                <Route path="/User" element={<User />} />
-                <Route path="/Customer" element={<Customer />} />
                 <Route path="/Report" element={<Report />} />
-                <Route path="/expense" element={<Expense />} />
 
-                {/* Redirect any invalid path to Dashboard */}
+                <Route path="/expense" element={<Expense />} />
+                <Route path="/money-mgt" element={<MoneyMgt />} />
+                <Route path="/DailyIncome" element={<DailyIncome />} />
+                <Route path="/MonthlyIncome" element={<MonthlyIncome />} />
+
+                <Route path="/customerlist" element={<CustomerList />} />
+                <Route path="/customerledger" element={<CustomerLedger />} />
+                <Route path="/insertcustomer" element={<InsertCustomer />} />
+
+                <Route path="/login" element={<Login />} />
+
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </Suspense>
