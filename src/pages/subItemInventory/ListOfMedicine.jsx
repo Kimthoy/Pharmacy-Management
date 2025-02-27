@@ -32,7 +32,7 @@ const medicines = [
 ];
 
 const MedicineTable = () => {
-  const [openMenu, setOpenMenu] = useState(null);
+  // const [openMenu, setOpenMenu] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
@@ -40,7 +40,7 @@ const MedicineTable = () => {
   const [endDate, setEndDate] = useState("");
   const [category, setCategory] = useState("");
 
-  const toggleMenu = (index) => setOpenMenu(openMenu === index ? null : index);
+  // const toggleMenu = (index) => setOpenMenu(openMenu === index ? null : index);
 
   const filteredMedicines = medicines.filter((med) => {
     const matchesSearch = med.name
@@ -126,6 +126,7 @@ const MedicineTable = () => {
               <td className="p-3 text-left">Category</td>
               <td className="p-3 text-left">Price</td>
               <td className="p-3 text-left">Stock</td>
+              <td className="p-3 text-left">Status</td>
               <td className="p-3 text-left">Date</td>
               <td className="p-3 text-left">Actions</td>
             </tr>
