@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
 
-const Inventory = () => {
+const AddMedicine = () => {
   const [barcode, setBarcode] = useState("");
   const [openScanner, setOpenScanner] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -312,4 +312,4 @@ const Inventory = () => {
     </>
   );
 };
-export default Inventory;
+export default AddMedicine;

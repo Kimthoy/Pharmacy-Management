@@ -1,16 +1,10 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
+import { BiCapsule } from "react-icons/bi";
 import {
-  HomeIcon,
   ClipboardDocumentListIcon,
-  Cog6ToothIcon,
-  BellIcon,
   FolderIcon,
-  FlagIcon,
-  ShoppingBagIcon,
-  CalendarDaysIcon,
-  BanknotesIcon,
   XMarkIcon,
   UserGroupIcon,
   UserPlusIcon,
@@ -18,50 +12,53 @@ import {
   UsersIcon,
   ArrowLeftEndOnRectangleIcon,
 } from "@heroicons/react/24/outline";
-import { CurrencyDollarIcon } from "@heroicons/react/20/solid";
+import { CiSettings } from "react-icons/ci";
+import { RiPagesLine } from "react-icons/ri";
+
+import {
+  MdAddHomeWork,
+  MdListAlt,
+  MdOutlineMonitorHeart,
+  MdOutlineMedicationLiquid,
+} from "react-icons/md";
+import { LuNotebookPen } from "react-icons/lu";
+import { LiaWarehouseSolid } from "react-icons/lia";
+import { HiOutlineCurrencyDollar } from "react-icons/hi2";
+import { BiPurchaseTag } from "react-icons/bi";
+import { PiInvoiceBold } from "react-icons/pi";
+import { GoGraph, GoSignIn } from "react-icons/go";
+import { FaFileInvoiceDollar } from "react-icons/fa";
+import { TfiDashboard } from "react-icons/tfi";
 
 const Sidebar = ({ setSelectedPage, selectedPage }) => {
   const navigate = useNavigate();
   const [isSubSidebarOpen, setIsSubSidebarOpen] = useState(false);
-  const [activeMenuItem, setActiveMenuItem] = useState({
-    name: "Inventory",
-    icon: ShoppingBagIcon,
-    path: "/inventory",
-    subItems: [
-      { name: "Inventory", icon: ShoppingBagIcon, path: "/inventory" },
-      {
-        name: "Medicine Group",
-        icon: FolderIcon,
-        path: "/medicine-group",
-      },
-      {
-        name: "List of Medicine",
-        icon: ClipboardDocumentListIcon,
-        path: "/list-of-medicine",
-      },
-    ],
-  });
+  const [activeMenuItem, setActiveMenuItem] = useState(false);
 
   const [subSidebarWidth] = useState(256);
 
   const menuItems = [
-    { name: "Dashboard", icon: HomeIcon, path: "/" },
+    { name: "Dashboard", icon: TfiDashboard, path: "/" },
 
     {
-      name: "Medicine",
-      icon: ShoppingBagIcon,
-      path: "/inventory",
+      name: "MedicinePage",
+      icon: BiCapsule,
+      path: "/madicinepage",
       subItems: [
-        { name: "Add Medicine", icon: ShoppingBagIcon, path: "/inventory" },
         {
-          name: "List Medicine",
-          icon: ClipboardDocumentListIcon,
-          path: "/list-of-medicine",
+          name: "AddMedicinePage",
+          icon: MdOutlineMedicationLiquid,
+          path: "/addmedicinepage",
         },
         {
-          name: "Medicine Detail",
+          name: "ListMedicinePage",
+          icon: ClipboardDocumentListIcon,
+          path: "/listofmedicine",
+        },
+        {
+          name: "MedicineDetailPage",
           icon: FolderIcon,
-          path: "/medicine-group",
+          path: "/medicinedetail",
         },
       ],
     },
@@ -80,30 +77,104 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
         },
       ],
     },
+
     {
-      name: "Finance",
-      icon: CurrencyDollarIcon,
-
+      name: "Manufacturer",
+      icon: LiaWarehouseSolid,
+      path: "/menufacturer",
       subItems: [
-        { name: "Expense", icon: CurrencyDollarIcon, path: "/expense" },
-
-        { name: "Income", icon: BanknotesIcon, path: "/dailyincome" },
         {
-          name: "Invoice List",
-          icon: CalendarDaysIcon,
-          path: "/monthlyincome",
+          name: "Add Manufacturer",
+          icon: MdAddHomeWork,
+          path: "/addmanu",
+        },
+
+        {
+          name: "Manufacturer List",
+          icon: MdListAlt,
+          path: "/manufacturerlist",
         },
         {
-          name: "Invoice Detail",
-          icon: CurrencyDollarIcon,
-          path: "/money-mgt",
+          name: "Manufacturer Ledger",
+          icon: LuNotebookPen,
+          path: "/manuledger",
         },
       ],
     },
-    { name: "Notifications", icon: BellIcon, path: "/notifications" },
-    { name: "Report", icon: FlagIcon, path: "/report" },
-    { name: "Setting", icon: Cog6ToothIcon, path: "/configuration" },
-    { name: "Login", icon: ArrowLeftEndOnRectangleIcon, path: "/login" },
+
+    {
+      name: "FinancePage",
+      icon: HiOutlineCurrencyDollar,
+      path: "/financepage",
+      subItems: [
+        {
+          name: "ExpenasePage",
+          icon: HiOutlineCurrencyDollar,
+          path: "/expensepage",
+        },
+
+        {
+          name: "IncomePage",
+          icon: GoGraph,
+          path: "/incomepage",
+        },
+        {
+          name: "InvoiceDetailPage",
+          icon: FaFileInvoiceDollar,
+          path: "/invoicedetail",
+        },
+        {
+          name: "InvoiceListPage",
+          icon: PiInvoiceBold,
+          path: "/invoicelist",
+        },
+      ],
+    },
+    {
+      name: "Report",
+      icon: MdOutlineMonitorHeart,
+      path: "/reportall",
+      subItems: [
+        {
+          name: "SaleReport",
+          icon: MdOutlineMonitorHeart,
+          path: "/salereport",
+        },
+
+        {
+          name: "StockReport",
+          icon: LiaWarehouseSolid,
+          path: "/stockreport",
+        },
+        {
+          name: "PurchaseReport",
+          icon: BiPurchaseTag,
+          path: "/purchasreport",
+        },
+      ],
+    },
+    {
+      name: "Pages",
+      icon: RiPagesLine,
+      path: "/login",
+      subItems: [
+        {
+          name: "Login",
+          icon: ArrowLeftEndOnRectangleIcon,
+          path: "/login",
+        },
+        {
+          name: "Sign In",
+          icon: GoSignIn,
+          path: "/register",
+        },
+      ],
+    },
+    {
+      name: "Settings",
+      icon: CiSettings,
+      path: "/settingpage",
+    },
   ];
   const handlePageSelection = (item, path) => {
     setSelectedPage(item);

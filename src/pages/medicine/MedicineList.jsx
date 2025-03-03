@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FaEllipsisV } from "react-icons/fa";
-
+import { BiEdit, BiShow, BiTrash } from "react-icons/bi";
+import { MdWarehouse } from "react-icons/md";
 const medicines = [
   {
     name: "Zimax",
@@ -31,8 +32,8 @@ const medicines = [
   },
 ];
 
-const MedicineTable = () => {
-  // const [openMenu, setOpenMenu] = useState(null);
+const MedicineList = () => {
+  const [openMenu, setOpenMenu] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
@@ -40,7 +41,7 @@ const MedicineTable = () => {
   const [endDate, setEndDate] = useState("");
   const [category, setCategory] = useState("");
 
-  // const toggleMenu = (index) => setOpenMenu(openMenu === index ? null : index);
+  const toggleMenu = (index) => setOpenMenu(openMenu === index ? null : index);
 
   const filteredMedicines = medicines.filter((med) => {
     const matchesSearch = med.name
@@ -145,9 +146,34 @@ const MedicineTable = () => {
                   <td className={`p-3 font-semibold ${color}`}>{text}</td>
                   <td className="p-3 text-gray-400">{med.date}</td>
                   <td className="p-3 relative">
-                    <button className="p-2 bg-gray-200 rounded-full hover:bg-gray-300">
+                    <button
+                      className="p-2 bg-gray-200 rounded-full hover:bg-gray-300"
+                      onClick={() => toggleMenu(index)}
+                    >
                       <FaEllipsisV />
                     </button>
+                    {openMenu === index && (
+                      <div className="absolute z-10 right-24  mt-2 top-2 w-36 bg-gray-100 border-green-600  rounded-md shadow-md">
+                        <button className="flex  align-middle w-full text-left text-gray-600  py-2 hover:rounded-md hover:bg-green-500 hover:text-white">
+                          <MdWarehouse className="mt-1 w-10" />
+                          Manufacturer
+                        </button>
+                        <button className="flex  align-middle w-full text-left text-gray-600  py-2 hover:rounded-md hover:bg-green-500 hover:text-white">
+                          <BiShow className="mt-1 w-10" />
+                          View Details
+                        </button>
+
+                        <button className="flex  align-middle w-full text-left text-gray-600 hover:rounded-md  py-2 hover:bg-green-500 hover:text-white">
+                          <BiEdit className="mt-1 w-10" />
+                          Edit
+                        </button>
+
+                        <button className="flex align-middle w-full text-gray-600 text-center hover:rounded-md  py-2 hover:bg-green-500 hover:text-white">
+                          <BiTrash className="mt-1 w-10" />
+                          Remove
+                        </button>
+                      </div>
+                    )}
                   </td>
                 </tr>
               );
@@ -202,4 +228,4 @@ const MedicineTable = () => {
   );
 };
 
-export default MedicineTable;
+export default MedicineList;

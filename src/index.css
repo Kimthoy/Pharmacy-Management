@@ -56,3 +56,24 @@ code {
 .font-header {
   font-size: 30px;
 }
+@media print {
+  body * {
+    padding:0px 5px;
+    visibility: hidden;
+  }
+  .invoice-print-area,
+  .invoice-print-area * {
+    visibility: visible;
+  }
+  .invoice-print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  .print-button {
+    display: none; /* Hide the print button when printing */
+  }
+}

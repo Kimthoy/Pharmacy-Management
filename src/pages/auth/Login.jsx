@@ -5,7 +5,7 @@ const Login = () => {
     <section className="flex justify-center items-center min-h-screen bg-gray-100 px-4">
       <div className="bg-white shadow-md rounded-md flex flex-col md:flex-row w-full max-w-4xl p-6">
         <div className="flex flex-col justify-center md:w-1/2 p-4 text-center md:text-left">
-          <h1 className="font-bold text-2xl md:text-3xl mb-3 font-header">
+          <h1 className="font-bold text-2xl md:text-3xl mb-3 font-header text-green-500">
             Welcome <br /> Panharith Pharmacy
           </h1>
           <p className="text-gray-500 text-sm md:text-base">

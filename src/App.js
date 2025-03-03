@@ -9,29 +9,40 @@ import Loader from "./components/Loader";
 import TopBar from "./components/TopBar";
 import Footer from "./components/Footer";
 import Sidebar from "./components/Sidebar";
-import Report from "./pages/Report";
-import DailyIncome from "./pages/subIcome/DailyIncome";
-import MonthlyIncome from "./pages/subIcome/MonthlyIcome";
+import Register from "./pages/auth/Register";
+
 const Login = lazy(() => import("./pages/auth/Login"));
+
 const CustomerList = lazy(() => import("./pages/customer/ListCustomer"));
 const CustomerLedger = lazy(() => import("./pages/customer/CustomerLedger"));
 const InsertCustomer = lazy(() => import("./pages/customer/InsertCustomer"));
 
-const Dashboard = lazy(() => import("./pages/Dashboard"));
-const Expense = lazy(() => import("./pages/subIcome/Expense"));
-const Inventory = lazy(() => import("./pages/Inventory"));
-const Configuration = lazy(() => import("./pages/Configuration"));
-const MoneyMgt = lazy(() => import("./pages/MoneyMgt"));
-const Notifications = lazy(() => import("./pages/Notifications"));
-const ListOfMedicine = lazy(() =>
-  import("./pages/subItemInventory/ListOfMedicine")
+const Dashboard = lazy(() => import("./pages/dashboard/Dashboard"));
+
+const ManufacturerList = lazy(() =>
+  import("./pages/manufacturer/ManufacturerList")
 );
-const MedicineGroup = lazy(() =>
-  import("./pages/subItemInventory/MedicineGroup")
+const AddManu = lazy(() => import("./pages/manufacturer/AddManufacturer"));
+const ManuLedger = lazy(() =>
+  import("./pages/manufacturer/ManufacturerLedger")
 );
-const MedicineDetails = lazy(() =>
-  import("./pages/subItemInventory/medicineDetail/MedicineDetails")
-);
+
+const SellReport = lazy(() => import("./pages/report/ReportSell"));
+const StockReport = lazy(() => import("./pages/report/ReportStock"));
+const PurchaseReport = lazy(() => import("./pages/report/ReportPurchase"));
+
+const ExpensePage = lazy(() => import("./pages/finance/Expense"));
+const IncomePage = lazy(() => import("./pages/finance/Income"));
+const InvoiceDetailsPage = lazy(() => import("./pages/finance/InvoiceDetail"));
+const InvoiceListPage = lazy(() => import("./pages/finance/InvoiceList"));
+
+const AboutUser = lazy(() => import("./pages/profile/AboutUser"));
+
+const AddMedicine = lazy(() => import("./pages/medicine/AddMedicine"));
+const MedicineList = lazy(() => import("./pages/medicine/MedicineList"));
+const MedicineDetail = lazy(() => import("./pages/medicine/MedicineDetail"));
+
+const Setting = lazy(() => import("./pages/setting/Setting"));
 
 const App = () => {
   const [selectedPage, setSelectedPage] = useState("Dashboard");
@@ -76,25 +87,36 @@ const App = () => {
             <Suspense fallback={<Loader />}>
               <Routes>
                 <Route path="/" element={<Dashboard />} />
-                <Route path="/configuration" element={<Configuration />} />
-                <Route path="/notifications" element={<Notifications />} />
-
-                <Route path="/inventory" element={<Inventory />} />
-                <Route path="/list-of-medicine" element={<ListOfMedicine />} />
-                <Route path="/medicine-group" element={<MedicineGroup />} />
-                <Route path="/MedicineDetails" element={<MedicineDetails />} />
-                <Route path="/Report" element={<Report />} />
-
-                <Route path="/expense" element={<Expense />} />
-                <Route path="/money-mgt" element={<MoneyMgt />} />
-                <Route path="/DailyIncome" element={<DailyIncome />} />
-                <Route path="/MonthlyIncome" element={<MonthlyIncome />} />
 
                 <Route path="/customerlist" element={<CustomerList />} />
                 <Route path="/customerledger" element={<CustomerLedger />} />
                 <Route path="/insertcustomer" element={<InsertCustomer />} />
 
+                <Route
+                  path="/manufacturerlist"
+                  element={<ManufacturerList />}
+                />
+                <Route path="/addmanu" element={<AddManu />} />
+                <Route path="/manuledger" element={<ManuLedger />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+
+                <Route path="/salereport" element={<SellReport />} />
+                <Route path="/purchasreport" element={<PurchaseReport />} />
+                <Route path="/stockreport" element={<StockReport />} />
+
+                <Route path="/expensepage" element={<ExpensePage />} />
+                <Route path="/incomepage" element={<IncomePage />} />
+                <Route path="/invoicedetail" element={<InvoiceDetailsPage />} />
+                <Route path="/invoicelist" element={<InvoiceListPage />} />
+
+                <Route path="/aboutuser" element={<AboutUser />} />
+
+                <Route path="/addmedicinepage" element={<AddMedicine />} />
+                <Route path="/listofmedicine" element={<MedicineList />} />
+                <Route path="/medicinedetail" element={<MedicineDetail />} />
+
+                <Route path="/settingpage" element={<Setting />} />
 
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
