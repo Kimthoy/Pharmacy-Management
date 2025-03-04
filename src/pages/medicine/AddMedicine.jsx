@@ -1,10 +1,77 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
+import axios from "axios";
 
 const AddMedicine = () => {
-  const [barcode, setBarcode] = useState("");
+  const [setBarcode] = useState("");
   const [openScanner, setOpenScanner] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
+
+  const [medicine, setMedicine] = useState({
+    medicine_name: "",
+    price: "",
+    quantity: "",
+    in_stock_date: "",
+    weight: "",
+    generic_name: "",
+    barcode_number: "",
+    expire_date: "",
+    status: "active",
+    category: "tablet",
+    medicine_detail: "",
+  });
+
+  const [token, setToken] = useState(localStorage.getItem("authToken") || ""); // ✅ Fix token state
+
+  useEffect(() => {
+    const userToken = localStorage.getItem("authToken");
+
+    if (userToken) {
+      console.log("Fetched Token from login:", userToken); // Debugging
+      setToken(userToken); // ✅ Set token in state
+    } else {
+      alert("You are not logged in!");
+    }
+  }, []);
+
+  const handleChange = (e) => {
+    setMedicine({ ...medicine, [e.target.name]: e.target.value });
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // ✅ Ensure token exists before submitting
+    if (!token) {
+      alert("User is not authenticated! Please log in.");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/medicines/create",
+        medicine,
+        {
+          headers: {
+            Authorization: `Bearer ${token.trim()}`, // ✅ Include token
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      alert("Medicine added successfully!");
+      console.log(response.data);
+    } catch (error) {
+      console.error(
+        "Error adding medicine:",
+        error.response?.data || error.message
+      );
+      alert(
+        `Failed to add medicine: ${
+          error.response?.data?.message || "Unknown error"
+        }`
+      );
+    }
+  };
 
   const toggleForm = () => {
     setIsFormOpen(!isFormOpen);
@@ -97,7 +164,7 @@ const AddMedicine = () => {
           </div>
         )}
 
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="flex flex-col">
               <label htmlFor="" className="mb-2">
@@ -106,7 +173,10 @@ const AddMedicine = () => {
 
               <input
                 type="text"
+                name="medicine_name"
                 placeholder="Medicine Name"
+                value={medicine.medicine_name}
+                onChange={handleChange}
                 className="bg-slate-200 px-2 py-2 rounded-md shadow-md focus:shadow-none focus:outline-green-500"
                 required
               />
@@ -119,6 +189,9 @@ const AddMedicine = () => {
               <input
                 type="text"
                 placeholder="Price"
+                name="price"
+                value={medicine.price}
+                onChange={handleChange}
                 className="bg-slate-200 px-2 py-2 rounded-md shadow-md focus:shadow-none focus:outline-green-500"
                 required
               />
@@ -131,7 +204,10 @@ const AddMedicine = () => {
 
               <input
                 type="number"
+                name="quantity"
                 placeholder="Quantity"
+                onChange={handleChange}
+                value={medicine.quantity}
                 className="bg-slate-200 px-2 py-2 rounded-md shadow-md focus:shadow-none focus:outline-green-500"
                 required
               />
@@ -144,6 +220,9 @@ const AddMedicine = () => {
 
               <input
                 type="date"
+                name="in_stock_date"
+                onChange={handleChange}
+                value={medicine.in_stock_date}
                 className="bg-slate-200 px-2 py-2 rounded-md shadow-md focus:shadow-none focus:outline-green-500"
                 required
               />
@@ -157,6 +236,9 @@ const AddMedicine = () => {
               <input
                 type="text"
                 placeholder="Weight"
+                name="weight"
+                value={medicine.weight}
+                onChange={handleChange}
                 className="bg-slate-200 px-2 py-2 rounded-md shadow-md focus:shadow-none focus:outline-green-500"
                 required
               />
@@ -169,26 +251,30 @@ const AddMedicine = () => {
 
               <input
                 type="text"
+                name="generic_name"
+                onChange={handleChange}
                 placeholder="Generic Name"
+                value={medicine.generic_name}
                 className="bg-slate-200 px-2 py-2 rounded-md shadow-md focus:shadow-none focus:outline-green-500"
                 required
               />
             </div>
 
-            <div className="flex flex-col">
+            <div className="flex z-0 flex-col">
               <label htmlFor="barcode" className="mb-2">
                 Barcode Scan
               </label>
 
-              <div className="bg-slate-200  rounded-sm shadow-md px-6 py-2 focus:border-none outline-none cursor-pointer relative">
+              <div className="bg-slate-200 z-10  rounded-sm shadow-md px-6 py-2 focus:border-none outline-none cursor-pointer relative">
                 <input
                   required
                   id="barcode"
                   type="text"
-                  value={barcode}
-                  onChange={(e) => setBarcode(e.target.value)}
+                  value={medicine.barcode_number}
+                  name="barcode_number"
+                  onChange={((e) => setBarcode(e.target.value), handleChange)}
                   placeholder="Scan or enter barcode"
-                  className="bg-transparent focus:outline-none "
+                  className="bg-transparent  focus:outline-none "
                 />
                 <button
                   onClick={() => setOpenScanner(true)}
@@ -262,8 +348,11 @@ const AddMedicine = () => {
 
               <input
                 type="date"
+                name="expire_date"
                 className="bg-slate-200 px-2 py-2 rounded-md shadow-md focus:shadow-none focus:outline-green-500"
                 required
+                value={medicine.expire_date}
+                onChange={handleChange}
               />
             </div>
 
@@ -272,7 +361,12 @@ const AddMedicine = () => {
                 Status
               </label>
 
-              <select className="bg-slate-200 px-2 py-2 rounded-md shadow-md focus:shadow-none focus:outline-green-500 ">
+              <select
+                className="bg-slate-200 px-2 py-2 rounded-md shadow-md focus:shadow-none focus:outline-green-500 "
+                onChange={handleChange}
+                required
+                value={medicine.status}
+              >
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
               </select>
@@ -282,11 +376,16 @@ const AddMedicine = () => {
                 Cateogry
               </label>
 
-              <select className=" bg-slate-200 px-2 py-2 rounded-md shadow-md focus:shadow-none focus:outline-green-500">
+              <select
+                className=" bg-slate-200 px-2 py-2 rounded-md shadow-md focus:shadow-none focus:outline-green-500"
+                onChange={handleChange}
+                value={medicine.category}
+                required
+              >
                 <option>Select Category</option>
-                <option value="Tablet">Tablet</option>
-                <option value="Syrup">Syrup</option>
-                <option value="Vitamin">Vitamin</option>
+                <option value="tablet">Tablet</option>
+                <option value="syrup">Syrup</option>
+                <option value="vitamin">Vitamin</option>
               </select>
             </div>
             <div className="flex flex-col ">
@@ -295,6 +394,10 @@ const AddMedicine = () => {
               </label>
               <textarea
                 placeholder="Medicine Details"
+                name="medicine_detail"
+                onChange={handleChange}
+                value={medicine.medicine_detail}
+                required
                 className=" h-24 bg-slate-200 px-2 py-2 rounded-md shadow-md focus:shadow-none focus:outline-green-500"
               ></textarea>
             </div>

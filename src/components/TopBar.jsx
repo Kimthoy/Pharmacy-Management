@@ -48,7 +48,7 @@ const TopBar = () => {
   }, []);
 
   return (
-    <div className="bg-white z-50  p-4 flex items-center justify-between relative">
+    <div className="bg-white z-10  p-4 flex items-center justify-between relative">
       {/* Search Bar */}
       <div className="flex items-center border-b  border-green-600 w-1/3">
         <input
@@ -66,7 +66,7 @@ const TopBar = () => {
         <Bell className="text-green-600 cursor-pointer" size={30} />
 
         {/* Language Selector */}
-        <div className="flex items-center space-x-2 rounded-md px-4 py-2 bg-green-300">
+        <div className="flex items-center space-x-2 rounded-md px-4 py-2 ">
           <img
             src={languageOptions.find((lang) => lang.value === language)?.flag}
             alt={language}

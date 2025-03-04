@@ -17,6 +17,7 @@
     "@mui/x-data-grid-premium": "^7.27.0",
     "@mui/x-data-grid-pro": "^7.25.0",
     "@mui/x-date-pickers": "^7.25.0",
+    "axios": "^1.8.1",
     "cra-template": "1.2.0",
     "dayjs": "^1.11.13",
     "jspdf": "^2.5.2",
@@ -61,6 +62,7 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.5.1",
     "tailwindcss": "^3.4.17"

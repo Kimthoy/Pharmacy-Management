@@ -214,7 +214,8 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
               } group`}
             >
               <Icon className="h-6 w-6" />
-              <span className="absolute left-full ml-2 p-1 rounded bg-gray-800 text-white text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+              {/* name hover */}
+              <span className="absolute left-full ml-2 p-2 rounded bg-gray-600 font-bold  text-white text-sm z-50 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                 {name}
               </span>
             </li>
@@ -223,7 +224,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
       </div>
       <div className="flex ">
         <div
-          className={`bg-gray-100 text-black  flex flex-col shadow-md h-screen p-5 transition-all duration-100 ease-in-out overflow-hidden ${
+          className={`bg-gray-100 text-black   flex flex-col shadow-md h-screen p-5 transition-all duration-100 ease-in-out overflow-hidden ${
             isSubSidebarOpen ? "block" : "hidden"
           }`}
           style={{ width: `${subSidebarWidth}px` }}
