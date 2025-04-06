@@ -24,16 +24,16 @@ const Dashboard = () => {
       {/* Header */}
       <div className="flex justify-between items-center mb-4 sm:mb-6">
         <div>
-          <h1 className="text-lg sm:text-2xl font-bold text-gray-800">
+          <h1 className="text-lg sm:text-2xl font-bold text-gray-600">
             Dashboard
           </h1>
-          <p className="text-sm sm:text-base text-gray-600">
+          <p className="text-xs sm:text-base text-gray-600">
             A quick data overview of the inventory.
           </p>
         </div>
         <div className="relative">
           <button
-            className="bg-gray-200 text-gray-800 px-3 py-1 sm:px-4 sm:py-2 rounded-md shadow-sm hover:bg-gray-300"
+            className=" text-gray-500 border px-3 py-1 sm:px-4 sm:py-2 rounded-md shadow-sm hover:border-emerald-600 hover:text-emerald-500"
             onClick={() => setShowDropdown(!showDropdown)}
             aria-haspopup="true"
             aria-expanded={showDropdown ? "true" : "false"}
@@ -43,14 +43,14 @@ const Dashboard = () => {
           {showDropdown && (
             <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-300 rounded-md shadow-lg z-10">
               <button
-                className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
+                className="block w-full px-4 py-2 text-left text-gray-700 hover:border-emerald-600 hover:text-emerald-600"
                 onClick={() => handleDownload("Excel")}
                 aria-label="Download report as Excel"
               >
                 Excel
               </button>
               <button
-                className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
+                className="block w-full px-4 py-2 text-left text-gray-700 hover:border-emerald-600 hover:text-emerald-600"
                 onClick={() => handleDownload("PDF")}
                 aria-label="Download report as PDF"
               >
@@ -85,18 +85,18 @@ const Dashboard = () => {
               Revenue · Jan 2022
             </p>
 
-            <button className="mt-4 bg-yellow-200 px-2 py-1 sm:px-4 sm:py-2 text-yellow-800 rounded-lg hover:bg-yellow-300">
+            <button className="mt-4 bg-yellow-200 px-2 py-1 sm:px-4 sm:py-2 text-yellow-700 rounded-lg hover:bg-yellow-300">
               View Detailed Report
             </button>
           </div>
         </Link>
         <Link to="/list-of-medicine">
           <div className="bg-blue-100 border border-blue-300 p-4 rounded-lg text-center">
-            <ClipboardDocumentListIcon className="h-6 sm:h-8 w-6 sm:w-8 text-blue-800 mx-auto" />
-            <h3 className="text-sm sm:text-xl font-semibold text-blue-800 mt-2">
+            <ClipboardDocumentListIcon className="h-6 sm:h-8 w-6 sm:w-8 text-blue-500 mx-auto" />
+            <h3 className="text-sm sm:text-xl font-semibold text-blue-500 mt-2">
               298
             </h3>
-            <p className="text-xs sm:text-sm text-gray-700">
+            <p className="text-xs sm:text-sm text-gray-500">
               Medicines Available
             </p>
             <button className="mt-4 bg-blue-200 px-2 py-1 sm:px-4 sm:py-2 text-blue-800 rounded-lg hover:bg-blue-300">
@@ -133,37 +133,37 @@ const Dashboard = () => {
               Go to Configuration »
             </Link>
           </div>
-          <p className="mt-4 text-xs sm:text-sm text-gray-700">
+          <p className="mt-4 text-xs sm:text-sm text-gray-500">
             <strong>298</strong> Total no of Medicines
           </p>
-          <p className="mt-1 text-xs sm:text-sm text-gray-700">
+          <p className="mt-1 text-xs sm:text-sm text-gray-500">
             <strong>24</strong> Medicine Groups
           </p>
         </div>
         <div className="bg-white shadow rounded-lg p-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center">
-              <ShoppingCartIcon className="h-5 sm:h-6 w-5 sm:w-6 text-gray-800 mr-2" />
-              <h3 className="text-sm sm:text-base font-semibold text-gray-800">
+              <ShoppingCartIcon className="h-5 sm:h-6 w-5 sm:w-6 text-gray-500 mr-2" />
+              <h3 className="text-sm sm:text-base font-semibold text-gray-500">
                 Quick Report
               </h3>
             </div>
-            <span className="text-xs sm:text-sm text-gray-600">
+            <span className="text-xs sm:text-sm text-gray-500">
               January 2022
             </span>
           </div>
-          <p className="mt-4 text-xs sm:text-sm text-gray-700">
+          <p className="mt-4 text-xs sm:text-sm text-gray-500">
             <strong>70,856</strong> Qty of Medicines Sold
           </p>
-          <p className="mt-1 text-xs sm:text-sm text-gray-700">
+          <p className="mt-1 text-xs sm:text-sm text-gray-500">
             <strong>5,288</strong> Invoices Generated
           </p>
         </div>
         <div className="bg-white shadow rounded-lg p-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center">
-              <UserGroupIcon className="h-5 sm:h-6 w-5 sm:w-6 text-gray-800 mr-2" />
-              <h3 className="text-sm sm:text-base font-semibold text-gray-800">
+              <UserGroupIcon className="h-5 sm:h-6 w-5 sm:w-6 text-gray-500 mr-2" />
+              <h3 className="text-sm sm:text-base font-semibold text-gray-500">
                 My Pharmacy
               </h3>
             </div>
@@ -174,18 +174,18 @@ const Dashboard = () => {
               Go to User Management »
             </Link>
           </div>
-          <p className="mt-4 text-xs sm:text-sm text-gray-700">
+          <p className="mt-4 text-xs sm:text-sm text-gray-500">
             <strong>04</strong> Total no of Suppliers
           </p>
-          <p className="mt-1 text-xs sm:text-sm text-gray-700">
+          <p className="mt-1 text-xs sm:text-sm text-gray-500">
             <strong>05</strong> Total no of Users
           </p>
         </div>
         <div className="bg-white shadow rounded-lg p-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center">
-              <UsersIcon className="h-5 sm:h-6 w-5 sm:w-6 text-gray-800 mr-2" />
-              <h3 className="text-sm sm:text-base font-semibold text-gray-800">
+              <UsersIcon className="h-5 sm:h-6 w-5 sm:w-6 text-gray-500 mr-2" />
+              <h3 className="text-sm sm:text-base font-semibold text-gray-500">
                 Customers
               </h3>
             </div>
@@ -196,10 +196,10 @@ const Dashboard = () => {
               Go to Customers Page »
             </Link>
           </div>
-          <p className="mt-4 text-xs sm:text-sm text-gray-700">
+          <p className="mt-4 text-xs sm:text-sm text-gray-500">
             <strong>845</strong> Total no of Customers
           </p>
-          <p className="mt-1 text-xs sm:text-sm text-gray-700">
+          <p className="mt-1 text-xs sm:text-sm text-gray-500">
             <strong>Adalimumab</strong> Frequently bought Item
           </p>
         </div>

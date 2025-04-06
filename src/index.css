@@ -58,7 +58,7 @@ code {
 }
 @media print {
   body * {
-    padding:0px 5px;
+    padding: 0px 5px;
     visibility: hidden;
   }
   .invoice-print-area,
@@ -76,4 +76,8 @@ code {
   .print-button {
     display: none; /* Hide the print button when printing */
   }
+}
+body {
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
 }

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import React from "react";
 
-const AddCustomer = () => {
+const AddWastageReturn = () => {
   //check amount input
   const [amount, setAmount] = useState("");
 
@@ -17,9 +17,9 @@ const AddCustomer = () => {
       <div className="p-4 bg-white rounded-md shadow-md w-full max-w-6xl mx-auto">
         <div className="mb-4 flex flex-col md:flex-row justify-between items-start md:items-center">
           <div>
-            <h1 className="text-lg font-semibold">Add Customer</h1>
+            <h1 className="text-lg font-semibold">Add Wastage Return</h1>
             <p className="text-gray-600">
-              You can add a customer by fil these field.
+              You can add a wastage return by fill these field.
             </p>
           </div>
         </div>
@@ -29,13 +29,13 @@ const AddCustomer = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="flex flex-col">
               <label htmlFor="" className="mb-2">
-                Name
+                Customer
               </label>
 
               <input
                 type="text"
-                name="name"
-                placeholder="Name"
+                name="customer"
+                placeholder="Customer"
                 // value={medicine.medicine_name}
                 // onChange={handleChange}
                 className="border border-gray-400   px-2 text-sm py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
@@ -45,13 +45,13 @@ const AddCustomer = () => {
 
             <div className="flex flex-col">
               <label htmlFor="" className="mb-2 font-medium ">
-                Phone
+                Seller
               </label>
 
               <input
                 type="text"
-                placeholder="Phone"
-                name="phone"
+                placeholder="Seller"
+                name="seller"
                 // value={medicine.price}
                 // onChange={handleChange}
                 className="border border-gray-400   px-2 text-sm py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
@@ -75,13 +75,13 @@ const AddCustomer = () => {
             </div>
             <div className="flex flex-col">
               <label htmlFor="" className="mb-2">
-                Adddress
+                Product Name
               </label>
 
               <input
                 type="text"
-                placeholder="Adddress"
-                name="address"
+                placeholder="Product Name"
+                name="productname"
                 // value={medicine.price}
                 // onChange={handleChange}
                 className="border border-gray-400   px-2 text-sm py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
@@ -91,31 +91,48 @@ const AddCustomer = () => {
 
             <div className="flex flex-col">
               <label htmlFor="" className="mb-2">
-                Purchased Item
+                Generic Name
               </label>
 
               <input
                 type="text"
-                placeholder="Item"
-                name="item"
+                placeholder="Generic Name"
+                name="genericname"
                 // value={medicine.weight}
                 // onChange={handleChange}
                 className="border border-gray-400   px-2 text-sm py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
                 required
               />
             </div>
+            <div className="flex flex-col">
+              <label htmlFor="" className="mb-2">
+                Category
+              </label>
+
+              <select
+                className="border border-gray-400   px-2 text-sm py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
+                // onChange={handleChange}
+                // value={medicine.status}
+                required
+              >
+                <option value="tablet">Tablet</option>
+                <option value="syrub">Syrub</option>
+                <option value="vitamin">Vitamin</option>
+                <option value="inhealer">Inhealer</option>
+              </select>
+            </div>
 
             <div className="flex flex-col">
               <label htmlFor="" className="mb-2">
-                Purchased Quantity
+                Invoice No
               </label>
 
               <input
                 type="text"
-                name="quantity"
+                name="invoiceno"
                 // onChange={handleChange}
                 // value={medicine.generic_name}
-                placeholder="Quantity"
+                placeholder="Invoice No"
                 className="border border-gray-400   px-2 text-sm py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
                 required
               />
@@ -131,6 +148,52 @@ const AddCustomer = () => {
                 value={amount}
                 onChange={handleChange}
                 placeholder="Amount"
+                className="border border-gray-400   px-2 text-sm py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
+                required
+              />
+            </div>
+            <div className="flex flex-col">
+              <label htmlFor="" className="mb-2">
+                Reason
+              </label>
+
+              <select
+                className="border border-gray-400   px-2 text-sm py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
+                // onChange={handleChange}
+                // value={medicine.status}
+                required
+              >
+                <option value="Worng Medication<">Worng Medication</option>
+                <option value="Worng Dispensing<">Worng Dispensing</option>
+                <option value="Subsidence Symptoms">Subsidence Symptoms</option>
+              </select>
+            </div>
+            <div className="flex flex-col">
+              <label htmlFor="" className="mb-2">
+                Quantity
+              </label>
+
+              <input
+                type="number"
+                name="quantity"
+                // onChange={handleChange}
+                // value={medicine.generic_name}
+                placeholder=" Quantity"
+                className="border border-gray-400   px-2 text-sm py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
+                required
+              />
+            </div>
+            <div className="flex flex-col">
+              <label htmlFor="" className="mb-2">
+                Date
+              </label>
+
+              <input
+                type="date"
+                name="date"
+                // onChange={handleChange}
+                // value={medicine.generic_name}
+                placeholder="Date"
                 className="border border-gray-400   px-2 text-sm py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
                 required
               />
@@ -154,15 +217,15 @@ const AddCustomer = () => {
 
             <div className="flex flex-col ">
               <label htmlFor="" className="mb-2">
-                Customer Detials
+                Description
               </label>
               <textarea
-                placeholder="Customer Details"
-                name="customer_detail"
+                placeholder="Description"
+                name="description"
                 // onChange={handleChange}
                 // value={medicine.medicine_detail}
                 required
-                className="border border-gray-400   px-2 text-sm py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
+                className="border border-gray-400 w-[580px] h-[200px]  px-2 text-sm py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
               ></textarea>
             </div>
           </div>
@@ -171,7 +234,7 @@ const AddCustomer = () => {
               type="submit"
               className="bg-green-500 text-white px-6 py-3 rounded-md w-full md:w-auto shadow-md active:shadow-none"
             >
-              Add Customer
+              Add Return
             </button>
           </div>
         </form>
@@ -179,4 +242,4 @@ const AddCustomer = () => {
     </>
   );
 };
-export default AddCustomer;
+export default AddWastageReturn;

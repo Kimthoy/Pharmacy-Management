@@ -2,32 +2,21 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import { BiCapsule } from "react-icons/bi";
+import { CiRepeat } from "react-icons/ci";
+
 import {
-  ClipboardDocumentListIcon,
-  FolderIcon,
   XMarkIcon,
   UserGroupIcon,
   UserPlusIcon,
   ListBulletIcon,
-  UsersIcon,
-  ArrowLeftEndOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 import { CiSettings } from "react-icons/ci";
 import { RiPagesLine } from "react-icons/ri";
 
-import {
-  MdAddHomeWork,
-  MdListAlt,
-  MdOutlineMonitorHeart,
-  MdOutlineMedicationLiquid,
-} from "react-icons/md";
-import { LuNotebookPen } from "react-icons/lu";
+import { MdOutlineMonitorHeart } from "react-icons/md";
 import { LiaWarehouseSolid } from "react-icons/lia";
 import { HiOutlineCurrencyDollar } from "react-icons/hi2";
-import { BiPurchaseTag } from "react-icons/bi";
-import { PiInvoiceBold } from "react-icons/pi";
-import { GoGraph, GoSignIn } from "react-icons/go";
-import { FaFileInvoiceDollar } from "react-icons/fa";
+
 import { TfiDashboard } from "react-icons/tfi";
 
 const Sidebar = ({ setSelectedPage, selectedPage }) => {
@@ -41,23 +30,23 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
     { name: "Dashboard", icon: TfiDashboard, path: "/" },
 
     {
-      name: "MedicinePage",
+      name: "Medicine",
       icon: BiCapsule,
       path: "/madicinepage",
       subItems: [
         {
-          name: "AddMedicinePage",
-          icon: MdOutlineMedicationLiquid,
+          name: "Add Medicine",
+
           path: "/addmedicinepage",
         },
         {
-          name: "ListMedicinePage",
-          icon: ClipboardDocumentListIcon,
+          name: "Medicine List",
+
           path: "/listofmedicine",
         },
         {
-          name: "MedicineDetailPage",
-          icon: FolderIcon,
+          name: "Medicine Detail",
+
           path: "/medicinedetail",
         },
       ],
@@ -72,7 +61,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
         { name: "Customer List", icon: ListBulletIcon, path: "/customerlist" },
         {
           name: "Customer Ledger",
-          icon: UsersIcon,
+
           path: "/customerledger",
         },
       ],
@@ -84,48 +73,65 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
       path: "/menufacturer",
       subItems: [
         {
-          name: "Add Manufacturer",
-          icon: MdAddHomeWork,
-          path: "/addmanu",
-        },
-
-        {
           name: "Manufacturer List",
-          icon: MdListAlt,
+
           path: "/manufacturerlist",
         },
         {
           name: "Manufacturer Ledger",
-          icon: LuNotebookPen,
+
           path: "/manuledger",
+        },
+      ],
+    },
+    {
+      name: "Return",
+      icon: CiRepeat,
+      path: "/menufacturer",
+      subItems: [
+        {
+          name: "Add Wastage Return",
+
+          path: "/addwastagereturn",
+        },
+        {
+          name: "Add Manufacturer Return",
+
+          path: "/addmanufacturerreturn",
+        },
+        {
+          name: "Manufacturer Return List",
+
+          path: "/manufacturerreturnlist",
+        },
+        {
+          name: "Wastage Return List",
+
+          path: "/wastagereturnlist",
         },
       ],
     },
 
     {
-      name: "FinancePage",
+      name: "Finance",
       icon: HiOutlineCurrencyDollar,
       path: "/financepage",
       subItems: [
         {
-          name: "ExpenasePage",
-          icon: HiOutlineCurrencyDollar,
+          name: "Expenase",
           path: "/expensepage",
         },
 
         {
-          name: "IncomePage",
-          icon: GoGraph,
+          name: "Income",
           path: "/incomepage",
         },
         {
-          name: "InvoiceDetailPage",
-          icon: FaFileInvoiceDollar,
+          name: "Invoice Detail",
           path: "/invoicedetail",
         },
         {
-          name: "InvoiceListPage",
-          icon: PiInvoiceBold,
+          name: "Invoice List",
           path: "/invoicelist",
         },
       ],
@@ -137,18 +143,18 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
       subItems: [
         {
           name: "SaleReport",
-          icon: MdOutlineMonitorHeart,
+
           path: "/salereport",
         },
 
         {
           name: "StockReport",
-          icon: LiaWarehouseSolid,
+
           path: "/stockreport",
         },
         {
           name: "PurchaseReport",
-          icon: BiPurchaseTag,
+
           path: "/purchasreport",
         },
       ],
@@ -160,12 +166,12 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
       subItems: [
         {
           name: "Login",
-          icon: ArrowLeftEndOnRectangleIcon,
+
           path: "/login",
         },
         {
           name: "Sign In",
-          icon: GoSignIn,
+
           path: "/register",
         },
       ],
@@ -209,7 +215,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
               onClick={() =>
                 openSubSidebar({ name, icon: Icon, path, subItems })
               }
-              className={`relative p-2 rounded cursor-pointer flex items-center justify-center hover:bg-green-400  transition-all duration-300 ease-in-out ${
+              className={`relative p-2 rounded cursor-pointer flex items-center justify-center hover:bg-green-400 hover:text-white  transition-all duration-300 ease-in-out ${
                 selectedPage === name ? "bg-green-400 text-white" : ""
               } group`}
             >
@@ -246,16 +252,14 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
             </button>
           </div>
           <ul className="mt-4 space-y-2 overflow-y-auto">
-            {activeMenuItem?.subItems?.map(({ name, icon: Icon, path }) => (
+            {activeMenuItem?.subItems?.map(({ name, path }) => (
               <li
                 key={name}
                 onClick={() => handlePageSelection(name, path)}
-                className={`p-3 rounded cursor-pointer hover:bg-green-400 transition-all duration-100 ease-in-out flex items-center ${
+                className={`p-3 rounded cursor-pointer hover:bg-green-400 hover:text-white transition-all duration-100 ease-in-out flex items-center ${
                   selectedPage === name ? "bg-green-500 text-white" : ""
                 }`}
               >
-                <Icon className="h-5 w-5 mr-2" />
-
                 <span className={`${subSidebarWidth < 100 ? "hidden" : ""}`}>
                   {name}
                 </span>

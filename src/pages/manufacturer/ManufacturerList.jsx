@@ -1,150 +1,190 @@
 import React, { useState } from "react";
-import { FiMoreVertical, FiEdit, FiTrash2 } from "react-icons/fi";
+import { FaEllipsisH } from "react-icons/fa";
+// import { FaSquarePlus } from "react-icons/fa6";
 
-const ManufacturerList = () => {
-  const [showForm, setShowForm] = useState(false);
-  const [showMenu, setShowMenu] = useState(null);
-  const [selectedManufacturers, setSelectedManufacturers] = useState([]);
-  const [bulkAction, setBulkAction] = useState("");
+const medicines = [
+  {
+    manufacturer_id: "#M-35",
+    company: "Healthcare",
+    email: "info@softnio.com",
+    phone: "+811 847-4958",
+    address: "Stoeng Meanchey ,Phnom Penh",
+    balance: 7868.55,
+    status: "active",
+  },
+];
+const getStatus = (status) => {
+  if (status === "active") return { text: "Active", color: "text-green-400" };
 
-  const handleSelect = (id) => {
-    setSelectedManufacturers((prev) =>
-      prev.includes(id) ? prev.filter((mId) => mId !== id) : [...prev, id]
-    );
+  return { text: "InActive", color: "text-red-400" };
+};
+
+const Manufacturerlist = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const filteredMedicines = medicines.filter((med) => {
+    const matchesSearch = med.manufacturer_id
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+
+    return matchesSearch;
+  });
+
+  const totalPages = Math.ceil(filteredMedicines.length / rowsPerPage);
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const selectedMedicines = filteredMedicines.slice(
+    startIndex,
+    startIndex + rowsPerPage
+  );
+  const toggleForm = () => {
+    setIsFormOpen(!isFormOpen);
   };
+  //check amount input
+  // const [amount, setAmount] = useState("");
 
-  const handleBulkAction = () => {
-    if (bulkAction === "Delete") {
-      setManufacturers((prev) =>
-        prev.filter((m) => !selectedManufacturers.includes(m.id))
-      );
-      setSelectedManufacturers([]);
-    }
-  };
-
-  const [manufacturers, setManufacturers] = useState([
-    {
-      id: 1,
-      name: "Healthcare",
-      email: "info@softnio.com",
-      phone: "+811 847-4958",
-      location: "Toronto, Canada",
-      balance: "7868.55 USD",
-      status: "Inactive",
-    },
-    {
-      id: 2,
-      name: "Square",
-      email: "square@.com",
-      phone: "+124 394-1787",
-      location: "Florida, USA",
-      balance: "9047.20 USD",
-      status: "Active",
-    },
-    {
-      id: 3,
-      name: "Lupun",
-      email: "lupin@.com",
-      phone: "+168 603-2320",
-      location: "Montgomery, USA",
-      balance: "4300.98 USD",
-      status: "Active",
-    },
-  ]);
-
+  // const handleChange = (e) => {
+  //   const value = e.target.value;
+  //   // Regex to allow only double (floating-point) numbers
+  //   if (/^\d*\.?\d*$/.test(value)) {
+  //     setAmount(value);
+  //   }
+  // };
   return (
-    <div className="p-6">
-      <h2 className="text-xl font-semibold">Manufacturer Lists</h2>
-      <div className="py-4 ml-3">
-        <select
-          className="border p-2 rounded"
-          value={bulkAction}
-          onChange={(e) => setBulkAction(e.target.value)}
-        >
-          <option value="">Bulk Action</option>
-          <option value="Send Email">Send Email</option>
-          <option value="Delete">Delete</option>
-        </select>
+    <div className="p-6 bg-white shadow-md rounded-md overflow-x-auto">
+      <div>
+        <div>
+          <h2 className="text-2xl font-bold mb-2 text-gray-500">
+            Manufacturer Lists
+          </h2>
+          <p className="text-gray-400 text-sm mb-5">
+            You have total 30 Manufacturer for Pharmacy.
+          </p>
+        </div>
 
         <button
-          className={`px-4 py-2 rounded ml-4 ${
-            selectedManufacturers.length && bulkAction
-              ? "bg-blue-500 text-white hover:bg-blue-700"
-              : "bg-gray-300 text-gray-700 cursor-not-allowed"
-          }`}
-          onClick={handleBulkAction}
-          disabled={!selectedManufacturers.length || !bulkAction}
-        >
-          Apply
-        </button>
-        <button
-          className="bg-green-500 ml-4 text-white px-4 py-2 rounded hover:bg-green-700"
-          onClick={() => setShowForm(true)}
+          type="button"
+          onClick={toggleForm}
+          className="border hover:border-emerald-400 hover:text-emerald-400 text-gray-400 px-4 py-2 rounded-md  transition float-end"
         >
           + Add Manufacturer
         </button>
       </div>
-
-      {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
-            <h2 className="text-xl font-semibold mb-4">Add Manufacturer</h2>
+      {isFormOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-1/2 relative">
+            <h2 className="text-xl font-bold ">Add Manufacturer</h2>
+            <p className="text-gray-500 mb-4">
+              The manufacturer must be fill all this field.
+            </p>
             <form>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <input
-                  className="w-full p-2 border rounded"
-                  type="text"
-                  required
-                  placeholder="Company"
-                />
-                <input
-                  className="w-full p-2 border rounded"
-                  type="email"
-                  placeholder="Email"
-                />
-                <input
-                  className="w-full p-2 border rounded"
-                  type="text"
-                  required
-                  placeholder="Phone"
-                />
-                <input
-                  className="w-full p-2 border rounded"
-                  type="text"
-                  required
-                  placeholder="Balance"
-                />
-                <input
-                  className="w-full p-2 border rounded"
-                  type="text"
-                  required
-                  placeholder="Country"
-                />
-                <input
-                  className="w-full p-2 border rounded"
-                  type="text"
-                  required
-                  placeholder="City"
-                />
-                <input
-                  className="w-full p-2 border rounded"
-                  type="text"
-                  required
-                  placeholder="State"
-                />
-                <select className="w-full p-2 border rounded" required>
-                  <option value="">Select -/-</option>
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                </select>
+              <div className="grid grid-cols-1 md:grid-cols-2  gap-8">
+                <div className="flex flex-col">
+                  <label htmlFor="" className="mb-2">
+                    Company
+                  </label>
+
+                  <input
+                    type="text"
+                    name="company"
+                    placeholder="Company"
+                    // value={medicine.medicine_name}
+                    // onChange={handleChange}
+                    className="border border-gray-400   px-2 text-sm py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
+                    required
+                  />
+                </div>
+
+                <div className="flex flex-col">
+                  <label htmlFor="" className="mb-2 font-medium ">
+                    Email
+                  </label>
+
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    name="phone"
+                    // value={medicine.price}
+                    // onChange={handleChange}
+                    className="border border-gray-400   px-2 text-sm py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
+                    required
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <label htmlFor="" className="mb-2">
+                    Phone
+                  </label>
+
+                  <input
+                    type="text"
+                    placeholder="Phone"
+                    name="phone"
+                    // value={medicine.price}
+                    // onChange={handleChange}
+                    className="border border-gray-400   px-2 text-sm py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
+                    required
+                  />
+                </div>
+
+                <div className="flex flex-col">
+                  <label htmlFor="" className="mb-2">
+                    Address
+                  </label>
+
+                  <input
+                    type="text"
+                    placeholder="Address"
+                    name="address"
+                    // value={medicine.weight}
+                    // onChange={handleChange}
+                    className="border border-gray-400   px-2 text-sm py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
+                    required
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <label htmlFor="" className="mb-2">
+                    Balance
+                  </label>
+
+                  <input
+                    type="text"
+                    placeholder="Balance"
+                    name="balance"
+                    // value={medicine.price}
+                    // onChange={handleChange}
+                    className="border border-gray-400   px-2 text-sm py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
+                    required
+                  />
+                </div>
+
+                <div className="flex flex-col">
+                  <label htmlFor="" className="mb-2">
+                    Status
+                  </label>
+
+                  <select
+                    className="border border-gray-400   px-2 text-sm py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
+                    // onChange={handleChange}
+                    // value={medicine.status}
+                    required
+                  >
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div>
               </div>
-              <div className="flex justify-end space-x-4 mt-4">
-                <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700">
+              <div className="mt-4">
+                <button
+                  type="submit"
+                  className="bg-emerald-400 text-white px-2 py-2 mt-5 rounded-md w-full md:w-auto shadow-md active:shadow-none"
+                >
                   Add Manufacturer
                 </button>
                 <button
-                  className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
-                  onClick={() => setShowForm(false)}
+                  type="button"
+                  onClick={toggleForm}
+                  className=" text-gray-400 px-4 py-2 rounded-md"
                 >
                   Cancel
                 </button>
@@ -154,85 +194,119 @@ const ManufacturerList = () => {
         </div>
       )}
 
-      <table className="w-full border-collapse bg-white shadow-md mt-4">
-        <thead>
-          {/* <tr>
-            <td colSpan={6}></td>
-          </tr> */}
-          <tr className="bg-gray-200">
-            <td className="p-3">
-              <input
-                type="checkbox"
-                onChange={(e) =>
-                  setSelectedManufacturers(
-                    e.target.checked ? manufacturers.map((m) => m.id) : []
-                  )
-                }
-                checked={selectedManufacturers.length === manufacturers.length}
-              />
-            </td>
-            <td className="p-3">Company</td>
-            <td className="p-3">Email</td>
-            <td className="p-3">Phone</td>
-            <td className="p-3">Location</td>
-            <td className="p-3">Balance</td>
-            <td className="p-3">Status</td>
-            <td className="p-3">Action</td>
-          </tr>
-        </thead>
-        <tbody>
-          {manufacturers.map((manufacturer) => (
-            <tr key={manufacturer.id} className="border-b">
-              <td className="p-3">
-                <input
-                  type="checkbox"
-                  checked={selectedManufacturers.includes(manufacturer.id)}
-                  onChange={() => handleSelect(manufacturer.id)}
-                />
+      <div className="flex flex-wrap gap-4 mb-4">
+        <input
+          type="text"
+          placeholder="Find ID ..."
+          className="border p-2 rounded-md focus:outline-green-500"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
+      {/* Table */}
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[600px] border-collapse bg-white shadow-md rounded-lg">
+          <thead className="border">
+            <tr>
+              <td className="p-3 text-left text-gray-400 font-light text-[13px]">
+                Manufacturer ID
               </td>
-              <td className="p-3">{manufacturer.name}</td>
-              <td className="p-3">{manufacturer.email}</td>
-              <td className="p-3">{manufacturer.phone}</td>
-              <td className="p-3">{manufacturer.location}</td>
-              <td className="p-3">{manufacturer.balance}</td>
-              <td
-                className={`p-3 font-semibold ${
-                  manufacturer.status === "Active"
-                    ? "text-green-500"
-                    : "text-yellow-500"
-                }`}
-              >
-                {manufacturer.status}
+              <td className="p-3 text-left text-gray-400 font-light text-[13px]">
+                Company
               </td>
-              <td className="p-3 relative">
-                <button
-                  onClick={() =>
-                    setShowMenu(
-                      showMenu === manufacturer.id ? null : manufacturer.id
-                    )
-                  }
-                >
-                  <FiMoreVertical size={20} />
-                </button>
-                {showMenu === manufacturer.id && (
-                  <div className="absolute z-50 right-24 top-0 mt-2 w-32 bg-white shadow-lg rounded-lg p-2">
-                    <button className="flex items-center space-x-2 w-full text-left p-2 hover:bg-gray-100">
-                      <FiEdit size={16} />
-                      <span>Edit</span>
-                    </button>
-                    <button className="flex items-center space-x-2 w-full text-left p-2 text-red-500 hover:bg-gray-100">
-                      <FiTrash2 size={16} />
-                      <span>Remove</span>
-                    </button>
-                  </div>
-                )}
+              <td className="p-3 text-left text-gray-400 font-light text-[13px]">
+                Phone
+              </td>
+              <td className="p-3 text-left text-gray-400 font-light text-[13px]">
+                Address
+              </td>
+              <td className="p-3 text-left text-gray-400 font-light text-[13px]">
+                Balance (USD)
+              </td>
+              <td className="p-3 text-left text-gray-400 font-light text-[13px]">
+                Status
+              </td>
+              <td className="p-3 text-left text-gray-400">
+                <FaEllipsisH className="hover:text-green-600 text-xl cursor-pointer"></FaEllipsisH>
               </td>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="border">
+            {selectedMedicines.map((med, index) => {
+              const { text, color } = getStatus(med.status);
+              return (
+                <tr key={index} className="border text-sm sm:text-base ">
+                  <td className="p-3 text-[13px]  text-green-400 cursor-pointer hover:underline ">
+                    {med.manufacturer_id}
+                  </td>
+                  <td className="p-3 text-[13px] text-gray-400">
+                    {med.company}
+                    <br />
+                    {med.email}
+                  </td>
+                  <td className="p-3 text-[13px] text-gray-400">{med.phone}</td>
+                  <td className="p-3 text-[13px] text-gray-400">
+                    {med.address}
+                  </td>
+                  <td className="p-3 text-[13px] text-gray-400">
+                    {med.balance}
+                  </td>
+                  <td className={`px-6 py-2 font-light text-xs  ${color}`}>
+                    {text}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination Controls */}
+      <div className="flex flex-wrap items-center justify-between mt-4">
+        <div className="flex items-center space-x-2">
+          <span className="text-gray-400 font-light text-[13px]">
+            Rows per page:
+          </span>
+          <select
+            className="border p-2 rounded-md"
+            value={rowsPerPage}
+            onChange={(e) => {
+              setRowsPerPage(parseInt(e.target.value, 10));
+              setCurrentPage(1);
+            }}
+          >
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="15">15</option>
+          </select>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            className="px-3 py-1 border rounded-md text-gray-400 font-light text-[13px]"
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+
+          <span className="text-gray-400 font-light text-[13px]">
+            Page {currentPage} of {totalPages}
+          </span>
+
+          <button
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            className="px-3 py-1 border rounded-md text-gray-400 font-light text-[13px]"
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
-
-export default ManufacturerList;
+export default Manufacturerlist;

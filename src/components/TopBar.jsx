@@ -54,29 +54,29 @@ const TopBar = () => {
         <input
           type="text"
           placeholder="Search anything"
-          className="w-full p-2 outline-none text-gray-600"
+          className="w-full p-2 outline-none text-gray-600 "
           aria-label="Search"
         />
       </div>
 
       {/* Icons Section */}
       <div className="flex items-center space-x-6">
-        <RiGlobalLine className="text-green-600 cursor-pointer " size={30} />
-        <MessageCircle className="text-green-600 cursor-pointer" size={30} />
-        <Bell className="text-green-600 cursor-pointer" size={30} />
+        <RiGlobalLine className="text-green-600 cursor-pointer " size={27} />
+        <MessageCircle className="text-green-600 cursor-pointer" size={27} />
+        <Bell className="text-green-600 cursor-pointer" size={27} />
 
         {/* Language Selector */}
-        <div className="flex items-center space-x-2 rounded-md px-4 py-2 ">
+        <div className="flex items-center border space-x-2 rounded-md px-4 py-2 hover:border-green-600">
           <img
             src={languageOptions.find((lang) => lang.value === language)?.flag}
             alt={language}
-            className="w-8 h-8 rounded-full "
+            className="w-8 h-8 rounded-full  border"
             aria-label="Selected language flag"
           />
           <select
             value={language}
             onChange={handleLanguageChange}
-            className="text-gray-600 outline-none text-sm bg-transparent cursor-pointer"
+            className="text-gray-500   text-xs  cursor-pointer"
             aria-label="Language selector"
           >
             {languageOptions.map((lang) => (
@@ -91,12 +91,12 @@ const TopBar = () => {
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="bg-green-500 text-white p-2 rounded-full cursor-pointer"
+            className="bg-green-500 text-white p-1 rounded-full cursor-pointer me-5"
           >
             <User size={30} />
           </button>
           {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-56 bg-white shadow-lg rounded-lg p-2">
+            <div className="absolute right-4 border border-green-200 mt-2 w-56 bg-white shadow-lg rounded-lg p-2">
               <div className="flex items-center p-2 border-b">
                 <div className="bg-green-500 text-white w-10 h-10 flex items-center justify-center rounded-full font-bold">
                   AB

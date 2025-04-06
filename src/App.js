@@ -44,6 +44,17 @@ const MedicineDetail = lazy(() => import("./pages/medicine/MedicineDetail"));
 
 const Setting = lazy(() => import("./pages/setting/Setting"));
 
+
+
+const AddWastageReturn = lazy(() => import("./pages/return/AddWastageReturn"));
+const AddManufacturerReturn = lazy(() =>
+  import("./pages/return/AddManufacturerReturn")
+);
+const ManufacturerReturnList = lazy(() =>
+  import("./pages/return/ManufacturerReturnList")
+);
+const WastageReturnList = lazy(() => import("./pages/return/WastageReturnList"));
+
 const App = () => {
   const [selectedPage, setSelectedPage] = useState("Dashboard");
   const [isLoading, setIsLoading] = useState(true);
@@ -117,6 +128,23 @@ const App = () => {
                 <Route path="/medicinedetail" element={<MedicineDetail />} />
 
                 <Route path="/settingpage" element={<Setting />} />
+
+                <Route
+                  path="/manufacturerreturnlist"
+                  element={<ManufacturerReturnList />}
+                />
+                <Route
+                  path="/addwastagereturn"
+                  element={<AddWastageReturn />}
+                />
+                <Route
+                  path="/addmanufacturerreturn"
+                  element={<AddManufacturerReturn />}
+                />
+                <Route
+                  path="/wastagereturnlist"
+                  element={<WastageReturnList />}
+                />
 
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>

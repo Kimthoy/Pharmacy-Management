@@ -1,77 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
-import axios from "axios";
+//import axios from "axios";
 
 const AddMedicine = () => {
-  const [setBarcode] = useState("");
+  const [barcode, setBarcode] = useState("");
   const [openScanner, setOpenScanner] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
-
-  const [medicine, setMedicine] = useState({
-    medicine_name: "",
-    price: "",
-    quantity: "",
-    in_stock_date: "",
-    weight: "",
-    generic_name: "",
-    barcode_number: "",
-    expire_date: "",
-    status: "active",
-    category: "tablet",
-    medicine_detail: "",
-  });
-
-  const [token, setToken] = useState(localStorage.getItem("authToken") || ""); // ✅ Fix token state
-
-  useEffect(() => {
-    const userToken = localStorage.getItem("authToken");
-
-    if (userToken) {
-      console.log("Fetched Token from login:", userToken); // Debugging
-      setToken(userToken); // ✅ Set token in state
-    } else {
-      alert("You are not logged in!");
-    }
-  }, []);
-
-  const handleChange = (e) => {
-    setMedicine({ ...medicine, [e.target.name]: e.target.value });
-  };
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // ✅ Ensure token exists before submitting
-    if (!token) {
-      alert("User is not authenticated! Please log in.");
-      return;
-    }
-
-    try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/medicines/create",
-        medicine,
-        {
-          headers: {
-            Authorization: `Bearer ${token.trim()}`, // ✅ Include token
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      alert("Medicine added successfully!");
-      console.log(response.data);
-    } catch (error) {
-      console.error(
-        "Error adding medicine:",
-        error.response?.data || error.message
-      );
-      alert(
-        `Failed to add medicine: ${
-          error.response?.data?.message || "Unknown error"
-        }`
-      );
-    }
-  };
+  const [torchOn, setTorchOn] = useState(false);
 
   const toggleForm = () => {
     setIsFormOpen(!isFormOpen);
@@ -90,7 +25,7 @@ const AddMedicine = () => {
           <button
             type="button"
             onClick={toggleForm}
-            className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition"
+            className="text-xs text-emerald-500 border border-emerald-500 px-4 py-2 rounded-md hover:text-white hover:bg-emerald-500 transition"
           >
             Add Supplier
           </button>
@@ -113,48 +48,48 @@ const AddMedicine = () => {
                 <input
                   type="text"
                   placeholder="Supplier Name"
-                  className="bg-slate-200 px-2 py-2 rounded-md shadow-md focus:shadow-none focus:outline-green-500"
+                  className="text-xs border border-gray-400   px-2  py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
                   required
                 />
                 <input
                   type="text"
                   placeholder="Pharmacy Name"
-                  className="bg-slate-200 px-2 py-2 rounded-md shadow-md focus:shadow-none focus:outline-green-500"
+                  className="text-xs border border-gray-400   px-2  py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
                   required
                 />
                 <input
                   type="text"
                   placeholder="Address"
-                  className="bg-slate-200 px-2 py-2 rounded-md shadow-md focus:shadow-none focus:outline-green-500"
+                  className="text-xs border border-gray-400   px-2  py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
                   required
                 />
                 <input
                   type="file"
-                  className="bg-slate-200 px-2 py-2 rounded-md shadow-md focus:shadow-none focus:outline-green-500"
+                  className="text-xs border border-gray-400   px-2  py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
                   required
                 />
                 <input
                   type="text"
                   placeholder="Invoice ID"
-                  className="bg-slate-200 px-2 py-2 rounded-md shadow-md focus:shadow-none focus:outline-green-500"
+                  className="text-xs border border-gray-400   px-2  py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
                   required
                 />
                 <input
                   type="date"
-                  className="bg-slate-200 px-2 py-2 rounded-md shadow-md focus:shadow-none focus:outline-green-500"
+                  className="text-xs border border-gray-400   px-2  py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
                   required
                 />
                 <div className="col-span-1 md:col-span-2 flex justify-end space-x-3">
                   <button
                     type="submit"
-                    className="bg-purple-600 text-white px-4 py-2 rounded-md"
+                    className="border text-green-600 hover:text-white hover:bg-green-600 px-4 py-2 rounded-md"
                   >
                     Save
                   </button>
                   <button
                     type="button"
                     onClick={toggleForm}
-                    className="bg-red-600 text-white px-4 py-2 rounded-md"
+                    className="hover:text-red-600 text-gray-400 rounded-md"
                   >
                     Cancel
                   </button>
@@ -163,8 +98,8 @@ const AddMedicine = () => {
             </div>
           </div>
         )}
-
-        <form onSubmit={handleSubmit}>
+        {/* onSubmit={handleSubmit} */}
+        <form>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="flex flex-col">
               <label htmlFor="" className="mb-2">
@@ -175,9 +110,9 @@ const AddMedicine = () => {
                 type="text"
                 name="medicine_name"
                 placeholder="Medicine Name"
-                value={medicine.medicine_name}
-                onChange={handleChange}
-                className="bg-slate-200 px-2 py-2 rounded-md shadow-md focus:shadow-none focus:outline-green-500"
+                // value={medicine.medicine_name}
+                // onChange={handleChange}
+                className="text-xs border border-gray-400   px-2  py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
                 required
               />
             </div>
@@ -190,9 +125,9 @@ const AddMedicine = () => {
                 type="text"
                 placeholder="Price"
                 name="price"
-                value={medicine.price}
-                onChange={handleChange}
-                className="bg-slate-200 px-2 py-2 rounded-md shadow-md focus:shadow-none focus:outline-green-500"
+                // value={medicine.price}
+                // onChange={handleChange}
+                className="text-xs border border-gray-400   px-2  py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
                 required
               />
             </div>
@@ -206,9 +141,9 @@ const AddMedicine = () => {
                 type="number"
                 name="quantity"
                 placeholder="Quantity"
-                onChange={handleChange}
-                value={medicine.quantity}
-                className="bg-slate-200 px-2 py-2 rounded-md shadow-md focus:shadow-none focus:outline-green-500"
+                // onChange={handleChange}
+                // value={medicine.quantity}
+                className="text-xs border border-gray-400   px-2  py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
                 required
               />
             </div>
@@ -221,9 +156,9 @@ const AddMedicine = () => {
               <input
                 type="date"
                 name="in_stock_date"
-                onChange={handleChange}
-                value={medicine.in_stock_date}
-                className="bg-slate-200 px-2 py-2 rounded-md shadow-md focus:shadow-none focus:outline-green-500"
+                // onChange={handleChange}
+                // value={medicine.in_stock_date}
+                className="text-xs border border-gray-400   px-2  py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
                 required
               />
             </div>
@@ -237,9 +172,9 @@ const AddMedicine = () => {
                 type="text"
                 placeholder="Weight"
                 name="weight"
-                value={medicine.weight}
-                onChange={handleChange}
-                className="bg-slate-200 px-2 py-2 rounded-md shadow-md focus:shadow-none focus:outline-green-500"
+                // value={medicine.weight}
+                // onChange={handleChange}
+                className="text-xs border border-gray-400   px-2  py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
                 required
               />
             </div>
@@ -252,91 +187,84 @@ const AddMedicine = () => {
               <input
                 type="text"
                 name="generic_name"
-                onChange={handleChange}
+                // onChange={handleChange}
+                // value={medicine.generic_name}
                 placeholder="Generic Name"
-                value={medicine.generic_name}
-                className="bg-slate-200 px-2 py-2 rounded-md shadow-md focus:shadow-none focus:outline-green-500"
+                className="text-xs border border-gray-400   px-2  py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
                 required
               />
             </div>
 
-            <div className="flex z-0 flex-col">
-              <label htmlFor="barcode" className="mb-2">
+            <div className="flex flex-col relative">
+              <label
+                htmlFor="barcode"
+                className="mb-2 text-sm font-medium text-gray-700"
+              >
                 Barcode Scan
               </label>
 
-              <div className="bg-slate-200 z-10  rounded-sm shadow-md px-6 py-2 focus:border-none outline-none cursor-pointer relative">
+              <div className="border border-gray-400 text-xs font-light focus-within:outline-green-400 focus-within:border-green-700 focus-within:placeholder:text-green-400 z-10 rounded-sm px-6 py-2 cursor-pointer relative">
                 <input
                   required
                   id="barcode"
                   type="text"
-                  value={medicine.barcode_number}
+                  value={barcode} // Connected to state
+                  onChange={(e) => setBarcode(e.target.value)}
                   name="barcode_number"
-                  onChange={((e) => setBarcode(e.target.value), handleChange)}
                   placeholder="Scan or enter barcode"
-                  className="bg-transparent  focus:outline-none "
+                  className="bg-transparent focus:outline-none w-full"
                 />
                 <button
                   onClick={() => setOpenScanner(true)}
-                  style={{
-                    marginLeft: "-40px",
-                    padding: "10px",
-                    background: "transparent",
-                    border: "none",
-                    cursor: "pointer",
-                    position: "absolute",
-                    right: "5px",
-                    top: "-5px",
-                  }}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2"
                 >
                   <img
                     src="https://img.icons8.com/ios/50/barcode.png"
                     alt="Scan"
-                    width="30px"
+                    width="25px"
                   />
                 </button>
               </div>
 
               {openScanner && (
-                <div
-                  style={{
-                    position: "fixed",
-                    top: "0",
-                    left: "0",
-                    width: "100%",
-                    height: "100%",
-                    background: "rgba(0,0,0,0.5)", // Dark overlay
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    zIndex: 1000,
-                  }}
-                >
-                  <div
-                    style={{
-                      background: "white",
+                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+                  <div className="bg-white rounded-lg p-4 w-full max-w-md">
+                    <div className="relative" style={{ height: "300px" }}>
+                      <BarcodeScannerComponent
+                        width="100%"
+                        height="100%"
+                        facingMode="environment"
+                        torch={torchOn}
+                        onUpdate={(err, result) => {
+                          if (result) {
+                            setBarcode(result.text); // Updates the input field
+                            setOpenScanner(false); // Closes scanner after successful scan
+                          }
+                          if (err) {
+                            console.error("Scanner error:", err);
+                          }
+                        }}
+                      />
 
-                      borderRadius: "10px",
-                      textAlign: "center",
-                      position: "relative",
-                    }}
-                  >
-                    <h1 className="mb-4 font-semibold">Scan Barcode</h1>
-                    <BarcodeScannerComponent
-                      width={500}
-                      onUpdate={(err, result) => {
-                        if (result) {
-                          setBarcode(result.text);
-                          setOpenScanner(false);
-                        }
-                      }}
-                    />
-                    <button
-                      onClick={() => setOpenScanner(false)}
-                      className="text-red-600 py-4 "
-                    >
-                      Close Scanner
-                    </button>
+                      <button
+                        onClick={() => setTorchOn(!torchOn)}
+                        className="absolute top-2 right-2 bg-black bg-opacity-70 text-white p-2 rounded-full"
+                      >
+                        {torchOn ? "🔦 Flash On" : "💡 Flash Off"}
+                      </button>
+                    </div>
+
+                    <div className="mt-4 flex justify-between items-center">
+                      <div className="text-sm text-gray-600">
+                        {barcode && `Scanned: ${barcode}`}
+                      </div>
+                      <button
+                        onClick={() => setOpenScanner(false)}
+                        className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                      >
+                        Close Scanner
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
@@ -349,10 +277,10 @@ const AddMedicine = () => {
               <input
                 type="date"
                 name="expire_date"
-                className="bg-slate-200 px-2 py-2 rounded-md shadow-md focus:shadow-none focus:outline-green-500"
+                className="text-xs border border-gray-400   px-2  py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
                 required
-                value={medicine.expire_date}
-                onChange={handleChange}
+                // value={medicine.expire_date}
+                // onChange={handleChange}
               />
             </div>
 
@@ -362,10 +290,10 @@ const AddMedicine = () => {
               </label>
 
               <select
-                className="bg-slate-200 px-2 py-2 rounded-md shadow-md focus:shadow-none focus:outline-green-500 "
-                onChange={handleChange}
+                className="text-xs border border-gray-400   px-2  py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
+                // onChange={handleChange}
+                // value={medicine.status}
                 required
-                value={medicine.status}
               >
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
@@ -377,9 +305,9 @@ const AddMedicine = () => {
               </label>
 
               <select
-                className=" bg-slate-200 px-2 py-2 rounded-md shadow-md focus:shadow-none focus:outline-green-500"
-                onChange={handleChange}
-                value={medicine.category}
+                className="text-xs border border-gray-400   px-2  py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
+                // onChange={handleChange}
+                // value={medicine.category}
                 required
               >
                 <option>Select Category</option>
@@ -395,17 +323,17 @@ const AddMedicine = () => {
               <textarea
                 placeholder="Medicine Details"
                 name="medicine_detail"
-                onChange={handleChange}
-                value={medicine.medicine_detail}
+                // onChange={handleChange}
+                // value={medicine.medicine_detail}
                 required
-                className=" h-24 bg-slate-200 px-2 py-2 rounded-md shadow-md focus:shadow-none focus:outline-green-500"
+                className="border border-gray-400  w-[580px] h-[200px] px-2 text-xs py-2 rounded-[4px] font-light   focus:outline-green-400  focus:border-green-700 focus:placeholder:text-green-400"
               ></textarea>
             </div>
           </div>
           <div className="mt-4">
             <button
               type="submit"
-              className="bg-green-500 text-white px-6 py-3 rounded-md w-full md:w-auto shadow-md active:shadow-none"
+              className="bg-green-500 text-xs text-white px-3 py-3 rounded-md w-full md:w-auto shadow-md active:shadow-none"
             >
               Add Medicine
             </button>

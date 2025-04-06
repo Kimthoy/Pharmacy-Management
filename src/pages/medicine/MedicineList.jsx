@@ -90,14 +90,15 @@ const MedicineList = () => {
           <option value="Vitamin">Vitamin</option>
           <option value="Inhaler">Inhaler</option>
         </select>
-
-        <div>
+      </div>
+      <div className="flex mb-4">
+        <div className="me-5">
           <label htmlFor="" className="me-2 text-gray-400">
             Filter by Choose start date
           </label>
           <input
             type="date"
-            className="border p-2 rounded-md focus:outline-green-500"
+            className="border p-2 rounded-md focus:outline-green-500 "
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
           />
@@ -119,41 +120,53 @@ const MedicineList = () => {
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full min-w-[600px] border-collapse bg-white shadow-md rounded-lg">
-          <thead className="bg-gray-100 text-gray-700 rounded">
+          <thead className="border text-gray-400 rounded">
             <tr>
-              <td className="p-3 text-left">Name</td>
-              <td className="p-3 text-left">Generic Name</td>
-              <td className="p-3 text-left">Weight</td>
-              <td className="p-3 text-left">Category</td>
-              <td className="p-3 text-left">Price</td>
-              <td className="p-3 text-left">Stock</td>
-              <td className="p-3 text-left">Status</td>
-              <td className="p-3 text-left">Date</td>
-              <td className="p-3 text-left">Actions</td>
+              <td className="p-3 text-left text-sm">Name</td>
+              <td className="p-3 text-left text-sm">Generic Name</td>
+              <td className="p-3 text-left text-sm">Weight</td>
+              <td className="p-3 text-left text-sm">Category</td>
+              <td className="p-3 text-left text-sm">Price</td>
+              <td className="p-3 text-left text-sm">Stock</td>
+              <td className="p-3 text-left text-sm">Status</td>
+              <td className="p-3 text-left text-sm">Date</td>
+              <td className="p-3 text-left text-sm">Actions</td>
             </tr>
           </thead>
           <tbody>
             {selectedMedicines.map((med, index) => {
               const { text, color } = getStatus(med.stock);
               return (
-                <tr key={index} className="border-b text-sm sm:text-base">
-                  <td className="p-3 font-bold text-gray-600">{med.name}</td>
-                  <td className="p-3 text-gray-400">{med.generic}</td>
-                  <td className="p-3 text-gray-400">{med.weight}</td>
-                  <td className="p-3 text-gray-400">{med.category}</td>
-                  <td className="p-3 text-gray-400">{med.price}</td>
-                  <td className="p-3 text-gray-400">{med.stock}</td>
-                  <td className={`p-3 font-semibold ${color}`}>{text}</td>
-                  <td className="p-3 text-gray-400">{med.date}</td>
-                  <td className="p-3 relative">
+                <tr key={index} className="border text-xs sm:text-base">
+                  <td className="p-3  text-[13px]  text-gray-400">
+                    {med.name}
+                  </td>
+                  <td className="p-3  text-[13px] text-gray-400">
+                    {med.generic}
+                  </td>
+                  <td className="p-3  text-[13px] text-gray-400">
+                    {med.weight}
+                  </td>
+                  <td className="p-3  text-[13px] text-gray-400">
+                    {med.category}
+                  </td>
+                  <td className="p-3  text-[13px] text-gray-400">
+                    {med.price}
+                  </td>
+                  <td className="p-3  text-[13px] text-gray-400">
+                    {med.stock}
+                  </td>
+                  <td className={`p-3 text-[13px]   ${color}`}>{text}</td>
+                  <td className="p-3  text-[13px] text-gray-400">{med.date}</td>
+                  <td className="p-3  text-[13px] relative">
                     <button
-                      className="p-2 bg-gray-200 rounded-full hover:bg-gray-300"
+                      className="p-2 bg-gray-00 rounded-full hover:bg-gray-300"
                       onClick={() => toggleMenu(index)}
                     >
                       <FaEllipsisV />
                     </button>
                     {openMenu === index && (
-                      <div className="absolute z-10 right-24  mt-2 top-2 w-36 bg-gray-100 border-green-600  rounded-md shadow-md">
+                      <div className="absolute z-10 right-16  mt-2 top-2 w-36 bg-gray-100 border-green-600  rounded-md shadow-md">
                         <button className="flex  align-middle w-full text-left text-gray-600  py-2 hover:rounded-md hover:bg-green-500 hover:text-white">
                           <MdWarehouse className="mt-1 w-10" />
                           Manufacturer
