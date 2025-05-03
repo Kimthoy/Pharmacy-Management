@@ -1,0 +1,31 @@
+{
+  "topbar": {
+    "searchPlaceholder": "Search...",
+    "viewProfile": "View Profile",
+    "accountSetting": "Account Settings",
+    "loginActivity": "Login Activity",
+    "signOut": "Sign Out"
+  },
+  "common": {
+    "download": "Download",
+    "viewReport": "View Detailed Report",
+    "goTo": "Go to"
+  },
+  
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Overview of your pharmacy data",
+    "downloadReport": "Download Report",
+    "excel": "Excel",
+    "pdf": "PDF",
+    "inventoryStatus": "Inventory Status",
+    "revenue": "Revenue",
+    "medicinesAvailable": "Medicines Available",
+    "medicineShortage": "Medicine Shortage"
+  },
+  "inventory": {
+    "title": "Inventory",
+    "totalMedicines": "Total Medicines"
+  }
+
+}

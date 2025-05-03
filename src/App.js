@@ -10,7 +10,7 @@ import TopBar from "./components/TopBar";
 import Footer from "./components/Footer";
 import Sidebar from "./components/Sidebar";
 import Register from "./pages/auth/Register";
-
+import { LanguageProvider } from "./context/LanguageContext";
 const Login = lazy(() => import("./pages/auth/Login"));
 
 const CustomerList = lazy(() => import("./pages/customer/ListCustomer"));
@@ -44,8 +44,6 @@ const MedicineDetail = lazy(() => import("./pages/medicine/MedicineDetail"));
 
 const Setting = lazy(() => import("./pages/setting/Setting"));
 
-
-
 const AddWastageReturn = lazy(() => import("./pages/return/AddWastageReturn"));
 const AddManufacturerReturn = lazy(() =>
   import("./pages/return/AddManufacturerReturn")
@@ -53,9 +51,18 @@ const AddManufacturerReturn = lazy(() =>
 const ManufacturerReturnList = lazy(() =>
   import("./pages/return/ManufacturerReturnList")
 );
-const WastageReturnList = lazy(() => import("./pages/return/WastageReturnList"));
+const WastageReturnList = lazy(() =>
+  import("./pages/return/WastageReturnList")
+);
 
 const App = () => {
+  const [langCode, setLangCode] = useState(
+    localStorage.getItem("selectedLanguage") || "en"
+  );
+
+  const handleLanguageChange = (newLang) => {
+    setLangCode(newLang);
+  };
   const [selectedPage, setSelectedPage] = useState("Dashboard");
   const [isLoading, setIsLoading] = useState(true);
 
@@ -85,75 +92,80 @@ const App = () => {
     </div>
   ) : (
     <Router>
-      <div className="flex h-screen bg-slate-100">
-        <Sidebar
-          setSelectedPage={setSelectedPage}
-          selectedPage={selectedPage}
-        />
+      <LanguageProvider>
+        <div className="flex h-screen bg-slate-100">
+          <Sidebar
+            setSelectedPage={setSelectedPage}
+            selectedPage={selectedPage}
+          />
 
-        <div className="flex-1 flex flex-col">
-          <TopBar />
+          <div className="flex-1 flex flex-col">
+            <TopBar onLanguageChange={handleLanguageChange} />
 
-          <div className="flex-1 overflow-y-auto p-4 bg-slate-100">
-            <Suspense fallback={<Loader />}>
-              <Routes>
-                <Route path="/" element={<Dashboard />} />
+            <div className="flex-1 overflow-y-auto p-4 bg-slate-100">
+              <Suspense fallback={<Loader />}>
+                <Routes>
+                  <Route path="/" element={<Dashboard langCode={langCode} />} />
 
-                <Route path="/customerlist" element={<CustomerList />} />
-                <Route path="/customerledger" element={<CustomerLedger />} />
-                <Route path="/insertcustomer" element={<InsertCustomer />} />
+                  <Route path="/customerlist" element={<CustomerList />} />
+                  <Route path="/customerledger" element={<CustomerLedger />} />
+                  <Route path="/insertcustomer" element={<InsertCustomer />} />
 
-                <Route
-                  path="/manufacturerlist"
-                  element={<ManufacturerList />}
-                />
-                <Route path="/addmanu" element={<AddManu />} />
-                <Route path="/manuledger" element={<ManuLedger />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
+                  <Route
+                    path="/manufacturerlist"
+                    element={<ManufacturerList />}
+                  />
+                  <Route path="/addmanu" element={<AddManu />} />
+                  <Route path="/manuledger" element={<ManuLedger />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
 
-                <Route path="/salereport" element={<SellReport />} />
-                <Route path="/purchasreport" element={<PurchaseReport />} />
-                <Route path="/stockreport" element={<StockReport />} />
+                  <Route path="/salereport" element={<SellReport />} />
+                  <Route path="/purchasreport" element={<PurchaseReport />} />
+                  <Route path="/stockreport" element={<StockReport />} />
 
-                <Route path="/expensepage" element={<ExpensePage />} />
-                <Route path="/incomepage" element={<IncomePage />} />
-                <Route path="/invoicedetail" element={<InvoiceDetailsPage />} />
-                <Route path="/invoicelist" element={<InvoiceListPage />} />
+                  <Route path="/expensepage" element={<ExpensePage />} />
+                  <Route path="/incomepage" element={<IncomePage />} />
+                  <Route
+                    path="/invoicedetail"
+                    element={<InvoiceDetailsPage />}
+                  />
+                  <Route path="/invoicelist" element={<InvoiceListPage />} />
 
-                <Route path="/aboutuser" element={<AboutUser />} />
+                  <Route path="/aboutuser" element={<AboutUser />} />
 
-                <Route path="/addmedicinepage" element={<AddMedicine />} />
-                <Route path="/listofmedicine" element={<MedicineList />} />
-                <Route path="/medicinedetail" element={<MedicineDetail />} />
+                  <Route path="/addmedicinepage" element={<AddMedicine />} />
+                  <Route path="/listofmedicine" element={<MedicineList />} />
+                  <Route path="/medicinedetail" element={<MedicineDetail />} />
 
-                <Route path="/settingpage" element={<Setting />} />
+                  <Route path="/settingpage" element={<Setting />} />
 
-                <Route
-                  path="/manufacturerreturnlist"
-                  element={<ManufacturerReturnList />}
-                />
-                <Route
-                  path="/addwastagereturn"
-                  element={<AddWastageReturn />}
-                />
-                <Route
-                  path="/addmanufacturerreturn"
-                  element={<AddManufacturerReturn />}
-                />
-                <Route
-                  path="/wastagereturnlist"
-                  element={<WastageReturnList />}
-                />
+                  <Route
+                    path="/manufacturerreturnlist"
+                    element={<ManufacturerReturnList />}
+                  />
+                  <Route
+                    path="/addwastagereturn"
+                    element={<AddWastageReturn />}
+                  />
+                  <Route
+                    path="/addmanufacturerreturn"
+                    element={<AddManufacturerReturn />}
+                  />
+                  <Route
+                    path="/wastagereturnlist"
+                    element={<WastageReturnList />}
+                  />
 
-                <Route path="*" element={<Navigate to="/" />} />
-              </Routes>
-            </Suspense>
+                  <Route path="*" element={<Navigate to="/" />} />
+                </Routes>
+              </Suspense>
+            </div>
+
+            <Footer />
           </div>
-
-          <Footer />
         </div>
-      </div>
+      </LanguageProvider>
     </Router>
   );
 };

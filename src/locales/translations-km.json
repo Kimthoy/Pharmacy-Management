@@ -1,0 +1,24 @@
+{
+  "topbar": {
+    "searchPlaceholder": "ស្វែងរក...",
+    "viewProfile": "មើលប្រវត្តិរូប",
+    "accountSetting": "ការកំណត់គណនី",
+    "loginActivity": "សកម្មភាពចូលប្រើ",
+    "signOut": "ចាកចេញ"
+  },
+  "dashboard": {
+    "title": "ផ្ទាំងគ្រប់គ្រង",
+    "subtitle": "ទិន្នន័យសារព័ត៌មានរបស់អ្នក",
+    "downloadReport": "ទាញយករបាយការណ៍",
+    "excel": "Excel",
+    "pdf": "PDF",
+    "inventoryStatus": "ស្ថានភាពសារព័ត៌",
+    "revenue": "ចំណូល",
+    "medicinesAvailable": "ថ្នាំដែលមានស្រាប់",
+    "medicineShortage": "កង្វះថ្នាំ"
+  },
+  "inventory": {
+    "title": "សារព័ត៌",
+    "totalMedicines": "ថ្នាំសរុប"
+  }
+}
