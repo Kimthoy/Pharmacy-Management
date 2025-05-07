@@ -10,7 +10,8 @@ import TopBar from "./components/TopBar";
 import Footer from "./components/Footer";
 import Sidebar from "./components/Sidebar";
 import Register from "./pages/auth/Register";
-import { LanguageProvider } from "./context/LanguageContext";
+import { LanguageProvider } from "./context/LanguageContext"; // ✅ Import your LanguageProvider
+
 const Login = lazy(() => import("./pages/auth/Login"));
 
 const CustomerList = lazy(() => import("./pages/customer/ListCustomer"));
@@ -63,6 +64,7 @@ const App = () => {
   const handleLanguageChange = (newLang) => {
     setLangCode(newLang);
   };
+
   const [selectedPage, setSelectedPage] = useState("Dashboard");
   const [isLoading, setIsLoading] = useState(true);
 
@@ -91,8 +93,10 @@ const App = () => {
       <Loader />
     </div>
   ) : (
-    <Router>
-      <LanguageProvider>
+    <LanguageProvider>
+      {" "}
+      {/* ✅ Wrap your entire app here */}
+      <Router>
         <div className="flex h-screen bg-slate-100">
           <Sidebar
             setSelectedPage={setSelectedPage}
@@ -117,6 +121,7 @@ const App = () => {
                   />
                   <Route path="/addmanu" element={<AddManu />} />
                   <Route path="/manuledger" element={<ManuLedger />} />
+
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
 
@@ -165,8 +170,8 @@ const App = () => {
             <Footer />
           </div>
         </div>
-      </LanguageProvider>
-    </Router>
+      </Router>
+    </LanguageProvider>
   );
 };
 

@@ -1,17 +1,20 @@
 {
   "topbar": {
-    "searchPlaceholder": "Search...",
+    "search": "Search for somethings...",
     "viewProfile": "View Profile",
     "accountSetting": "Account Settings",
     "loginActivity": "Login Activity",
-    "signOut": "Sign Out"
+    "signOut": "Sign Out",
+    "messages": "Messages",
+    "notifications": "Notifications",
+    "profile": "Profile"
   },
   "common": {
     "download": "Download",
     "viewReport": "View Detailed Report",
     "goTo": "Go to"
   },
-  
+
   "dashboard": {
     "title": "Dashboard",
     "subtitle": "Overview of your pharmacy data",
@@ -26,6 +29,43 @@
   "inventory": {
     "title": "Inventory",
     "totalMedicines": "Total Medicines"
+  },
+  "supplier": {
+    "supptitle": "Supplier",
+    "totalsupp": "Total Suppliers"
+  },
+  "report": {
+    "title-report": "Report",
+    "total-report": "Total Report"
+  },
+  "customers": {
+    "title-customer": "Customer",
+    "total-customer": "Total Customer"
+  },
+  "add-medicine": {
+    "AddMedicine": "Add Medicine",
+    "title-addmedicine": "You can add a medicine by filling this form.",
+    "MecineName-PlaceHolder": "Enter Medincine Name",
+    "Madicinename": "Madicine name",
+    "Price": "Price",
+    "Price-PlaceHolder": "Enter Price",
+    "Quantity": "Quantity",
+    "Quantity-PlaceHolder": "Enter Quantity",
+    "InStockDate": "In Stock Date",
+    "StockDate-PlaceHolder": "Choose Stock Date",
+    "Weight": "Weight",
+    "Weight-PlaceHolder": "Enter Weight",
+    "BarcodeScan": "Barcode Scan",
+    "BarcodeScan-PlaceHolder": "Enter Barcode Scan",
+    "ExpireDate": "Expire Date",
+    "Status": "Status",
+    "Status-PlaceHolder": "Choose Status",
+    "Category": "Category",
+    "Category-PlaceHolder": "Choose Category",
+    "MedicineInformation": "Medicine Information",
+    "MedicineInformation-PlaceHolder": "Enter Medicine Information",
+    "ButtonAddMedicine": "Add Medicine",
+    "ButtonAddSupplier": "Add Supplier",
+    "CloseScanner": "Close Scanner"
   }
-
 }

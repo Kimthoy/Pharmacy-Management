@@ -117,12 +117,12 @@ const Dashboard = () => {
             <div className="flex items-center">
               <ShoppingCartIcon className="h-5 w-5 text-gray-500 mr-2" />
               <h3 className="text-sm font-semibold text-gray-500">
-                {t("dashboard.quickReport")}
+                {t("report.title-report")}
               </h3>
             </div>
           </div>
           <p className="mt-4 text-xs text-gray-500">
-            <strong>70,856</strong> {t("dashboard.medicinesSold")}
+            <strong>70,856</strong> {t("report.total-report")}
           </p>
         </div>
 
@@ -131,12 +131,12 @@ const Dashboard = () => {
             <div className="flex items-center">
               <UserGroupIcon className="h-5 w-5 text-gray-500 mr-2" />
               <h3 className="text-sm font-semibold text-gray-500">
-                {t("dashboard.myPharmacy")}
+                {t("supplier.supptitle")}
               </h3>
             </div>
           </div>
           <p className="mt-4 text-xs text-gray-500">
-            <strong>04</strong> {t("dashboard.totalSuppliers")}
+            <strong>04</strong> {t("supplier.totalsupp")}
           </p>
         </div>
 
@@ -145,12 +145,12 @@ const Dashboard = () => {
             <div className="flex items-center">
               <UsersIcon className="h-5 w-5 text-gray-500 mr-2" />
               <h3 className="text-sm font-semibold text-gray-500">
-                {t("dashboard.customers")}
+                {t("customers.title-customer")}
               </h3>
             </div>
           </div>
           <p className="mt-4 text-xs text-gray-500">
-            <strong>845</strong> {t("dashboard.totalCustomers")}
+            <strong>845</strong> {t("customers.total-customer")}
           </p>
         </div>
       </div>

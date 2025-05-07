@@ -1,10 +1,13 @@
 {
   "topbar": {
-    "searchPlaceholder": "ស្វែងរក...",
+    "search": "ស្វែងរក...",
     "viewProfile": "មើលប្រវត្តិរូប",
     "accountSetting": "ការកំណត់គណនី",
     "loginActivity": "សកម្មភាពចូលប្រើ",
-    "signOut": "ចាកចេញ"
+    "signOut": "ចាកចេញ",
+    "messages": "សារ",
+    "notifications": "ការជូនដំណឹង",
+    "profile": "ប្រវត្តិរូប"
   },
   "dashboard": {
     "title": "ផ្ទាំងគ្រប់គ្រង",
@@ -20,5 +23,44 @@
   "inventory": {
     "title": "សារព័ត៌",
     "totalMedicines": "ថ្នាំសរុប"
+  },
+  "supplier": {
+    "supptitle": "អ្នកផ្គត់ផ្គង់",
+    "totalsupp": "អ្នកផ្គត់ផ្គង់ទាំងអស់"
+  },
+
+  "report": {
+    "title-report": "របាយការណ៍",
+    "total-report": "របាយការណ៍​ សរុប"
+  },
+  "customers": {
+    "title-customer": "អតិថិជន",
+    "total-customer": "អតិថិជន សរុប"
+  },
+  "add-medicine": {
+    "AddMedicine": "បន្ថែម ថ្នាំ",
+    "title-addmedicine": "សូមបំពេញ ព័ត៍មានទាំងអស់នេះឲ្យបានត្រឹមត្រូវ។",
+    "MecineName-PlaceHolder": "សូមបញ្ជូល​ ឈ្មោះថ្នាំ",
+    "Madicinename": "ឈ្មោះថ្នាំ",
+    "Price": "តម្លៃ",
+    "Price-PlaceHolder": "សូមបញ្ជូល​​ តម្លៃ",
+    "Quantity": "ចំនួន",
+    "Quantity-PlaceHolder": "សូមបញ្ជូល​ ចំនួន",
+    "InStockDate": "ថ្ងៃចូលស្តុក",
+    "StockDate-PlaceHolder": "សូមជ្រើសរើស",
+    "Weight": "ទម្ងន់",
+    "Weight-PlaceHolder": "សូមបញ្ជូល​ ទម្ងន់",
+    "BarcodeScan": "បារកូដ ស្កេន",
+    "BarcodeScan-PlaceHolder": "សូមបញ្ជូល​​​ បារកូដ",
+    "ExpireDate": "ថ្ងៃចូល ផុតកំណត់",
+    "Status": "ស្ថានភាព",
+    "Status-PlaceHolder": "សូមជ្រើសរើស ស្ថានភាព",
+    "Category": "ប្រភេទ",
+    "Category-PlaceHolder": "សូមជ្រើសរើស ប្រភេទ",
+    "MedicineInformation": "ព័ត៍ ថ្នាំ",
+    "MedicineInformation-PlaceHolder": "សូមបញ្ជូល​ ព័ត៍ថាំ្ន",
+    "ButtonAddMedicine": "បន្ថែម ថ្នាំ",
+    "ButtonAddSupplier": "បន្ថែម អ្នកផ្គត់ផ្គង់",
+    "CloseScanner": "បិទ ស្កេន"
   }
 }

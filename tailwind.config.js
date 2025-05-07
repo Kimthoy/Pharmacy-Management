@@ -9,6 +9,13 @@ module.exports = {
         tablet: "1280px",
         computer: "1536px",
       },
+      fontFamily: {
+        sans: ["Inter", "sans-serif"],
+        // Add other custom fonts here
+        roboto: ["Roboto", "sans-serif"],
+        poppins: ["Poppins", "sans-serif"],
+        khmer: ["Nokora", "Kantumruy", "serif"],
+      },
     },
   },
   plugins: [],
