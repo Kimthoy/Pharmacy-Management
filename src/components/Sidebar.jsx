@@ -5,6 +5,7 @@ import { useTranslation } from "../../src/hooks/useTranslation"; // Make sure pa
 import { BiCapsule } from "react-icons/bi";
 import { CiRepeat, CiSettings } from "react-icons/ci";
 import { RiPagesLine } from "react-icons/ri";
+import { FaUserDoctor } from "react-icons/fa6";
 import {
   UserGroupIcon,
   UserPlusIcon,
@@ -53,7 +54,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
     },
     {
       name: t("sidebar.staff"),
-      icon: UserGroupIcon,
+      icon: FaUserDoctor,
       path: "/staff",
       subItems: [
         {
@@ -134,7 +135,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
   return (
     <div
       className={`h-screen  flex-shrink-0 bg-white shadow-lg transition-all duration-300 ${
-        isHovered ? "w-44" : "w-[60px]"
+        isHovered ? "w-52" : "w-[70px]"
       }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
@@ -159,13 +160,33 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                         handlePageSelection(name, path);
                       }
                     }}
-                    className={`flex  items-center  w-full p-2 rounded-md text-gray-700 hover:bg-green-100 hover:text-green-700 transition-all duration-200 ${
+                    className={`flex items-center justify-between w-full text-xs p-2 rounded-md text-gray-700 hover:bg-green-100 hover:text-green-700 transition-all duration-200 ${
                       selectedPage === name ? "bg-green-500 text-white" : ""
                     }`}
                   >
-                    <Icon className="w-6 h-6 flex-shrink-0" />
-                    {isHovered && (
-                      <span className="ml-6 whitespace-nowrap">{name}</span>
+                    {/* Left section: icon + label */}
+                    <div className="flex items-center">
+                      <Icon className="w-6 h-6 flex-shrink-0" />
+                      {isHovered && (
+                        <span className="ml-6 whitespace-nowrap">{name}</span>
+                      )}
+                    </div>
+
+                    {/* Right section: dropdown arrow (if applicable) */}
+                    {isHovered && subItems && (
+                      <svg
+                        className={`w-4 h-4 transition-transform ${
+                          activeMenuItem === name ? "rotate-180" : ""
+                        } text-green-600`}
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.27a.75.75 0 01.02-1.06z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
                     )}
                   </button>
 
@@ -184,7 +205,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                             onClick={() =>
                               handlePageSelection(sub.name, sub.path)
                             }
-                            className={`w-full text-left ml-10 mt-1 p-2 rounded text-sm hover:bg-green-100 hover:text-green-700 transition-colors ${
+                            className={`w-full  text-left ml-10 mt-1 p-2 rounded text-xs hover:bg-green-100 hover:text-green-700 transition-colors ${
                               selectedPage === sub.name
                                 ? "bg-green-500 text-white"
                                 : ""

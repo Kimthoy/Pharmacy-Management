@@ -3,7 +3,7 @@
 @tailwind utilities;
 /* index.css */
 /* src/index.css */
-@import url('https://fonts.googleapis.com/css2?family=Kantumruy :wght@300;400;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Kantumruy :wght@300;400;700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap");
 /* src/index.css */
 @import url("https://fonts.googleapis.com/css2?family=Nokora:wght@400;700&display=swap");
@@ -87,4 +87,19 @@ code {
 body {
   font-family: Roboto, sans-serif;
   font-size: 14px;
+}
+
+@keyframes dropdown {
+  0% {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-dropdown {
+  animation: dropdown 0.25s ease-out forwards;
 }

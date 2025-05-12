@@ -98,5 +98,10 @@
     "login": "ចូល",
     "register": "ចុះឈ្មោះ",
     "settings": "ការកំណត់"
+  },
+  "register": {
+    "Welcomes": "សូមស្វាគមន៍",
+    "PanharithPharmacys": "Panharith Pharmacy",
+    "Pleaseenter": "សូមបញ្ជូលព័ត៍មាន អាខោនថ្នីរបស់អ្នក​ឲ្យបានត្រឹមត្រូវ"
   }
 }

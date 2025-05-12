@@ -1,5 +1,5 @@
 // src/components/Dashboard.jsx
-import  { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "../../hooks/useTranslation";
 import {
   ShieldCheckIcon,
@@ -15,6 +15,22 @@ import {
 const Dashboard = () => {
   const { t } = useTranslation();
   const [showDropdown, setShowDropdown] = useState(false);
+  const downloadDropdownRef = useRef(null);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        downloadDropdownRef.current &&
+        !downloadDropdownRef.current.contains(event.target)
+      ) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleDownload = (format) => {
     alert(`${t(`dashboard.${format.toLowerCase()}`)} file downloaded`);
@@ -33,7 +49,7 @@ const Dashboard = () => {
             {t("dashboard.subtitle")}
           </p>
         </div>
-        <div className="relative">
+        <div className="relative" ref={downloadDropdownRef}>
           <button
             className="text-gray-500 border px-3 py-1 sm:px-4 sm:py-2 rounded-md shadow-sm hover:border-emerald-600 hover:text-emerald-500"
             onClick={() => setShowDropdown(!showDropdown)}
@@ -41,7 +57,11 @@ const Dashboard = () => {
             {t("dashboard.downloadReport")} <span className="ml-1">▼</span>
           </button>
           {showDropdown && (
-            <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-300 rounded-md shadow-lg z-10">
+            <div
+              className="absolute right-0 mt-2 w-40 bg-white border border-gray-300 rounded-md shadow-lg z-10 
+            transition-all duration-300 ease-out transform origin-top scale-95 opacity-0 
+            animate-dropdown"
+            >
               <button
                 className="block w-full px-4 py-2 text-left text-gray-700 hover:border-emerald-600 hover:text-emerald-600"
                 onClick={() => handleDownload("Excel")}
