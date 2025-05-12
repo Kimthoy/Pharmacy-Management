@@ -1,0 +1,157 @@
+/* Container for the ManageStaff page */
+.staff-container {
+  width: 100%;
+  max-width: 100%;
+  padding: 0 20px;
+  margin-top: 30px;
+}
+
+/* Title for the page */
+.staff-title {
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #32cd32;
+  background: linear-gradient(45deg, #32cd32, #228b22);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* Loading message */
+.loading-message {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #888;
+  font-style: italic;
+}
+
+/* Table wrapper for responsive design */
+.staff-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Styling for the table */
+.staff-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+/* Header styling */
+.staff-table-header {
+  background-color: #2e8b57;
+  color: #fff;
+  text-align: center;
+}
+
+.staff-table-header th {
+  padding: 12px 15px;
+}
+
+/* Row styling */
+.staff-table-row {
+  text-align: center;
+}
+
+.staff-table-row td {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+}
+
+/* Styling for alternate row colors */
+.staff-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.staff-table-row:hover {
+  background-color: #e1f5e1;
+}
+
+/* Badge for active/inactive status */
+.status-badge {
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+  border-radius: 12px;
+}
+
+.active-status {
+  background-color: #28a745;
+}
+
+.inactive-status {
+  background-color: #fc5801;
+}
+
+/* Buttons for actions */
+.action-btn {
+  border-radius: 5px;
+  padding: 8px 16px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 14px;
+}
+
+.edit-btn {
+  background-color: #ffc107;
+  color: white;
+}
+
+.delete-btn {
+  background-color: #dc3545;
+  color: white;
+  margin-left: 5px;
+}
+
+/* Animation for table */
+.staff-table {
+  animation: fadeIn 1.5s ease-out;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+  .staff-table th,
+  .staff-table td {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .staff-title {
+    font-size: 1.8rem;
+  }
+
+  .action-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .staff-table th,
+  .staff-table td {
+    font-size: 12px;
+  }
+}
+.add-staff {
+  background-color: #32cd32;
+  color: white;
+  padding: 8px 12px;
+}
+.add-staff:hover {
+  background-color: #107110;
+  color: white;
+  padding: 8px 12px;
+}

@@ -67,5 +67,43 @@
     "ButtonAddMedicine": "Add Medicine",
     "ButtonAddSupplier": "Add Supplier",
     "CloseScanner": "Close Scanner"
-  }
+  },
+
+  
+    "sidebar": {
+      "appName": "My App",
+      "dashboards": "Dashboard",
+      "medicine": "Medicine",
+      "addMedicine": "Add Medicine",
+      "medicineList": "Medicine List",
+      "medicineDetail": "Medicine Detail",
+      "customer": "Customers",
+      "newCustomer": "New Customer",
+      "customerList": "Customer List",
+      "customerLedger": "Customer Ledger",
+      "staff": "Staff",
+      "staffList": "List of Staff",
+      "manufacturer": "Manufacturer",
+      "manufacturerList": "Manufacturer List",
+      "manufacturerLedger": "Manufacturer Ledger",
+      "returns": "Return",
+      "addWastageReturn": "Add Wastage Return",
+      "addManufacturerReturn": "Add Manufacturer Return",
+      "manufacturerReturnList": "Manufacturer Return List",
+      "wastageReturnList": "Wastage Return List",
+      "finance": "Finance",
+      "expense": "Expense",
+      "income": "Income",
+      "invoiceDetail": "Invoice Detail",
+      "invoiceList": "Invoice List",
+      "reports": "Report",
+      "saleReport": "SaleReport",
+      "stockReport": "StockReport",
+      "purchaseReport": "PurchaseReport",
+      "pages": "Pages",
+      "login": "Login",
+      "register": "Sign In",
+      "settings": "Settings"
+    }
+  
 }

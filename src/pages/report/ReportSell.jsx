@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import  { useMemo, useState } from "react";
 import { FaEllipsisH } from "react-icons/fa";
 import {
   LineChart,
@@ -10,15 +10,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-// Mock data
-const SALES_DATA = [
-  { name: "Day 1", sales: 200 },
-  { name: "Day 2", sales: 400 },
-  { name: "Day 3", sales: 300 },
-  { name: "Day 4", sales: 500 },
-  { name: "Day 5", sales: 450 },
-  { name: "Day 6", sales: 600 },
-];
 
 const MEDICINES = [
   {

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FaEllipsisH } from "react-icons/fa";
-import { read } from "xlsx";
+
 // import { BiEdit, BiTrash } from "react-icons/bi";
 
 const medicines = [

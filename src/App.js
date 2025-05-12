@@ -55,7 +55,7 @@ const ManufacturerReturnList = lazy(() =>
 const WastageReturnList = lazy(() =>
   import("./pages/return/WastageReturnList")
 );
-
+const StaffList = lazy(() => import("./pages/staff/ManageStaff"));
 const App = () => {
   const [langCode, setLangCode] = useState(
     localStorage.getItem("selectedLanguage") || "en"
@@ -97,7 +97,7 @@ const App = () => {
       {" "}
       {/* ✅ Wrap your entire app here */}
       <Router>
-        <div className="flex h-screen bg-slate-100">
+        <div className="flex h-screen bg-slate-100 font-khmer">
           <Sidebar
             setSelectedPage={setSelectedPage}
             selectedPage={selectedPage}
@@ -161,7 +161,7 @@ const App = () => {
                     path="/wastagereturnlist"
                     element={<WastageReturnList />}
                   />
-
+                  <Route path="/listofstaff" element={<StaffList />} />
                   <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
               </Suspense>

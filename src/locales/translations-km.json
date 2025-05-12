@@ -21,7 +21,7 @@
     "medicineShortage": "កង្វះថ្នាំ"
   },
   "inventory": {
-    "title": "សារព័ត៌",
+    "title": "ព័ត៌មាន​ ស្តុក",
     "totalMedicines": "ថ្នាំសរុប"
   },
   "supplier": {
@@ -57,10 +57,46 @@
     "Status-PlaceHolder": "សូមជ្រើសរើស ស្ថានភាព",
     "Category": "ប្រភេទ",
     "Category-PlaceHolder": "សូមជ្រើសរើស ប្រភេទ",
-    "MedicineInformation": "ព័ត៍ ថ្នាំ",
-    "MedicineInformation-PlaceHolder": "សូមបញ្ជូល​ ព័ត៍ថាំ្ន",
+    "MedicineInformation": "ព័ត៍មានថ្នាំ",
+    "MedicineInformation-PlaceHolder": "សូមបញ្ជូល​ ព័ត៍មានថាំ្ន",
     "ButtonAddMedicine": "បន្ថែម ថ្នាំ",
     "ButtonAddSupplier": "បន្ថែម អ្នកផ្គត់ផ្គង់",
     "CloseScanner": "បិទ ស្កេន"
+  },
+
+  "sidebar": {
+    "appName": "ឳសថស្ថានថ្នាំ",
+    "dashboards": "ផ្ទាំងគ្រប់គ្រង",
+    "medicine": "ថ្នាំ",
+    "addMedicine": "បន្ថែមថ្នាំ",
+    "medicineList": "បញ្ជីថ្នាំ",
+    "medicineDetail": "ព័ត៌មានលម្អិតអំពីថ្នាំ",
+    "customer": "អតិថិជន",
+    "newCustomer": "អតិថិជនថ្មី",
+    "customerList": "បញ្ជីអតិថិជន",
+    "customerLedger": "សៀវភៅគណនីអតិថិជន",
+    "staff": "បុគ្គលិក",
+    "staffList": "បញ្ជីបុគ្គលិក",
+    "manufacturer": "ក្រុមហ៊ុនផលិត",
+    "manufacturerList": "បញ្ជីក្រុមហ៊ុនផលិត",
+    "manufacturerLedger": "សៀវភៅគណនីក្រុមហ៊ុនផលិត",
+    "returns": "ត្រឡប់",
+    "addWastageReturn": "បន្ថែមការត្រឡប់ថ្នាំខូច",
+    "addManufacturerReturn": "បន្ថែមការត្រឡប់ទៅក្រុមហ៊ុនផលិត",
+    "manufacturerReturnList": "បញ្ជីការត្រឡប់ទៅក្រុមហ៊ុនផលិត",
+    "wastageReturnList": "បញ្ជីការត្រឡប់ថ្នាំខូច",
+    "finance": "ហិរញ្ញវត្ថុ",
+    "expense": "ចំណាយ",
+    "income": "ចំណូល",
+    "invoiceDetail": "ព័ត៌មានលម្អិតវិក័យប័ត្រ",
+    "invoiceList": "បញ្ជីវិក័យប័ត្រ",
+    "reports": "របាយការណ៍",
+    "saleReport": "របាយការណ៍លក់",
+    "stockReport": "របាយការណ៍ស្តុក",
+    "purchaseReport": "របាយការណ៍ទិញ",
+    "pages": "ទំព័រ",
+    "login": "ចូល",
+    "register": "ចុះឈ្មោះ",
+    "settings": "ការកំណត់"
   }
 }

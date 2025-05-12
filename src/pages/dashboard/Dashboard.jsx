@@ -1,5 +1,5 @@
 // src/components/Dashboard.jsx
-import React, { useState } from "react";
+import  { useState } from "react";
 import { useTranslation } from "../../hooks/useTranslation";
 import {
   ShieldCheckIcon,
@@ -13,7 +13,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 const Dashboard = () => {
-  const { t, langCode } = useTranslation();
+  const { t } = useTranslation();
   const [showDropdown, setShowDropdown] = useState(false);
 
   const handleDownload = (format) => {

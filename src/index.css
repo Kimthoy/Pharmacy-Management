@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 /* index.css */
+/* src/index.css */
+@import url('https://fonts.googleapis.com/css2?family=Kantumruy :wght@300;400;700&display=swap');
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap");
 /* src/index.css */
 @import url("https://fonts.googleapis.com/css2?family=Nokora:wght@400;700&display=swap");
