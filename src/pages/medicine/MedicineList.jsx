@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { FaEllipsisV } from "react-icons/fa";
 import { BiEdit, BiShow, BiTrash } from "react-icons/bi";
 import { MdWarehouse } from "react-icons/md";
+import { useTranslation } from "../../hooks/useTranslation";
+import { useTheme } from "../../context/ThemeContext";
+
 const medicines = [
   {
     name: "Zimax",
-    generic: "Azithromycin",
     weight: "500mg",
     category: "Tablet",
     price: "20.55 USD",
@@ -14,7 +16,6 @@ const medicines = [
   },
   {
     name: "Oxidon",
-    generic: "Domperidon",
     weight: "10mg",
     category: "Tablet",
     price: "15.00 USD",
@@ -23,7 +24,6 @@ const medicines = [
   },
   {
     name: "MED-1008",
-    generic: "Hydrazine",
     weight: "200Doses",
     category: "Inhaler",
     price: "12.45 USD",
@@ -33,7 +33,10 @@ const medicines = [
 ];
 
 const MedicineList = () => {
+  const { t } = useTranslation();
+  const { theme } = useTheme();
   const [openMenu, setOpenMenu] = useState(null);
+  const menuRef = useRef(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
@@ -42,6 +45,19 @@ const MedicineList = () => {
   const [category, setCategory] = useState("");
 
   const toggleMenu = (index) => setOpenMenu(openMenu === index ? null : index);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setOpenMenu(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const filteredMedicines = medicines.filter((med) => {
     const matchesSearch = med.name
@@ -60,28 +76,34 @@ const MedicineList = () => {
     startIndex,
     startIndex + rowsPerPage
   );
+
   const getStatus = (stock) => {
-    if (stock === 0) return { text: "Out of Stock", color: "text-red-600" };
-    if (stock <= 50) return { text: "Low", color: "text-orange-500" };
-    return { text: "Available", color: "text-green-600" };
+    if (stock === 0)
+      return { text: "Out of Stock", color: "text-red-600 dark:text-red-400" };
+    if (stock <= 50)
+      return { text: "Low", color: "text-orange-500 dark:text-orange-300" };
+    return { text: "Available", color: "text-green-600 dark:text-green-400" };
   };
 
   return (
-    <div className="p-6 bg-white shadow-md rounded-md overflow-x-auto">
-      <h2 className="text-2xl font-bold mb-2">Medicine</h2>
-      <p className="text-gray-600 mb-4">Here is the medicine list.</p>
+    <div className="p-6 bg-white dark:bg-gray-900 shadow-md dark:shadow-gray-800 rounded-md overflow-x-auto">
+      <h2 className="text-2xl font-bold mb-2 text-gray-800 dark:text-gray-200">
+        {t("medicinelist.MedicineListTitle")}
+      </h2>
+      <p className="text-gray-600 dark:text-gray-300 mb-4">
+        {t("medicinelist.MedicineListDesc")}
+      </p>
 
       <div className="flex flex-wrap gap-4 mb-4">
         <input
           type="text"
-          placeholder="Search by name..."
-          className="border p-2 rounded-md focus:outline-green-500"
+          placeholder={t("medicinelist.MedicineListSearchByName")}
+          className="border border-gray-300 dark:border-gray-600 p-2 rounded-md focus:outline-green-500 dark:bg-gray-700 dark:text-gray-200"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-
         <select
-          className="border p-2 rounded-md focus:outline-green-500"
+          className="border border-gray-300 dark:border-gray-600 p-2 rounded-md focus:outline-green-500 dark:bg-gray-700 dark:text-gray-200"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
         >
@@ -93,24 +115,23 @@ const MedicineList = () => {
       </div>
       <div className="flex mb-4">
         <div className="me-5">
-          <label htmlFor="" className="me-2 text-gray-400">
-            Filter by Choose start date
+          <label htmlFor="" className="me-2 text-gray-400 dark:text-gray-300">
+            {t("medicinelist.MedicineListFilterStartDate")}
           </label>
           <input
             type="date"
-            className="border p-2 rounded-md focus:outline-green-500 "
+            className="border border-gray-300 dark:border-gray-600 p-2 rounded-md focus:outline-green-500 dark:bg-gray-700 dark:text-gray-200"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
           />
         </div>
-
         <div>
-          <label htmlFor="" className="me-2 text-gray-400">
-            Choose end date
+          <label htmlFor="" className="me-2 text-gray-400 dark:text-gray-300">
+            {t("medicinelist.MedicineListFilterEndDate")}
           </label>
           <input
             type="date"
-            className="border p-2 rounded-md focus:outline-green-500"
+            className="border border-gray-300 dark:border-gray-600 p-2 rounded-md focus:outline-green-500 dark:bg-gray-700 dark:text-gray-200"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
           />
@@ -119,71 +140,87 @@ const MedicineList = () => {
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[600px] border-collapse bg-white shadow-md rounded-lg">
-          <thead className="border text-gray-400 rounded">
+        <table className="w-full min-w-[600px] border-collapse bg-white dark:bg-gray-800 shadow-md dark:shadow-gray-700 rounded-lg">
+          <thead className="border border-gray-200 dark:border-gray-600 text-gray-400 dark:text-gray-300 rounded">
             <tr>
-              <td className="p-3 text-left text-sm">Name</td>
-              <td className="p-3 text-left text-sm">Generic Name</td>
-              <td className="p-3 text-left text-sm">Weight</td>
-              <td className="p-3 text-left text-sm">Category</td>
-              <td className="p-3 text-left text-sm">Price</td>
-              <td className="p-3 text-left text-sm">Stock</td>
-              <td className="p-3 text-left text-sm">Status</td>
-              <td className="p-3 text-left text-sm">Date</td>
-              <td className="p-3 text-left text-sm">Actions</td>
+              <td className="p-3 text-left text-sm">
+                {t("medicinelist.MedicineListMedicineName")}
+              </td>
+              <td className="p-3 text-left text-sm">
+                {t("medicinelist.MedicineListMedicineWeight")}
+              </td>
+              <td className="p-3 text-left text-sm">
+                {t("medicinelist.MedicineListMedicineCategory")}
+              </td>
+              <td className="p-3 text-left text-sm">
+                {t("medicinelist.MedicineListMedicinePrice")}
+              </td>
+              <td className="p-3 text-left text-sm">
+                {t("medicinelist.MedicineListMedicineStock")}
+              </td>
+              <td className="p-3 text-left text-sm">
+                {t("medicinelist.MedicineListMedicineStatus")}
+              </td>
+              <td className="p-3 text-left text-sm">
+                {t("medicinelist.MedicineListMedicineDate")}
+              </td>
+              <td className="p-3 text-left text-sm">
+                {t("medicinelist.MedicineListMedicineActions")}
+              </td>
             </tr>
           </thead>
           <tbody>
             {selectedMedicines.map((med, index) => {
               const { text, color } = getStatus(med.stock);
               return (
-                <tr key={index} className="border text-xs sm:text-base">
-                  <td className="p-3  text-[13px]  text-gray-400">
+                <tr
+                  key={index}
+                  className="border border-gray-200 dark:border-gray-600 text-xs sm:text-base"
+                >
+                  <td className="p-3 text-[13px] text-gray-400 dark:text-gray-300">
                     {med.name}
                   </td>
-                  <td className="p-3  text-[13px] text-gray-400">
-                    {med.generic}
-                  </td>
-                  <td className="p-3  text-[13px] text-gray-400">
+                  <td className="p-3 text-[13px] text-gray-400 dark:text-gray-300">
                     {med.weight}
                   </td>
-                  <td className="p-3  text-[13px] text-gray-400">
+                  <td className="p-3 text-[13px] text-gray-400 dark:text-gray-300">
                     {med.category}
                   </td>
-                  <td className="p-3  text-[13px] text-gray-400">
+                  <td className="p-3 text-[13px] text-gray-400 dark:text-gray-300">
                     {med.price}
                   </td>
-                  <td className="p-3  text-[13px] text-gray-400">
+                  <td className="p-3 text-[13px] text-gray-400 dark:text-gray-300">
                     {med.stock}
                   </td>
-                  <td className={`p-3 text-[13px]   ${color}`}>{text}</td>
-                  <td className="p-3  text-[13px] text-gray-400">{med.date}</td>
-                  <td className="p-3  text-[13px] relative">
+                  <td className={`p-3 text-[13px] ${color}`}>{text}</td>
+                  <td className="p-3 text-[13px] text-gray-400 dark:text-gray-300">
+                    {med.date}
+                  </td>
+                  <td className="p-3 text-[13px] relative">
                     <button
-                      className="p-2 bg-gray-00 rounded-full hover:bg-gray-300"
+                      ref={menuRef}
+                      className="p-2 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300"
                       onClick={() => toggleMenu(index)}
                     >
                       <FaEllipsisV />
                     </button>
                     {openMenu === index && (
-                      <div className="absolute z-10 right-16  mt-2 top-2 w-36 bg-gray-100 border-green-600  rounded-md shadow-md">
-                        <button className="flex  align-middle w-full text-left text-gray-600  py-2 hover:rounded-md hover:bg-green-500 hover:text-white">
+                      <div className="absolute z-10 right-16 mt-2 top-2 w-36 bg-gray-100 dark:bg-gray-800 border border-green-600 dark:border-green-500 rounded-md shadow-md dark:shadow-gray-700">
+                        <button className="flex align-middle w-full text-left text-gray-600 dark:text-gray-200 py-2 hover:rounded-md hover:bg-green-500 hover:text-white dark:hover:bg-green-400 dark:hover:text-white">
                           <MdWarehouse className="mt-1 w-10" />
-                          Manufacturer
+                          {t("medicinelist.MedicineListMedicineManufacturer")}
                         </button>
-                        <button className="flex  align-middle w-full text-left text-gray-600  py-2 hover:rounded-md hover:bg-green-500 hover:text-white">
+                        <button className="flex align-middle w-full text-left text-gray-600 dark:text-gray-200 py-2 hover:rounded-md hover:bg-green-500 hover:text-white dark:hover:bg-green-400 dark:hover:text-white">
                           <BiShow className="mt-1 w-10" />
-                          View Details
+                          {t("medicinelist.MedicineListMedicineViewDetails")}
                         </button>
-
-                        <button className="flex  align-middle w-full text-left text-gray-600 hover:rounded-md  py-2 hover:bg-green-500 hover:text-white">
+                        <button className="flex align-middle w-full text-left text-gray-600 dark:text-gray-200 py-2 hover:rounded-md hover:bg-green-500 hover:text-white dark:hover:bg-green-400 dark:hover:text-white">
                           <BiEdit className="mt-1 w-10" />
-                          Edit
+                          {t("medicinelist.MedicineListMedicineViewEdit")}
                         </button>
-
-                        <button className="flex align-middle w-full text-gray-600 text-center hover:rounded-md  py-2 hover:bg-green-500 hover:text-white">
+                        <button className="flex align-middle w-full text-left text-gray-600 dark:text-gray-200 py-2 hover:rounded-md hover:bg-green-500 hover:text-white dark:hover:bg-green-400 dark:hover:text-white">
                           <BiTrash className="mt-1 w-10" />
-                          Remove
+                          {t("medicinelist.MedicineListMedicineRemove")}
                         </button>
                       </div>
                     )}
@@ -198,9 +235,11 @@ const MedicineList = () => {
       {/* Pagination Controls */}
       <div className="flex flex-wrap items-center justify-between mt-4">
         <div className="flex items-center space-x-2">
-          <span className="text-gray-600">Rows per page:</span>
+          <span className="text-gray-600 dark:text-gray-300">
+            {t("medicinelist.Rowsperpag")}
+          </span>
           <select
-            className="border p-2 rounded-md"
+            className="border border-gray-300 dark:border-gray-600 p-2 rounded-md dark:bg-gray-700 dark:text-gray-200"
             value={rowsPerPage}
             onChange={(e) => {
               setRowsPerPage(parseInt(e.target.value, 10));
@@ -212,28 +251,26 @@ const MedicineList = () => {
             <option value="15">15</option>
           </select>
         </div>
-
         <div className="flex items-center space-x-2">
           <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            className="px-3 py-1 border rounded-md"
+            className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
             disabled={currentPage === 1}
           >
-            Previous
+            {t("medicinelist.MedicineListMedicinePrevious")}
           </button>
-
-          <span className="text-gray-700">
-            Page {currentPage} of {totalPages}
+          <span className="text-gray-700 dark:text-gray-300">
+            {t("medicinelist.MedicineListMedicinePage")} {currentPage}{" "}
+            {t("medicinelist.MedicineListMedicineof")} {totalPages}
           </span>
-
           <button
             onClick={() =>
               setCurrentPage((prev) => Math.min(prev + 1, totalPages))
             }
-            className="px-3 py-1 border rounded-md"
+            className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
             disabled={currentPage === totalPages}
           >
-            Next
+            {t("medicinelist.MedicineListMedicineNext")}
           </button>
         </div>
       </div>

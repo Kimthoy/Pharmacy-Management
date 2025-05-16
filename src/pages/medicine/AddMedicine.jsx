@@ -1,10 +1,11 @@
 import { useState } from "react";
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
-// import axios from "axios"; // Uncomment when ready to use API
 import { useTranslation } from "../../hooks/useTranslation";
+import { useTheme } from "../../context/ThemeContext";
 
 const AddMedicine = () => {
   const { t } = useTranslation();
+  const { theme } = useTheme();
 
   // State for medicine form
   const [medicine, setMedicine] = useState({
@@ -44,19 +45,21 @@ const AddMedicine = () => {
   };
 
   return (
-    <div className="p-4 bg-white rounded-md shadow-md w-full max-w-6xl mx-auto">
+    <div className="p-4 bg-white dark:bg-gray-900 rounded-md shadow-md dark:shadow-gray-800 w-full max-w-6xl mx-auto">
       {/* Header */}
       <div className="mb-4 flex flex-col md:flex-row justify-between items-start md:items-center">
         <div>
-          <h1 className="text-lg font-semibold">
+          <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
             {t("add-medicine.AddMedicine")}
           </h1>
-          <p className="text-gray-600">{t("add-medicine.title-addmedicine")}</p>
+          <p className="text-gray-600 dark:text-gray-300">
+            {t("add-medicine.title-addmedicine")}
+          </p>
         </div>
         <button
           type="button"
           onClick={() => setIsFormOpen(true)}
-          className="text-xs text-emerald-500 border border-emerald-500 px-4 py-2 rounded-md hover:text-white hover:bg-emerald-500 transition"
+          className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-4 py-2 rounded-md dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition"
         >
           {t("add-medicine.ButtonAddSupplier")}
         </button>
@@ -65,67 +68,67 @@ const AddMedicine = () => {
       {/* Supplier Modal Form */}
       {isFormOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-1/2 relative">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg dark:shadow-gray-700 w-11/12 md:w-1/2 relative">
             <button
               type="button"
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl"
+              className="absolute top-2 right-2 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100 text-2xl"
               onClick={() => setIsFormOpen(false)}
               aria-label="Close modal"
             >
-              &times;
+              ×
             </button>
-            <h2 className="text-xl font-bold mb-2">
+            <h2 className="text-xl font-bold mb-2 text-gray-800 dark:text-gray-200">
               {t("add-medicine.SupplierFormTitle")}
             </h2>
-            <p className="text-gray-500 mb-4">
+            <p className="text-gray-500 dark:text-gray-300 mb-4">
               {t("add-medicine.SupplierFormDescription")}
             </p>
             <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <input
                 type="text"
                 placeholder={t("add-medicine.SupplierName")}
-                className="text-xs border border-gray-400 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700"
+                className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
                 required
               />
               <input
                 type="text"
                 placeholder={t("add-medicine.PharmacyName")}
-                className="text-xs border border-gray-400 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700"
+                className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
                 required
               />
               <input
                 type="text"
                 placeholder={t("add-medicine.Address")}
-                className="text-xs border border-gray-400 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700"
+                className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
                 required
               />
               <input
                 type="file"
-                className="text-xs border border-gray-400 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700"
+                className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
                 required
               />
               <input
                 type="text"
                 placeholder={t("add-medicine.InvoiceID")}
-                className="text-xs border border-gray-400 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700"
+                className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
                 required
               />
               <input
                 type="date"
-                className="text-xs border border-gray-400 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700"
+                className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
                 required
               />
               <div className="col-span-1 md:col-span-2 flex justify-end space-x-3 mt-4">
                 <button
                   type="submit"
-                  className="border text-green-600 hover:text-white hover:bg-green-600 px-4 py-2 rounded-md"
+                  className="border text-green-600 dark:text-green-400 hover:text-white hover:bg-green-600 dark:hover:bg-green-500 px-4 py-2 rounded-md"
                 >
                   {t("add-medicine.Save")}
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsFormOpen(false)}
-                  className="hover:text-red-600 text-gray-400 rounded-md"
+                  className="hover:text-red-600 dark:hover:text-red-400 text-gray-400 dark:text-gray-300 rounded-md"
                 >
                   {t("add-medicine.Cancel")}
                 </button>
@@ -140,7 +143,10 @@ const AddMedicine = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Medicine Name */}
           <div className="flex flex-col">
-            <label htmlFor="medicine_name" className="mb-2">
+            <label
+              htmlFor="medicine_name"
+              className="mb-2 text-gray-700 dark:text-gray-300"
+            >
               {t("add-medicine.Madicinename")}
             </label>
             <input
@@ -150,14 +156,17 @@ const AddMedicine = () => {
               placeholder={t("add-medicine.MecineName-PlaceHolder")}
               value={medicine.medicine_name}
               onChange={handleChange}
-              className="text-xs border border-gray-400 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700"
+              className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
               required
             />
           </div>
 
           {/* Price */}
           <div className="flex flex-col">
-            <label htmlFor="price" className="mb-2">
+            <label
+              htmlFor="price"
+              className="mb-2 text-gray-700 dark:text-gray-300"
+            >
               {t("add-medicine.Price")}
             </label>
             <input
@@ -167,14 +176,17 @@ const AddMedicine = () => {
               placeholder={t("add-medicine.Price-PlaceHolder")}
               value={medicine.price}
               onChange={handleChange}
-              className="text-xs border border-gray-400 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700"
+              className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
               required
             />
           </div>
 
           {/* Quantity */}
           <div className="flex flex-col">
-            <label htmlFor="quantity" className="mb-2">
+            <label
+              htmlFor="quantity"
+              className="mb-2 text-gray-700 dark:text-gray-300"
+            >
               {t("add-medicine.Quantity")}
             </label>
             <input
@@ -184,14 +196,17 @@ const AddMedicine = () => {
               placeholder={t("add-medicine.Quantity-PlaceHolder")}
               value={medicine.quantity}
               onChange={handleChange}
-              className="text-xs border border-gray-400 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700"
+              className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
               required
             />
           </div>
 
           {/* In Stock Date */}
           <div className="flex flex-col">
-            <label htmlFor="in_stock_date" className="mb-2">
+            <label
+              htmlFor="in_stock_date"
+              className="mb-2 text-gray-700 dark:text-gray-300"
+            >
               {t("add-medicine.InStockDate")}
             </label>
             <input
@@ -200,14 +215,17 @@ const AddMedicine = () => {
               name="in_stock_date"
               value={medicine.in_stock_date}
               onChange={handleChange}
-              className="text-xs border border-gray-400 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700"
+              className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
               required
             />
           </div>
 
           {/* Weight */}
           <div className="flex flex-col">
-            <label htmlFor="weight" className="mb-2">
+            <label
+              htmlFor="weight"
+              className="mb-2 text-gray-700 dark:text-gray-300"
+            >
               {t("add-medicine.Weight")}
             </label>
             <input
@@ -217,17 +235,20 @@ const AddMedicine = () => {
               placeholder={t("add-medicine.Weight-PlaceHolder")}
               value={medicine.weight}
               onChange={handleChange}
-              className="text-xs border border-gray-400 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700"
+              className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
               required
             />
           </div>
 
           {/* Barcode Scanner */}
           <div className="flex flex-col relative">
-            <label htmlFor="barcode_number" className="mb-2">
+            <label
+              htmlFor="barcode_number"
+              className="mb-2 text-gray-700 dark:text-gray-300"
+            >
               {t("add-medicine.BarcodeScan")}
             </label>
-            <div className="border border-gray-400 text-xs font-light focus-within:outline-green-400 focus-within:border-green-700  rounded-sm px-6 py-2 cursor-pointer relative">
+            <div className="border border-gray-400 dark:border-gray-600 text-xs font-light focus-within:outline-green-400 focus-within:border-green-700 rounded-sm px-6 py-2 cursor-pointer relative dark:bg-gray-700">
               <input
                 id="barcode_number"
                 type="text"
@@ -235,7 +256,7 @@ const AddMedicine = () => {
                 value={medicine.barcode_number}
                 onChange={handleChange}
                 placeholder={t("add-medicine.BarcodeScan-PlaceHolder")}
-                className="bg-transparent focus:outline-none w-full"
+                className="bg-transparent focus:outline-none w-full text-gray-800 dark:text-gray-200"
                 readOnly
               />
               <button
@@ -255,7 +276,10 @@ const AddMedicine = () => {
 
           {/* Expire Date */}
           <div className="flex flex-col">
-            <label htmlFor="expire_date" className="mb-2">
+            <label
+              htmlFor="expire_date"
+              className="mb-2 text-gray-700 dark:text-gray-300"
+            >
               {t("add-medicine.ExpireDate")}
             </label>
             <input
@@ -264,14 +288,17 @@ const AddMedicine = () => {
               name="expire_date"
               value={medicine.expire_date}
               onChange={handleChange}
-              className="text-xs border border-gray-400 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700"
+              className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
               required
             />
           </div>
 
           {/* Status */}
           <div className="flex flex-col">
-            <label htmlFor="status" className="mb-2">
+            <label
+              htmlFor="status"
+              className="mb-2 text-gray-700 dark:text-gray-300"
+            >
               {t("add-medicine.Status")}
             </label>
             <select
@@ -279,7 +306,7 @@ const AddMedicine = () => {
               name="status"
               value={medicine.status}
               onChange={handleChange}
-              className="text-xs border border-gray-400 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700"
+              className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
               required
             >
               <option value="">{t("add-medicine.Status-PlaceHolder")}</option>
@@ -290,7 +317,10 @@ const AddMedicine = () => {
 
           {/* Category */}
           <div className="flex flex-col">
-            <label htmlFor="category" className="mb-2">
+            <label
+              htmlFor="category"
+              className="mb-2 text-gray-700 dark:text-gray-300"
+            >
               {t("add-medicine.Category")}
             </label>
             <select
@@ -298,7 +328,7 @@ const AddMedicine = () => {
               name="category"
               value={medicine.category}
               onChange={handleChange}
-              className="text-xs border border-gray-400 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700"
+              className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
               required
             >
               <option value="">{t("add-medicine.Category-PlaceHolder")}</option>
@@ -310,7 +340,10 @@ const AddMedicine = () => {
 
           {/* Medicine Details */}
           <div className="flex flex-col col-span-1 md:col-span-3">
-            <label htmlFor="medicine_detail" className="mb-2">
+            <label
+              htmlFor="medicine_detail"
+              className="mb-2 text-gray-700 dark:text-gray-300"
+            >
               {t("add-medicine.MedicineInformation")}
             </label>
             <textarea
@@ -319,7 +352,7 @@ const AddMedicine = () => {
               placeholder={t("add-medicine.MedicineInformation-PlaceHolder")}
               value={medicine.medicine_detail}
               onChange={handleChange}
-              className="border border-gray-400 w-full h-32 px-2 py-2 rounded-[4px] font-light text-xs focus:outline-green-400 focus:border-green-700"
+              className="border border-gray-400 dark:border-gray-600 w-full h-32 px-2 py-2 rounded-[4px] font-light text-xs focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
               required
             ></textarea>
           </div>
@@ -329,7 +362,7 @@ const AddMedicine = () => {
         <div className="mt-4">
           <button
             type="submit"
-            className="bg-green-500 text-xs text-white px-3 py-3 rounded-md w-full md:w-auto shadow-md active:shadow-none"
+            className="bg-green-500 dark:bg-green-600 text-xs text-white px-3 py-3 rounded-md w-full md:w-auto shadow-md active:shadow-none hover:bg-green-600 dark:hover:bg-green-500"
           >
             {t("add-medicine.ButtonAddMedicine")}
           </button>
@@ -339,7 +372,7 @@ const AddMedicine = () => {
       {/* Barcode Scanner Modal */}
       {openScanner && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-4 w-full max-w-md">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 w-full max-w-md">
             <div className="relative" style={{ height: "300px" }}>
               <BarcodeScannerComponent
                 width="100%"
@@ -368,13 +401,13 @@ const AddMedicine = () => {
               </button>
             </div>
             <div className="mt-4 flex justify-between items-center">
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-gray-600 dark:text-gray-300">
                 {medicine.barcode_number &&
                   `${t("add-medicine.Scanned")}: ${medicine.barcode_number}`}
               </div>
               <button
                 onClick={() => setOpenScanner(false)}
-                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                className="px-4 py-2 bg-red-500 dark:bg-red-600 text-white rounded hover:bg-red-600 dark:hover:bg-red-500"
               >
                 {t("add-medicine.CloseScanner")}
               </button>

@@ -148,10 +148,48 @@
 .add-staff {
   background-color: #32cd32;
   color: white;
-  padding: 8px 12px;
+  border-radius: 100px;
+  padding: 8px;
+  font-size: small;
 }
 .add-staff:hover {
   background-color: #107110;
   color: white;
-  padding: 8px 12px;
+}
+
+.no-data-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+}
+
+.no-data-image {
+  width: 300px;
+
+  margin-bottom: 10px;
+  opacity: 0.8;
+}
+
+.no-data-text {
+  font-size: 1rem;
+  color: #555;
+}
+.flex-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.table-header {
+  justify-content: center;
+  background-color: #2e8b57;
+  color: #fff;
+  text-align: center;
+  display: flex;
+  align-items: center;
+}
+.margin-class {
+  margin: 12px;
 }

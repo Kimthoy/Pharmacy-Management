@@ -2,12 +2,35 @@ import React, { useState } from "react";
 import { FaCog, FaUsers, FaLock, FaShieldAlt, FaHistory } from "react-icons/fa";
 
 const Setting = () => {
-
   const [activityLogs, setActivityLogs] = useState([
-    { id: 1, browser: "Chrome on Window", ip: "192.149.122.128", time: "11:34 PM", activity: "Deleted" },
-    { id: 2, browser: "Mozilla on Window", ip: "86.188.154.225", time: "11:34 PM", activity: "Updated" },
-    { id: 3, browser: "Chrome on iMac", ip: "192.149.122.128", time: "11:34 PM", activity: "Deleted" },
-    { id: 4, browser: "Chrome on Window", ip: "192.149.122.128", time: "11:34 PM", activity: "Created" },
+    {
+      id: 1,
+      browser: "Chrome on Window",
+      ip: "192.149.122.128",
+      time: "11:34 PM",
+      activity: "Deleted",
+    },
+    {
+      id: 2,
+      browser: "Mozilla on Window",
+      ip: "86.188.154.225",
+      time: "11:34 PM",
+      activity: "Updated",
+    },
+    {
+      id: 3,
+      browser: "Chrome on iMac",
+      ip: "192.149.122.128",
+      time: "11:34 PM",
+      activity: "Deleted",
+    },
+    {
+      id: 4,
+      browser: "Chrome on Window",
+      ip: "192.149.122.128",
+      time: "11:34 PM",
+      activity: "Created",
+    },
   ]);
 
   const [showPopup, setShowPopup] = useState(false);
@@ -19,7 +42,7 @@ const Setting = () => {
   };
 
   const confirmDelete = () => {
-    setActivityLogs(activityLogs.filter(log => log.id !== deleteId));
+    setActivityLogs(activityLogs.filter((log) => log.id !== deleteId));
     setShowPopup(false);
     setDeleteId(null);
   };
@@ -65,16 +88,14 @@ const Setting = () => {
       setSelectedMember("");
     }
   };
-  
 
   const renderContent = () => {
     switch (activeTab) {
       case "General":
-        
         return (
           <div>
-            <h2 className="text-2xl font-semibold">General Settings</h2>
-            <p className="text-gray-600 mb-6">
+            <h2 className="text-xl font-semibold">General Settings</h2>
+            <p className="text-gray-600 mb-6 text-xs">
               These settings helps you modify site settings.
             </p>
 
@@ -331,8 +352,8 @@ const Setting = () => {
       case "Members":
         return (
           <div>
-            <h2 className="text-2xl font-semibold">Member Settings</h2>
-            <p className="text-gray-600 mb-4">
+            <h2 className="text-xl font-semibold">Member Settings</h2>
+            <p className="text-gray-600 mb-4 text-xs">
               These settings help you add or manage users.
             </p>
             <div className="p-6 bg-white shadow-lg rounded-lg">
@@ -400,8 +421,10 @@ const Setting = () => {
       case "E-mail":
         return (
           <div>
-            <h2 className="text-2xl font-semibold">Email Settings</h2>
-            <p className="text-gray-600 mb-6">Manage email notifications.</p>
+            <h2 className="text-xl font-semibold">Email Settings</h2>
+            <p className="text-gray-600 mb-6 text-xs">
+              Manage email notifications.
+            </p>
             <div className="bg-white shadow-lg rounded-lg p-6">
               <form>
                 <div className="mb-4">
@@ -503,8 +526,10 @@ const Setting = () => {
       case "Security":
         return (
           <div>
-            <h2 className="text-2xl font-semibold">Security Settings</h2>
-            <p className="text-gray-600 mb-6">Manage security options.</p>
+            <h2 className="text-xl font-semibold">Security Settings</h2>
+            <p className="text-gray-600 mb-6 text-xs">
+              Manage security options.
+            </p>
             <div className="bg-white shadow-lg rounded-lg p-6">
               <p>Security settings are currently unavailable.</p>
             </div>
@@ -514,29 +539,34 @@ const Setting = () => {
       case "Account activity":
         return (
           <div>
-            <h2 className="text-2xl font-semibold">Account Activity</h2>
-            <p className="text-gray-600 mb-6">View recent account activity.</p>
+            <h2 className="text-xl font-semibold">Account Activity</h2>
+            <p className="text-gray-600 mb-6 text-xs">
+              View recent account activity.
+            </p>
             <div className="bg-white shadow-lg rounded-lg p-6">
               <div className="container mx-auto p-6">
                 <div className="p-6">
                   <table className="w-full border-collapse bg-white shadow-md">
                     <thead>
                       <tr className="bg-gray-200">
-                        <th className="p-3 text-left">BROWSER</th>
-                        <th className="p-3 text-left">IP</th>
-                        <th className="p-3 text-left">TIME</th>
-                        <th className="p-3 text-left">ACTIVITY</th>
-                        <th className="p-3 text-left">ACTION</th>
+                        <td className="p-3  text-sm    text-left">BROWSER</td>
+                        <td className="p-3  text-sm    text-left">IP</td>
+                        <td className="p-3  text-sm    text-left">TIME</td>
+                        <td className="p-3  text-sm    text-left">ACTIVITY</td>
+                        <td className="p-3  text-sm    text-left">ACTION</td>
                       </tr>
                     </thead>
                     <tbody>
                       {activityLogs.map((log) => (
-                        <tr key={log.id} className="border-b">
-                          <td className="p-3">{log.browser}</td>
-                          <td className="p-3">{log.ip}</td>
-                          <td className="p-3">{log.time}</td>
+                        <tr
+                          key={log.id}
+                          className="border-b hover:bg-slate-200"
+                        >
+                          <td className="p-3 text-xs">{log.browser}</td>
+                          <td className="p-3 text-xs">{log.ip}</td>
+                          <td className="p-3 text-xs">{log.time}</td>
                           <td
-                            className={`p-3 font-semibold ${
+                            className={`p-3 text-xs font-semibold ${
                               log.activity === "Deleted"
                                 ? "text-red-500"
                                 : log.activity === "Updated"
@@ -595,24 +625,24 @@ const Setting = () => {
   return (
     <>
       <div>
-        <label htmlFor="" className="text-2xl font-semibold text-green-600">
+        <label htmlFor="" className="text-xl font-semibold text-green-600">
           Setting Management
         </label>
-        <p className="mb-3 text-gray-400 font-normal">
+        <p className="mb-3 text-gray-400 text-xs font-normal">
           There are all setting may hepl you controller your page.
         </p>
       </div>
       <div className="flex  h-screen bg-gray-100">
         {/* Sidebar */}
         <div className="w-64 bg-white shadow-lg p-4 rounded-md mt-11">
-          <h2 className="text-xl font-semibold ">Settings</h2>
-          <p className="mb-6 text-sm text-gray-400">
+          <h2 className="text-sm font-semibold ">Settings</h2>
+          <p className="mb-6 text-xs text-gray-400">
             Here you can change and edit your needs
           </p>
 
-          <ul className="space-y-4">
+          <ul className="space-y-6">
             <li
-              className={`flex items-center space-x-3 cursor-pointer ${
+              className={`flex items-center  space-x-3 cursor-pointer ${
                 activeTab === "General"
                   ? "text-green-600 font-semibold"
                   : "text-gray-600 hover:text-green-600"

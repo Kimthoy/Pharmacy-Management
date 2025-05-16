@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { FaEllipsisH } from "react-icons/fa";
+import { useTheme } from "../../context/ThemeContext";
+import { useTranslation } from "../../hooks/useTranslation";
+import { Sun, Moon } from "lucide-react";
 
 // import { BiEdit, BiTrash } from "react-icons/bi";
 
@@ -8,41 +11,34 @@ const medicines = [
     p_id: "#P7865",
     customer: "Abu Bin Ishtiyak",
     email: "larson@example.com",
-
-    reason: "Expire Date",
-
+    reason: "wrong_medication",
     amount: 20.55,
     status: "Active",
-
     date: "2024-03-15",
   },
   {
     customer: "Abu Bin Ishtiyak",
     email: "larson@example.com",
     p_id: "#P7865",
-
-    reason: "Wrong Drug",
-
+    reason: "wrong_dispensing",
     amount: 20.55,
     status: "Inactive",
-
     date: "2024-03-15",
   },
   {
     customer: "Abu Bin Ishtiyak",
     email: "larson@example.com",
     p_id: "#P7865",
-
-    reason: "Damaged",
-
+    reason: "subsidence_symptoms",
     amount: 20.55,
     status: "Inactive",
-
     date: "2024-03-15",
   },
 ];
 
 const ManufacturerReturnList = () => {
+  const { t } = useTranslation();
+  const { theme, toggleTheme } = useTheme();
   // const [openMenu, setOpenMenu] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -72,152 +68,200 @@ const ManufacturerReturnList = () => {
     startIndex,
     startIndex + rowsPerPage
   );
+
   const getReason = (reason) => {
-    if (reason === "Expire Date") {
+    if (reason === "wrong_medication") {
       return {
-        text: "Expire Date",
-        color: "text-red-600 border p-1 text-xs rounded border-red-600",
+        text: t("manufacturerReturnList.reasons.wrongMedication"),
+        color: `text-red-600 border p-1 text-xs rounded border-red-600 ${
+          theme === "dark" ? "bg-gray-700" : "bg-white"
+        }`,
       };
     }
-    if (reason === "Damaged") {
+    if (reason === "wrong_dispensing") {
       return {
-        text: "Damaged",
-        color: "text-yellow-500 border text-xs p-1 rounded border-yellow-500",
+        text: t("manufacturerReturnList.reasons.wrongDispensing"),
+        color: `text-yellow-500 border p-1 text-xs rounded border-yellow-500 ${
+          theme === "dark" ? "bg-gray-700" : "bg-white"
+        }`,
+      };
+    }
+    if (reason === "subsidence_symptoms") {
+      return {
+        text: t("manufacturerReturnList.reasons.subsidenceSymptoms"),
+        color: `text-green-600 border p-1 text-xs rounded border-green-600 ${
+          theme === "dark" ? "bg-gray-700" : "bg-white"
+        }`,
       };
     }
     return {
-      text: "Wrong Drug",
-      color: "text-green-600 border p-1 text-xs rounded border-green-600",
+      text: t("manufacturerReturnList.reasons.unknown"),
+      color: `text-gray-600 border p-1 text-xs rounded border-gray-600 ${
+        theme === "dark" ? "bg-gray-700" : "bg-white"
+      }`,
     };
   };
+
   const getStatus = (status) => {
     if (status === "Active") {
       return {
-        text: "Active",
-        color: "text-green-600  text-xs ",
+        text: t("manufacturerReturnList.statuses.active"),
+        color: "text-green-600 text-xs",
       };
     }
-
     return {
-      text: "InActive",
-      color: "text-red-500  text-xs ",
+      text: t("manufacturerReturnList.statuses.inactive"),
+      color: "text-red-500 text-xs",
     };
   };
 
   return (
-    <div className="p-3 bg-white shadow-md rounded-md overflow-x-auto">
-      <div className="flex justify-between mb-6">
-        <h2 className="text-2xl font-bold">Customer Lists</h2>
+    <div
+      className={`p-3 shadow-md rounded-md overflow-x-auto ${
+        theme === "dark" ? "bg-gray-800 text-white" : "bg-white text-gray-900"
+      }`}
+    >
+      <div className="flex justify-between mb-6 items-center">
+        <h2 className="text-2xl font-bold">{t("manufacturerReturnList.title")}</h2>
+       
       </div>
 
-      <div className="flex flex-wrap gap-4 mb-4 ">
+      <div className="flex flex-wrap gap-4 mb-4">
         <input
           type="text"
-          placeholder="Search by name..."
-          className="border p-2 rounded-md focus:outline-green-500"
+          placeholder={t("manufacturerReturnList.searchPlaceholder")}
+          className={`border p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+            theme === "dark"
+              ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+              : "bg-white border-gray-400 text-gray-900 placeholder-gray-500"
+          }`}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
 
-      <div className="flex mb-4">
-        <div className="me-2">
-          <label htmlFor="" className="me-2 text-gray-400">
-            Filter by Choose start date
+      <div className="flex flex-wrap gap-4 mb-4">
+        <div>
+          <label htmlFor="startDate" className={`me-2 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+            {t("manufacturerReturnList.startDateLabel")}
           </label>
           <input
             type="date"
-            className="border p-2 rounded-md focus:outline-green-500"
+            id="startDate"
+            className={`border p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+              theme === "dark"
+                ? "bg-gray-700 border-gray-600 text-white"
+                : "bg-white border-gray-400 text-gray-900"
+            }`}
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
           />
         </div>
 
         <div>
-          <label htmlFor="" className="me-2 text-gray-400">
-            Choose end date
+          <label htmlFor="endDate" className={`me-2 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+            {t("manufacturerReturnList.endDateLabel")}
           </label>
           <input
             type="date"
-            className="border p-2 rounded-md focus:outline-green-500"
+            id="endDate"
+            className={`border p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+              theme === "dark"
+                ? "bg-gray-700 border-gray-600 text-white"
+                : "bg-white border-gray-400 text-gray-900"
+            }`}
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
           />
         </div>
       </div>
-      <div className="mb-5">
+
+      <div className="flex flex-wrap gap-4 mb-5">
         <select
-          className="border  focus:border-green-600 p-2 rounded-md w-[180px]"
+          className={`border p-2 rounded-md w-[180px] focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+            theme === "dark"
+              ? "bg-gray-700 border-gray-600 text-white"
+              : "bg-white border-gray-400 text-gray-900"
+          }`}
           value={selectedReason}
           onChange={(e) => setSelectedReason(e.target.value)}
         >
-          <option value="">Filter by Reason</option>
-          <option value="Wrong medication">Wrong medication</option>
-          <option value="Wrong dispensing">Wrong dispensing</option>
-          <option value="Subsidence symptoms">Subsidence symptoms</option>
+          <option value="">{t("manufacturerReturnList.reasonFilter")}</option>
+          <option value="wrong_medication">{t("manufacturerReturnList.reasons.wrongMedication")}</option>
+          <option value="wrong_dispensing">{t("manufacturerReturnList.reasons.wrongDispensing")}</option>
+          <option value="subsidence_symptoms">{t("manufacturerReturnList.reasons.subsidenceSymptoms")}</option>
         </select>
 
         <select
-          className="border p-2 ml-4 rounded-md w-[150px]   focus:border-green-600"
+          className={`border p-2 rounded-md w-[150px] focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+            theme === "dark"
+              ? "bg-gray-700 border-gray-600 text-white"
+              : "bg-white border-gray-400 text-gray-900"
+          }`}
           value={selectedStatus}
           onChange={(e) => setSelectedStatus(e.target.value)}
         >
-          <option value="">Filter by Status</option>
-          <option value="Active">Active</option>
-          <option value="Inactive">Inactive</option>
+          <option value="">{t("manufacturerReturnList.statusFilter")}</option>
+          <option value="Active">{t("manufacturerReturnList.statuses.active")}</option>
+          <option value="Inactive">{t("manufacturerReturnList.statuses.inactive")}</option>
         </select>
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[600px] bg-white shadow-md rounded-lg border">
-          <thead className="border">
+        <table
+          className={`w-full min-w-[600px] shadow-md rounded-lg border ${
+            theme === "dark" ? "bg-gray-800 border-gray-600" : "bg-white border-gray-200"
+          }`}
+        >
+          <thead className={`border-b ${theme === "dark" ? "border-gray-600" : "border-gray-200"}`}>
             <tr>
-              <td className="px-6 py-2 text-left text-gray-400">Purchase ID</td>
-              <td className="px-6 py-2 text-left text-gray-400">
-                Manufacturer
-              </td>
-              <td className="px-6 py-2 text-left text-gray-400">Date</td>
-              <td className="px-6 py-2 text-left text-gray-400">Reason</td>
-              <td className="px-6 py-2 text-left text-gray-400">Status</td>
-              <td className="px-6 py-2 text-left text-gray-400">Amount</td>
-
-              <td className="p-3 text-left text-gray-400">
-                <FaEllipsisH className="hover:text-green-600 text-xl cursor-pointer"></FaEllipsisH>
-              </td>
+              <th className="px-6 py-2 text-left text-gray-400">{t("manufacturerReturnList.headers.purchaseId")}</th>
+              <th className="px-6 py-2 text-left text-gray-400">{t("manufacturerReturnList.headers.customer")}</th>
+              <th className="px-6 py-2 text-left text-gray-400">{t("manufacturerReturnList.headers.date")}</th>
+              <th className="px-6 py-2 text-left text-gray-400">{t("manufacturerReturnList.headers.reason")}</th>
+              <th className="px-6 py-2 text-left text-gray-400">{t("manufacturerReturnList.headers.status")}</th>
+              <th className="px-6 py-2 text-left text-gray-400">{t("manufacturerReturnList.headers.amount")}</th>
+              <th className="p-3 text-left text-gray-400"></th>
             </tr>
           </thead>
-          <tbody className="border">
+          <tbody className={`border-t ${theme === "dark" ? "border-gray-600" : "border-gray-200"}`}>
             {selectedMedicines.map((med, index) => {
               const reason = getReason(med.reason || "Unknown");
               const { text, color } = getStatus(med.status);
               return (
-                <tr key={index} className="border-b text-sm">
-                  <td className="text-green-600  px-6 py-6 font-medium ">
+                <tr
+                  key={index}
+                  className={`border-b ${theme === "dark" ? "border-gray-600" : "border-gray-200"} text-sm`}
+                >
+                  <td className="text-emerald-600 px-6 py-6 font-medium">
                     <span className="hover:cursor-pointer hover:underline active:cursor-grabbing">
                       {med.p_id}
                     </span>
                   </td>
-                  <td>
-                    <td className="px-6 py-2 text-gray-400 text-sm ">
-                      <span>
-                        {med.customer} <br />
-                        <span className="font-normal">{med.email}</span>
-                      </span>
-                    </td>
+                  <td className="px-6 py-2 text-gray-400 text-sm">
+                    <span>
+                      {med.customer} <br />
+                      <span className="font-normal">{med.email}</span>
+                    </span>
                   </td>
-                  <td className="px-6 py-2 text-gray-400">{med.date}</td>
+                  <td className={`px-6 py-2 ${theme === "dark" ? "text-gray-300" : "text-gray-400"}`}>
+                    {med.date}
+                  </td>
                   <td className="px-6 py-2">
-                    <span className={` ${reason.color} inline-block px-1`}>
+                    <span className={`inline-block px-1 ${reason.color}`}>
                       {reason.text}
                     </span>
                   </td>
-                  <td className={`px-6 py-2  ${color}`}>{text}</td>
-
-                  <td className="px-6 py-2 text-gray-600">
+                  <td className={`px-6 py-2 ${color}`}>{text}</td>
+                  <td className={`px-6 py-2 ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
                     <span className="font-bold">{med.amount}</span> $
                   </td>
                   <td className="p-3">
-                    <FaEllipsisH className="hover:text-green-600  text-gray-400 text-xl cursor-pointer"></FaEllipsisH>
+                    <FaEllipsisH
+                      className={`text-xl cursor-pointer ${
+                        theme === "dark" ? "text-gray-400 hover:text-emerald-500" : "text-gray-400 hover:text-emerald-600"
+                      }`}
+                    />
                   </td>
                 </tr>
               );
@@ -226,9 +270,13 @@ const ManufacturerReturnList = () => {
         </table>
       </div>
 
-      <div className="flex justify-between mt-4">
+      <div className="flex justify-between mt-4 items-center">
         <select
-          className="border p-2 rounded-md border-green-600  focus:border-green-600"
+          className={`border p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+            theme === "dark"
+              ? "bg-gray-700 border-gray-600 text-white"
+              : "bg-white border-emerald-600 text-gray-900"
+          }`}
           value={rowsPerPage}
           onChange={(e) => {
             setRowsPerPage(parseInt(e.target.value, 10));
@@ -239,26 +287,31 @@ const ManufacturerReturnList = () => {
           <option value="10">10</option>
           <option value="15">15</option>
         </select>
-        <div>
+        <div className="flex items-center gap-3">
           <button
-            className="text-green-600 border border-green-600 px-2 rounded-[5px] text-center me-3 hover:text-white hover:bg-green-500 hove:border-none"
+            className={`px-2 py-1 rounded-[5px] border text-center hover:text-white hover:bg-emerald-500 hover:border-none ${
+              theme === "dark"
+                ? "border-gray-600 text-gray-300 disabled:opacity-50"
+                : "border-emerald-600 text-emerald-600 disabled:opacity-50"
+            }`}
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
           >
-            Previous
+            {t("manufacturerReturnList.previous")}
           </button>
-          <span>
-            {" "}
-            Page {currentPage} of {totalPages}{" "}
+          <span className={theme === "dark" ? "text-gray-300" : "text-gray-600"}>
+            {t("manufacturerReturnList.page", { current: currentPage, total: totalPages })}
           </span>
           <button
-            className="text-green-600 border border-green-600 px-2 rounded-[5px] text-center ml-3 hover:text-white hover:bg-green-500 hove:border-none"
-            onClick={() =>
-              setCurrentPage(Math.min(currentPage + 1, totalPages))
-            }
+            className={`px-2 py-1 rounded-[5px] border text-center hover:text-white hover:bg-emerald-500 hover:border-none ${
+              theme === "dark"
+                ? "border-gray-600 text-gray-300 disabled:opacity-50"
+                : "border-emerald-600 text-emerald-600 disabled:opacity-50"
+            }`}
+            onClick={() => setCurrentPage(Math.min(currentPage + 1, totalPages))}
             disabled={currentPage === totalPages}
           >
-            Next
+            {t("manufacturerReturnList.next")}
           </button>
         </div>
       </div>

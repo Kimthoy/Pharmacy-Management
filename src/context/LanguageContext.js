@@ -1,26 +1,28 @@
-// src/context/LanguageContext.js
-import React, { createContext, useState, useEffect } from "react";
+// context/LanguageContext.js
+import { createContext, useContext, useState, useEffect } from "react";
 
-export const LanguageContext = createContext();
+const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
-  const [langCode, setLangCode] = useState(
-    localStorage.getItem("selectedLanguage") || "en"
-  );
-
-  const changeLanguage = (newLang) => {
-    if (["en", "km"].includes(newLang)) {
-      setLangCode(newLang);
-    }
-  };
+  const [language, setLanguage] = useState("en");
 
   useEffect(() => {
-    localStorage.setItem("selectedLanguage", langCode);
-  }, [langCode]);
+    const storedLang = localStorage.getItem("selectedLanguage");
+    if (storedLang) {
+      setLanguage(storedLang);
+    }
+  }, []);
+
+  const changeLanguage = (lang) => {
+    setLanguage(lang);
+    localStorage.setItem("selectedLanguage", lang);
+  };
 
   return (
-    <LanguageContext.Provider value={{ langCode, changeLanguage }}>
+    <LanguageContext.Provider value={{ language, changeLanguage }}>
       {children}
     </LanguageContext.Provider>
   );
 };
+
+export const useLanguage = () => useContext(LanguageContext);

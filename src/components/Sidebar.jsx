@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
-import { useTranslation } from "../../src/hooks/useTranslation"; // Make sure path is correct
+import { useTranslation } from "../../src/hooks/useTranslation";
+import { useTheme } from "../context/ThemeContext";
 import { BiCapsule } from "react-icons/bi";
 import { CiRepeat, CiSettings } from "react-icons/ci";
 import { RiPagesLine } from "react-icons/ri";
@@ -18,6 +19,7 @@ import { TfiDashboard } from "react-icons/tfi";
 
 const Sidebar = ({ setSelectedPage, selectedPage }) => {
   const { t } = useTranslation();
+  const { theme } = useTheme();
   const navigate = useNavigate();
   const [activeMenuItem, setActiveMenuItem] = useState(null);
   const [isHovered, setIsHovered] = useState(false);
@@ -118,13 +120,10 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
       subItems: [
         { name: t("sidebar.login"), path: "/login" },
         { name: t("sidebar.register"), path: "/register" },
+        { name: t("sidebar.client"), path: "/client" },
       ],
     },
-    {
-      name: t("sidebar.settings"),
-      icon: CiSettings,
-      path: "/settingpage",
-    },
+    { name: t("sidebar.settings"), icon: CiSettings, path: "/settingpage" },
   ];
 
   const handlePageSelection = (item, path) => {
@@ -134,8 +133,8 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
 
   return (
     <div
-      className={`h-screen  flex-shrink-0 bg-white shadow-lg transition-all duration-300 ${
-        isHovered ? "w-52" : "w-[70px]"
+      className={`h-screen flex-shrink-0 bg-white dark:bg-gray-900 shadow-lg dark:shadow-gray-800 transition-all duration-300 ${
+        isHovered ? "w-52" : "w-[80px]"
       }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
@@ -143,10 +142,10 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
         setActiveMenuItem(null);
       }}
     >
-      <div className="flex flex-col h-full ">
+      <div className="flex flex-col h-full">
         {/* Main Menu Items */}
-        <nav className="flex-1  px-2 py-2 ">
-          <ul className="space-y-1 ">
+        <nav className="flex-1 px-2 py-2">
+          <ul className="space-y-1">
             {menuItems.map(({ name, icon: Icon, path, subItems }) => (
               <React.Fragment key={name}>
                 <li>
@@ -160,24 +159,25 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                         handlePageSelection(name, path);
                       }
                     }}
-                    className={`flex items-center justify-between w-full text-xs p-2 rounded-md text-gray-700 hover:bg-green-100 hover:text-green-700 transition-all duration-200 ${
-                      selectedPage === name ? "bg-green-500 text-white" : ""
+                    className={`flex items-center justify-between w-full text-xs p-2 rounded-md text-gray-700 dark:text-gray-200 hover:bg-green-100 dark:hover:bg-gray-700 hover:text-green-700 dark:hover:text-green-400 transition-all duration-200 ${
+                      selectedPage === name
+                        ? "bg-green-500 text-white dark:bg-green-600"
+                        : ""
                     }`}
                   >
                     {/* Left section: icon + label */}
                     <div className="flex items-center">
-                      <Icon className="w-6 h-6 flex-shrink-0" />
+                      <Icon className="w-6 h-6 flex-shrink-0 text-gray-600 dark:text-gray-300" />
                       {isHovered && (
                         <span className="ml-6 whitespace-nowrap">{name}</span>
                       )}
                     </div>
-
                     {/* Right section: dropdown arrow (if applicable) */}
                     {isHovered && subItems && (
                       <svg
                         className={`w-4 h-4 transition-transform ${
                           activeMenuItem === name ? "rotate-180" : ""
-                        } text-green-600`}
+                        } text-green-600 dark:text-green-400`}
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -189,7 +189,6 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                       </svg>
                     )}
                   </button>
-
                   {/* Submenu with smooth expand */}
                   {subItems && (
                     <ul
@@ -205,9 +204,9 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                             onClick={() =>
                               handlePageSelection(sub.name, sub.path)
                             }
-                            className={`w-full  text-left ml-10 mt-1 p-2 rounded text-xs hover:bg-green-100 hover:text-green-700 transition-colors ${
+                            className={`w-full text-left ml-10 mt-1 p-2 rounded text-xs text-gray-700 dark:text-gray-200 hover:bg-green-100 dark:hover:bg-gray-700 hover:text-green-700 dark:hover:text-green-400 transition-colors ${
                               selectedPage === sub.name
-                                ? "bg-green-500 text-white"
+                                ? "bg-green-500 text-white dark:bg-green-600"
                                 : ""
                             }`}
                           >

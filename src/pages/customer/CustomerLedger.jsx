@@ -1,6 +1,8 @@
 import React, { useState } from "react";
+import { useTranslation } from "../../hooks/useTranslation";
+import { useTheme } from "../../context/ThemeContext";
 
-const medicines = [
+const ledgerEntries = [
   {
     id: "#DP0796",
     date: "10 Feb 2020",
@@ -25,68 +27,72 @@ const medicines = [
 ];
 
 const CustomerLedger = () => {
+  const { t } = useTranslation();
+  const { theme } = useTheme();
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  const filteredMedicines = medicines.filter((med) => {
-    const matchesSearch = med.id
+  const filteredEntries = ledgerEntries.filter((entry) => {
+    const matchesSearch = entry.id
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
-
     const matchesDate =
-      (!startDate || new Date(med.date) >= new Date(startDate)) &&
-      (!endDate || new Date(med.date) <= new Date(endDate));
+      (!startDate || new Date(entry.date) >= new Date(startDate)) &&
+      (!endDate || new Date(entry.date) <= new Date(endDate));
     return matchesSearch && matchesDate;
   });
 
-  const totalPages = Math.ceil(filteredMedicines.length / rowsPerPage);
+  const totalPages = Math.ceil(filteredEntries.length / rowsPerPage) || 1;
   const startIndex = (currentPage - 1) * rowsPerPage;
-  const selectedMedicines = filteredMedicines.slice(
+  const selectedEntries = filteredEntries.slice(
     startIndex,
     startIndex + rowsPerPage
   );
 
   return (
-    <div className="p-6 bg-white shadow-md rounded-md overflow-x-auto">
-      <h2 className="text-2xl font-bold mb-2 text-gray-500">Customer Ledger</h2>
+    <div className="p-6 bg-white dark:bg-gray-900 shadow-md dark:shadow-gray-800 rounded-md overflow-x-auto">
+      <h2 className="text-2xl font-bold mb-2 text-gray-500 dark:text-gray-200">
+        {t("customerledger.CustomerLedgerTitle")}
+      </h2>
 
       <div className="flex flex-wrap gap-4 mb-4">
         <input
           type="text"
-          placeholder="Find ID ..."
-          className="border p-2 rounded-md focus:outline-green-500"
+          id="search"
+          placeholder={t("customerledger.SearchPlaceholder")}
+          className="border border-gray-300 dark:border-gray-600 p-2 rounded-md focus:outline-green-500 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-
         <div>
           <label
-            htmlFor=""
-            className="me-2 text-gray-400 text-xs font-extralight"
+            htmlFor="startDate"
+            className="me-2 text-gray-400 dark:text-gray-300 text-sm"
           >
-            Filter by Choose start date
+            {t("customerledger.FilterStartDate")}
           </label>
           <input
             type="date"
-            className="border p-2 rounded-md focus:outline-green-500"
+            id="startDate"
+            className="border border-gray-300 dark:border-gray-600 p-2 rounded-md focus:outline-green-500 dark:bg-gray-700 dark:text-gray-200"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
           />
         </div>
-
         <div>
           <label
-            htmlFor=""
-            className="me-2 text-gray-400 text-xs font-extralight"
+            htmlFor="endDate"
+            className="me-2 text-gray-400 dark:text-gray-300 text-sm"
           >
-            Choose end date
+            {t("customerledger.FilterEndDate")}
           </label>
           <input
             type="date"
-            className="border p-2 rounded-md focus:outline-green-500"
+            id="endDate"
+            className="border border-gray-300 dark:border-gray-600 p-2 rounded-md focus:outline-green-500 dark:bg-gray-700 dark:text-gray-200"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
           />
@@ -95,44 +101,49 @@ const CustomerLedger = () => {
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[600px] border-collapse bg-white shadow-md rounded-lg">
-          <thead className="border">
+        <table className="w-full min-w-[600px] border-collapse bg-white dark:bg-gray-800 shadow-md dark:shadow-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+          <thead className="border border-gray-200 dark:border-gray-600">
             <tr>
-              <td className="p-3 text-left text-gray-400 font-light text-[13px]">
-                ID
-              </td>
-              <td className="p-3 text-left text-gray-400 font-light text-[13px]">
-                Date
-              </td>
-              <td className="p-3 text-left text-gray-400 font-light text-[13px]">
-                Debit (USD)
-              </td>
-              <td className="p-3 text-left text-gray-400 font-light text-[13px]">
-                Credit (USD)
-              </td>
-              <td className="p-3 text-left text-gray-400 font-light text-[13px]">
-                Balance (USD)
-              </td>
+              <th className="p-3 text-left text-gray-400 dark:text-gray-300 text-sm">
+                {t("customerledger.ID")}
+              </th>
+              <th className="p-3 text-left text-gray-400 dark:text-gray-300 text-sm">
+                {t("customerledger.Date")}
+              </th>
+              <th className="p-3 text-left text-gray-400 dark:text-gray-300 text-sm">
+                {t("customerledger.Debit")}
+              </th>
+              <th className="p-3 text-left text-gray-400 dark:text-gray-300 text-sm">
+                {t("customerledger.Credit")}
+              </th>
+              <th className="p-3 text-left text-gray-400 dark:text-gray-300 text-sm">
+                {t("customerledger.Balance")}
+              </th>
             </tr>
           </thead>
-          <tbody className="border">
-            {selectedMedicines.map((med, index) => {
-              return (
-                <tr key={index} className="border text-sm sm:text-base ">
-                  <td className="p-3 text-[13px]  text-green-400 cursor-pointer hover:underline ">
-                    {med.id}
-                  </td>
-                  <td className="p-3 text-[13px] text-gray-400">{med.date}</td>
-                  <td className="p-3 text-[13px] text-gray-400">{med.debit}</td>
-                  <td className="p-3 text-[13px] text-gray-400">
-                    {med.credit}
-                  </td>
-                  <td className="p-3 text-[13px] text-gray-400">
-                    {med.balance}
-                  </td>
-                </tr>
-              );
-            })}
+          <tbody className="border border-gray-200 dark:border-gray-600">
+            {selectedEntries.map((entry, index) => (
+              <tr
+                key={index}
+                className="border-b border-gray-200 dark:border-gray-600 text-sm"
+              >
+                <td className="p-3 text-green-400 dark:text-green-300 cursor-pointer hover:underline">
+                  {entry.id}
+                </td>
+                <td className="p-3 text-gray-400 dark:text-gray-300">
+                  {entry.date}
+                </td>
+                <td className="p-3 text-gray-400 dark:text-gray-300">
+                  {entry.debit}
+                </td>
+                <td className="p-3 text-gray-400 dark:text-gray-300">
+                  {entry.credit}
+                </td>
+                <td className="p-3 text-gray-400 dark:text-gray-300">
+                  {entry.balance}
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
@@ -140,48 +151,49 @@ const CustomerLedger = () => {
       {/* Pagination Controls */}
       <div className="flex flex-wrap items-center justify-between mt-4">
         <div className="flex items-center space-x-2">
-          <span className="text-gray-400 font-light text-[13px]">
-            Rows per page:
+          <span className="text-gray-400 dark:text-gray-300 text-sm">
+            {t("customerledger.RowsPerPage")}
           </span>
           <select
-            className="border p-2 rounded-md"
+            id="rowsPerPage"
+            className="border border-gray-300 dark:border-gray-600 p-2 rounded-md dark:bg-gray-700 dark:text-gray-200"
             value={rowsPerPage}
             onChange={(e) => {
               setRowsPerPage(parseInt(e.target.value, 10));
               setCurrentPage(1);
             }}
+            aria-label={t("customerledger.RowsPerPage")}
           >
             <option value="5">5</option>
             <option value="10">10</option>
             <option value="15">15</option>
           </select>
         </div>
-
         <div className="flex items-center space-x-2">
           <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            className="px-3 py-1 border rounded-md text-gray-400 font-light text-[13px]"
+            className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-gray-400 dark:text-gray-300 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
             disabled={currentPage === 1}
           >
-            Previous
+            {t("customerledger.Previous")}
           </button>
-
-          <span className="text-gray-400 font-light text-[13px]">
-            Page {currentPage} of {totalPages}
+          <span className="text-gray-400 dark:text-gray-300 text-sm">
+            {t("customerledger.Page")} {currentPage} {t("customerledger.Of")}{" "}
+            {totalPages}
           </span>
-
           <button
             onClick={() =>
               setCurrentPage((prev) => Math.min(prev + 1, totalPages))
             }
-            className="px-3 py-1 border rounded-md text-gray-400 font-light text-[13px]"
+            className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-gray-400 dark:text-gray-300 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
             disabled={currentPage === totalPages}
           >
-            Next
+            {t("customerledger.Next")}
           </button>
         </div>
       </div>
     </div>
   );
 };
+
 export default CustomerLedger;

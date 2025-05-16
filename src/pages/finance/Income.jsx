@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { FaSort, FaCog } from "react-icons/fa";
+import { useTranslation } from "../../hooks/useTranslation";
 
 const Income = () => {
+  const { t } = useTranslation();
   const [showFilter, setShowFilter] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
@@ -139,10 +141,10 @@ const Income = () => {
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-700">
-          Income Dashboard <br />
-          <span className="text-sm font-normal text-gray-400">
-            Manage all income records efficiently.
+        <h1 className="text-xl font-bold text-gray-700">
+          {t("income.IncomeDashboard")} <br />
+          <span className="text-xs font-normal text-gray-400">
+            {t("income.IncomeDashboardDesc")}
           </span>
         </h1>
 
@@ -151,7 +153,7 @@ const Income = () => {
             className="bg-white text-green-500 px-4 py-2 rounded-md shadow-sm outline outline-green-500 transition"
             onClick={() => setShowFilter(!showFilter)}
           >
-            Filtered By: {selectedFilter}
+            {t("income.IncomeDashboardFilteredBy")}: {selectedFilter}
           </button>
           {showFilter && (
             <div className="absolute top-12 left-0 bg-white shadow-md rounded-md w-40 p-2">
@@ -159,66 +161,76 @@ const Income = () => {
                 onClick={() => filterIncome("All")}
                 className="block w-full text-left px-4 py-2 text-green-500 hover:bg-green-200 rounded-md"
               >
-                All
+                {t("income.filterOptions.all")}
               </button>
               <button
                 onClick={() => filterIncome(3)}
                 className="block w-full text-left px-4 py-2 text-green-500 hover:bg-green-200 rounded-md"
               >
-                Last 3 Days
+                {t("income.filterOptions.last3Days")}
               </button>
               <button
                 onClick={() => filterIncome(7)}
                 className="block w-full text-left px-4 py-2 text-green-500 hover:bg-green-200 rounded-md"
               >
-                Last 7 Days
+                {t("income.filterOptions.last7Days")}
               </button>
             </div>
           )}
           <button className="outline text-green-500 px-4 py-2 rounded-md shadow-md hover:bg-green-200 transition">
-            + Add Income
+            {t("income.addIncome")}
           </button>
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="bg-white grid gap-2 p-4 rounded-lg shadow-md text-center hover:shadow-green-200 duration-100 ease-in-out">
           <h2 className="text-md font-semibold text-gray-400">
-            Today's Income
+            {t("income.summaryCards.todaysIncome")}
           </h2>
           <p className=" font-bold">$10,945</p>
-          <p className="text-green-500">↑ 4.63% vs. Yesterday</p>
+          <p className="text-green-500">
+            ↑ 4.63% {t("income.summaryCards.vsYesterday")}
+          </p>
         </div>
         <div className="bg-white grid gap-2 p-4 rounded-lg shadow-md text-center hover:shadow-green-200 duration-100 ease-in-out">
           <h2 className="text-md  font-semibold text-gray-400">
-            This Week Income
+            {t("income.summaryCards.thisWeekIncome")}
           </h2>
           <p className="  font-bold">$12,338</p>
-          <p className="text-red-500">↓ 2.34% vs. last week</p>
+          <p className="text-red-500">
+            ↓ 2.34% {t("income.summaryCards.vsLastWeek")}
+          </p>
         </div>
         <div className="bg-white grid gap-2 p-4 rounded-lg shadow-md text-center hover:shadow-green-200 duration-100 ease-in-out">
           <h2 className="text-md font-semibold text-gray-400">
-            This Month Income
+            {t("income.summaryCards.vsLastMonth")}
           </h2>
           <p className=" font-bold">$20,847</p>
-          <p className="text-green-500">↑ 4.63% vs. last Month</p>
+          <p className="text-green-500">
+            ↑ 4.63% {t("income.summaryCards.vsLastMonth")}
+          </p>
         </div>
         <div className="bg-white grid gap-2 p-4 rounded-lg shadow-md text-center hover:shadow-green-200 duration-100 ease-in-out">
           <h2 className="text-md font-semibold text-gray-400">
-            This Year Income
+            {t("income.summaryCards.thisYearIncome")}
           </h2>
           <p className=" font-bold">$23,485</p>
-          <p className="text-green-500">↑ 1.34% vs. last Year</p>
+          <p className="text-green-500">
+            ↑ 1.34% {t("income.summaryCards.vsLastYear")}
+          </p>
         </div>
       </div>
 
       <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
         <div className="flex justify-between align-middle">
-          <h2 className="text-2xl font-bold text-gray-700 mb-4">Income List</h2>
+          <h2 className="text-xl font-bold text-gray-700 mb-4">
+            {t("income.incomeList")}
+          </h2>
 
           <div className=" flex items-center space-x-3 mb-4">
             <input
               type="text"
-              placeholder="Search by name..."
+              placeholder={t("income.searchPlaceholder")}
               value={searchQuery}
               onChange={handleSearch}
               className="border px-3 py-2 rounded-md shadow-sm focus:outline-green-700  outline outline-green-400"
@@ -237,11 +249,11 @@ const Income = () => {
         <table className="w-full border-collapse border border-gray-300 text-gray-700">
           <thead>
             <tr className="bg-gray-200 text-gray-500 text-center">
-              <th className="p-3 border">Category</th>
-              <th className="p-3 border">Invoice ID</th>
-              <th className="p-3 border">Date</th>
-              <th className="p-3 border">Income Head</th>
-              <th className="p-3 border">Amount</th>
+              <th className="p-3 border">{t("income.category")}</th>
+              <th className="p-3 border">{t("income.invoiceId")}</th>
+              <th className="p-3 border">{t("income.date")}</th>
+              <th className="p-3 border">{t("income.incomeHead")}</th>
+              <th className="p-3 border">{t("income.amount")}</th>
             </tr>
           </thead>
           <tbody>
@@ -263,7 +275,7 @@ const Income = () => {
                   colSpan="5"
                   className="p-3 border text-center text-gray-500"
                 >
-                  No income records found
+                  {t("income.noRecords")}
                 </td>
               </tr>
             )}
@@ -272,7 +284,7 @@ const Income = () => {
         <div className="flex justify-between">
           <div className="px-4 py-2 flex justify-between">
             <label>
-              <span className="text-gray-400">Show</span>
+              <span className="text-gray-400">{t("income.show")}</span>
               <select
                 className="m-3  border p-1 focus:outline-green-600"
                 value={itemsPerPage}
@@ -285,7 +297,7 @@ const Income = () => {
                 <option value={10}>10</option>
                 <option value={15}>15</option>
               </select>
-              <span className="text-gray-400"> entries</span>
+              <span className="text-gray-400">{t("income.entries")} </span>
             </label>
           </div>
           <div className="flex  items-center mt-4">
@@ -294,17 +306,17 @@ const Income = () => {
               onClick={() => setCurrentPage(currentPage - 1)}
               className="outline outline-green-600 px-3 rounded disabled:opacity-50"
             >
-              Previous
+              {t("income.previous")}
             </button>
             <span className="m-3">
-              Page {currentPage} of {totalPages}
+              {t("income.page")} {currentPage} {t("income.of")} {totalPages}
             </span>
             <button
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage(currentPage + 1)}
               className=" outline outline-green-600 px-3  rounded disabled:opacity-50"
             >
-              Next
+              {t("income.next")}
             </button>
           </div>
         </div>
