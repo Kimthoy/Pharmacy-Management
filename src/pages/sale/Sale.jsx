@@ -162,7 +162,7 @@ const PharmacyInterface = () => {
   return (
     <div className="flex h-screen bg-gray-100 relative">
       {/* Sidebar */}
-      <div className="w-64 bg-white shadow-lg">
+      <div className="w-36 bg-white shadow-lg hidden md:block">
         <div className="flex items-center justify-center h-16 bg-green-600 text-white">
           <span className="text-2xl font-bold">✚</span>
         </div>
@@ -212,12 +212,12 @@ const PharmacyInterface = () => {
         </nav>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      {/* Main Content and Cart */}
+      <div className="flex-1 flex flex-col md:flex-row">
         {/* Product List */}
         <div className="flex-1 p-6 overflow-auto">
           <header className="mb-6">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between flex-1 items-center mb-4">
               <h1 className="text-2xl font-bold" aria-label="ឱសថស្ថាន">
                 ឱសថស្ថាន (NCPDP ID: 1234567)
               </h1>
@@ -279,14 +279,14 @@ const PharmacyInterface = () => {
                     (e.target.src =
                       "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mN8z8DwHwAFBQIA/rB/WQAAAABJRU5ErkJggg==")
                   }
-                  className="w-full h-40 object-cover mb-2 rounded"
+                  className="w-40 h-32 object-cover mb-4 rounded"
                 />
-                <h3 className="text-lg font-semibold">{product.name}</h3>
-                <p className="text-gray-600">
-                  តម្លៃ {displayPrice(product.price).toFixed(2)}{" "}
+                <h3 className="text-sm font-semibold mb-2">{product.name}</h3>
+                <p className="text-gray-600 mb-4">
+                  {displayPrice(product.price).toFixed(2)}{" "}
                   {currency === "USD" ? "$" : "៛"}
                 </p>
-                <div className="mt-2 flex justify-center items-center">
+                <div className="flex justify-center items-center mb-2">
                   <label className="mr-2" htmlFor={`qty-${product.id}`}>
                     ចំនួន:
                   </label>
@@ -304,7 +304,7 @@ const PharmacyInterface = () => {
                 </div>
                 <button
                   onClick={() => addToCart(product)}
-                  className="mt-2 w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
+                  className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
                   aria-label={`បន្ថែម ${product.name} ទៅកន្ត្រក`}
                 >
                   បន្ថែមទៅកន្ត្រក
@@ -314,18 +314,9 @@ const PharmacyInterface = () => {
           </div>
         </div>
 
-        {/* Cart Toggle for Mobile */}
-        <button
-          className="md:hidden fixed bottom-4 right-4 bg-green-600 text-white p-4 rounded-full shadow-lg"
-          onClick={() => setIsCartOpen(true)}
-          aria-label="បើកកន្ត្រក"
-        >
-          🛒 ({totalQuantity})
-        </button>
-
-        {/* Cart Section (Desktop: Sidebar, Mobile: Bottom Drawer) */}
+        {/* Cart Section (Desktop: Right Sidebar, Mobile: Bottom Drawer) */}
         <div
-          className={`bg-white shadow-lg p-4 transition-all duration-300 md:w-80 md:block md:static md:h-auto
+          className={`bg-white shadow-lg p-4 transition-all duration-300 md:w-60 md:h-full md:static
             fixed bottom-0 left-0 w-full h-3/4 rounded-t-2xl md:rounded-none flex flex-col
             ${
               isCartOpen ? "translate-y-0" : "translate-y-full md:translate-y-0"
@@ -344,96 +335,99 @@ const PharmacyInterface = () => {
           </div>
 
           {/* Cart Items - Scrollable */}
-          <div>
-            {cart.length === 0 ? (
-              <div className="flex-1 flex flex-col items-center justify-center text-gray-600">
-                <span className="text-4xl mb-2">🛒</span>
-                <p>កន្ត្រកទទេ</p>
-              </div>
-            ) : (
-              <div className="flex-1 overflow-auto mb-4">
-                <ul className="space-y-2">
-                  {cart.map((item) => (
-                    <li
-                      key={item.id}
-                      className="flex items-center space-x-3 border-b py-2 hover:bg-gray-50 transition"
-                    >
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-10 h-10 object-cover rounded flex-shrink-0"
-                      />
-                      <div className="flex-1">
-                        <div className="flex justify-between items-center">
-                          <span className="font-semibold text-sm">
-                            {item.name}
-                          </span>
-                          <button
-                            onClick={() => removeFromCart(item.id)}
-                            className="text-red-600 text-sm hover:underline"
-                            aria-label={`លុប ${item.name} ចេញពីកន្ត្រក`}
-                          >
-                            លុប
-                          </button>
-                        </div>
-                        <div className="flex items-center mt-1 text-sm">
-                          <span>{item.quantity} x</span>
-                          <span className="ml-1">
-                            {displayPrice(item.price).toFixed(2)}{" "}
-                            {currency === "USD" ? "$" : "៛"}
-                          </span>
-                        </div>
+          {cart.length === 0 ? (
+            <div className="flex-1 flex flex-col items-center justify-center text-gray-600">
+              <span className="text-4xl mb-2">🛒</span>
+              <p>កន្ត្រកទទេ</p>
+            </div>
+          ) : (
+            <div className="flex-1 overflow-auto mb-4">
+              <ul className="space-y-2">
+                {cart.map((item, index) => (
+                  <li
+                    key={item.id}
+                    className="flex items-center space-x-3 border-b py-2 hover:bg-gray-50 transition"
+                  >
+                    <span className="text-sm font-medium">{index + 1}.</span>
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-10 h-10 object-cover rounded flex-shrink-0"
+                    />
+                    <div className="flex-1">
+                      <div className="flex justify-between items-center">
+                        <span className=" text-xs">{item.name}</span>
+                        <button
+                          onClick={() => removeFromCart(item.id)}
+                          className="text-red-600 text-sm hover:underline"
+                          aria-label={`លុប ${item.name} ចេញពីកន្ត្រក`}
+                        >
+                          លុប
+                        </button>
                       </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
+                      <div className="text-sm">
+                        {item.quantity} x {displayPrice(item.price).toFixed(2)}{" "}
+                        {currency === "USD" ? "$" : "៛"} ={" "}
+                        {(displayPrice(item.price) * item.quantity).toFixed(2)}{" "}
+                        {currency === "USD" ? "$" : "៛"}
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
-          <div>
-            {/* Cart Footer - Sticky Totals and Buttons */}
-            {cart.length > 0 && (
-              <div className="sticky bottom-0 bg-white z-10 pt-2 border-t">
-                <div className="flex flex-col space-y-2 mb-4">
-                  <div className="flex justify-between items-center font-semibold text-lg">
-                    <span>សរុប</span>
-                    <span>
-                      {totalPrice.toFixed(2)} {currency === "USD" ? "$" : "៛"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center text-gray-600 text-sm">
-                    <span>បរិមាណសរុប</span>
-                    <span>{totalQuantity}</span>
-                  </div>
+          {/* Cart Footer - Sticky Totals and Buttons */}
+          {cart.length > 0 && (
+            <div className="sticky bottom-0 bg-white z-10 pt-2 border-t">
+              <div className="flex flex-col space-y-2 mb-4">
+                <div className="flex justify-between items-center font-semibold text-lg">
+                  <span>សរុប</span>
+                  <span>
+                    {totalPrice.toFixed(2)} {currency === "USD" ? "$" : "៛"}
+                  </span>
                 </div>
-                <div className="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
-                  <button
-                    onClick={clearCart}
-                    aria-label="លុបកន្ត្រក"
-                    className="flex-1 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition"
-                  >
-                    លុប
-                  </button>
-                  <button
-                    onClick={saveCart}
-                    aria-label="រក្សាទុកកន្ត្រក"
-                    className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
-                  >
-                    រក្សាទុក
-                  </button>
-                  <button
-                    onClick={placeOrder}
-                    aria-label="បញ្ជាទិញ"
-                    className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
-                  >
-                    បញ្ជាទិញ
-                  </button>
+                <div className="flex justify-between items-center text-gray-600 text-sm">
+                  <span>បរិមាណសរុប</span>
+                  <span>{totalQuantity}</span>
                 </div>
               </div>
-            )}
-          </div>
+              <div className="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
+                <button
+                  onClick={clearCart}
+                  aria-label="លុបកន្ត្រក"
+                  className="flex-1 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition"
+                >
+                  លុប
+                </button>
+                <button
+                  onClick={saveCart}
+                  aria-label="រក្សាទុកកន្ត្រក"
+                  className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
+                >
+                  រក្សាទុក
+                </button>
+                <button
+                  onClick={placeOrder}
+                  aria-label="បញ្ជាទិញ"
+                  className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+                >
+                  បញ្ជាទិញ
+                </button>
+              </div>
+            </div>
+          )}
         </div>
+
+        {/* Cart Toggle for Mobile */}
+        <button
+          className="md:hidden fixed bottom-4 right-4 bg-green-600 text-white p-4 rounded-full shadow-lg"
+          onClick={() => setIsCartOpen(true)}
+          aria-label="បើកកន្ត្រក"
+        >
+          🛒 ({totalQuantity})
+        </button>
       </div>
 
       {/* Checkout Modal */}
@@ -451,7 +445,7 @@ const PharmacyInterface = () => {
               {totalQuantity} ផលិតផល)
             </p>
             <p className="text-sm text-gray-600">
-              ពេលវេលា: 06:38 PM +07, ថ្ងៃអាទិត្យ, 18 ឧសភា 2025
+              ពេលវេលា: 09:43 AM +07, ថ្ងៃចន្ទ, 19 ឧសភា 2025
             </p>
             <div className="flex space-x-2 mt-4">
               <button
