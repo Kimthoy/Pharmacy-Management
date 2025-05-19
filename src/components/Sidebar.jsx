@@ -34,6 +34,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
         { name: t("sidebar.addMedicine"), path: "/addmedicinepage" },
         { name: t("sidebar.medicineList"), path: "/listofmedicine" },
         { name: t("sidebar.medicineDetail"), path: "/medicinedetail" },
+        { name: t("sidebar.categoies"), path: "/categoies" },
       ],
     },
     {
@@ -102,6 +103,12 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
         { name: t("sidebar.invoiceDetail"), path: "/invoicedetail" },
         { name: t("sidebar.invoiceList"), path: "/invoicelist" },
       ],
+    },
+    {
+      name: t("sidebar.salepage"),
+      icon: HiOutlineCurrencyDollar,
+      path: "/salepage",
+      subItems: [{ name: t("sidebar.saledashboard"), path: "/saledashboard" }],
     },
     {
       name: t("sidebar.reports"),

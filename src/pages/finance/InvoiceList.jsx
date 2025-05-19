@@ -1,11 +1,15 @@
-import  { useState } from "react";
-import { FaSort, FaCog, FaFilter } from "react-icons/fa";
+import { useState } from "react";
+import { FaSort, FaCog, FaFilter, FaSun, FaMoon } from "react-icons/fa";
+import { useTranslation } from "../../hooks/useTranslation";
+import { useTheme } from "../../context/ThemeContext";
 
 const InvoiceList = () => {
+  const { t } = useTranslation();
+  const { theme, toggleTheme } = useTheme();
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [showFilter, setShowFilter] = useState(false);
-  const [setSelectedFilter] = useState("All");
+  const [selectedFilter, setSelectedFilter] = useState("All");
   const [sortOrder, setSortOrder] = useState("asc");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -74,7 +78,6 @@ const InvoiceList = () => {
 
   const [invoiceList, setInvoiceList] = useState(originalInvoiceList);
 
-  // Filter by status
   const filterInvoices = (status) => {
     if (status === "All") {
       setInvoiceList(originalInvoiceList);
@@ -89,19 +92,16 @@ const InvoiceList = () => {
     setCurrentPage(1);
   };
 
-  // Sort by date
   const sortedList = [...invoiceList].sort((a, b) => {
     const dateA = new Date(a.date);
     const dateB = new Date(b.date);
     return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
   });
 
-  // Search by ORDER ID
   const filteredList = sortedList.filter((item) =>
     item.id.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Pagination
   const totalPages = Math.ceil(filteredList.length / itemsPerPage);
   const paginatedList = filteredList.slice(
     (currentPage - 1) * itemsPerPage,
@@ -109,111 +109,143 @@ const InvoiceList = () => {
   );
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-700">
-          Invoices <br />
-          <span className="text-sm font-normal text-gray-400">
-            You have total {invoiceList.length} invoices.
+    <div className="p-6 bg-gray-100 dark:bg-gray-900 min-h-screen max-w-6xl mx-auto">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-700 dark:text-gray-200">
+            {t("invoice.title")}
+          </h1>
+          <span className="text-xs font-normal text-gray-400 dark:text-gray-300">
+            {t("invoice.description", { count: invoiceList.length })}
           </span>
-        </h1>
-        <button className="bg-green-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-green-600 transition">
-          + Add Invoice
-        </button>
+        </div>
+        <div className="flex items-center space-x-2 mt-4 md:mt-0">
+          <button
+            onClick={toggleTheme}
+            className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition"
+            aria-label={
+              theme === "light" ? "Switch to dark mode" : "Switch to light mode"
+            }
+          >
+            {theme === "light" ? <FaMoon /> : <FaSun />}
+          </button>
+          <button className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-4 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition">
+            {t("invoice.addInvoice")}
+          </button>
+        </div>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md dark:shadow-gray-700 border border-gray-200 dark:border-gray-600">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold text-gray-700">All Invoice</h2>
+          <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-200">
+            {t("invoice.allInvoices")}
+          </h2>
           <div className="flex items-center space-x-3">
             <input
               type="text"
-              placeholder="Search by ORDER ID..."
+              placeholder={t("invoice.searchPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="border px-3 py-2 rounded-md shadow-sm focus:outline-green-500 outline outline-green-300"
+              className="text-xs border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
             />
             <button
               onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-              className="bg-white px-4 py-2 rounded-md shadow-sm flex items-center space-x-2 outline outline-green-300"
+              className="bg-white dark:bg-gray-700 px-4 py-2 rounded-[4px] shadow-md dark:shadow-gray-600 flex items-center space-x-2 border border-gray-400 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600"
             >
               <FaSort />
             </button>
             <div className="relative">
               <button
                 onClick={() => setShowFilter(!showFilter)}
-                className="bg-white px-4 py-2 rounded-md shadow-sm flex items-center space-x-2 outline outline-green-300"
+                className="bg-white dark:bg-gray-700 px-4 py-2 rounded-[4px] shadow-md dark:shadow-gray-600 flex items-center space-x-2 border border-gray-400 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600"
               >
                 <FaFilter />
               </button>
               {showFilter && (
-                <div className="absolute top-12 right-0 bg-white shadow-md rounded-md w-40 p-2">
+                <div className="absolute top-12 right-0 bg-white dark:bg-gray-700 shadow-md dark:shadow-gray-600 rounded-[4px] w-40 p-2 z-10">
                   <button
                     onClick={() => filterInvoices("All")}
-                    className="block w-full text-left px-4 py-2 text-green-500 hover:bg-green-100 rounded-md"
+                    className="block w-full text-left px-4 py-2 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600 rounded-[4px] text-xs"
                   >
-                    All
+                    {t("invoice.filterAll")}
                   </button>
                   <button
                     onClick={() => filterInvoices("Complete")}
-                    className="block w-full text-left px-4 py-2 text-green-500 hover:bg-green-100 rounded-md"
+                    className="block w-full text-left px-4 py-2 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600 rounded-[4px] text-xs"
                   >
-                    Complete
+                    {t("invoice.filterComplete")}
                   </button>
                   <button
                     onClick={() => filterInvoices("Pending")}
-                    className="block w-full text-left px-4 py-2 text-green-500 hover:bg-green-100 rounded-md"
+                    className="block w-full text-left px-4 py-2 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600 rounded-[4px] text-xs"
                   >
-                    Pending
+                    {t("invoice.filterPending")}
                   </button>
                   <button
                     onClick={() => filterInvoices("Cancelled")}
-                    className="block w-full text-left px-4 py-2 text-green-500 hover:bg-green-100 rounded-md"
+                    className="block w-full text-left px-4 py-2 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600 rounded-[4px] text-xs"
                   >
-                    Cancelled
+                    {t("invoice.filterCancelled")}
                   </button>
                 </div>
               )}
             </div>
-            <button className="bg-white px-4 py-2 rounded-md shadow-sm flex items-center space-x-2 outline outline-green-300">
+            <button className="bg-white dark:bg-gray-700 px-4 py-2 rounded-[4px] shadow-md dark:shadow-gray-600 flex items-center space-x-2 border border-gray-400 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600">
               <FaCog />
             </button>
           </div>
         </div>
-        <table className="w-full border-collapse border border-gray-300 text-gray-700">
+        <table className="w-full border-collapse border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200">
           <thead>
-            <tr className="bg-gray-200 text-gray-500 text-center">
-              <th className="p-3 border">ORDER ID</th>
-              <th className="p-3 border">DATE</th>
-              <th className="p-3 border">AMOUNT</th>
-              <th className="p-3 border">STATUS</th>
-              <th className="p-3 border">ACTIONS</th>
+            <tr className="bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-300 text-center">
+              <th className="p-3 border border-gray-300 dark:border-gray-600">
+                {t("invoice.orderId")}
+              </th>
+              <th className="p-3 border border-gray-300 dark:border-gray-600">
+                {t("invoice.date")}
+              </th>
+              <th className="p-3 border border-gray-300 dark:border-gray-600">
+                {t("invoice.amount")}
+              </th>
+              <th className="p-3 border border-gray-300 dark:border-gray-600">
+                {t("invoice.status")}
+              </th>
+              <th className="p-3 border border-gray-300 dark:border-gray-600">
+                {t("invoice.actions")}
+              </th>
             </tr>
           </thead>
           <tbody>
             {paginatedList.length > 0 ? (
               paginatedList.map((item, index) => (
-                <tr key={index} className="border text-center">
-                  <td className="p-3 border text-green-500 cursor-pointer">
+                <tr
+                  key={index}
+                  className="border border-gray-300 dark:border-gray-600 text-center"
+                >
+                  <td className="p-3 border border-gray-300 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 cursor-pointer">
                     {item.id}
                   </td>
-                  <td className="p-3 border text-gray-400">{item.date}</td>
-                  <td className="p-3 border text-gray-800">{item.amount}</td>
-                  <td className="p-3 border text-gray-400">
+                  <td className="p-3 border border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-300">
+                    {item.date}
+                  </td>
+                  <td className="p-3 border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200">
+                    {item.amount}
+                  </td>
+                  <td className="p-3 border border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-300">
                     <span
                       className={`inline-block w-2 h-2 rounded-full ${
                         item.status === "Complete"
-                          ? "bg-green-500"
+                          ? "bg-emerald-500 dark:bg-emerald-400"
                           : item.status === "Pending"
-                          ? "bg-yellow-500"
-                          : "bg-red-500"
+                          ? "bg-yellow-500 dark:bg-yellow-400"
+                          : "bg-red-500 dark:bg-red-400"
                       }`}
                     ></span>{" "}
-                    {item.status}
+                    {t(`invoice.status${item.status}`)}
                   </td>
-                  <td className="p-3 border text-gray-400">
-                    <button className="text-blue-500 hover:text-blue-700">
-                      ⏰ View
+                  <td className="p-3 border border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-300">
+                    <button className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-xs">
+                      ⏰ {t("invoice.view")}
                     </button>
                   </td>
                 </tr>
@@ -222,50 +254,52 @@ const InvoiceList = () => {
               <tr>
                 <td
                   colSpan="5"
-                  className="p-3 border text-center text-gray-500"
+                  className="p-16 border border-gray-300 dark:border-gray-600 text-center text-gray-500 dark:text-gray-400"
                 >
-                  No invoice records found
+                  {t("invoice.noRecords")}
                 </td>
               </tr>
             )}
           </tbody>
         </table>
-        <div className="flex justify-between mt-4">
-          <div className="px-4 py-2 flex justify-between">
-            <label>
-              <span className="text-gray-400">Show</span>
-              <select
-                className="m-3 border p-1 focus:outline-green-500"
-                value={itemsPerPage}
-                onChange={(e) => {
-                  setItemsPerPage(Number(e.target.value));
-                  setCurrentPage(1);
-                }}
-              >
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={15}>15</option>
-              </select>
-              <span className="text-gray-400"> entries</span>
-            </label>
+        <div className="flex flex-col md:flex-row justify-between items-center mt-4">
+          <div className="flex items-center space-x-2">
+            <span className="text-gray-400 dark:text-gray-300 text-xs">
+              {t("invoice.show")}
+            </span>
+            <select
+              className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
+              value={itemsPerPage}
+              onChange={(e) => {
+                setItemsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={15}>15</option>
+            </select>
+            <span className="text-gray-400 dark:text-gray-300 text-xs">
+              {t("invoice.entries")}
+            </span>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center space-x-2 mt-4 md:mt-0">
             <button
               disabled={currentPage === 1}
               onClick={() => setCurrentPage(currentPage - 1)}
-              className="outline outline-green-500 px-3 rounded disabled:opacity-50"
+              className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition disabled:opacity-50"
             >
-              Previous
+              {t("invoice.previous")}
             </button>
-            <span className="m-3">
-              Page {currentPage} of {totalPages}
+            <span className="text-gray-700 dark:text-gray-200 text-xs">
+              {t("invoice.page")} {currentPage} {t("invoice.of")} {totalPages}
             </span>
             <button
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage(currentPage + 1)}
-              className="outline outline-green-500 px-3 rounded disabled:opacity-50"
+              className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition disabled:opacity-50"
             >
-              Next
+              {t("invoice.next")}
             </button>
           </div>
         </div>

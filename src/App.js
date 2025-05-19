@@ -14,6 +14,8 @@ import Register from "./pages/auth/Register";
 import { LanguageProvider } from "./context/LanguageContext";
 import { AuthProvider } from "./context/AuthContext";
 
+const ActivityPage = lazy(() => import("./pages/profile/ActivityPage"));
+
 const Login = lazy(() => import("./pages/auth/Login"));
 const CustomerList = lazy(() => import("./pages/customer/ListCustomer"));
 const CustomerLedger = lazy(() => import("./pages/customer/CustomerLedger"));
@@ -36,9 +38,11 @@ const InvoiceListPage = lazy(() => import("./pages/finance/InvoiceList"));
 const AboutUser = lazy(() => import("./pages/profile/AboutUser"));
 const AddMedicine = lazy(() => import("./pages/medicine/AddMedicine"));
 const MedicineList = lazy(() => import("./pages/medicine/MedicineList"));
+const Category = lazy(() => import("./pages/medicine/Category"));
 const MedicineDetail = lazy(() => import("./pages/medicine/MedicineDetail"));
 const Setting = lazy(() => import("./pages/setting/Setting"));
 const AddWastageReturn = lazy(() => import("./pages/return/AddWastageReturn"));
+const SaleDashboard = lazy(() => import("./pages/sale/Sale"));
 const AddManufacturerReturn = lazy(() =>
   import("./pages/return/AddManufacturerReturn")
 );
@@ -50,7 +54,7 @@ const WastageReturnList = lazy(() =>
 );
 const StaffList = lazy(() => import("./pages/staff/ManageStaff"));
 const Client = lazy(() => import("./pages/auth/Client"));
-
+const Profile = lazy(() => import("./pages/profile/AboutUser"));
 const App = () => {
   const [langCode, setLangCode] = useState(
     localStorage.getItem("selectedLanguage") || "en"
@@ -152,6 +156,7 @@ const App = () => {
                         path="/medicinedetail"
                         element={<MedicineDetail />}
                       />
+                      <Route path="/categoies" element={<Category />} />
                       <Route path="/settingpage" element={<Setting />} />
                       <Route
                         path="/manufacturerreturnlist"
@@ -171,6 +176,10 @@ const App = () => {
                       />
                       <Route path="/listofstaff" element={<StaffList />} />
                       <Route path="/client" element={<Client />} />
+                      <Route path="/profile" element={<Profile />} />
+                      <Route path="/activity" element={<ActivityPage />} />
+                      <Route path="/saledashboard" element={<SaleDashboard />} />
+
                       <Route path="*" element={<Navigate to="/" />} />
                     </Routes>
                   </Suspense>

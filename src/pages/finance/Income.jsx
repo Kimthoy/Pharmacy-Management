@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { FaSort, FaCog } from "react-icons/fa";
+import { FaSort, FaCog, FaSun, FaMoon } from "react-icons/fa";
 import { useTranslation } from "../../hooks/useTranslation";
+import { useTheme } from "../../context/ThemeContext";
 
 const Income = () => {
   const { t } = useTranslation();
+  const { theme, toggleTheme } = useTheme();
   const [showFilter, setShowFilter] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
@@ -119,7 +121,7 @@ const Income = () => {
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
-    setCurrentPage(1); // Reset to the first page when searching
+    setCurrentPage(1);
   };
 
   const sortedList = [...incomeList].sort((a, b) => {
@@ -139,141 +141,173 @@ const Income = () => {
   );
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-xl font-bold text-gray-700">
-          {t("income.IncomeDashboard")} <br />
-          <span className="text-xs font-normal text-gray-400">
+    <div className="p-6 bg-gray-100 dark:bg-gray-900 min-h-screen max-w-6xl mx-auto">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <div>
+          <h1 className="text-xl font-bold text-gray-700 dark:text-gray-200">
+            {t("income.IncomeDashboard")}
+          </h1>
+          <span className="text-xs font-normal text-gray-400 dark:text-gray-300">
             {t("income.IncomeDashboardDesc")}
           </span>
-        </h1>
-
-        <div className="relative flex items-center space-x-2">
+        </div>
+        <div className="flex items-center space-x-2 mt-4 md:mt-0">
           <button
-            className="bg-white text-green-500 px-4 py-2 rounded-md shadow-sm outline outline-green-500 transition"
-            onClick={() => setShowFilter(!showFilter)}
+            onClick={toggleTheme}
+            className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition"
+            aria-label={
+              theme === "light" ? "Switch to dark mode" : "Switch to light mode"
+            }
           >
-            {t("income.IncomeDashboardFilteredBy")}: {selectedFilter}
+            {theme === "light" ? <FaMoon /> : <FaSun />}
           </button>
-          {showFilter && (
-            <div className="absolute top-12 left-0 bg-white shadow-md rounded-md w-40 p-2">
-              <button
-                onClick={() => filterIncome("All")}
-                className="block w-full text-left px-4 py-2 text-green-500 hover:bg-green-200 rounded-md"
-              >
-                {t("income.filterOptions.all")}
-              </button>
-              <button
-                onClick={() => filterIncome(3)}
-                className="block w-full text-left px-4 py-2 text-green-500 hover:bg-green-200 rounded-md"
-              >
-                {t("income.filterOptions.last3Days")}
-              </button>
-              <button
-                onClick={() => filterIncome(7)}
-                className="block w-full text-left px-4 py-2 text-green-500 hover:bg-green-200 rounded-md"
-              >
-                {t("income.filterOptions.last7Days")}
-              </button>
-            </div>
-          )}
-          <button className="outline text-green-500 px-4 py-2 rounded-md shadow-md hover:bg-green-200 transition">
+          <div className="relative">
+            <button
+              className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-4 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition"
+              onClick={() => setShowFilter(!showFilter)}
+            >
+              {t("income.IncomeDashboardFilteredBy")}: {selectedFilter}
+            </button>
+            {showFilter && (
+              <div className="absolute top-[100%] mt-1 left-0 min-w-[160px] bg-white dark:bg-gray-800 shadow-md dark:shadow-gray-700 rounded-[4px] p-2 z-[100]">
+                <button
+                  onClick={() => filterIncome("All")}
+                  className="block w-full text-left px-4 py-2 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600 rounded-[4px] text-xs"
+                >
+                  {t("income.filterOptions.all")}
+                </button>
+                <button
+                  onClick={() => filterIncome(3)}
+                  className="block w-full text-left px-4 py-2 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600 rounded-[4px] text-xs"
+                >
+                  {t("income.filterOptions.last3Days")}
+                </button>
+                <button
+                  onClick={() => filterIncome(7)}
+                  className="block w-full text-left px-4 py-2 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600 rounded-[4px] text-xs"
+                >
+                  {t("income.filterOptions.last7Days")}
+                </button>
+              </div>
+            )}
+          </div>
+          <button className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-4 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition">
             {t("income.addIncome")}
           </button>
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white grid gap-2 p-4 rounded-lg shadow-md text-center hover:shadow-green-200 duration-100 ease-in-out">
-          <h2 className="text-md font-semibold text-gray-400">
+        <div className="bg-white dark:bg-gray-800 grid gap-2 p-4 rounded-lg shadow-md dark:shadow-gray-700 text-center hover:shadow-emerald-200 dark:hover:shadow-emerald-600 duration-100 ease-in-out">
+          <h2 className="text-md font-semibold text-gray-400 dark:text-gray-300">
             {t("income.summaryCards.todaysIncome")}
           </h2>
-          <p className=" font-bold">$10,945</p>
-          <p className="text-green-500">
+          <p className="font-bold text-gray-800 dark:text-gray-200">$10,945</p>
+          <p className="text-emerald-500 dark:text-emerald-400">
             ↑ 4.63% {t("income.summaryCards.vsYesterday")}
           </p>
         </div>
-        <div className="bg-white grid gap-2 p-4 rounded-lg shadow-md text-center hover:shadow-green-200 duration-100 ease-in-out">
-          <h2 className="text-md  font-semibold text-gray-400">
+        <div className="bg-white dark:bg-gray-800 grid gap-2 p-4 rounded-lg shadow-md dark:shadow-gray-700 text-center hover:shadow-emerald-200 dark:hover:shadow-emerald-600 duration-100 ease-in-out">
+          <h2 className="text-md font-semibold text-gray-400 dark:text-gray-300">
             {t("income.summaryCards.thisWeekIncome")}
           </h2>
-          <p className="  font-bold">$12,338</p>
-          <p className="text-red-500">
+          <p className="font-bold text-gray-800 dark:text-gray-200">$12,338</p>
+          <p className="text-red-500 dark:text-red-400">
             ↓ 2.34% {t("income.summaryCards.vsLastWeek")}
           </p>
         </div>
-        <div className="bg-white grid gap-2 p-4 rounded-lg shadow-md text-center hover:shadow-green-200 duration-100 ease-in-out">
-          <h2 className="text-md font-semibold text-gray-400">
+        <div className="bg-white dark:bg-gray-800 grid gap-2 p-4 rounded-lg shadow-md dark:shadow-gray-700 text-center hover:shadow-emerald-200 dark:hover:shadow-emerald-600 duration-100 ease-in-out">
+          <h2 className="text-md font-semibold text-gray-400 dark:text-gray-300">
             {t("income.summaryCards.vsLastMonth")}
           </h2>
-          <p className=" font-bold">$20,847</p>
-          <p className="text-green-500">
+          <p className="font-bold text-gray-800 dark:text-gray-200">$20,847</p>
+          <p className="text-emerald-500 dark:text-emerald-400">
             ↑ 4.63% {t("income.summaryCards.vsLastMonth")}
           </p>
         </div>
-        <div className="bg-white grid gap-2 p-4 rounded-lg shadow-md text-center hover:shadow-green-200 duration-100 ease-in-out">
-          <h2 className="text-md font-semibold text-gray-400">
+        <div className="bg-white dark:bg-gray-800 grid gap-2 p-4 rounded-lg shadow-md dark:shadow-gray-700 text-center hover:shadow-emerald-200 dark:hover:shadow-emerald-600 duration-100 ease-in-out">
+          <h2 className="text-md font-semibold text-gray-400 dark:text-gray-300">
             {t("income.summaryCards.thisYearIncome")}
           </h2>
-          <p className=" font-bold">$23,485</p>
-          <p className="text-green-500">
+          <p className="font-bold text-gray-800 dark:text-gray-200">$23,485</p>
+          <p className="text-emerald-500 dark:text-emerald-400">
             ↑ 1.34% {t("income.summaryCards.vsLastYear")}
           </p>
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-        <div className="flex justify-between align-middle">
-          <h2 className="text-xl font-bold text-gray-700 mb-4">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md dark:shadow-gray-700 border border-gray-200 dark:border-gray-600">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold text-gray-700 dark:text-gray-200">
             {t("income.incomeList")}
           </h2>
-
-          <div className=" flex items-center space-x-3 mb-4">
+          <div className="flex items-center space-x-3">
             <input
               type="text"
               placeholder={t("income.searchPlaceholder")}
               value={searchQuery}
               onChange={handleSearch}
-              className="border px-3 py-2 rounded-md shadow-sm focus:outline-green-700  outline outline-green-400"
+              className="text-xs border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
             />
             <button
               onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-              className="bg-white px-4 py-3 rounded-md shadow-sm flex items-center space-x-2 outline outline-green-400"
+              className="bg-white dark:bg-gray-700 px-4 py-2 rounded-[4px] shadow-md dark:shadow-gray-600 flex items-center space-x-2 border border-gray-400 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600"
             >
               <FaSort />
             </button>
-            <button className="bg-white px-4 py-3 rounded-md shadow-sm flex items-center space-x-2 outline outline-green-400">
+            <button className="bg-white dark:bg-gray-700 px-4 py-2 rounded-[4px] shadow-md dark:shadow-gray-600 flex items-center space-x-2 border border-gray-400 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600">
               <FaCog />
             </button>
           </div>
         </div>
-        <table className="w-full border-collapse border border-gray-300 text-gray-700">
+        <table className="w-full border-collapse border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200">
           <thead>
-            <tr className="bg-gray-200 text-gray-500 text-center">
-              <th className="p-3 border">{t("income.category")}</th>
-              <th className="p-3 border">{t("income.invoiceId")}</th>
-              <th className="p-3 border">{t("income.date")}</th>
-              <th className="p-3 border">{t("income.incomeHead")}</th>
-              <th className="p-3 border">{t("income.amount")}</th>
+            <tr className="bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-300 text-center">
+              <th className="p-3 border border-gray-300 dark:border-gray-600">
+                {t("income.category")}
+              </th>
+              <th className="p-3 border border-gray-300 dark:border-gray-600">
+                {t("income.invoiceId")}
+              </th>
+              <th className="p-3 border border-gray-300 dark:border-gray-600">
+                {t("income.date")}
+              </th>
+              <th className="p-3 border border-gray-300 dark:border-gray-600">
+                {t("income.incomeHead")}
+              </th>
+              <th className="p-3 border border-gray-300 dark:border-gray-600">
+                {t("income.amount")}
+              </th>
             </tr>
           </thead>
           <tbody>
             {paginatedList.length > 0 ? (
               paginatedList.map((item, index) => (
-                <tr key={index} className="border text-center">
-                  <td className="p-3 border text-gray-400">{item.category}</td>
-                  <td className="p-3 border text-green-500 cursor-pointer">
+                <tr
+                  key={index}
+                  className="border border-gray-300 dark:border-gray-600 text-center"
+                >
+                  <td className="p-3 border border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-300">
+                    {item.category}
+                  </td>
+                  <td className="p-3 border border-gray-300 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 cursor-pointer">
                     {item.id}
                   </td>
-                  <td className="p-3 border text-gray-400">{item.date}</td>
-                  <td className="p-3 border text-gray-400">{item.head}</td>
-                  <td className="p-3 border text-gray-800">{item.amount}</td>
+                  <td className="p-3 border border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-300">
+                    {item.date}
+                  </td>
+                  <td className="p-3 border border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-300">
+                    {item.head}
+                  </td>
+                  <td className="p-3 border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200">
+                    {item.amount}
+                  </td>
                 </tr>
               ))
             ) : (
               <tr>
                 <td
                   colSpan="5"
-                  className="p-3 border text-center text-gray-500"
+                  className="p-16 border border-gray-300 dark:border-gray-600 text-center text-gray-500 dark:text-gray-400"
                 >
                   {t("income.noRecords")}
                 </td>
@@ -281,40 +315,42 @@ const Income = () => {
             )}
           </tbody>
         </table>
-        <div className="flex justify-between">
-          <div className="px-4 py-2 flex justify-between">
-            <label>
-              <span className="text-gray-400">{t("income.show")}</span>
-              <select
-                className="m-3  border p-1 focus:outline-green-600"
-                value={itemsPerPage}
-                onChange={(e) => {
-                  setItemsPerPage(Number(e.target.value));
-                  setCurrentPage(1);
-                }}
-              >
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={15}>15</option>
-              </select>
-              <span className="text-gray-400">{t("income.entries")} </span>
-            </label>
+        <div className="flex flex-col md:flex-row justify-between items-center mt-4">
+          <div className="flex items-center space-x-2">
+            <span className="text-gray-400 dark:text-gray-300 text-xs">
+              {t("income.show")}
+            </span>
+            <select
+              className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
+              value={itemsPerPage}
+              onChange={(e) => {
+                setItemsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={15}>15</option>
+            </select>
+            <span className="text-gray-400 dark:text-gray-300 text-xs">
+              {t("income.entries")}
+            </span>
           </div>
-          <div className="flex  items-center mt-4">
+          <div className="flex items-center space-x-2 mt-4 md:mt-0">
             <button
               disabled={currentPage === 1}
               onClick={() => setCurrentPage(currentPage - 1)}
-              className="outline outline-green-600 px-3 rounded disabled:opacity-50"
+              className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition disabled:opacity-50"
             >
               {t("income.previous")}
             </button>
-            <span className="m-3">
+            <span className="text-gray-700 dark:text-gray-200 text-xs">
               {t("income.page")} {currentPage} {t("income.of")} {totalPages}
             </span>
             <button
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage(currentPage + 1)}
-              className=" outline outline-green-600 px-3  rounded disabled:opacity-50"
+              className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition disabled:opacity-50"
             >
               {t("income.next")}
             </button>

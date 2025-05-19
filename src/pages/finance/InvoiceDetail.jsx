@@ -1,160 +1,223 @@
 import React from "react";
 import { BsFillPrinterFill } from "react-icons/bs";
+import { FaSun, FaMoon } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { MdOutlineKeyboardDoubleArrowLeft } from "react-icons/md";
 import { useTranslation } from "../../hooks/useTranslation";
+import { useTheme } from "../../context/ThemeContext";
 
 const InvoiceDetail = () => {
   const { t } = useTranslation();
+  const { theme, toggleTheme } = useTheme();
+
   const handlePrint = () => {
     window.print();
   };
 
+  const invoice = {
+    id: "66K5W3",
+    date: "26 Jan, 2020",
+    companyName: t("invoiceDetail.companyName"),
+    companyAddress: t("invoiceDetail.companyAddress"),
+    companyPhone: t("invoiceDetail.companyPhone"),
+    subtotal: "$435.00",
+    processingFee: "$10.00",
+    tax: "$43.50",
+    grandTotal: "$478.50",
+    items: [
+      {
+        id: "24108054",
+        description: "Zimax - Group of Azithromycin",
+        price: "$40.00",
+        qty: 5,
+        amount: "$200.00",
+      },
+      {
+        id: "24108054",
+        description: "6 months premium support",
+        price: "$25.00",
+        qty: 1,
+        amount: "$25.00",
+      },
+      {
+        id: "23604094",
+        description: "Oxidon - Group of Domperidon",
+        price: "$131.25",
+        qty: 1,
+        amount: "$131.25",
+      },
+      {
+        id: "23604094",
+        description: "6 months premium support",
+        price: "$78.75",
+        qty: 1,
+        amount: "$78.75",
+      },
+    ],
+  };
+
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      <Link to="/invoicelist">
-        <button className="rounded-md px-2 flex justify-center py-1 outline outline-green-500">
-          <MdOutlineKeyboardDoubleArrowLeft className="mt-1 text-lg" />{" "}
-          {t("invoiceDetail.back")}
-        </button>
-      </Link>
-      <div className="mb-4 flex justify-end">
-        <button
-          onClick={handlePrint}
-          className=" text-green-600 px-4 py-2 rounded-md shadow-md hover:bg-green-200 transition print:hidden"
-        >
-          <BsFillPrinterFill className="text-2xl" />
-        </button>
+    <div className="p-6 bg-gray-100 dark:bg-gray-900 min-h-screen max-w-6xl mx-auto">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+        <Link to="/invoicelist">
+          <button className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] flex items-center space-x-1 dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition">
+            <MdOutlineKeyboardDoubleArrowLeft className="text-lg" />
+            <span>{t("invoiceDetail.back")}</span>
+          </button>
+        </Link>
+        <div className="flex items-center space-x-2 mt-4 md:mt-0">
+          <button
+            onClick={toggleTheme}
+            className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition print:hidden"
+            aria-label={
+              theme === "light" ? "Switch to dark mode" : "Switch to light mode"
+            }
+          >
+            {theme === "light" ? <FaMoon /> : <FaSun />}
+          </button>
+          <button
+            onClick={handlePrint}
+            className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-4 py-2 rounded-[4px] flex items-center space-x-2 dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition print:hidden"
+          >
+            <BsFillPrinterFill className="text-lg" />
+            <span>{t("invoiceDetail.print")}</span>
+          </button>
+        </div>
       </div>
 
-      {/* Invoice Content */}
-      <div className="bg-white p-8 rounded-lg shadow-md border border-gray-200 invoice-print-area">
-        <div className="flex justify-between items-start mb-8">
+      <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md dark:shadow-gray-700 border border-gray-200 dark:border-gray-600 invoice-print-area">
+        <div className="flex flex-col md:flex-row justify-between items-start mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-700">
+            <h1 className="text-3xl font-bold text-gray-700 dark:text-gray-200">
               {t("invoiceDetail.invoice")}
             </h1>
-            <p className="text-sm text-gray-400">
-              {t("invoiceDetail.invoiceId")}: 66K5W3
+            <p className="text-sm text-gray-400 dark:text-gray-300">
+              {t("invoiceDetail.invoiceId")}: {invoice.id}
             </p>
           </div>
-          <div className="text-right">
-            <h2 className="text-2xl font-bold text-gray-700">
-              {t("invoiceDetail.companyName")}
+          <div className="text-left md:text-right mt-4 md:mt-0">
+            <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-200">
+              {invoice.companyName}
             </h2>
-            <p className="text-sm text-gray-400">
-              {t("invoiceDetail.companyAddress")}
+            <p className="text-sm text-gray-400 dark:text-gray-300">
+              {invoice.companyAddress}
             </p>
-            <p className="text-sm text-gray-400">
-              {t("invoiceDetail.companyPhone")}
+            <p className="text-sm text-gray-400 dark:text-gray-300">
+              {invoice.companyPhone}
             </p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           <div>
-            <h3 className="text-lg font-semibold text-gray-700 mb-2">
+            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2">
               {t("invoiceDetail.invoiceTo")}
             </h3>
-            <p className="text-gray-600">
-              {t("invoiceDetail.companyName")}
+            <p className="text-gray-600 dark:text-gray-300">
+              {invoice.companyName}
             </p>
-            <p className="text-gray-600">
-              {t("invoiceDetail.companyAddress")}
+            <p className="text-gray-600 dark:text-gray-300">
+              {invoice.companyAddress}
             </p>
-           
-            <p className="text-gray-600">
-              {t("invoiceDetail.companyPhone")}
+            <p className="text-gray-600 dark:text-gray-300">
+              {invoice.companyPhone}
             </p>
           </div>
-          <div className="text-right">
-            <h3 className="text-lg font-semibold text-gray-700 mb-2">
+          <div className="text-left md:text-right">
+            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2">
               {t("invoiceDetail.date")}
             </h3>
-            <p className="text-gray-600">26 Jan, 2020</p>
+            <p className="text-gray-600 dark:text-gray-300">{invoice.date}</p>
           </div>
         </div>
 
-        <table className="w-full border-collapse border border-gray-300 text-gray-700 mb-8">
+        <table className="w-full border-collapse border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 mb-8">
           <thead>
-            <tr className="bg-gray-200 text-gray-500 text-center">
-              <th className="p-3 border">
+            <tr className="bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-300 text-center">
+              <th className="p-3 border border-gray-300 dark:border-gray-600">
                 {t("invoiceDetail.tableHeaders.itemId")}
               </th>
-              <th className="p-3 border">
+              <th className="p-3 border border-gray-300 dark:border-gray-600">
                 {t("invoiceDetail.tableHeaders.description")}
               </th>
-              <th className="p-3 border">
+              <th className="p-3 border border-gray-300 dark:border-gray-600">
                 {t("invoiceDetail.tableHeaders.price")}
               </th>
-              <th className="p-3 border">
+              <th className="p-3 border border-gray-300 dark:border-gray-600">
                 {t("invoiceDetail.tableHeaders.qty")}
               </th>
-              <th className="p-3 border">
+              <th className="p-3 border border-gray-300 dark:border-gray-600">
                 {t("invoiceDetail.tableHeaders.amount")}
               </th>
             </tr>
           </thead>
           <tbody>
-            <tr className="border text-center">
-              <td className="p-3 border">24108054</td>
-              <td className="p-3 border">Zimax - Group of Azithromycin</td>
-              <td className="p-3 border">$40.00</td>
-              <td className="p-3 border">5</td>
-              <td className="p-3 border">$200.00</td>
-            </tr>
-            <tr className="border text-center">
-              <td className="p-3 border">24108054</td>
-              <td className="p-3 border">6 months premium support</td>
-              <td className="p-3 border">$25.00</td>
-              <td className="p-3 border">1</td>
-              <td className="p-3 border">$25.00</td>
-            </tr>
-            <tr className="border text-center">
-              <td className="p-3 border">23604094</td>
-              <td className="p-3 border">Oxidon - Group of Domperidon</td>
-              <td className="p-3 border">$131.25</td>
-              <td className="p-3 border">1</td>
-              <td className="p-3 border">$131.25</td>
-            </tr>
-            <tr className="border text-center">
-              <td className="p-3 border">23604094</td>
-              <td className="p-3 border">6 months premium support</td>
-              <td className="p-3 border">$78.75</td>
-              <td className="p-3 border">1</td>
-              <td className="p-3 border">$78.75</td>
-            </tr>
+            {invoice.items.map((item, index) => (
+              <tr
+                key={index}
+                className="border border-gray-300 dark:border-gray-600 text-center"
+              >
+                <td className="p-3 border border-gray-300 dark:border-gray-600">
+                  {item.id}
+                </td>
+                <td className="p-3 border border-gray-300 dark:border-gray-600">
+                  {item.description}
+                </td>
+                <td className="p-3 border border-gray-300 dark:border-gray-600">
+                  {item.price}
+                </td>
+                <td className="p-3 border border-gray-300 dark:border-gray-600">
+                  {item.qty}
+                </td>
+                <td className="p-3 border border-gray-300 dark:border-gray-600">
+                  {item.amount}
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
 
-        <div className="text-right">
+        <div className="text-left md:text-right">
           <div className="mb-2">
-            <span className="text-gray-600">{t("invoiceDetail.subtotal")}</span>
-            <span className="ml-4 font-semibold">$435.00</span>
+            <span className="text-gray-600 dark:text-gray-300">
+              {t("invoiceDetail.subtotal")}
+            </span>
+            <span className="ml-4 font-semibold dark:text-gray-300">
+              {invoice.subtotal}
+            </span>
           </div>
           <div className="mb-2">
-            <span className="text-gray-600">
+            <span className="text-gray-600 dark:text-gray-300">
               {t("invoiceDetail.processingFee")}
             </span>
-            <span className="ml-4 font-semibold">$10.00</span>
+            <span className="ml-4 font-semibold dark:text-gray-300">
+              {invoice.processingFee}
+            </span>
           </div>
           <div className="mb-2">
-            <span className="text-gray-600">{t("invoiceDetail.tax")}</span>
-            <span className="ml-4 font-semibold">$43.50</span>
+            <span className="text-gray-600 dark:text-gray-300">
+              {t("invoiceDetail.tax")}
+            </span>
+            <span className="ml-4 font-semibold dark:text-gray-300">
+              {invoice.tax}
+            </span>
           </div>
           <div className="mb-2">
-            <span className="text-gray-600">
+            <span className="text-gray-600 dark:text-gray-300">
               {t("invoiceDetail.grandTotal")}
             </span>
-            <span className="ml-4 font-bold text-xl">$478.50</span>
+            <span className="ml-4 font-bold text-xl dark:text-gray-300">
+              {invoice.grandTotal}
+            </span>
           </div>
         </div>
 
-        <div className="mt-8 text-center text-gray-500 text-sm">
+        <div className="mt-8 text-center text-gray-500 dark:text-gray-400 text-sm">
           <p>{t("invoiceDetail.footerNote")}</p>
         </div>
       </div>
     </div>
   );
 };
+
 export default InvoiceDetail;

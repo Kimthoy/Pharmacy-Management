@@ -47,7 +47,7 @@ const Client = () => {
           theme === "dark" ? "bg-gray-800" : "bg-white"
         } shadow-md sticky top-0 z-10`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between py-4">
+        <div className="max-w-7xl sticky -z-20 mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between py-4">
           {/* Logo and Pharmacy Name */}
           <Link to="/" className="flex items-center space-x-2">
             <img

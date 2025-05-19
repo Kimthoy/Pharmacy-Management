@@ -168,7 +168,7 @@ const ProfileDropdown = ({
             (e.key === "Enter" || e.key === " ") &&
             setIsDropdownOpen(!isDropdownOpen)
           }
-          className="flex items-center bg-emerald-500 dark:bg-emerald-600 text-white hover:bg-emerald-700 rounded-md px-3 py-1 cursor-pointer transition-all space-x-1"
+          className="flex items-center   text-black rounded-md px-3 py-1 cursor-pointer transition-all space-x-1"
           aria-expanded={isDropdownOpen}
           aria-label={t("topbar.profile")}
         >
@@ -179,22 +179,15 @@ const ProfileDropdown = ({
               className="w-6 h-6 rounded-full object-cover"
             />
           ) : (
-            <UserCircle size={24} className="text-white" />
+            <UserCircle
+              size={24}
+              className="text-black hover:scale-125 dark:text-white dark:hover:scale-125 dark:hover:text-emerald-500 hover:text-emerald-500"
+            />
           )}
-          <div className="flex flex-col">
-            <span className="text-sm font-medium">
-              {truncateName(user?.name)}
-            </span>
-            {user?.role && (
-              <span className="text-xs text-emerald-100 dark:text-emerald-200">
-                {truncateRole(user.role)}
-              </span>
-            )}
-          </div>
         </button>
       </Tooltip>
       {isDropdownOpen && (
-        <div className="absolute z-50 right-0 mt-2 w-56 bg-white dark:bg-gray-800 border border-emerald-200 dark:border-gray-600 shadow-lg rounded-lg py-2 animate-fade-in">
+        <div className="absolute right-0 z-50 mt-2 w-56 bg-white dark:bg-gray-800 border border-emerald-200 dark:border-gray-600 shadow-lg rounded-lg py-2 animate-fade-in">
           <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-600">
             <p className="font-semibold text-gray-800 dark:text-gray-200">
               {user?.name || t("topbar.unknownUser")}
@@ -202,11 +195,6 @@ const ProfileDropdown = ({
             <p className="text-xs text-gray-500 dark:text-gray-400">
               {user?.email || t("topbar.noEmail")}
             </p>
-            {user?.role && (
-              <p className="text-xs text-emerald-600 dark:text-emerald-400">
-                {t("topbar.role")}: {user.role}
-              </p>
-            )}
           </div>
           <Link to="/profile">
             <button
@@ -217,7 +205,7 @@ const ProfileDropdown = ({
               {t("topbar.viewProfile")}
             </button>
           </Link>
-          <Link to="/settings">
+          <Link to="/settingspage">
             <button
               className="w-full flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
               onClick={() => setIsDropdownOpen(false)}

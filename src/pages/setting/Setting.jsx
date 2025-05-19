@@ -1,411 +1,396 @@
-import React, { useState } from "react";
-import { FaCog, FaUsers, FaLock, FaShieldAlt, FaHistory } from "react-icons/fa";
+import  { useState } from "react";
+import {
+  FaCog,
+  FaUsers,
+  FaLock,
+  FaShieldAlt,
+  FaHistory,
+  FaSun,
+  FaMoon,
+} from "react-icons/fa";
+import { useTranslation } from "../../hooks/useTranslation";
+import { useTheme } from "../../context/ThemeContext";
+import axios from "axios";
 
 const Setting = () => {
-  const [activityLogs, setActivityLogs] = useState([
-    {
-      id: 1,
-      browser: "Chrome on Window",
-      ip: "192.149.122.128",
-      time: "11:34 PM",
-      activity: "Deleted",
-    },
-    {
-      id: 2,
-      browser: "Mozilla on Window",
-      ip: "86.188.154.225",
-      time: "11:34 PM",
-      activity: "Updated",
-    },
-    {
-      id: 3,
-      browser: "Chrome on iMac",
-      ip: "192.149.122.128",
-      time: "11:34 PM",
-      activity: "Deleted",
-    },
-    {
-      id: 4,
-      browser: "Chrome on Window",
-      ip: "192.149.122.128",
-      time: "11:34 PM",
-      activity: "Created",
-    },
-  ]);
-
+  const { t } = useTranslation();
+  const { theme, toggleTheme } = useTheme();
+  const [activityLogs, setActivityLogs] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
+  const [activeTab, setActiveTab] = useState("General");
+  const [registrationOption, setRegistrationOption] = useState("Enable");
+  const [isMaintenance, setIsMaintenance] = useState(false);
+  const [settings, setSettings] = useState({
+    pharmacyName: "",
+    pharmacyAddress: "",
+    copyright: "",
+    site: "",
+    description: "",
+  });
+  const [selectedMember, setSelectedMember] = useState("");
+  const [selectedDesignation, setSelectedDesignation] = useState("Pharmacist");
+  const [members, setMembers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleDeleteClick = (id) => {
     setDeleteId(id);
     setShowPopup(true);
   };
 
-  const confirmDelete = () => {
-    setActivityLogs(activityLogs.filter((log) => log.id !== deleteId));
-    setShowPopup(false);
-    setDeleteId(null);
-  };
-  const [activeTab, setActiveTab] = useState("General");
-  const [registrationOption, setRegistrationOption] = useState("Enable");
-  // const [isEnabled, setIsEnabled] = useState(true);
-  const [isMaintenance, setIsMaintenance] = useState(false);
-  const settings = {
-    pharmacyName: "Dashlite",
-    pharmacyAddress: "Softnio Street 3",
-    copyright: "© 2019, DashLite. All Rights Reserved.",
-    site: "www.panharithphamacy.com",
+  const confirmDelete = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError(t("settings.authError"));
+        return;
+      }
+      await axios.delete(
+        `http://127.0.0.1:8000/api/activity-logs/${deleteId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setActivityLogs(activityLogs.filter((log) => log.id !== deleteId));
+      setShowPopup(false);
+      setDeleteId(null);
+    } catch (err) {
+      setError(
+        t("settings.deleteError") + (err.response?.data?.message || err.message)
+      );
+    }
   };
 
-  const [selectedMember, setSelectedMember] = useState("");
-  const [selectedDesignation, setSelectedDesignation] = useState("Pharmacist");
-  const [members, setMembers] = useState([
-    {
-      name: "Abu Bin Ishtiyak",
-      email: "info@softnio.com",
-      role: "Admin",
-      joinedOn: "10 Feb 2020",
-    },
-    {
-      name: "Ashley Lawson",
-      email: "AshleyLawson@.com",
-      role: "Manager",
-      joinedOn: "17 Feb 2020",
-    },
-  ]);
-
-  const handleAddMember = () => {
-    if (selectedMember) {
-      setMembers([
-        ...members,
+  const handleAddMember = async () => {
+    if (!selectedMember) return;
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError(t("settings.authError"));
+        return;
+      }
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/members",
         {
           name: selectedMember,
-          email: "",
           role: selectedDesignation,
+          email: "",
           joinedOn: "-",
         },
-      ]);
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setMembers([...members, response.data]);
       setSelectedMember("");
+    } catch (err) {
+      setError(
+        t("settings.addMemberError") +
+          (err.response?.data?.message || err.message)
+      );
+    }
+  };
+
+  const handleSettingsChange = (e) => {
+    const { name, value } = e.target;
+    setSettings((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSettingsSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError(t("settings.authError"));
+        return;
+      }
+      await axios.put(
+        "http://127.0.0.1:8000/api/settings",
+        { ...settings, registrationOption, maintenanceMode: isMaintenance },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setError(null);
+      alert(t("settings.updateSuccess"));
+    } catch (err) {
+      setError(
+        t("settings.updateError") + (err.response?.data?.message || err.message)
+      );
     }
   };
 
   const renderContent = () => {
+    if (loading)
+      return (
+        <div className="text-center text-gray-600 dark:text-gray-300 text-xs">
+          {t("settings.loading")}
+        </div>
+      );
+    if (error)
+      return (
+        <div className="text-center text-red-500 dark:text-red-400 text-xs">
+          {error}
+        </div>
+      );
+
     switch (activeTab) {
       case "General":
         return (
           <div>
-            <h2 className="text-xl font-semibold">General Settings</h2>
-            <p className="text-gray-600 mb-6 text-xs">
-              These settings helps you modify site settings.
+            <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200">
+              {t("settings.general.title")}
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-6 text-xs">
+              {t("settings.general.description")}
             </p>
-
-            <div className="bg-white shadow-lg rounded-lg p-6">
-              <form>
+            <div className="bg-white dark:bg-gray-800 shadow-lg rounded-[4px] p-6 border border-gray-200 dark:border-gray-600">
+              <form onSubmit={handleSettingsSubmit}>
                 <div className="mb-4">
-                  <label className="block text-gray-700 font-medium">
-                    Pharmacy Name
+                  <label className="block text-gray-700 dark:text-gray-200 font-medium text-xs">
+                    {t("settings.general.pharmacyName")}
                   </label>
-                  <span
-                    lassName="ai-font-italic"
-                    className="italic text-xs text-gray-400"
-                  >
-                    Specify the name of your pharmacy.
+                  <span className="italic text-xs text-gray-400 dark:text-gray-300">
+                    {t("settings.general.pharmacyNameHint")}
                   </span>
                   <input
                     type="text"
-                    placeholder={settings.pharmacyName}
-                    className="w-full border rounded-lg p-2 mt-1 focus:outline focus:outline-green-500"
+                    name="pharmacyName"
+                    value={settings.pharmacyName}
+                    onChange={handleSettingsChange}
+                    className="w-full border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] text-xs focus:outline-none focus:ring-2 focus:ring-emerald-400 dark:bg-gray-700 dark:text-gray-200"
                   />
                 </div>
-
                 <div className="mb-4">
-                  <label className="block text-gray-700 font-medium">
-                    Pharmacy Address
+                  <label className="block text-gray-700 dark:text-gray-200 font-medium text-xs">
+                    {t("settings.general.pharmacyAddress")}
                   </label>
-                  <span
-                    lassName="ai-font-italic"
-                    className="italic text-xs text-gray-400"
-                  >
-                    Specify the key of your pharmacy address.
+                  <span className="italic text-xs text-gray-400 dark:text-gray-300">
+                    {t("settings.general.pharmacyAddressHint")}
                   </span>
                   <input
                     type="text"
-                    placeholder={settings.pharmacyAddress}
-                    className="w-full border rounded-lg p-2 mt-1 focus:outline focus:outline-green-500"
+                    name="pharmacyAddress"
+                    value={settings.pharmacyAddress}
+                    onChange={handleSettingsChange}
+                    className="w-full border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] text-xs focus:outline-none focus:ring-2 focus:ring-emerald-400 dark:bg-gray-700 dark:text-gray-200"
                   />
                 </div>
-
                 <div className="mb-4">
-                  <label className="block text-gray-700 font-medium">
-                    Copyright
+                  <label className="block text-gray-700 dark:text-gray-200 font-medium text-xs">
+                    {t("settings.general.copyright")}
                   </label>
-                  <span
-                    lassName="ai-font-italic"
-                    className="italic text-xs text-gray-400"
-                  >
-                    Copyright information of your pharmacy.
+                  <span className="italic text-xs text-gray-400 dark:text-gray-300">
+                    {t("settings.general.copyrightHint")}
                   </span>
                   <input
                     type="text"
-                    placeholder={settings.copyright}
-                    className="w-full border rounded-lg p-2 mt-1 focus:outline focus:outline-green-500"
+                    name="copyright"
+                    value={settings.copyright}
+                    onChange={handleSettingsChange}
+                    className="w-full border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] text-xs focus:outline-none focus:ring-2 focus:ring-emerald-400 dark:bg-gray-700 dark:text-gray-200"
                   />
                 </div>
                 <div className="mb-4">
-                  <div className="mb-4">
-                    <label className="block text-gray-700 font-medium ">
-                      Allow Registration
-                    </label>
-                    <span
-                      lassName="ai-font-italic"
-                      className="italic text-xs text-gray-400"
-                    >
-                      Enable or disable registration from site.
-                    </span>
-
-                    <div className="flex mt-3 space-x-6">
-                      {/* Enable Option */}
+                  <label className="block text-gray-700 dark:text-gray-200 font-medium text-xs">
+                    {t("settings.general.allowRegistration")}
+                  </label>
+                  <span className="italic text-xs text-gray-400 dark:text-gray-300">
+                    {t("settings.general.allowRegistrationHint")}
+                  </span>
+                  <div className="flex mt-3 space-x-6">
+                    {["Enable", "Disable", "On Request"].map((option) => (
                       <div
+                        key={option}
                         className="flex items-center space-x-2 cursor-pointer"
-                        onClick={() => setRegistrationOption("Enable")}
+                        onClick={() => setRegistrationOption(option)}
                       >
                         <input
                           type="radio"
-                          id="enable"
+                          id={option.toLowerCase()}
                           name="registration"
-                          value="Enable"
-                          checked={registrationOption === "Enable"}
-                          onChange={() => setRegistrationOption("Enable")}
+                          value={option}
+                          checked={registrationOption === option}
+                          onChange={() => setRegistrationOption(option)}
                           className="hidden"
                         />
                         <div
                           className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                            registrationOption === "Enable"
-                              ? "border-green-500"
-                              : "border-gray-400"
+                            registrationOption === option
+                              ? "border-emerald-500"
+                              : "border-gray-400 dark:border-gray-600"
                           }`}
                         >
-                          {registrationOption === "Enable" && (
-                            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                          {registrationOption === option && (
+                            <div className="w-3 h-3 bg-emerald-500 dark:bg-emerald-400 rounded-full"></div>
                           )}
                         </div>
                         <label
-                          htmlFor="enable"
-                          className={`cursor-pointer ${
-                            registrationOption === "Enable"
-                              ? "text-green-600 font-semibold"
-                              : "text-gray-600"
+                          htmlFor={option.toLowerCase()}
+                          className={`cursor-pointer text-xs ${
+                            registrationOption === option
+                              ? "text-emerald-500 dark:text-emerald-400 font-semibold"
+                              : "text-gray-600 dark:text-gray-300"
                           }`}
                         >
-                          Enable
-                        </label>
-                      </div>
-
-                      {/* Disable Option */}
-                      <div
-                        className="flex items-center space-x-2 cursor-pointer"
-                        onClick={() => setRegistrationOption("Disable")}
-                      >
-                        <input
-                          type="radio"
-                          id="disable"
-                          name="registration"
-                          value="Disable"
-                          checked={registrationOption === "Disable"}
-                          onChange={() => setRegistrationOption("Disable")}
-                          className="hidden"
-                        />
-                        <div
-                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                            registrationOption === "Disable"
-                              ? "border-green-500"
-                              : "border-gray-400"
-                          }`}
-                        >
-                          {registrationOption === "Disable" && (
-                            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                          {t(
+                            `settings.general.registrationOptions.${option.toLowerCase()}`
                           )}
-                        </div>
-                        <label
-                          htmlFor="disable"
-                          className={`cursor-pointer ${
-                            registrationOption === "Disable"
-                              ? "text-green-600 font-semibold"
-                              : "text-gray-600"
-                          }`}
-                        >
-                          Disable
                         </label>
                       </div>
-
-                      {/* On Request Option */}
-                      <div
-                        className="flex items-center space-x-2 cursor-pointer"
-                        onClick={() => setRegistrationOption("On Request")}
-                      >
-                        <input
-                          type="radio"
-                          id="on-request"
-                          name="registration"
-                          value="On Request"
-                          checked={registrationOption === "On Request"}
-                          onChange={() => setRegistrationOption("On Request")}
-                          className="hidden"
-                        />
-                        <div
-                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                            registrationOption === "On Request"
-                              ? "border-green-500"
-                              : "border-gray-400"
-                          }`}
-                        >
-                          {registrationOption === "On Request" && (
-                            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                          )}
-                        </div>
-                        <label
-                          htmlFor="on-request"
-                          className={`cursor-pointer ${
-                            registrationOption === "On Request"
-                              ? "text-green-600 font-semibold"
-                              : "text-gray-600"
-                          }`}
-                        >
-                          On Request
-                        </label>
-                      </div>
-                    </div>
+                    ))}
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-gray-700 font-medium">
-                    Main Site
+                  <label className="block text-gray-700 dark:text-gray-200 font-medium text-xs">
+                    {t("settings.general.mainSite")}
                   </label>
-                  <span
-                    lassName="ai-font-italic"
-                    className="italic text-xs text-gray-400"
-                  >
-                    Specify the URL if your main website is external.
+                  <span className="italic text-xs text-gray-400 dark:text-gray-300">
+                    {t("settings.general.mainSiteHint")}
                   </span>
                   <input
                     type="text"
-                    placeholder={settings.site}
-                    className="w-full border rounded-lg p-2 mt-1 focus:outline focus:outline-green-500"
+                    name="site"
+                    value={settings.site}
+                    onChange={handleSettingsChange}
+                    className="w-full border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] text-xs focus:outline-none focus:ring-2 focus:ring-emerald-400 dark:bg-gray-700 dark:text-gray-200"
                   />
                 </div>
                 <div className="mb-4">
-                  <label className="block text-gray-700 font-medium">
-                    Description
+                  <label className="block text-gray-700 dark:text-gray-200 font-medium text-xs">
+                    {t("settings.general.description")}
                   </label>
-                  <span
-                    lassName="ai-font-italic"
-                    className="italic text-xs text-gray-400"
-                  >
-                    Describe your pharmacy information.
+                  <span className="italic text-xs text-gray-400 dark:text-gray-300">
+                    {t("settings.general.descriptionHint")}
                   </span>
                   <textarea
-                    type="text"
-                    placeholder=""
-                    className="w-full h-40 border rounded-lg p-2 mt-1 focus:outline focus:outline-green-500"
+                    name="description"
+                    value={settings.description}
+                    onChange={handleSettingsChange}
+                    className="w-full h-40 border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] text-xs focus:outline-none focus:ring-2 focus:ring-emerald-400 dark:bg-gray-700 dark:text-gray-200"
                   ></textarea>
                 </div>
                 <div className="mb-4">
-                  {/* Maintenance Mode Toggle */}
-                  <div>
-                    <label className="block text-gray-700 font-medium text-lg">
-                      Maintenance Mode
-                    </label>
-                    <span className="italic text-sm text-gray-500">
-                      Enable to make the project offline.
-                    </span>
-
-                    <div className="flex items-center mt-3">
-                      <button
-                        className={`relative w-14 h-7 rounded-full transition duration-300 focus:outline-none shadow-inner ${
-                          isMaintenance ? "bg-green-500" : "bg-gray-400"
+                  <label className="block text-gray-700 dark:text-gray-200 font-medium text-xs">
+                    {t("settings.general.maintenanceMode")}
+                  </label>
+                  <span className="italic text-xs text-gray-400 dark:text-gray-300">
+                    {t("settings.general.maintenanceModeHint")}
+                  </span>
+                  <div className="flex items-center mt-3">
+                    <button
+                      className={`relative w-14 h-7 rounded-full transition duration-300 focus:outline-none shadow-inner ${
+                        isMaintenance
+                          ? "bg-emerald-500"
+                          : "bg-gray-400 dark:bg-gray-600"
+                      }`}
+                      onClick={() => setIsMaintenance(!isMaintenance)}
+                      aria-label={
+                        isMaintenance
+                          ? t("settings.general.disableMaintenance")
+                          : t("settings.general.enableMaintenance")
+                      }
+                    >
+                      <div
+                        className={`absolute left-1 top-1 w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+                          isMaintenance ? "translate-x-7" : "translate-x-0"
                         }`}
-                        onClick={() => setIsMaintenance(!isMaintenance)}
-                      >
-                        <div
-                          className={`absolute left-1 top-1 w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
-                            isMaintenance ? "translate-x-7" : "translate-x-0"
-                          }`}
-                        ></div>
-                      </button>
-                      <span className="text-gray-600 ml-3">Offine</span>
-                    </div>
+                      ></div>
+                    </button>
+                    <span className="text-gray-600 dark:text-gray-300 ml-3 text-xs">
+                      {isMaintenance
+                        ? t("settings.general.online")
+                        : t("settings.general.offline")}
+                    </span>
                   </div>
                 </div>
                 <div>
                   <button
                     type="submit"
-                    className="bg-teal-500 px-4 py-3 text-white rounded-md shadow-md active:shadow-none active:cursor-progress mt-6"
+                    className="bg-emerald-500 dark:bg-emerald-400 text-white px-4 py-2 rounded-[4px] text-xs shadow-md hover:bg-emerald-600 dark:hover:bg-emerald-500 transition active:shadow-none"
                   >
-                    Update
+                    {t("settings.general.update")}
                   </button>
                 </div>
               </form>
             </div>
           </div>
         );
-
       case "Members":
         return (
           <div>
-            <h2 className="text-xl font-semibold">Member Settings</h2>
-            <p className="text-gray-600 mb-4 text-xs">
-              These settings help you add or manage users.
+            <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200">
+              {t("settings.members.title")}
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-4 text-xs">
+              {t("settings.members.description")}
             </p>
-            <div className="p-6 bg-white shadow-lg rounded-lg">
-              <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="p-6 bg-white dark:bg-gray-800 shadow-lg rounded-[4px] border border-gray-200 dark:border-gray-600">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label className="block font-medium">Select Member</label>
+                  <label className="block font-medium text-gray-700 dark:text-gray-200 text-xs">
+                    {t("settings.members.selectMember")}
+                  </label>
                   <select
-                    className="w-full border rounded-lg p-2 mt-1"
+                    class
+                    className="w-full border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] text-xs focus:outline-none focus:ring-2 focus:ring-emerald-400 dark:bg-gray-700 dark:text-gray-200"
                     value={selectedMember}
                     onChange={(e) => setSelectedMember(e.target.value)}
                   >
-                    <option value="">Select a Member</option>
+                    <option value="">
+                      {t("settings.members.selectMemberPlaceholder")}
+                    </option>
                     <option value="John Doe">John Doe</option>
                     <option value="Jane Smith">Jane Smith</option>
                   </select>
                 </div>
-
                 <div>
-                  <label className="block font-medium">
-                    Select Designation
+                  <label className="block font-medium text-gray-700 dark:text-gray-200 text-xs">
+                    {t("settings.members.selectDesignation")}
                   </label>
                   <select
-                    className="w-full border rounded-lg p-2 mt-1"
+                    className="w-full border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] text-xs focus:outline-none focus:ring-2 focus:ring-emerald-400 dark:bg-gray-700 dark:text-gray-200"
                     value={selectedDesignation}
                     onChange={(e) => setSelectedDesignation(e.target.value)}
                   >
-                    <option value="Pharmacist">Pharmacist</option>
-                    <option value="Manager">Manager</option>
-                    <option value="Assistant">Assistant</option>
+                    <option value="Pharmacist">
+                      {t("settings.members.designations.pharmacist")}
+                    </option>
+                    <option value="Manager">
+                      {t("settings.members.designations.manager")}
+                    </option>
+                    <option value="Assistant">
+                      {t("settings.members.designations.assistant")}
+                    </option>
                   </select>
                 </div>
               </div>
-
               <button
-                className="bg-green-500 text-white px-4 py-2 rounded-lg"
+                className="bg-emerald-500 dark:bg-emerald-400 text-white px-4 py-2 rounded-[4px] text-xs hover:bg-emerald-600 dark:hover:bg-emerald-500 transition"
                 onClick={handleAddMember}
               >
-                Add Selected
+                {t("settings.members.addSelected")}
               </button>
-
-              <table className="w-full mt-6 border rounded-lg">
+              <table className="w-full mt-6 border border-gray-300 dark:border-gray-600 rounded-[4px]">
                 <thead>
-                  <tr className="bg-gray-100">
-                    <th className="p-2">Name</th>
-                    <th className="p-2">Email Address</th>
-                    <th className="p-2">Role</th>
-                    <th className="p-2">Joined On</th>
+                  <tr className="bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-300 text-xs">
+                    <th className="p-2 border border-gray-300 dark:border-gray-600">
+                      {t("settings.members.tableHeaders.name")}
+                    </th>
+                    <th className="p-2 border border-gray-300 dark:border-gray-600">
+                      {t("settings.members.tableHeaders.email")}
+                    </th>
+                    <th className="p-2 border border-gray-300 dark:border-gray-600">
+                      {t("settings.members.tableHeaders.role")}
+                    </th>
+                    <th className="p-2 border border-gray-300 dark:border-gray-600">
+                      {t("settings.members.tableHeaders.joinedOn")}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {members.map((member, index) => (
-                    <tr key={index} className="border-t">
+                    <tr
+                      key={index}
+                      className="border-t border-gray-300 dark:border-gray-600 text-xs text-gray-700 dark:text-gray-200"
+                    >
                       <td className="p-2">{member.name}</td>
                       <td className="p-2">{member.email}</td>
                       <td className="p-2">{member.role}</td>
@@ -417,292 +402,248 @@ const Setting = () => {
             </div>
           </div>
         );
-
       case "E-mail":
         return (
           <div>
-            <h2 className="text-xl font-semibold">Email Settings</h2>
-            <p className="text-gray-600 mb-6 text-xs">
-              Manage email notifications.
+            <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200">
+              {t("settings.email.title")}
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-6 text-xs">
+              {t("settings.email.description")}
             </p>
-            <div className="bg-white shadow-lg rounded-lg p-6">
+            <div className="bg-white dark:bg-gray-800 shadow-lg rounded-[4px] p-6 border border-gray-200 dark:border-gray-600">
               <form>
                 <div className="mb-4">
-                  <label className="block text-gray-700 font-medium">
-                    Email
+                  <label className="block text-gray-700 dark:text-gray-200 font-medium text-xs">
+                    {t("settings.email.email")}
                   </label>
-                  <span
-                    lassName="ai-font-italic"
-                    className="italic text-xs text-gray-400"
-                  >
-                    Specify the email of your hospital.
+                  <span className="italic text-xs text-gray-400 dark:text-gray-300">
+                    {t("settings.email.emailHint")}
                   </span>
                   <input
                     type="email"
                     placeholder="info@softnio.com"
-                    autoComplete={false}
-                    className="w-full border rounded-lg p-2 mt-1 focus:outline focus:outline-green-500"
+                    className="w-full border bg-white  border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] text-xs focus:outline-none focus:ring-2 focus:ring-emerald-400 dark:bg-gray-700 dark:text-gray-200"
                   />
                 </div>
-
                 <div className="mb-4">
-                  <label className="block text-gray-700 font-medium">
-                    Password
+                  <label className="block text-gray-700 dark:text-gray-200 font-medium text-xs">
+                    {t("settings.email.password")}
                   </label>
-                  <span
-                    lassName="ai-font-italic"
-                    placeholder="123"
-                    className="italic text-xs text-gray-400"
-                  >
-                    Specify the email password.
+                  <span className="italic text-xs text-gray-400 dark:text-gray-300">
+                    {t("settings.email.passwordHint")}
                   </span>
                   <input
-                    type="text"
-                    className="w-full border rounded-lg p-2 mt-1 focus:outline focus:outline-green-500"
+                    type="password"
+                    className="w-full border   border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] text-xs focus:outline-none focus:ring-2 focus:ring-emerald-400 dark:bg-gray-700 dark:text-gray-200"
                   />
                 </div>
-                <div className="mb-4">
-                  <label className="block text-gray-700 font-medium">
-                    SMTP Host
-                  </label>
-                  <span
-                    lassName="ai-font-italic"
-                    className="italic text-xs text-gray-400"
-                  >
-                    Specify the SMTP host of your email address.
-                  </span>
-                  <input
-                    type="email"
-                    placeholder="https://www.softnio.com"
-                    className="w-full border rounded-lg p-2 mt-1 focus:outline focus:outline-green-500"
-                  />
-                </div>
-
-                <div className="mb-4">
-                  <label className="block text-gray-700 font-medium">
-                    SMTP Port{" "}
-                  </label>
-                  <span
-                    lassName="ai-font-italic"
-                    className="italic text-xs text-gray-400"
-                  >
-                    Specify the email SMTP port.
-                  </span>
-                  <input
-                    type="text"
-                    placeholder="921"
-                    className="w-full border rounded-lg p-2 mt-1 focus:outline focus:outline-green-500"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-gray-700 font-medium">
-                    SMTP Encryption
-                  </label>
-                  <span
-                    lassName="ai-font-italic"
-                    className="italic text-xs text-gray-400"
-                  >
-                    Specify the encryption of your hospital email.
-                  </span>
-                  <input
-                    type="text"
-                    placeholder="921"
-                    className="w-full border rounded-lg p-2 mt-1 focus:outline focus:outline-green-500"
-                  />
-                </div>
-                <div className="mb-4">
+               
+                <div>
                   <button
                     type="submit"
-                    className="bg-teal-500 px-4 py-3 text-white rounded-md shadow-md active:shadow-none active:cursor-progress mt-6"
+                    className="bg-emerald-500 dark:bg-emerald-400 text-white px-4 py-2 rounded-[4px] text-xs shadow-md hover:bg-emerald-600 dark:hover:bg-emerald-500 transition active:shadow-none"
                   >
-                    Update
+                    {t("settings.email.update")}
                   </button>
                 </div>
               </form>
             </div>
           </div>
         );
-
       case "Security":
         return (
           <div>
-            <h2 className="text-xl font-semibold">Security Settings</h2>
-            <p className="text-gray-600 mb-6 text-xs">
-              Manage security options.
+            <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200">
+              {t("settings.security.title")}
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-6 text-xs">
+              {t("settings.security.description")}
             </p>
-            <div className="bg-white shadow-lg rounded-lg p-6">
-              <p>Security settings are currently unavailable.</p>
+            <div className="bg-white dark:bg-gray-800 shadow-lg rounded-[4px] p-6 border border-gray-200 dark:border-gray-600">
+              <p className="text-gray-600 dark:text-gray-300 text-xs">
+                {t("settings.security.unavailable")}
+              </p>
             </div>
           </div>
         );
-
       case "Account activity":
         return (
           <div>
-            <h2 className="text-xl font-semibold">Account Activity</h2>
-            <p className="text-gray-600 mb-6 text-xs">
-              View recent account activity.
+            <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200">
+              {t("settings.activity.title")}
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-6 text-xs">
+              {t("settings.activity.description")}
             </p>
-            <div className="bg-white shadow-lg rounded-lg p-6">
-              <div className="container mx-auto p-6">
-                <div className="p-6">
-                  <table className="w-full border-collapse bg-white shadow-md">
-                    <thead>
-                      <tr className="bg-gray-200">
-                        <td className="p-3  text-sm    text-left">BROWSER</td>
-                        <td className="p-3  text-sm    text-left">IP</td>
-                        <td className="p-3  text-sm    text-left">TIME</td>
-                        <td className="p-3  text-sm    text-left">ACTIVITY</td>
-                        <td className="p-3  text-sm    text-left">ACTION</td>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {activityLogs.map((log) => (
-                        <tr
-                          key={log.id}
-                          className="border-b hover:bg-slate-200"
-                        >
-                          <td className="p-3 text-xs">{log.browser}</td>
-                          <td className="p-3 text-xs">{log.ip}</td>
-                          <td className="p-3 text-xs">{log.time}</td>
-                          <td
-                            className={`p-3 text-xs font-semibold ${
-                              log.activity === "Deleted"
-                                ? "text-red-500"
-                                : log.activity === "Updated"
-                                ? "text-green-500"
-                                : "text-blue-500"
-                            }`}
-                          >
-                            {log.activity}
-                          </td>
-                          <td
-                            className="p-3 text-red-500 cursor-pointer hover:text-red-700"
-                            onClick={() => handleDeleteClick(log.id)}
-                          >
-                            &times;
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-
-                  {/* Confirmation Popup */}
-                  {showPopup && (
-                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                      <div className="bg-white p-5 rounded-lg shadow-lg">
-                        <p className="text-lg font-semibold">
-                          Are you sure you want to delete this device?
-                        </p>
-                        <div className="flex justify-end space-x-4 mt-4">
-                          <button
-                            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700"
-                            onClick={confirmDelete}
-                          >
-                            Yes, Delete
-                          </button>
-                          <button
-                            className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
-                            onClick={() => setShowPopup(false)}
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
+            <div className="bg-white dark:bg-gray-800 shadow-lg rounded-[4px] p-6 border border-gray-200 dark:border-gray-600">
+              <table className="w-full border-collapse bg-white dark:bg-gray-800 shadow-md rounded-[4px]">
+                <thead>
+                  <tr className="bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-300 text-xs">
+                    <th className="p-3 text-left border border-gray-300 dark:border-gray-600">
+                      {t("settings.activity.tableHeaders.browser")}
+                    </th>
+                    <th className="p-3 text-left border border-gray-300 dark:border-gray-600">
+                      {t("settings.activity.tableHeaders.ip")}
+                    </th>
+                    <th className="p-3 text-left border border-gray-300 dark:border-gray-600">
+                      {t("settings.activity.tableHeaders.time")}
+                    </th>
+                    <th className="p-3 text-left border border-gray-300 dark:border-gray-600">
+                      {t("settings.activity.tableHeaders.activity")}
+                    </th>
+                    <th className="p-3 text-left border border-gray-300 dark:border-gray-600">
+                      {t("settings.activity.tableHeaders.action")}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {activityLogs.map((log) => (
+                    <tr
+                      key={log.id}
+                      className="border-b hover:bg-gray-100 dark:hover:bg-gray-700 text-xs"
+                    >
+                      <td className="p-3 text-gray-700 dark:text-gray-200">
+                        {log.browser}
+                      </td>
+                      <td className="p-3 text-gray-700 dark:text-gray-200">
+                        {log.ip}
+                      </td>
+                      <td className="p-3 text-gray-700 dark:text-gray-200">
+                        {log.time}
+                      </td>
+                      <td
+                        className={`p-3 font-semibold text-xs ${
+                          log.activity === "Deleted"
+                            ? "text-red-500 dark:text-red-400"
+                            : log.activity === "Updated"
+                            ? "text-emerald-500 dark:text-emerald-400"
+                            : "text-blue-500 dark:text-blue-400"
+                        }`}
+                      >
+                        {t(
+                          `settings.activity.activities.${log.activity.toLowerCase()}`
+                        )}
+                      </td>
+                      <td
+                        className="p-3 text-red-500 dark:text-red-400 cursor-pointer hover:text-red-700 dark:hover:text-red-300"
+                        onClick={() => handleDeleteClick(log.id)}
+                        aria-label={t("settings.activity.delete")}
+                      >
+                        ×
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {showPopup && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                  <div className="bg-white dark:bg-gray-800 p-5 rounded-[4px] shadow-lg border border-gray-200 dark:border-gray-600">
+                    <p className="text-lg font-semibold text-gray-700 dark:text-gray-200">
+                      {t("settings.activity.confirmDelete")}
+                    </p>
+                    <div className="flex justify-end space-x-4 mt-4">
+                      <button
+                        className="bg-red-500 dark:bg-red-400 text-white px-4 py-2 rounded-[4px] text-xs hover:bg-red-600 dark:hover:bg-red-500 transition"
+                        onClick={confirmDelete}
+                      >
+                        {t("settings.activity.yesDelete")}
+                      </button>
+                      <button
+                        className="bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-[4px] text-xs hover:bg-gray-400 dark:hover:bg-gray-500 transition"
+                        onClick={() => setShowPopup(false)}
+                      >
+                        {t("settings.activity.cancel")}
+                      </button>
                     </div>
-                  )}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         );
-
       default:
         return null;
     }
   };
 
   return (
-    <>
-      <div>
-        <label htmlFor="" className="text-xl font-semibold text-green-600">
-          Setting Management
-        </label>
-        <p className="mb-3 text-gray-400 text-xs font-normal">
-          There are all setting may hepl you controller your page.
-        </p>
-      </div>
-      <div className="flex  h-screen bg-gray-100">
-        {/* Sidebar */}
-        <div className="w-64 bg-white shadow-lg p-4 rounded-md mt-11">
-          <h2 className="text-sm font-semibold ">Settings</h2>
-          <p className="mb-6 text-xs text-gray-400">
-            Here you can change and edit your needs
+    <div className="p-6 bg-gray-100 dark:bg-gray-900 min-h-screen max-w-6xl mx-auto">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <div>
+          <h1 className="text-xl font-semibold text-emerald-500 dark:text-emerald-400">
+            {t("settings.title")}
+          </h1>
+          <p className="text-gray-400 dark:text-gray-300 text-xs font-normal">
+            {t("settings.description")}
           </p>
-
+        </div>
+        <button
+          onClick={toggleTheme}
+          className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] mt-4 md:mt-0 dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition"
+          aria-label={
+            theme === "light"
+              ? t("settings.switchToDark")
+              : t("settings.switchToLight")
+          }
+        >
+          {theme === "light" ? <FaMoon /> : <FaSun />}
+        </button>
+      </div>
+      <div className="flex flex-col md:flex-row gap-6">
+        <div className="w-full md:w-64 bg-white dark:bg-gray-800 shadow-lg p-4 rounded-[4px] border border-gray-200 dark:border-gray-600">
+          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+            {t("settings.sidebar.title")}
+          </h2>
+          <p className="mb-6 text-xs text-gray-400 dark:text-gray-300">
+            {t("settings.sidebar.description")}
+          </p>
           <ul className="space-y-6">
-            <li
-              className={`flex items-center  space-x-3 cursor-pointer ${
-                activeTab === "General"
-                  ? "text-green-600 font-semibold"
-                  : "text-gray-600 hover:text-green-600"
-              }`}
-              onClick={() => setActiveTab("General")}
-            >
-              <FaCog />
-              <span>General</span>
-            </li>
-            <li
-              className={`flex items-center space-x-3 cursor-pointer ${
-                activeTab === "Members"
-                  ? "text-green-600 font-semibold"
-                  : "text-gray-600 hover:text-green-600"
-              }`}
-              onClick={() => setActiveTab("Members")}
-            >
-              <FaUsers />
-              <span>Members</span>
-            </li>
-            <li
-              className={`flex items-center space-x-3 cursor-pointer ${
-                activeTab === "E-mail"
-                  ? "text-green-600 font-semibold"
-                  : "text-gray-600 hover:text-green-600"
-              }`}
-              onClick={() => setActiveTab("E-mail")}
-            >
-              <FaLock />
-              <span>E-mail</span>
-            </li>
-            <li
-              className={`flex items-center space-x-3 cursor-pointer ${
-                activeTab === "Security"
-                  ? "text-green-600 font-semibold"
-                  : "text-gray-600 hover:text-green-600"
-              }`}
-              onClick={() => setActiveTab("Security")}
-            >
-              <FaShieldAlt />
-              <span>Security</span>
-            </li>
-            <li
-              className={`flex items-center space-x-3 cursor-pointer ${
-                activeTab === "Account activity"
-                  ? "text-green-600 font-semibold"
-                  : "text-gray-600 hover:text-green-600"
-              }`}
-              onClick={() => setActiveTab("Account activity")}
-            >
-              <FaHistory />
-              <span>Account activity</span>
-            </li>
+            {[
+              {
+                tab: "General",
+                icon: <FaCog />,
+                label: t("settings.sidebar.general"),
+              },
+              {
+                tab: "Members",
+                icon: <FaUsers />,
+                label: t("settings.sidebar.members"),
+              },
+              {
+                tab: "E-mail",
+                icon: <FaLock />,
+                label: t("settings.sidebar.email"),
+              },
+              {
+                tab: "Security",
+                icon: <FaShieldAlt />,
+                label: t("settings.sidebar.security"),
+              },
+              {
+                tab: "Account activity",
+                icon: <FaHistory />,
+                label: t("settings.sidebar.activity"),
+              },
+            ].map(({ tab, icon, label }) => (
+              <li
+                key={tab}
+                className={`flex items-center space-x-3 cursor-pointer text-xs ${
+                  activeTab === tab
+                    ? "text-emerald-500 dark:text-emerald-400 font-semibold"
+                    : "text-gray-600 dark:text-gray-300 hover:text-emerald-500 dark:hover:text-emerald-400"
+                }`}
+                onClick={() => setActiveTab(tab)}
+              >
+                {icon}
+                <span>{label}</span>
+              </li>
+            ))}
           </ul>
         </div>
-
-        {/* Settings Content */}
-        <div className="flex-1 p-8">{renderContent()}</div>
+        <div className="flex-1">{renderContent()}</div>
       </div>
-    </>
+    </div>
   );
 };
 
