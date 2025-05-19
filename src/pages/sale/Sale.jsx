@@ -19,19 +19,19 @@ const PharmacyInterface = () => {
       id: 1,
       name: "ថ្នាំក្អក",
       price: 1.25,
-      image: "https://via.placeholder.com/150",
+      image: "paracetamol.jpg",
     },
     {
       id: 2,
       name: "វីតាមីន C",
       price: 2.5,
-      image: "https://via.placeholder.com/150",
+      image: "panadol_extra.jpg",
     },
     {
       id: 3,
       name: "អាស្ពីរីន",
       price: 0.8,
-      image: "https://via.placeholder.com/150",
+      image: "./panadol.jpg",
     },
     {
       id: 4,
@@ -266,11 +266,11 @@ const PharmacyInterface = () => {
             </div>
           </header>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="flex flex-1 flex-wrap justify-center gap-2">
             {filteredProducts.map((product) => (
               <div
                 key={product.id}
-                className="bg-white rounded-lg shadow-lg p-4 text-center hover:shadow-xl transition"
+                className="bg-white rounded-lg shadow-lg p-1 w-56 text-center hover:shadow-xl transition mx-auto"
               >
                 <img
                   src={product.image}
@@ -279,14 +279,14 @@ const PharmacyInterface = () => {
                     (e.target.src =
                       "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mN8z8DwHwAFBQIA/rB/WQAAAABJRU5ErkJggg==")
                   }
-                  className="w-40 h-32 object-cover mb-4 rounded"
+                  className="w-full h-40 object-contain mb-2 rounded mx-auto"
                 />
                 <h3 className="text-sm font-semibold mb-2">{product.name}</h3>
                 <p className="text-gray-600 mb-4">
                   {displayPrice(product.price).toFixed(2)}{" "}
                   {currency === "USD" ? "$" : "៛"}
                 </p>
-                <div className="flex justify-center items-center mb-2">
+                <div className="flex justify-center items-center mb-4">
                   <label className="mr-2" htmlFor={`qty-${product.id}`}>
                     ចំនួន:
                   </label>
@@ -304,7 +304,7 @@ const PharmacyInterface = () => {
                 </div>
                 <button
                   onClick={() => addToCart(product)}
-                  className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
+                  className="w-32 bg-green-600 text-white py-2 mb-3 rounded-lg hover:bg-green-700 transition"
                   aria-label={`បន្ថែម ${product.name} ទៅកន្ត្រក`}
                 >
                   បន្ថែមទៅកន្ត្រក
@@ -317,14 +317,14 @@ const PharmacyInterface = () => {
         {/* Cart Section (Desktop: Right Sidebar, Mobile: Bottom Drawer) */}
         <div
           className={`bg-white shadow-lg p-4 transition-all duration-300 md:w-60 md:h-full md:static
-            fixed bottom-0 left-0 w-full h-3/4 rounded-t-2xl md:rounded-none flex flex-col
+            fixed bottom-0 left-0 w-20 h-3/4 rounded-t-2xl md:rounded-none flex flex-col
             ${
               isCartOpen ? "translate-y-0" : "translate-y-full md:translate-y-0"
             }`}
         >
           {/* Cart Header - Sticky */}
-          <div className="flex justify-between items-center mb-4 sticky top-0 bg-white z-10 pb-2 border-b">
-            <h2 className="text-lg font-bold">កន្ត្រក</h2>
+          <div className="flex justify-between items-center mb-4  bg-white z-10 pb-2 border-b">
+            <h2 className="text-sm font-bold">កន្ត្រក</h2>
             <button
               className="md:hidden text-gray-600 hover:text-gray-800"
               onClick={() => setIsCartOpen(false)}
@@ -341,7 +341,7 @@ const PharmacyInterface = () => {
               <p>កន្ត្រកទទេ</p>
             </div>
           ) : (
-            <div className="flex-1 overflow-auto mb-4">
+            <div className="flex-1 overflow-auto mb-2">
               <ul className="space-y-2">
                 {cart.map((item, index) => (
                   <li
@@ -355,16 +355,6 @@ const PharmacyInterface = () => {
                       className="w-10 h-10 object-cover rounded flex-shrink-0"
                     />
                     <div className="flex-1">
-                      <div className="flex justify-between items-center">
-                        <span className=" text-xs">{item.name}</span>
-                        <button
-                          onClick={() => removeFromCart(item.id)}
-                          className="text-red-600 text-sm hover:underline"
-                          aria-label={`លុប ${item.name} ចេញពីកន្ត្រក`}
-                        >
-                          លុប
-                        </button>
-                      </div>
                       <div className="text-sm">
                         {item.quantity} x {displayPrice(item.price).toFixed(2)}{" "}
                         {currency === "USD" ? "$" : "៛"} ={" "}
