@@ -89,7 +89,7 @@ const Register = () => {
 
   return (
     <section
-      className={`flex justify-center items-center min-h-screen ${
+      className={`flex justify-center items-center min-h-screen font-khmer ${
         theme === "dark" ? "bg-gray-900" : "bg-gray-100"
       } px-4`}
     >

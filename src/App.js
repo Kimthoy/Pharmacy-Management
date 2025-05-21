@@ -1,26 +1,28 @@
 import React, { Suspense, lazy, useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
-  Route,
   Routes,
+  Route,
   Navigate,
+  useLocation,
 } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext";
+import { LanguageProvider } from "./context/LanguageContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import Loader from "./components/Loader";
 import TopBar from "./components/TopBar";
 import Footer from "./components/Footer";
 import Sidebar from "./components/Sidebar";
-import Register from "./pages/auth/Register";
-import { LanguageProvider } from "./context/LanguageContext";
-import { AuthProvider } from "./context/AuthContext";
 
-const ActivityPage = lazy(() => import("./pages/profile/ActivityPage"));
-
+// Lazy-loaded pages
 const Login = lazy(() => import("./pages/auth/Login"));
+const Register = lazy(() => import("./pages/auth/Register"));
+const Client = lazy(() => import("./pages/auth/Client"));
+const Dashboard = lazy(() => import("./pages/dashboard/Dashboard"));
+const SaleDashboard = lazy(() => import("./pages/sale/Sale"));
 const CustomerList = lazy(() => import("./pages/customer/ListCustomer"));
 const CustomerLedger = lazy(() => import("./pages/customer/CustomerLedger"));
 const InsertCustomer = lazy(() => import("./pages/customer/InsertCustomer"));
-const Dashboard = lazy(() => import("./pages/dashboard/Dashboard"));
 const ManufacturerList = lazy(() =>
   import("./pages/manufacturer/ManufacturerList")
 );
@@ -36,13 +38,14 @@ const IncomePage = lazy(() => import("./pages/finance/Income"));
 const InvoiceDetailsPage = lazy(() => import("./pages/finance/InvoiceDetail"));
 const InvoiceListPage = lazy(() => import("./pages/finance/InvoiceList"));
 const AboutUser = lazy(() => import("./pages/profile/AboutUser"));
+const Profile = lazy(() => import("./pages/profile/AboutUser"));
+const ActivityPage = lazy(() => import("./pages/profile/ActivityPage"));
 const AddMedicine = lazy(() => import("./pages/medicine/AddMedicine"));
 const MedicineList = lazy(() => import("./pages/medicine/MedicineList"));
-const Category = lazy(() => import("./pages/medicine/Category"));
 const MedicineDetail = lazy(() => import("./pages/medicine/MedicineDetail"));
+const Category = lazy(() => import("./pages/medicine/Category"));
 const Setting = lazy(() => import("./pages/setting/Setting"));
 const AddWastageReturn = lazy(() => import("./pages/return/AddWastageReturn"));
-const SaleDashboard = lazy(() => import("./pages/sale/Sale"));
 const AddManufacturerReturn = lazy(() =>
   import("./pages/return/AddManufacturerReturn")
 );
@@ -53,26 +56,80 @@ const WastageReturnList = lazy(() =>
   import("./pages/return/WastageReturnList")
 );
 const StaffList = lazy(() => import("./pages/staff/ManageStaff"));
-const Client = lazy(() => import("./pages/auth/Client"));
-const Profile = lazy(() => import("./pages/profile/AboutUser"));
+
+// Protected Route Component with Role-Based Access
+const ProtectedRoute = ({ children, allowedRoles = ["admin", "cashier"] }) => {
+  const { isAuthenticated, user } = useAuth();
+  const location = useLocation();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
+  const userRole = user?.role?.toLowerCase() || "";
+  const isSaleDashboard = location.pathname === "/saledashboard";
+
+  // If user is cashier, they can only access /saledashboard
+  if (userRole === "cashier" && !isSaleDashboard) {
+    return <Navigate to="/saledashboard" replace />;
+  }
+
+  // Check if the user's role is allowed for this route
+  if (!allowedRoles.includes(userRole)) {
+    return (
+      <Navigate to={userRole === "cashier" ? "/saledashboard" : "/"} replace />
+    );
+  }
+
+  return children;
+};
+
+// Layout Component for Protected Routes
+const AppLayout = ({
+  children,
+  selectedPage,
+  setSelectedPage,
+  onLanguageChange,
+}) => {
+  const { user } = useAuth();
+  const userRole = user?.role?.toLowerCase() || "";
+
+  // Hide Sidebar for cashiers (they only see SaleDashboard)
+  return (
+    <div className="flex h-screen bg-white dark:bg-gray-900 font-khmer">
+      {userRole !== "cashier" && (
+        <Sidebar
+          selectedPage={selectedPage}
+          setSelectedPage={setSelectedPage}
+        />
+      )}
+      <div
+        className={`flex-1 flex flex-col ${
+          userRole === "cashier" ? "w-full" : ""
+        }`}
+      >
+        <TopBar onLanguageChange={onLanguageChange} />
+        <div className="flex-1 overflow-y-auto p-4 bg-white dark:bg-gray-900">
+          {children}
+        </div>
+        <Footer />
+      </div>
+    </div>
+  );
+};
+
+// Main App Component
 const App = () => {
   const [langCode, setLangCode] = useState(
     localStorage.getItem("selectedLanguage") || "en"
   );
-  const [selectedPage, setSelectedPage] = useState("Dashboard");
+  const [selectedPage, setSelectedPage] = useState(
+    localStorage.getItem("selectedPage") || "Dashboard"
+  );
   const [isLoading, setIsLoading] = useState(true);
 
   const simulateLoadingDelay = (delay) =>
     new Promise((resolve) => setTimeout(resolve, delay));
-
-  useEffect(() => {
-    const savedPage = localStorage.getItem("selectedPage") || "Dashboard";
-    setSelectedPage(savedPage);
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("selectedPage", selectedPage);
-  }, [selectedPage]);
 
   useEffect(() => {
     const loadContent = async () => {
@@ -82,111 +139,432 @@ const App = () => {
     loadContent();
   }, []);
 
-  return isLoading ? (
-    <div className="flex items-center justify-center h-screen bg-white dark:bg-gray-900">
-      <Loader />
-    </div>
-  ) : (
+  useEffect(() => {
+    localStorage.setItem("selectedPage", selectedPage);
+  }, [selectedPage]);
+
+  const handleLanguageChange = (lang) => {
+    setLangCode(lang);
+    localStorage.setItem("selectedLanguage", lang);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-white dark:bg-gray-900">
+        <Loader />
+      </div>
+    );
+  }
+
+  return (
     <Router>
       <ThemeProvider>
         <AuthProvider>
           <LanguageProvider>
-            <div className="flex h-screen bg-white dark:bg-gray-900 font-khmer">
-              <Sidebar
-                setSelectedPage={setSelectedPage}
-                selectedPage={selectedPage}
-              />
-              <div className="flex-1 flex flex-col">
-                <TopBar
-                  onLanguageChange={(lang) => {
-                    setLangCode(lang);
-                    localStorage.setItem("selectedLanguage", lang);
-                  }}
-                />
-                <div className="flex-1 overflow-y-auto p-4 bg-white dark:bg-gray-900">
-                  <Suspense fallback={<Loader />}>
-                    <Routes>
-                      <Route
-                        path="/"
-                        element={<Dashboard langCode={langCode} />}
-                      />
-                      <Route path="/customerlist" element={<CustomerList />} />
-                      <Route
-                        path="/customerledger"
-                        element={<CustomerLedger />}
-                      />
-                      <Route
-                        path="/insertcustomer"
-                        element={<InsertCustomer />}
-                      />
-                      <Route
-                        path="/manufacturerlist"
-                        element={<ManufacturerList />}
-                      />
-                      <Route path="/addmanu" element={<AddManu />} />
-                      <Route path="/manuledger" element={<ManuLedger />} />
-                      <Route path="/login" element={<Login />} />
-                      <Route path="/register" element={<Register />} />
-                      <Route path="/salereport" element={<SellReport />} />
-                      <Route
-                        path="/purchasreport"
-                        element={<PurchaseReport />}
-                      />
-                      <Route path="/stockreport" element={<StockReport />} />
-                      <Route path="/expensepage" element={<ExpensePage />} />
-                      <Route path="/incomepage" element={<IncomePage />} />
-                      <Route
-                        path="/invoicedetail"
-                        element={<InvoiceDetailsPage />}
-                      />
-                      <Route
-                        path="/invoicelist"
-                        element={<InvoiceListPage />}
-                      />
-                      <Route path="/aboutuser" element={<AboutUser />} />
-                      <Route
-                        path="/addmedicinepage"
-                        element={<AddMedicine />}
-                      />
-                      <Route
-                        path="/listofmedicine"
-                        element={<MedicineList />}
-                      />
-                      <Route
-                        path="/medicinedetail"
-                        element={<MedicineDetail />}
-                      />
-                      <Route path="/categoies" element={<Category />} />
-                      <Route path="/settingpage" element={<Setting />} />
-                      <Route
-                        path="/manufacturerreturnlist"
-                        element={<ManufacturerReturnList />}
-                      />
-                      <Route
-                        path="/addwastagereturn"
-                        element={<AddWastageReturn />}
-                      />
-                      <Route
-                        path="/addmanufacturerreturn"
-                        element={<AddManufacturerReturn />}
-                      />
-                      <Route
-                        path="/wastagereturnlist"
-                        element={<WastageReturnList />}
-                      />
-                      <Route path="/listofstaff" element={<StaffList />} />
-                      <Route path="/client" element={<Client />} />
-                      <Route path="/profile" element={<Profile />} />
-                      <Route path="/activity" element={<ActivityPage />} />
-                      <Route path="/saledashboard" element={<SaleDashboard />} />
+            <Suspense fallback={<Loader />}>
+              <Routes>
+                {/* Public Routes (Standalone) */}
+                <Route path="/" element={<Login />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/client" element={<Client />} />
 
-                      <Route path="*" element={<Navigate to="/" />} />
-                    </Routes>
-                  </Suspense>
-                </div>
-                <Footer />
-              </div>
-            </div>
+                {/* Protected Routes (With Layout) */}
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <Dashboard langCode={langCode} />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/saledashboard"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin", "cashier"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <SaleDashboard />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/customerlist"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <CustomerList />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/customerledger"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <CustomerLedger />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/insertcustomer"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <InsertCustomer />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/manufacturerlist"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <ManufacturerList />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/addmanu"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <AddManu />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/manuledger"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <ManuLedger />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/salereport"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <SellReport />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/purchasreport"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <PurchaseReport />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/stockreport"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <StockReport />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/expensepage"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <ExpensePage />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/incomepage"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <IncomePage />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/invoicedetail"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <InvoiceDetailsPage />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/invoicelist"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <InvoiceListPage />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/aboutuser"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <AboutUser />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <Profile />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/activity"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <ActivityPage />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/addmedicinepage"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <AddMedicine />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/listofmedicine"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <MedicineList />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/medicinedetail"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <MedicineDetail />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/categoies"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <Category />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/settingpage"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <Setting />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/addwastagereturn"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <AddWastageReturn />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/addmanufacturerreturn"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <AddManufacturerReturn />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/manufacturerreturnlist"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <ManufacturerReturnList />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/wastagereturnlist"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <WastageReturnList />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/listofstaff"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <StaffList />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Suspense>
           </LanguageProvider>
         </AuthProvider>
       </ThemeProvider>

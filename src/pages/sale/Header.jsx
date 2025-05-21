@@ -1,0 +1,62 @@
+import React from "react";
+
+const Header = ({
+  currency,
+  setCurrency,
+  searchQuery,
+  setSearchQuery,
+  randomizeProducts,
+  isCompoundMode,
+}) => {
+  return (
+    <header className="mb-6">
+      <div className="flex justify-between flex-1 items-center mb-4">
+        <h1 className="text-2xl font-bold" aria-label="ឱសថស្ថាន">
+          ឱសថស្ថាន
+        </h1>
+        <nav className="space-x-4">
+          <a
+            href="#"
+            className="text-gray-600 hover:text-gray-800"
+            aria-label="ទំព័រដើម"
+          >
+            ទំព័រដើម
+          </a>
+          <a
+            href="#"
+            className="text-gray-600 hover:text-gray-800"
+            aria-label="ផលិតផល"
+          >
+            ផលិតផល
+          </a>
+          <a
+            href="#"
+            className="text-gray-600 hover:text-gray-800"
+            aria-label="ការបញ្ជាទិញ"
+          >
+            ការបញ្ជាទិញ
+          </a>
+        </nav>
+      </div>
+      <div className="flex justify-center">
+        <input
+          type="text"
+          placeholder="ស្វែងរកថ្នាំ ..."
+          aria-label="ស្វែងរកផលិតផល"
+          className="w-full max-w-md p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 transition duration-200"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <button
+          onClick={randomizeProducts}
+          className="btn bg-emerald-500 text-white rounded-xl w-24 px-3 ml-5 transition-all duration-200 ease-in-out transform hover:scale-105 hover:bg-emerald-600 active:bg-emerald-700 active:scale-95 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+          aria-label={isCompoundMode ? "ប្តូរទៅថ្នាំផ្សំ" : "ថ្នាំកាត់ផ្សំ"}
+        >
+          {isCompoundMode ? "ថ្នាំផ្សំ" : "ថ្នាំកាត់ផ្សំ"}
+        </button>
+      </div>
+    </header>
+  );
+};
+
+export default Header;

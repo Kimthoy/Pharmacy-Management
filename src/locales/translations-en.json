@@ -22,18 +22,6 @@
     "noEmail": "No email provided",
     "role": "Role"
   },
-  "login": {
-    "welcome": "Welcome to",
-    "description": "Please enter your email and password to log in to the admin dashboard.",
-    "signIn": "Sign In",
-    "email": "Email",
-    "password": "Password",
-    "emailPlaceholder": "Enter email",
-    "passwordPlaceholder": "Enter password",
-    "success": "Login successful!",
-    "noToken": "Token not received!",
-    "invalidCredentials": "Invalid credentials. Please try again."
-  },
 
   "viewprofile": {
     "ProfileTitle": "User Profile",
@@ -115,7 +103,7 @@
   },
 
   "sidebar": {
-    "categoies":"Category",
+    "categoies": "Category",
     "appName": "My App",
     "dashboards": "Dashboard",
     "medicine": "Medicine",
@@ -149,7 +137,9 @@
     "login": "Login",
     "register": "Sign In",
     "client": "Client",
-    "settings": "Settings"
+    "settings": "Settings",
+    "salepage": "Sale",
+    "saledashboard": "Sale Dashboard"
   },
 
   "medicinedetail": {
@@ -477,7 +467,8 @@
     "nav": {
       "products": "Products",
       "services": "Services",
-      "contact": "Contact"
+      "contact": "Contact",
+      "partner": "Partner Ship"
     },
     "login": "Login",
     "register": "Register",
@@ -530,7 +521,7 @@
       "address": "123 Health St, Phnom Penh, Cambodia",
       "phone": "+855 123 456 789",
       "email": "info@panharithpharmacy.com",
-      "copyright": "© {{year}} Panharith Pharmacy. All rights reserved."
+      "copyright": "© 2025 Panharith Pharmacy. All rights reserved."
     }
   },
   "addWastageReturn": {
@@ -1100,5 +1091,27 @@
     "ConfirmRemoveCartMessage": "Are you sure you want to remove this cart?",
     "EmptyCartMessage": "Cart is Empty",
     "OrderSuccessMessage": "Order Placed Successfully"
+  },
+
+  "login": {
+    "signIn": "Sign In",
+    "createAccount": "Create an Account",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "rememberMe": "Remember me",
+    "lostPassword": "Lost your password?",
+    "success": "Login successful!",
+    "noToken": "No token received",
+    "invalidCredentials": "Invalid email or password",
+    "invalidRole": "Invalid role"
+  },
+  "footer": {
+    "home": "Home",
+    "about": "About",
+    "shop": "Shop",
+    "contact": "Contact",
+    "rights": "All rights reserved"
   }
 }

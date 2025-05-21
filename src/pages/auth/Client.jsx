@@ -4,13 +4,13 @@ import { useTheme } from "../../context/ThemeContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { AuthContext } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
-import { Search, User, ShoppingCart, Sun, Moon, Globe } from "lucide-react";
+import { Search, Sun, Moon, Globe } from "lucide-react";
 
 const Client = () => {
   const { t } = useTranslation();
   const { theme, toggleTheme } = useTheme();
   const { language, changeLanguage } = useLanguage();
-  const { isAuthenticated, user } = useContext(AuthContext);
+
   const [isLangOpen, setIsLangOpen] = useState(false);
   const langRef = useRef(null);
 
@@ -37,8 +37,8 @@ const Client = () => {
     <section
       className={`${
         theme === "dark"
-          ? "bg-gray-900 text-white"
-          : "bg-gray-100 text-gray-900"
+          ? "bg-gray-900 text-white font-khmer"
+          : "bg-gray-100 text-gray-900 font-khmer"
       } min-h-screen`}
     >
       {/* Top Bar */}
@@ -47,22 +47,20 @@ const Client = () => {
           theme === "dark" ? "bg-gray-800" : "bg-white"
         } shadow-md sticky top-0 z-10`}
       >
-        <div className="max-w-7xl sticky -z-20 mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between py-4">
+        <div className="max-w-7xl font-khmer sticky -z-20 mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between py-4">
           {/* Logo and Pharmacy Name */}
-          <Link to="/" className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 cursor-pointer">
             <img
               src="/logo.png"
-              width="70px"
+              width="66px"
               alt={t("client.pharmacyName")}
               className="rounded-full"
             />
-            <h1 className="text-xl font-bold font-header">
-              {t("client.pharmacyName")}
-            </h1>
-          </Link>
+            <h1 className="text-xl font-bold ">{t("client.pharmacyName")}</h1>
+          </div>
 
           {/* Search Bar */}
-          <div className="hidden md:flex flex-1 max-w-md mx-4">
+          <div className="hidden md:flex flex-1 max-w-md mx-4 font-khmer">
             <div className="relative w-full">
               <input
                 type="text"
@@ -83,16 +81,19 @@ const Client = () => {
           </div>
 
           {/* Navigation and Actions */}
-          <div className="flex items-center space-x-4">
-            <Link to="/products" className="hover:text-emerald-500">
+          <div className="flex items-center space-x-4 cursor-pointer">
+            <div className="hover:text-emerald-500">
               {t("client.nav.products")}
-            </Link>
-            <Link to="/services" className="hover:text-emerald-500">
+            </div>
+            <div className="hover:text-emerald-500 cursor-pointer">
               {t("client.nav.services")}
-            </Link>
-            <Link to="/contact" className="hover:text-emerald-500">
+            </div>
+            <div className="hover:text-emerald-500 cursor-pointer">
               {t("client.nav.contact")}
-            </Link>
+            </div>
+            <div className="hover:text-emerald-500 cursor-pointer">
+              {t("client.nav.partner")}
+            </div>
 
             {/* Theme Toggle */}
             <button
@@ -109,7 +110,7 @@ const Client = () => {
             <div className="relative" ref={langRef}>
               <button
                 onClick={() => setIsLangOpen(!isLangOpen)}
-                className={`flex items-center space-x-1 p-2 rounded-md ${
+                className={`flex items-center space-x-2 p-2 me-10 rounded-md ${
                   theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-200"
                 }`}
                 aria-label={t("client.selectLanguage")}
@@ -124,7 +125,7 @@ const Client = () => {
               </button>
               {isLangOpen && (
                 <ul
-                  className={`absolute z-20 mt-2 w-32 rounded-md shadow-lg ${
+                  className={`absolute  z-20 mt-2 w-32 rounded-md shadow-lg ${
                     theme === "dark" ? "bg-gray-800" : "bg-white"
                   } border ${
                     theme === "dark" ? "border-gray-600" : "border-gray-200"
@@ -137,7 +138,7 @@ const Client = () => {
                         changeLanguage(lang.value);
                         setIsLangOpen(false);
                       }}
-                      className={`flex items-center px-3 py-2 text-sm cursor-pointer ${
+                      className={`flex items-center px-3  py-2 text-sm cursor-pointer ${
                         language === lang.value
                           ? "bg-emerald-100 dark:bg-emerald-700"
                           : "hover:bg-emerald-50 dark:hover:bg-gray-700"
@@ -156,49 +157,6 @@ const Client = () => {
                 </ul>
               )}
             </div>
-
-            {/* User Actions */}
-            {isAuthenticated ? (
-              <Link
-                to="/profile"
-                className="flex items-center space-x-1 p-2 rounded-md hover:bg-emerald-100"
-              >
-                <User size={20} />
-                <span>{user?.name || t("client.user")}</span>
-              </Link>
-            ) : (
-              <div className="flex space-x-2">
-                <Link
-                  to="/login"
-                  className={`px-3 py-1 rounded-md ${
-                    theme === "dark"
-                      ? "bg-emerald-600 hover:bg-emerald-500"
-                      : "bg-emerald-500 hover:bg-emerald-600"
-                  } text-white`}
-                >
-                  {t("client.login")}
-                </Link>
-                <Link
-                  to="/register"
-                  className={`px-3 py-1 rounded-md border ${
-                    theme === "dark"
-                      ? "border-emerald-400 text-emerald-400 hover:bg-gray-700"
-                      : "border-emerald-500 text-emerald-500 hover:bg-emerald-50"
-                  }`}
-                >
-                  {t("client.register")}
-                </Link>
-              </div>
-            )}
-
-            {/* Cart */}
-            <Link
-              to="/cart"
-              className="p-2 rounded-md hover:bg-emerald-100"
-              aria-label={t("client.cart")}
-            >
-              <ShoppingCart size={20} />
-            </Link>
           </div>
         </div>
       </header>
@@ -210,12 +168,6 @@ const Client = () => {
             {t("client.hero.title")}
           </h2>
           <p className="text-lg mb-6">{t("client.hero.description")}</p>
-          <Link
-            to="/products"
-            className="inline-block px-6 py-3 bg-white text-emerald-500 rounded-md font-semibold hover:bg-gray-100"
-          >
-            {t("client.hero.shopNow")}
-          </Link>
         </div>
       </section>
 
@@ -322,25 +274,29 @@ const Client = () => {
                 id: 1,
                 name: t("client.products.painRelief"),
                 price: "$5.99",
-                image: "/pain_relief.jpg",
+                image:
+                  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-XZ5TagwviNMjOEqJUt9qK4z-NAH2AOyRDg&s",
               },
               {
                 id: 2,
                 name: t("client.products.vitamins"),
                 price: "$12.99",
-                image: "/vitamins.jpg",
+                image:
+                  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD9QjN9kEb9Sqm2xIGYj3SyLB2-lilSrFuRQ&s",
               },
               {
                 id: 3,
                 name: t("client.products.firstAid"),
                 price: "$8.49",
-                image: "/first_aid.jpg",
+                image:
+                  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-XZ5TagwviNMjOEqJUt9qK4z-NAH2AOyRDg&s",
               },
               {
                 id: 4,
                 name: t("client.products.skincare"),
                 price: "$15.99",
-                image: "/skincare.jpg",
+                image:
+                  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-XZ5TagwviNMjOEqJUt9qK4z-NAH2AOyRDg&s",
               },
             ].map((product) => (
               <div
@@ -445,9 +401,7 @@ const Client = () => {
             </div>
           </div>
           <div className="mt-8 text-center text-gray-400">
-            <p>
-              {t("client.footer.copyright", { year: new Date().getFullYear() })}
-            </p>
+            <p>{t("client.footer.copyright")}</p>
           </div>
         </div>
       </footer>
