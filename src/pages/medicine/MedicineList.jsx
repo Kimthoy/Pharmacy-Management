@@ -1,40 +1,66 @@
+// src/components/MedicineList.js
 import { useState, useRef, useEffect } from "react";
 import { FaEllipsisV } from "react-icons/fa";
 import { BiEdit, BiShow, BiTrash } from "react-icons/bi";
 import { MdWarehouse } from "react-icons/md";
 import { useTranslation } from "../../hooks/useTranslation";
-import { useTheme } from "../../context/ThemeContext";
+// import { useTheme } from "../../context/ThemeContext";
+import { useNavigate } from "react-router-dom";
 
 const medicines = [
   {
+    ProductID: 1,
     name: "Zimax",
     weight: "500mg",
     category: "Tablet",
+    quantityPerPackage: 100,
     price: "20.55 USD",
     stock: 100,
     date: "2025-01-20",
+    manufacturer: "Healthcare",
+    expireDate: "2020-12-19",
+    startingStock: 230,
+    manufacturePrice: 50.0,
+    wholesalePrice: 55.0,
+    sellingPrice: 60.0,
   },
   {
+    ProductID: 2,
     name: "Oxidon",
     weight: "10mg",
     category: "Tablet",
+    quantityPerPackage: 50,
     price: "15.00 USD",
     stock: 50,
     date: "2025-02-10",
+    manufacturer: "PharmaCorp",
+    expireDate: "2021-06-15",
+    startingStock: 100,
+    manufacturePrice: 40.0,
+    wholesalePrice: 45.0,
+    sellingPrice: 50.0,
   },
   {
+    ProductID: 3,
     name: "MED-1008",
     weight: "200Doses",
     category: "Inhaler",
+    quantityPerPackage: 1,
     price: "12.45 USD",
     stock: 0,
     date: "2025-03-21",
+    manufacturer: "MediTech",
+    expireDate: "2022-03-10",
+    startingStock: 50,
+    manufacturePrice: 30.0,
+    wholesalePrice: 35.0,
+    sellingPrice: 40.0,
   },
 ];
 
 const MedicineList = () => {
   const { t } = useTranslation();
-  const { theme } = useTheme();
+
   const [openMenu, setOpenMenu] = useState(null);
   const menuRef = useRef(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -43,6 +69,7 @@ const MedicineList = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [category, setCategory] = useState("");
+  const navigate = useNavigate();
 
   const toggleMenu = (index) => setOpenMenu(openMenu === index ? null : index);
 
@@ -52,11 +79,8 @@ const MedicineList = () => {
         setOpenMenu(null);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const filteredMedicines = medicines.filter((med) => {
@@ -115,7 +139,7 @@ const MedicineList = () => {
       </div>
       <div className="flex mb-4">
         <div className="me-5">
-          <label htmlFor="" className="me-2 text-gray-400 dark:text-gray-300">
+          <label className="me-2 text-gray-400 dark:text-gray-300">
             {t("medicinelist.MedicineListFilterStartDate")}
           </label>
           <input
@@ -126,7 +150,7 @@ const MedicineList = () => {
           />
         </div>
         <div>
-          <label htmlFor="" className="me-2 text-gray-400 dark:text-gray-300">
+          <label className="me-2 text-gray-400 dark:text-gray-300">
             {t("medicinelist.MedicineListFilterEndDate")}
           </label>
           <input
@@ -138,7 +162,6 @@ const MedicineList = () => {
         </div>
       </div>
 
-      {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full min-w-[600px] border-collapse bg-white dark:bg-gray-800 shadow-md dark:shadow-gray-700 rounded-lg">
           <thead className="border border-gray-200 dark:border-gray-600 text-gray-400 dark:text-gray-300 rounded">
@@ -147,17 +170,9 @@ const MedicineList = () => {
                 {t("medicinelist.MedicineListMedicineName")}
               </td>
               <td className="p-3 text-left text-sm">
-                {t("medicinelist.MedicineListMedicineWeight")}
-              </td>
-              <td className="p-3 text-left text-sm">
-                {t("medicinelist.MedicineListMedicineCategory")}
-              </td>
-              <td className="p-3 text-left text-sm">
                 {t("medicinelist.MedicineListMedicinePrice")}
               </td>
-              <td className="p-3 text-left text-sm">
-                {t("medicinelist.MedicineListMedicineStock")}
-              </td>
+
               <td className="p-3 text-left text-sm">
                 {t("medicinelist.MedicineListMedicineStatus")}
               </td>
@@ -174,24 +189,16 @@ const MedicineList = () => {
               const { text, color } = getStatus(med.stock);
               return (
                 <tr
-                  key={index}
+                  key={med.ProductID}
                   className="border border-gray-200 dark:border-gray-600 text-xs sm:text-base"
                 >
                   <td className="p-3 text-[13px] text-gray-400 dark:text-gray-300">
                     {med.name}
                   </td>
                   <td className="p-3 text-[13px] text-gray-400 dark:text-gray-300">
-                    {med.weight}
-                  </td>
-                  <td className="p-3 text-[13px] text-gray-400 dark:text-gray-300">
-                    {med.category}
-                  </td>
-                  <td className="p-3 text-[13px] text-gray-400 dark:text-gray-300">
                     {med.price}
                   </td>
-                  <td className="p-3 text-[13px] text-gray-400 dark:text-gray-300">
-                    {med.stock}
-                  </td>
+
                   <td className={`p-3 text-[13px] ${color}`}>{text}</td>
                   <td className="p-3 text-[13px] text-gray-400 dark:text-gray-300">
                     {med.date}
@@ -210,7 +217,10 @@ const MedicineList = () => {
                           <MdWarehouse className="mt-1 w-10" />
                           {t("medicinelist.MedicineListMedicineManufacturer")}
                         </button>
-                        <button className="flex align-middle w-full text-left text-gray-600 dark:text-gray-200 py-2 hover:rounded-md hover:bg-green-500 hover:text-white dark:hover:bg-green-400 dark:hover:text-white">
+                        <button
+                          className="flex align-middle w-full text-left text-gray-600 dark:text-gray-200 py-2 hover:rounded-md hover:bg-green-500 hover:text-white dark:hover:bg-green-400 dark:hover:text-white"
+                          onClick={() => navigate(`/medicine/${med.ProductID}`)} // Updated path
+                        >
                           <BiShow className="mt-1 w-10" />
                           {t("medicinelist.MedicineListMedicineViewDetails")}
                         </button>
@@ -232,7 +242,6 @@ const MedicineList = () => {
         </table>
       </div>
 
-      {/* Pagination Controls */}
       <div className="flex flex-wrap items-center justify-between mt-4">
         <div className="flex items-center space-x-2">
           <span className="text-gray-600 dark:text-gray-300">

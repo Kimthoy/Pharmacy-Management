@@ -1,11 +1,10 @@
 import { useState } from "react";
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
 import { useTranslation } from "../../hooks/useTranslation";
-import { useTheme } from "../../context/ThemeContext";
+// import { useTheme } from "../../context/ThemeContext";
 
 const AddMedicine = () => {
   const { t } = useTranslation();
-  const { theme } = useTheme();
 
   // State for medicine form
   const [medicine, setMedicine] = useState({
@@ -14,7 +13,6 @@ const AddMedicine = () => {
     quantity: "",
     in_stock_date: "",
     weight: "",
-    expire_date: "",
     status: "",
     category: "",
     medicine_detail: "",
@@ -272,25 +270,6 @@ const AddMedicine = () => {
                 />
               </button>
             </div>
-          </div>
-
-          {/* Expire Date */}
-          <div className="flex flex-col">
-            <label
-              htmlFor="expire_date"
-              className="mb-2 text-gray-700 dark:text-gray-300"
-            >
-              {t("add-medicine.ExpireDate")}
-            </label>
-            <input
-              type="date"
-              id="expire_date"
-              name="expire_date"
-              value={medicine.expire_date}
-              onChange={handleChange}
-              className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
-              required
-            />
           </div>
 
           {/* Status */}

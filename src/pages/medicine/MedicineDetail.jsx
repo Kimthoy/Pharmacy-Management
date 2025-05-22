@@ -1,9 +1,9 @@
 import { useTranslation } from "../../hooks/useTranslation";
-import { useTheme } from "../../context/ThemeContext";
+// import { useTheme } from "../../context/ThemeContext";
 
 const MedicineDetail = () => {
   const { t } = useTranslation();
-  const { theme } = useTheme();
+  // const { theme } = useTheme();
 
   return (
     <div className="p-6 bg-gray-100 dark:bg-gray-900 min-h-screen">

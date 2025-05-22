@@ -1,10 +1,11 @@
+
 import React, { useState, useMemo, useEffect } from "react";
-import Sidebar from "./Sidebar";
 import Header from "./Header";
 import ProductList from "./ProductList";
 import Cart from "./Cart";
 import OrderReviewModal from "./OrderReviewModal";
 import CheckoutModal from "./CheckoutModal";
+import RetailSaleModal from "./RetailSaleModal";
 import ToastNotification from "./ToastNotification";
 import compoundMedicines from "./compoundMedicines";
 
@@ -17,18 +18,17 @@ const Sale = () => {
   const [isOrderReviewModalOpen, setIsOrderReviewModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [isRetailSaleOpen, setIsRetailSaleOpen] = useState(false);
   const [toast, setToast] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState("cash");
-  const [rielAmount, setRielAmount] = useState("");
   const [cardNumber, setCardNumber] = useState("");
   const [currentProducts, setCurrentProducts] = useState([]);
   const [isCompoundMode, setIsCompoundMode] = useState(false);
 
-  const exchangeRate = 4050;
-
   const regularProducts = [
     {
       id: 1,
+      supply_id: 1,
       name: "ថ្នាំក្អក",
       price: 1.25,
       image:
@@ -38,6 +38,7 @@ const Sale = () => {
     },
     {
       id: 2,
+      supply_id: 1,
       name: "វីតាមីន C",
       price: 2.5,
       image:
@@ -47,6 +48,7 @@ const Sale = () => {
     },
     {
       id: 3,
+      supply_id: 2,
       name: "អាស្ពីរីន",
       price: 0.8,
       image:
@@ -56,6 +58,7 @@ const Sale = () => {
     },
     {
       id: 4,
+      supply_id: 2,
       name: "ថ្នាំបំបាត់ការឈឺចាប់",
       price: 1.2,
       image:
@@ -65,6 +68,7 @@ const Sale = () => {
     },
     {
       id: 5,
+      supply_id: 2,
       name: "វីតាមីន D",
       price: 5.0,
       image:
@@ -74,6 +78,7 @@ const Sale = () => {
     },
     {
       id: 6,
+      supply_id: 1,
       name: "ថ្នាំប្រឆាំងនឹងអាឡែស៊ី",
       price: 0.9,
       image:
@@ -121,7 +126,7 @@ const Sale = () => {
         ...prev,
         {
           ...product,
-          quantity: 1,
+          quantity: product.quantity || 1,
           typeofmedicine:
             product.typeofmedicine ||
             (isCompoundMode ? "ថ្នាំផ្សំ" : "ថ្នាំធម្មតា"),
@@ -136,7 +141,7 @@ const Sale = () => {
 
   const displayPrice = (price) => {
     if (typeof price !== "number") return 0;
-    return price; // Always in USD, no conversion needed
+    return price;
   };
 
   const filteredProducts = useMemo(
@@ -155,13 +160,6 @@ const Sale = () => {
     (sum, item) => sum + (item.quantity || 0),
     0
   );
-
-  const calculateChangeInUSD = () => {
-    if (!rielAmount || isNaN(rielAmount)) return 0;
-    const paidInUSD = parseFloat(rielAmount) / exchangeRate;
-    const change = paidInUSD - totalPrice;
-    return change > 0 ? change : 0;
-  };
 
   const clearCart = () => {
     if (window.confirm("តើអ្នកប្រាកដជាចង់លុបកន្ត្រកទេ?")) {
@@ -191,22 +189,17 @@ const Sale = () => {
   };
 
   const confirmOrder = () => {
-    if (paymentMethod === "cash") {
-      const paidInUSD = parseFloat(rielAmount) / exchangeRate;
-      if (isNaN(paidInUSD) || paidInUSD < totalPrice) {
-        setToast({ message: "ចំនួនប្រាក់មិនគ្រប់គ្រាន់!", type: "error" });
-        return;
-      }
-    }
-    if (paymentMethod === "card" && (!cardNumber || cardNumber.length < 16)) {
+    if (
+      (paymentMethod === "aba" || paymentMethod === "wing") &&
+      (!cardNumber || cardNumber.length < 16)
+    ) {
       setToast({
-        message: "សូមបញ្ចូលលេខកាត MasterCard ត្រឹមត្រូវ!",
+        message: "សូមបញ្ចូលលេខកាតត្រឹមត្រូវ!",
         type: "error",
       });
       return;
     }
     setCart([]);
-    setRielAmount("");
     setCardNumber("");
     setIsCheckoutOpen(false);
     setIsOrderReviewModalOpen(false);
@@ -225,8 +218,7 @@ const Sale = () => {
   }, [cart]);
 
   return (
-    <div className="flex h-screen bg-gray-100 relative">
-      <Sidebar totalQuantity={totalQuantity} />
+    <div className="flex h-screen bg-white dark:bg-gray-900 font-khmer relative">
       <div className="flex-1 flex flex-col md:flex-row">
         <div className="flex-1 p-6 overflow-auto">
           <Header
@@ -234,6 +226,7 @@ const Sale = () => {
             setSearchQuery={setSearchQuery}
             randomizeProducts={randomizeProducts}
             isCompoundMode={isCompoundMode}
+            openRetailSaleModal={() => setIsRetailSaleOpen(true)}
           />
           <ProductList
             products={filteredProducts}
@@ -269,11 +262,8 @@ const Sale = () => {
         totalPrice={totalPrice}
         paymentMethod={paymentMethod}
         setPaymentMethod={setPaymentMethod}
-        rielAmount={rielAmount}
-        setRielAmount={setRielAmount}
         cardNumber={cardNumber}
         setCardNumber={setCardNumber}
-        calculateChangeInUSD={calculateChangeInUSD}
         confirmOrder={confirmOrder}
         displayPrice={displayPrice}
       />
@@ -282,7 +272,17 @@ const Sale = () => {
         setIsOpen={setIsCheckoutOpen}
         totalPrice={totalPrice}
         totalQuantity={totalQuantity}
+        paymentMethod={paymentMethod}
+        setPaymentMethod={setPaymentMethod}
+        cardNumber={cardNumber}
+        setCardNumber={setCardNumber}
         confirmOrder={confirmOrder}
+      />
+      <RetailSaleModal
+        isOpen={isRetailSaleOpen}
+        setIsOpen={setIsRetailSaleOpen}
+        products={currentProducts}
+        addToCart={addToCart}
       />
       <ToastNotification toast={toast} />
     </div>

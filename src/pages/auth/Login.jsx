@@ -9,36 +9,7 @@ import {
   FaPinterestP,
   FaYoutube,
 } from "react-icons/fa";
-
-// Static data for testing
-const mockUsers = [
-  {
-    email: "admin@example.com",
-    password: "admin123",
-    user: {
-      name: "Admin User",
-      email: "admin@example.com",
-      profile_picture: "https://example.com/admin.jpg",
-      role: "admin",
-      contact: "+1234567890",
-      join_date: "2024-01-01",
-    },
-    token: "mock-admin-token-123",
-  },
-  {
-    email: "cashier@example.com",
-    password: "cashier123",
-    user: {
-      name: "Cashier User",
-      email: "cashier@example.com",
-      profile_picture: "./user-1.jpg",
-      role: "cashier",
-      contact: "+0987654321",
-      join_date: "2024-02-01",
-    },
-    token: "mock-cashier-token-456",
-  },
-];
+import { mockUsers } from "../../data/mockData"; // Import shared data
 
 const Login = () => {
   const { t } = useTranslation();
@@ -54,47 +25,60 @@ const Login = () => {
     setError("");
 
     try {
-      // Simulate API call with static data
+      // Find user by email and password
       const user = mockUsers.find(
         (u) => u.email === email && u.password === password
       );
 
-      if (user) {
-        const response = {
-          data: {
-            token: user.token,
-            user: user.user,
-          },
-        };
-
-        if (response.data.token) {
-          const userData = {
-            name: response.data.user?.name || "User",
-            email: response.data.user?.email || email,
-            profile_picture: response.data.user?.profile_picture || "",
-            role: response.data.user?.role || "Pharmacist",
-            contact: response.data.user?.contact || "",
-            join_date:
-              response.data.user?.join_date ||
-              new Date().toISOString().split("T")[0],
-          };
-          login(userData, response.data.token);
-
-          if (userData.role.toLowerCase() === "admin") {
-            navigate("/dashboard");
-          } else if (userData.role.toLowerCase() === "cashier") {
-            navigate("/saledashboard");
-          } else {
-            setError(t("login.invalidRole"));
-            return;
-          }
-
-          alert(t("login.success"));
-        } else {
-          throw new Error(t("login.noToken"));
-        }
-      } else {
+      if (!user) {
         throw new Error(t("login.invalidCredentials"));
+      }
+
+      // Check user status
+      if (user.status === "Inactive") {
+        throw new Error(t("login.inactiveAccount"));
+      }
+
+      // Prepare login response
+      const response = {
+        data: {
+          token: user.token,
+          user: {
+            name: user.name,
+            email: user.email,
+            profile_picture: user.profile_picture,
+            role: user.role,
+            contact: user.contact,
+            join_date: user.join_date,
+          },
+        },
+      };
+
+      if (response.data.token) {
+        const userData = {
+          name: response.data.user.name || "User",
+          email: response.data.user.email || email,
+          profile_picture: response.data.user.profile_picture || "",
+          role: response.data.user.role || "Pharmacist",
+          contact: response.data.user.contact || "",
+          join_date:
+            response.data.user.join_date ||
+            new Date().toISOString().split("T")[0],
+        };
+        login(userData, response.data.token);
+
+        if (userData.role.toLowerCase() === "admin") {
+          navigate("/dashboard");
+        } else if (userData.role.toLowerCase() === "cashier") {
+          navigate("/saledashboard");
+        } else {
+          setError(t("login.invalidRole"));
+          return;
+        }
+
+        alert(t("login.success"));
+      } else {
+        throw new Error(t("login.noToken"));
       }
     } catch (error) {
       console.error("Login failed:", error.message);
@@ -183,7 +167,7 @@ const Login = () => {
           </button>
         </form>
         <p className="text-sm text-gray-600 text-center">
-          ពេលវេលា: 07:14 PM +07, ថ្ងៃចន្ទ, 19 ឧសភា 2025
+          ពេលវេលា: 04:34 PM +07, ថ្ងៃពុធ, 21 ឧសភា 2025
         </p>
       </div>
 

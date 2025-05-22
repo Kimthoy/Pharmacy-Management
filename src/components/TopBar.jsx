@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useContext } from "react";
+import { useState, useRef, useContext } from "react";
 import { useTranslation } from "../../src/hooks/useTranslation";
 import { AuthContext } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
@@ -7,14 +7,12 @@ import {
   MessageCircle,
   Bell,
   UserCircle,
-  Settings,
   LogOut,
-  Activity,
   Sun,
   Moon,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import Tooltip from "../components/Tooltip";
+
 import Modal from "../components/Modal"; // Import the new Modal component
 
 const languageOptions = [
@@ -53,16 +51,13 @@ const SearchBar = ({ t, onSearch }) => {
   );
 };
 
-const IconButton = ({ Icon, tooltip, ariaLabel, onClick }) => (
-  <Tooltip text={tooltip}>
-    <button
-      className="text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all hover:scale-110"
-      aria-label={ariaLabel}
-      onClick={onClick}
-    >
-      <Icon size={24} />
-    </button>
-  </Tooltip>
+const IconButton = ({ Icon, onClick }) => (
+  <button
+    className="text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all hover:scale-110"
+    onClick={onClick}
+  >
+    <Icon size={24} />
+  </button>
 );
 
 const LanguageSelector = ({
@@ -149,43 +144,32 @@ const ProfileDropdown = ({
   handleLogout,
   t,
 }) => {
-  const truncateName = (name) => {
-    if (!name) return t("topbar.unknownUser");
-    return name.length > 10 ? `${name.slice(0, 8)}...` : name;
-  };
-
-  const truncateRole = (role) => {
-    if (!role) return "";
-    return role.length > 6 ? `${role.slice(0, 4)}...` : role;
-  };
-
   return (
     <div className="relative" ref={dropdownRef}>
-      <Tooltip text={t("topbar.profile")}>
-        <button
-          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-          onKeyDown={(e) =>
-            (e.key === "Enter" || e.key === " ") &&
-            setIsDropdownOpen(!isDropdownOpen)
-          }
-          className="flex items-center   text-black rounded-md px-3 py-1 cursor-pointer transition-all space-x-1"
-          aria-expanded={isDropdownOpen}
-          aria-label={t("topbar.profile")}
-        >
-          {user?.profile_picture ? (
-            <img
-              src={user.profile_picture}
-              alt={t("topbar.profile")}
-              className="w-6 h-6 rounded-full object-cover"
-            />
-          ) : (
-            <UserCircle
-              size={24}
-              className="text-black hover:scale-125 dark:text-white dark:hover:scale-125 dark:hover:text-emerald-500 hover:text-emerald-500"
-            />
-          )}
-        </button>
-      </Tooltip>
+      <button
+        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+        onKeyDown={(e) =>
+          (e.key === "Enter" || e.key === " ") &&
+          setIsDropdownOpen(!isDropdownOpen)
+        }
+        className="flex items-center   text-black rounded-md px-3 py-1 cursor-pointer transition-all space-x-1"
+        aria-expanded={isDropdownOpen}
+        aria-label={t("topbar.profile")}
+      >
+        {user?.profile_picture ? (
+          <img
+            src={user.profile_picture}
+            alt={t("topbar.profile")}
+            className="w-6 h-6 rounded-full object-cover hover:scale-125 transition-all"
+          />
+        ) : (
+          <UserCircle
+            size={24}
+            className="text-black hover:scale-125 dark:text-white dark:hover:scale-125 dark:hover:text-emerald-500 hover:text-emerald-500"
+          />
+        )}
+      </button>
+
       {isDropdownOpen && (
         <div className="absolute right-0 z-50 mt-2 w-56 bg-white dark:bg-gray-800 border border-emerald-200 dark:border-gray-600 shadow-lg rounded-lg py-2 animate-fade-in">
           <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-600">
@@ -196,33 +180,7 @@ const ProfileDropdown = ({
               {user?.email || t("topbar.noEmail")}
             </p>
           </div>
-          <Link to="/profile">
-            <button
-              className="w-full flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-              onClick={() => setIsDropdownOpen(false)}
-            >
-              <UserCircle className="mr-2" size={18} />
-              {t("topbar.viewProfile")}
-            </button>
-          </Link>
-          <Link to="/settingspage">
-            <button
-              className="w-full flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-              onClick={() => setIsDropdownOpen(false)}
-            >
-              <Settings className="mr-2" size={18} />
-              {t("topbar.accountSetting")}
-            </button>
-          </Link>
-          <Link to="/activity">
-            <button
-              className="w-full flex items-center px-4 py-2 text-emerald-600 dark:text-emerald-400 hover:bg-gray-100 dark:hover:bg-gray-700"
-              onClick={() => setIsDropdownOpen(false)}
-            >
-              <Activity className="mr-2" size={18} />
-              {t("topbar.loginActivity")}
-            </button>
-          </Link>
+
           <button
             className="w-full flex items-center px-4 py-2 text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
             onClick={handleLogout}
@@ -269,19 +227,19 @@ const TopBar = () => {
   const dropdownRef = useRef(null);
   const selectorRef = useRef(null);
 
-  useEffect(() => {
-    console.log("Auth State:", { isAuthenticated, user });
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
-      }
-      if (selectorRef.current && !selectorRef.current.contains(event.target)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  // useEffect(() => {
+  //   console.log("Auth State:", { isAuthenticated, user });
+  //   const handleClickOutside = (event) => {
+  //     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+  //       setIsDropdownOpen(false);
+  //     }
+  //     if (selectorRef.current && !selectorRef.current.contains(event.target)) {
+  //       setOpen(false);
+  //     }
+  //   };
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => document.removeEventListener("mousedown", handleClickOutside);
+  // }, []);
 
   const handleSearch = (term) => {
     console.log("Searching for:", term);
@@ -316,12 +274,6 @@ const TopBar = () => {
         />
         <IconButton
           Icon={theme === "light" ? Moon : Sun}
-          tooltip={
-            theme === "light" ? t("topbar.darkMode") : t("topbar.lightMode")
-          }
-          ariaLabel={
-            theme === "light" ? t("topbar.darkMode") : t("topbar.lightMode")
-          }
           onClick={toggleTheme}
         />
         <LanguageSelector

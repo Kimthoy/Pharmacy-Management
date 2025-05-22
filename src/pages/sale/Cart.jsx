@@ -1,5 +1,3 @@
-import React from "react";
-
 const Cart = ({
   cart,
   isCartOpen,
@@ -11,25 +9,17 @@ const Cart = ({
   placeOrder,
   displayPrice,
 }) => {
-  // Hardcode exchange rate (consistent with previous context)
-  const exchangeRate = 4050;
+  const exchangeRate = 4000;
   const totalPriceInRiel = totalPrice * exchangeRate;
 
   return (
     <div
-      className={`bg-white shadow-lg p-4 transition-all duration-300 md:w-60 md:h-full md:static
-        fixed bottom-0 left-0 w-full h-3/4 rounded-t-2xl md:rounded-none flex flex-col
+      className={`bg-white shadow-sm p-2 transition-all duration-300 md:w-60 md:h-full md:static
+        fixed bottom-0 left-0 w-[50%] h-3/4 rounded-t-2xl md:rounded-none flex flex-col
         ${isCartOpen ? "translate-y-0" : "translate-y-full md:translate-y-0"}`}
     >
       <div className="flex justify-between items-center mb-4 bg-white z-10 pb-2 border-b">
         <h2 className="text-sm font-bold">កន្ត្រក</h2>
-        <button
-          className="md:hidden text-gray-600"
-          onClick={() => setIsCartOpen(false)}
-          aria-label="បិទកន្ត្រក"
-        >
-          ✕
-        </button>
       </div>
       {cart.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center text-gray-600">
@@ -89,9 +79,12 @@ const Cart = ({
                 })}
               </span>
             </div>
+            <hr />
             <div className="flex justify-between items-center text-gray-600 text-sm">
               <span>បរិមាណសរុប</span>
-              <span>{totalQuantity}</span>
+              <span className="text-emerald-600 font-semibold text-sm">
+                {totalQuantity}
+              </span>
             </div>
           </div>
           <div className="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">

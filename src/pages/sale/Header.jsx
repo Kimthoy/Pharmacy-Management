@@ -1,12 +1,11 @@
 import React from "react";
 
 const Header = ({
-  currency,
-  setCurrency,
   searchQuery,
   setSearchQuery,
   randomizeProducts,
   isCompoundMode,
+  openRetailSaleModal, // New prop to trigger modal
 }) => {
   return (
     <header className="mb-6">
@@ -29,13 +28,13 @@ const Header = ({
           >
             ផលិតផល
           </a>
-          <a
-            href="#"
-            className="text-gray-600 hover:text-gray-800"
-            aria-label="ការបញ្ជាទិញ"
+          <button
+            onClick={openRetailSaleModal}
+            className="text-emerald-600 hover:border-emerald-600 hover:border border border-emerald-600 px-3 py-2 rounded-md hover:bg-emerald-600 hover:text-white"
+            aria-label="លក់ថ្នាំរាយ"
           >
-            ការបញ្ជាទិញ
-          </a>
+            លក់ថ្នាំរាយ
+          </button>
         </nav>
       </div>
       <div className="flex justify-center">

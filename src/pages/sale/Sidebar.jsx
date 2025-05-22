@@ -9,10 +9,10 @@ const Sidebar = ({ totalQuantity }) => {
       <nav className="mt-6">
         <a
           href="#"
-          className="block px-4 py-2 text-gray-600 hover:bg-gray-200"
-          aria-label="ទំព័រដើម"
+          className="block px-4 py-2 bg-green-100 text-green-600 font-semibold"
+          aria-label="ផលិតផល"
         >
-          ទំព័រដើម
+          ទិញរាយ
         </a>
         <a
           href="#"
@@ -34,20 +34,6 @@ const Sidebar = ({ totalQuantity }) => {
           aria-label="របាយការណ៍"
         >
           របាយការណ៍
-        </a>
-        <a
-          href="#"
-          className="block px-4 py-2 text-gray-600 hover:bg-gray-200"
-          aria-label="កន្ត្រក"
-        >
-          កន្ត្រក ({totalQuantity})
-        </a>
-        <a
-          href="#"
-          className="block px-4 py-2 text-gray-600 hover:bg-gray-200"
-          aria-label="ចាកចេញ"
-        >
-          ចាកចេញ
         </a>
       </nav>
     </div>

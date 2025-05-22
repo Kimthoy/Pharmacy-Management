@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useState, useEffect } from "react";
+import { Suspense, lazy, useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -15,21 +15,20 @@ import Footer from "./components/Footer";
 import Sidebar from "./components/Sidebar";
 
 // Lazy-loaded pages
+const SupplierList = lazy(() => import("./pages/supplier/SupplierList"));
+const SupplierDetail = lazy(() => import("./pages/supplier/SupplierDetail"));
+const Supplies = lazy(() => import("./pages/supplier/Supplies"));
 const Login = lazy(() => import("./pages/auth/Login"));
 const Register = lazy(() => import("./pages/auth/Register"));
 const Client = lazy(() => import("./pages/auth/Client"));
 const Dashboard = lazy(() => import("./pages/dashboard/Dashboard"));
 const SaleDashboard = lazy(() => import("./pages/sale/Sale"));
 const CustomerList = lazy(() => import("./pages/customer/ListCustomer"));
-const CustomerLedger = lazy(() => import("./pages/customer/CustomerLedger"));
 const InsertCustomer = lazy(() => import("./pages/customer/InsertCustomer"));
 const ManufacturerList = lazy(() =>
   import("./pages/manufacturer/ManufacturerList")
 );
 const AddManu = lazy(() => import("./pages/manufacturer/AddManufacturer"));
-const ManuLedger = lazy(() =>
-  import("./pages/manufacturer/ManufacturerLedger")
-);
 const SellReport = lazy(() => import("./pages/report/ReportSell"));
 const StockReport = lazy(() => import("./pages/report/ReportStock"));
 const PurchaseReport = lazy(() => import("./pages/report/ReportPurchase"));
@@ -120,7 +119,7 @@ const AppLayout = ({
 
 // Main App Component
 const App = () => {
-  const [langCode, setLangCode] = useState(
+  const [setLangCode] = useState(
     localStorage.getItem("selectedLanguage") || "en"
   );
   const [selectedPage, setSelectedPage] = useState(
@@ -179,7 +178,7 @@ const App = () => {
                         setSelectedPage={setSelectedPage}
                         onLanguageChange={handleLanguageChange}
                       >
-                        <Dashboard langCode={langCode} />
+                        <Dashboard />
                       </AppLayout>
                     </ProtectedRoute>
                   }
@@ -213,7 +212,7 @@ const App = () => {
                   }
                 />
                 <Route
-                  path="/customerledger"
+                  path="/supplierlist"
                   element={
                     <ProtectedRoute allowedRoles={["admin"]}>
                       <AppLayout
@@ -221,7 +220,35 @@ const App = () => {
                         setSelectedPage={setSelectedPage}
                         onLanguageChange={handleLanguageChange}
                       >
-                        <CustomerLedger />
+                        <SupplierList />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/suppies"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <Supplies />
+                      </AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/supplier/:supplier_id"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AppLayout
+                        selectedPage={selectedPage}
+                        setSelectedPage={setSelectedPage}
+                        onLanguageChange={handleLanguageChange}
+                      >
+                        <SupplierDetail />
                       </AppLayout>
                     </ProtectedRoute>
                   }
@@ -264,20 +291,6 @@ const App = () => {
                         onLanguageChange={handleLanguageChange}
                       >
                         <AddManu />
-                      </AppLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/manuledger"
-                  element={
-                    <ProtectedRoute allowedRoles={["admin"]}>
-                      <AppLayout
-                        selectedPage={selectedPage}
-                        setSelectedPage={setSelectedPage}
-                        onLanguageChange={handleLanguageChange}
-                      >
-                        <ManuLedger />
                       </AppLayout>
                     </ProtectedRoute>
                   }
