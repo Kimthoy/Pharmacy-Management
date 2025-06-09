@@ -1,8 +1,7 @@
-import React, { useState } from "react";
-import { FaSort, FaCog, FaSun, FaMoon, FaEdit, FaTrash } from "react-icons/fa";
+import  { useState } from "react";
+import { FaSort, FaCog, FaEdit, FaTrash } from "react-icons/fa";
 import { useTheme } from "../../context/ThemeContext";
 
-// Mock data for categories
 const mockCategories = [
   {
     id: 1,

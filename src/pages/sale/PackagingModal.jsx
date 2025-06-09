@@ -1,5 +1,3 @@
-import React from "react";
-
 const PackagingModal = ({
   isOpen,
   setIsOpen,
@@ -7,9 +5,7 @@ const PackagingModal = ({
   selectedPackaging,
   setSelectedPackaging,
   handleAddToCartWithPackaging,
-  quantities,
   setQuantities,
-  setToast,
 }) => {
   if (!isOpen || !product) return null;
 

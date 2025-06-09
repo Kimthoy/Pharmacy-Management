@@ -1,8 +1,7 @@
-import React, { useState, useRef, useEffect, useContext } from "react";
+import  { useState, useRef, useEffect } from "react";
 import { useTranslation } from "../../hooks/useTranslation";
 import { useTheme } from "../../context/ThemeContext";
 import { useLanguage } from "../../context/LanguageContext";
-import { AuthContext } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 import { Search, Sun, Moon, Globe } from "lucide-react";
 
@@ -41,14 +40,13 @@ const Client = () => {
           : "bg-gray-100 text-gray-900 font-khmer"
       } min-h-screen`}
     >
-      {/* Top Bar */}
+     
       <header
         className={`${
           theme === "dark" ? "bg-gray-800" : "bg-white"
         } shadow-md sticky top-0 z-10`}
       >
         <div className="max-w-7xl font-khmer sticky -z-20 mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between py-4">
-          {/* Logo and Pharmacy Name */}
           <div className="flex items-center space-x-2 cursor-pointer">
             <img
               src="/logo.png"
@@ -59,7 +57,7 @@ const Client = () => {
             <h1 className="text-xl font-bold ">{t("client.pharmacyName")}</h1>
           </div>
 
-          {/* Search Bar */}
+        
           <div className="hidden md:flex flex-1 max-w-md mx-4 font-khmer">
             <div className="relative w-full">
               <input
@@ -80,7 +78,7 @@ const Client = () => {
             </div>
           </div>
 
-          {/* Navigation and Actions */}
+         
           <div className="flex items-center space-x-4 cursor-pointer">
             <div className="hover:text-emerald-500">
               {t("client.nav.products")}
@@ -95,7 +93,7 @@ const Client = () => {
               {t("client.nav.partner")}
             </div>
 
-            {/* Theme Toggle */}
+            
             <button
               onClick={toggleTheme}
               className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
@@ -106,7 +104,7 @@ const Client = () => {
               {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
             </button>
 
-            {/* Language Selector */}
+           
             <div className="relative" ref={langRef}>
               <button
                 onClick={() => setIsLangOpen(!isLangOpen)}
@@ -161,7 +159,7 @@ const Client = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
+   
       <section className="bg-emerald-500 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -171,7 +169,7 @@ const Client = () => {
         </div>
       </section>
 
-      {/* Features Section */}
+     
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
@@ -260,7 +258,7 @@ const Client = () => {
         </div>
       </section>
 
-      {/* Product Showcase */}
+    
       <section
         className={`${theme === "dark" ? "bg-gray-800" : "bg-gray-50"} py-16`}
       >
@@ -346,7 +344,7 @@ const Client = () => {
         </div>
       </section>
 
-      {/* Footer */}
+    
       <footer
         className={`${
           theme === "dark" ? "bg-gray-800" : "bg-gray-900"

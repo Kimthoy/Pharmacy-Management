@@ -1,4 +1,3 @@
-import React from "react";
 import { BsFillPrinterFill } from "react-icons/bs";
 import { FaSun, FaMoon } from "react-icons/fa";
 import { Link } from "react-router-dom";

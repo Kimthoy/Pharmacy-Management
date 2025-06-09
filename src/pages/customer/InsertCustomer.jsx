@@ -1,16 +1,13 @@
 import { useState } from "react";
 import { useTranslation } from "../../hooks/useTranslation";
-import { useTheme } from "../../context/ThemeContext";
+
 
 const AddCustomer = () => {
   const { t } = useTranslation();
-  const { theme } = useTheme();
-  // Check amount input
   const [amount, setAmount] = useState("");
 
   const handleChange = (e) => {
     const value = e.target.value;
-    // Regex to allow only double (floating-point) numbers
     if (/^\d*\.?\d*$/.test(value)) {
       setAmount(value);
     }

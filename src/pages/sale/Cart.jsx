@@ -1,7 +1,6 @@
 const Cart = ({
   cart,
   isCartOpen,
-  setIsCartOpen,
   totalPrice,
   totalQuantity,
   clearCart,

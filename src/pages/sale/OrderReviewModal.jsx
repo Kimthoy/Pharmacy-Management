@@ -1,5 +1,4 @@
-// src/components/OrderReviewModal.jsx
-import React, { useState } from "react";
+import { useState } from "react";
 
 const OrderReviewModal = ({
   isOpen,
@@ -7,14 +6,13 @@ const OrderReviewModal = ({
   cart,
   totalPrice,
   paymentMethod,
-  setPaymentMethod,
   cardNumber,
   setCardNumber,
   confirmOrder,
   displayPrice,
 }) => {
   const safeTotalPrice = totalPrice || 0;
-  const exchangeRate = 4050; // Aligned with Sale.jsx
+  const exchangeRate = 4050;
   const totalPriceInRiel = safeTotalPrice * exchangeRate;
 
   const [dollarAmountRaw, setDollarAmountRaw] = useState("");

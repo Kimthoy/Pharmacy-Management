@@ -467,18 +467,14 @@ const SupplierList = () => {
               <td className="p-3 text-left text-sm">
                 {t("supplierlist.SupplierListName")}
               </td>
-              <td className="p-3 text-left text-sm">
-                {t("supplierlist.SupplierListContactInfo")}
-              </td>
+
               <td className="p-3 text-left text-sm">
                 {t("supplierlist.SupplierListEmail")}
               </td>
               <td className="p-3 text-left text-sm">
                 {t("supplierlist.SupplierListPhone")}
               </td>
-              <td className="p-3 text-left text-sm">
-                {t("supplierlist.SupplierListCreatedAt")}
-              </td>
+
               <td className="p-3 text-left text-sm">
                 {t("supplierlist.SupplierListActions")}
               </td>
@@ -493,18 +489,14 @@ const SupplierList = () => {
                 <td className="p-3 text-[13px] text-gray-400 dark:text-gray-300">
                   {supplier.name}
                 </td>
-                <td className="p-3 text-[13px] text-gray-400 dark:text-gray-300">
-                  {supplier.contact_info}
-                </td>
+
                 <td className="p-3 text-[13px] text-gray-400 dark:text-gray-300">
                   {supplier.email}
                 </td>
                 <td className="p-3 text-[13px] text-gray-400 dark:text-gray-300">
                   {supplier.phone}
                 </td>
-                <td className="p-3 text-[13px] text-gray-400 dark:text-gray-300">
-                  {supplier.created_at}
-                </td>
+
                 <td className="p-3 text-[13px] relative">
                   <button
                     className="p-2 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300"

@@ -1,308 +1,73 @@
-import { useState, useRef, useContext } from "react";
-import { useTranslation } from "../../src/hooks/useTranslation";
-import { AuthContext } from "../context/AuthContext";
+import { useState } from "react";
+import { FaSun, FaMoon, FaSignOutAlt } from "react-icons/fa";
+import { useTranslation } from "../hooks/useTranslation";
 import { useTheme } from "../context/ThemeContext";
-import { useLanguage } from "../context/LanguageContext";
-import {
-  MessageCircle,
-  Bell,
-  UserCircle,
-  LogOut,
-  Sun,
-  Moon,
-} from "lucide-react";
-import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext"; // Use useAuth
+import { useNavigate } from "react-router-dom";
 
-import Modal from "../components/Modal"; // Import the new Modal component
-
-const languageOptions = [
-  {
-    value: "en",
-    label: "English",
-    iconPath: "/icon_en.jpg",
-  },
-  {
-    value: "km",
-    label: "ខ្មែរ",
-    iconPath: "/icon_kh.jpg",
-  },
-];
-
-const SearchBar = ({ t, onSearch }) => {
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const handleSearch = (e) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-    onSearch(value);
-  };
-
-  return (
-    <div className="flex-1 max-w-xs">
-      <input
-        type="text"
-        placeholder={t("topbar.search")}
-        value={searchTerm}
-        onChange={handleSearch}
-        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-800 dark:text-white"
-        aria-label={t("topbar.search")}
-      />
-    </div>
-  );
-};
-
-const IconButton = ({ Icon, onClick }) => (
-  <button
-    className="text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all hover:scale-110"
-    onClick={onClick}
-  >
-    <Icon size={24} />
-  </button>
-);
-
-const LanguageSelector = ({
-  langCode,
-  onLanguageChange,
-  open,
-  setOpen,
-  selectorRef,
-  t,
-}) => {
-  const handleLanguageChange = (value) => {
-    onLanguageChange(value);
-    setOpen(false);
-  };
-
-  const currentLang = languageOptions.find((lang) => lang.value === langCode);
-
-  return (
-    <div className="relative inline-block" ref={selectorRef}>
-      <button
-        onClick={() => setOpen(!open)}
-        onKeyDown={(e) =>
-          (e.key === "Enter" || e.key === " ") && setOpen(!open)
-        }
-        className="flex items-center bg-white dark:bg-gray-800 border border-emerald-500 dark:border-emerald-400 rounded-md px-3 py-1 shadow-sm hover:border-emerald-600 dark:hover:border-emerald-300 transition-all duration-200 w-32 justify-between"
-        aria-expanded={open}
-        aria-label={t("topbar.selectLanguage")}
-      >
-        <div className="flex items-center space-x-2">
-          <img
-            src={currentLang?.iconPath}
-            alt={currentLang?.label}
-            className="w-6 h-6 rounded-full object-cover"
-          />
-          <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
-            {currentLang?.label}
-          </span>
-        </div>
-        <svg
-          className={`w-4 h-4 ml-2 transition-transform ${
-            open ? "rotate-180" : ""
-          } text-emerald-600 dark:text-emerald-400`}
-          fill="currentColor"
-          viewBox="0 0 20 20"
-        >
-          <path
-            fillRule="evenodd"
-            d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.27a.75.75 0 01.02-1.06z"
-            clipRule="evenodd"
-          />
-        </svg>
-      </button>
-      {open && (
-        <ul className="absolute z-50 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg animate-fade-in">
-          {languageOptions.map((lang) => (
-            <li
-              key={lang.value}
-              onClick={() => handleLanguageChange(lang.value)}
-              className={`flex items-center px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-emerald-50 dark:hover:bg-gray-700 hover:text-emerald-600 dark:hover:text-emerald-400 cursor-pointer ${
-                langCode === lang.value
-                  ? "bg-emerald-100 dark:bg-gray-700 font-semibold"
-                  : ""
-              }`}
-            >
-              <img
-                src={lang.iconPath}
-                alt={lang.label}
-                className="w-5 h-5 rounded-full mr-2 object-cover"
-              />
-              {lang.label}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-};
-
-const ProfileDropdown = ({
-  user,
-  isDropdownOpen,
-  setIsDropdownOpen,
-  dropdownRef,
-  handleLogout,
-  t,
-}) => {
-  return (
-    <div className="relative" ref={dropdownRef}>
-      <button
-        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-        onKeyDown={(e) =>
-          (e.key === "Enter" || e.key === " ") &&
-          setIsDropdownOpen(!isDropdownOpen)
-        }
-        className="flex items-center   text-black rounded-md px-3 py-1 cursor-pointer transition-all space-x-1"
-        aria-expanded={isDropdownOpen}
-        aria-label={t("topbar.profile")}
-      >
-        {user?.profile_picture ? (
-          <img
-            src={user.profile_picture}
-            alt={t("topbar.profile")}
-            className="w-6 h-6 rounded-full object-cover hover:scale-125 transition-all"
-          />
-        ) : (
-          <UserCircle
-            size={24}
-            className="text-black hover:scale-125 dark:text-white dark:hover:scale-125 dark:hover:text-emerald-500 hover:text-emerald-500"
-          />
-        )}
-      </button>
-
-      {isDropdownOpen && (
-        <div className="absolute right-0 z-50 mt-2 w-56 bg-white dark:bg-gray-800 border border-emerald-200 dark:border-gray-600 shadow-lg rounded-lg py-2 animate-fade-in">
-          <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-600">
-            <p className="font-semibold text-gray-800 dark:text-gray-200">
-              {user?.name || t("topbar.unknownUser")}
-            </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              {user?.email || t("topbar.noEmail")}
-            </p>
-          </div>
-
-          <button
-            className="w-full flex items-center px-4 py-2 text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
-            onClick={handleLogout}
-          >
-            <LogOut className="mr-2" size={18} />
-            {t("topbar.signOut")}
-          </button>
-        </div>
-      )}
-    </div>
-  );
-};
-
-const AuthButtons = ({ t }) => (
-  <div className="flex items-center space-x-3">
-    <Link to="/login">
-      <button
-        className="px-4 py-2 bg-emerald-500 dark:bg-emerald-600 text-white rounded-md hover:bg-emerald-600 dark:hover:bg-emerald-500 transition-colors"
-        aria-label={t("topbar.login")}
-      >
-        {t("topbar.login")}
-      </button>
-    </Link>
-    <Link to="/register">
-      <button
-        className="px-4 py-2 border border-emerald-500 dark:border-emerald-400 text-emerald-500 dark:text-emerald-400 rounded-md hover:bg-emerald-50 dark:hover:bg-gray-700 transition-colors"
-        aria-label={t("topbar.register")}
-      >
-        {t("topbar.register")}
-      </button>
-    </Link>
-  </div>
-);
-
-const TopBar = () => {
-  const { isAuthenticated, logout, user } = useContext(AuthContext);
-  const { theme, toggleTheme } = useTheme();
-  const { language, changeLanguage } = useLanguage();
+const TopBar = ({ onLanguageChange }) => {
   const { t } = useTranslation();
-
-  const [open, setOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal
-  const dropdownRef = useRef(null);
-  const selectorRef = useRef(null);
-
-  // useEffect(() => {
-  //   console.log("Auth State:", { isAuthenticated, user });
-  //   const handleClickOutside = (event) => {
-  //     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-  //       setIsDropdownOpen(false);
-  //     }
-  //     if (selectorRef.current && !selectorRef.current.contains(event.target)) {
-  //       setOpen(false);
-  //     }
-  //   };
-  //   document.addEventListener("mousedown", handleClickOutside);
-  //   return () => document.removeEventListener("mousedown", handleClickOutside);
-  // }, []);
-
-  const handleSearch = (term) => {
-    console.log("Searching for:", term);
-  };
 
   const handleLogout = () => {
-    setIsModalOpen(true); // Open the modal instead of confirm
+    logout();
+    navigate("/login");
   };
 
-  const confirmLogout = () => {
-    logout();
-    setIsDropdownOpen(false);
-    setIsModalOpen(false);
-    window.location.href = "/login";
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
   };
 
   return (
-    <div className="bg-white dark:bg-gray-900 z-10 p-4 flex flex-col sm:flex-row items-center justify-between relative shadow-sm dark:shadow-gray-800">
-      <SearchBar t={t} onSearch={handleSearch} />
-      <div className="flex items-center space-x-2 sm:space-x-4 md:space-x-6 mt-4 sm:mt-0">
-        <IconButton
-          Icon={MessageCircle}
-          tooltip={t("topbar.messages")}
-          ariaLabel={t("topbar.messages")}
-          onClick={() => alert(t("topbar.messagesComingSoon"))}
-        />
-        <IconButton
-          Icon={Bell}
-          tooltip={t("topbar.notifications")}
-          ariaLabel={t("topbar.notifications")}
-          onClick={() => alert(t("topbar.notificationsComingSoon"))}
-        />
-        <IconButton
-          Icon={theme === "light" ? Moon : Sun}
-          onClick={toggleTheme}
-        />
-        <LanguageSelector
-          langCode={language}
-          onLanguageChange={changeLanguage}
-          open={open}
-          setOpen={setOpen}
-          selectorRef={selectorRef}
-          t={t}
-        />
-        {isAuthenticated ? (
-          <ProfileDropdown
-            user={user}
-            isDropdownOpen={isDropdownOpen}
-            setIsDropdownOpen={setIsDropdownOpen}
-            dropdownRef={dropdownRef}
-            handleLogout={handleLogout}
-            t={t}
-          />
-        ) : (
-          <AuthButtons t={t} />
-        )}
+    <div className="bg-white dark:bg-gray-800 shadow-md p-4 flex justify-between items-center">
+      <div className="text-lg font-bold text-gray-700 dark:text-gray-200">
+        {t("app.title")}
       </div>
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onConfirm={confirmLogout}
-        message={t("topbar.logoutConfirm")}
-      />
+      <div className="flex items-center space-x-4">
+        <select
+          onChange={(e) => onLanguageChange(e.target.value)}
+          className="text-sm border border-gray-400 dark:border-gray-600 px-2 py-1 rounded dark:bg-gray-700 dark:text-gray-200"
+        >
+          <option value="en">{t("language.english")}</option>
+          <option value="kh">{t("language.khmer")}</option>
+        </select>
+        <button
+          onClick={toggleTheme}
+          className="text-emerald-500 dark:text-emerald-400"
+          aria-label={
+            theme === "light" ? "Switch to dark mode" : "Switch to light mode"
+          }
+        >
+          {theme === "light" ? <FaMoon /> : <FaSun />}
+        </button>
+        <div className="relative">
+          <button
+            onClick={toggleDropdown}
+            className="flex items-center space-x-2 text-gray-700 dark:text-gray-200"
+          >
+            <span>{user?.name || t("user.guest")}</span>
+            <img
+              src={user?.avatar || "/default-avatar.png"}
+              alt="User avatar"
+              className="w-8 h-8 rounded-full"
+            />
+          </button>
+          {isDropdownOpen && (
+            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded shadow-lg">
+              <button
+                onClick={handleLogout}
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2"
+              >
+                <FaSignOutAlt />
+                <span>{t("user.logout")}</span>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

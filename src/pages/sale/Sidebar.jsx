@@ -1,6 +1,6 @@
 import React from "react";
 
-const Sidebar = ({ totalQuantity }) => {
+const Sidebar = () => {
   return (
     <div className="w-36 bg-white shadow-lg hidden md:block">
       <div className="flex items-center justify-center h-16 bg-green-600 text-white">

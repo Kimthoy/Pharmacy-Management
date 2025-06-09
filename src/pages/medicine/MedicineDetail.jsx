@@ -1,18 +1,13 @@
 import { useTranslation } from "../../hooks/useTranslation";
-// import { useTheme } from "../../context/ThemeContext";
 
 const MedicineDetail = () => {
   const { t } = useTranslation();
-  // const { theme } = useTheme();
-
   return (
     <div className="p-6 bg-gray-100 dark:bg-gray-900 min-h-screen">
       <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 shadow-md dark:shadow-gray-700 rounded-lg p-6">
         <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-200">
           {t("medicinedetail.MedicineDetails")}
         </h2>
-
-        {/* Medicine Information */}
         <div className="border-b border-gray-200 dark:border-gray-600 pb-4 mb-4">
           <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-200">
             {t("medicinedetail.MedicineInformation")}
@@ -58,8 +53,6 @@ const MedicineDetail = () => {
             </span>
           </p>
         </div>
-
-        {/* Stock Information */}
         <div className="border-b border-gray-200 dark:border-gray-600 pb-4 mb-4">
           <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-200">
             {t("medicinedetail.MedicineDetailStock")}
@@ -97,8 +90,6 @@ const MedicineDetail = () => {
             </div>
           </div>
         </div>
-
-        {/* Price Estimate */}
         <div className="mb-4">
           <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-200">
             {t("medicinedetail.MedicineDetailEstimate")}
@@ -124,8 +115,6 @@ const MedicineDetail = () => {
             </p>
           </div>
         </div>
-
-        {/* Back Button */}
         <div className="mt-4">
           <button
             className="px-4 py-2 bg-blue-500 dark:bg-blue-600 text-white rounded hover:bg-blue-600 dark:hover:bg-blue-500"

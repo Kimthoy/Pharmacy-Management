@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FaSort, FaCog, FaSun, FaMoon } from "react-icons/fa";
 import { useTranslation } from "../../hooks/useTranslation";
 import { useTheme } from "../../context/ThemeContext";
-import { mockUsers } from "../../data/mockData"; // Import shared data
+import { mockUsers } from "../../data/mockData"; 
 
 const ManageStaff = () => {
   const { t } = useTranslation();
@@ -13,10 +13,10 @@ const ManageStaff = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [showModal, setShowModal] = useState(false);
-  const [modalMode, setModalMode] = useState("add"); // "add" or "edit"
-  const [editUserId, setEditUserId] = useState(null); // ID of user being edited
-  const [confirmation, setConfirmation] = useState(""); // For success messages
-  const [users, setUsers] = useState(mockUsers); // Use shared data
+  const [modalMode, setModalMode] = useState("add");
+  const [editUserId, setEditUserId] = useState(null);
+  const [confirmation, setConfirmation] = useState("");
+  const [users, setUsers] = useState(mockUsers); 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -71,7 +71,6 @@ const ManageStaff = () => {
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    // Basic validation
     if (!formData.name.trim()) {
       setFormError(t("staff.error.nameRequired"));
       return;
@@ -85,12 +84,11 @@ const ManageStaff = () => {
     }
 
     if (modalMode === "add") {
-      // Add new staff
       const newUser = {
-        id: Date.now(), // Timestamp-based ID
+        id: Date.now(),
         name: formData.name.trim(),
         email: formData.email.trim(),
-        password: "default123", // Default password for new users
+        password: "default123",
         role: formData.role,
         status: formData.status,
         profile_picture: "./default.jpg",
@@ -101,7 +99,6 @@ const ManageStaff = () => {
       setUsers((prev) => [...prev, newUser]);
       setConfirmation(t("staff.success.added", { name: formData.name.trim() }));
     } else {
-      // Edit existing staff
       setUsers((prev) =>
         prev.map((user) =>
           user.id === editUserId
@@ -119,8 +116,6 @@ const ManageStaff = () => {
         t("staff.success.edited", { name: formData.name.trim() })
       );
     }
-
-    // Reset form and close modal
     setFormData({ name: "", email: "", role: "Manager", status: "Active" });
     setFormError("");
     setShowModal(false);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "../../hooks/useTranslation";
 import { useTheme } from "../../context/ThemeContext";
 import { FaEdit, FaSave, FaTimes, FaSun, FaMoon } from "react-icons/fa";

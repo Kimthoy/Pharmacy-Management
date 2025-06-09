@@ -25,7 +25,7 @@ const Login = () => {
     setError("");
 
     try {
-      // Find user by email and password
+      
       const user = mockUsers.find(
         (u) => u.email === email && u.password === password
       );
@@ -34,12 +34,12 @@ const Login = () => {
         throw new Error(t("login.invalidCredentials"));
       }
 
-      // Check user status
+     
       if (user.status === "Inactive") {
         throw new Error(t("login.inactiveAccount"));
       }
 
-      // Prepare login response
+    
       const response = {
         data: {
           token: user.token,
@@ -87,9 +87,9 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center font-khmer">
-      {/* Login Form */}
-      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-lg">
+    <div className="min-h-screen bg-gray-100  flex flex-col items-center justify-center font-khmer">
+    
+      <div className="w-full max-w-md mt-4 p-8 space-y-6 bg-white rounded-lg shadow-lg">
         <h2 className="text-2xl font-bold text-center text-gray-900">
           {t("login.signIn")}
         </h2>
@@ -154,9 +154,9 @@ const Login = () => {
               </label>
             </div>
             <div className="text-sm">
-              <a href="#" className="font-medium text-blue-600 hover:underline">
+              <button  className="font-medium text-blue-600 hover:underline">
                 {t("login.lostPassword")}
-              </a>
+              </button>
             </div>
           </div>
           <button
@@ -171,7 +171,7 @@ const Login = () => {
         </p>
       </div>
 
-      {/* Footer */}
+    
       <footer className="mt-8 w-full bg-gray-800 text-white py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center space-y-4">
@@ -218,18 +218,18 @@ const Login = () => {
               </a>
             </div>
             <div className="flex space-x-4 text-sm">
-              <a href="#" className="hover:underline">
+              <button href="#" className="hover:underline">
                 {t("footer.home")}
-              </a>
-              <a href="#" className="hover:underline">
+              </button>
+              <button href="#" className="hover:underline">
                 {t("footer.about")}
-              </a>
-              <a href="#" className="hover:underline">
+              </button>
+              <button href="#" className="hover:underline">
                 {t("footer.shop")}
-              </a>
-              <a href="#" className="hover:underline">
+              </button>
+              <button href="#" className="hover:underline">
                 {t("footer.contact")}
-              </a>
+              </button>
             </div>
             <p className="text-sm">
               © 2025 Panharith Pharmacy. {t("footer.rights")}

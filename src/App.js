@@ -14,7 +14,7 @@ import TopBar from "./components/TopBar";
 import Footer from "./components/Footer";
 import Sidebar from "./components/Sidebar";
 
-// Lazy-loaded pages
+
 const SupplierList = lazy(() => import("./pages/supplier/SupplierList"));
 const SupplierDetail = lazy(() => import("./pages/supplier/SupplierDetail"));
 const Supplies = lazy(() => import("./pages/supplier/Supplies"));
@@ -38,7 +38,6 @@ const InvoiceDetailsPage = lazy(() => import("./pages/finance/InvoiceDetail"));
 const InvoiceListPage = lazy(() => import("./pages/finance/InvoiceList"));
 const AboutUser = lazy(() => import("./pages/profile/AboutUser"));
 const Profile = lazy(() => import("./pages/profile/AboutUser"));
-const ActivityPage = lazy(() => import("./pages/profile/ActivityPage"));
 const AddMedicine = lazy(() => import("./pages/medicine/AddMedicine"));
 const MedicineList = lazy(() => import("./pages/medicine/MedicineList"));
 const MedicineDetail = lazy(() => import("./pages/medicine/MedicineDetail"));
@@ -55,8 +54,6 @@ const WastageReturnList = lazy(() =>
   import("./pages/return/WastageReturnList")
 );
 const StaffList = lazy(() => import("./pages/staff/ManageStaff"));
-
-// Protected Route Component with Role-Based Access
 const ProtectedRoute = ({ children, allowedRoles = ["admin", "cashier"] }) => {
   const { isAuthenticated, user } = useAuth();
   const location = useLocation();
@@ -67,13 +64,9 @@ const ProtectedRoute = ({ children, allowedRoles = ["admin", "cashier"] }) => {
 
   const userRole = user?.role?.toLowerCase() || "";
   const isSaleDashboard = location.pathname === "/saledashboard";
-
-  // If user is cashier, they can only access /saledashboard
   if (userRole === "cashier" && !isSaleDashboard) {
     return <Navigate to="/saledashboard" replace />;
   }
-
-  // Check if the user's role is allowed for this route
   if (!allowedRoles.includes(userRole)) {
     return (
       <Navigate to={userRole === "cashier" ? "/saledashboard" : "/"} replace />
@@ -82,8 +75,6 @@ const ProtectedRoute = ({ children, allowedRoles = ["admin", "cashier"] }) => {
 
   return children;
 };
-
-// Layout Component for Protected Routes
 const AppLayout = ({
   children,
   selectedPage,
@@ -92,8 +83,6 @@ const AppLayout = ({
 }) => {
   const { user } = useAuth();
   const userRole = user?.role?.toLowerCase() || "";
-
-  // Hide Sidebar for cashiers (they only see SaleDashboard)
   return (
     <div className="flex h-screen bg-white dark:bg-gray-900 font-khmer">
       {userRole !== "cashier" && (
@@ -116,8 +105,6 @@ const AppLayout = ({
     </div>
   );
 };
-
-// Main App Component
 const App = () => {
   const [setLangCode] = useState(
     localStorage.getItem("selectedLanguage") || "en"
@@ -162,13 +149,10 @@ const App = () => {
           <LanguageProvider>
             <Suspense fallback={<Loader />}>
               <Routes>
-                {/* Public Routes (Standalone) */}
                 <Route path="/" element={<Login />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/client" element={<Client />} />
-
-                {/* Protected Routes (With Layout) */}
                 <Route
                   path="/dashboard"
                   element={
@@ -421,20 +405,7 @@ const App = () => {
                     </ProtectedRoute>
                   }
                 />
-                <Route
-                  path="/activity"
-                  element={
-                    <ProtectedRoute allowedRoles={["admin"]}>
-                      <AppLayout
-                        selectedPage={selectedPage}
-                        setSelectedPage={setSelectedPage}
-                        onLanguageChange={handleLanguageChange}
-                      >
-                        <ActivityPage />
-                      </AppLayout>
-                    </ProtectedRoute>
-                  }
-                />
+              
                 <Route
                   path="/addmedicinepage"
                   element={

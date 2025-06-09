@@ -1,11 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { FaEllipsisH } from "react-icons/fa";
 import { useTheme } from "../../context/ThemeContext";
 import { useTranslation } from "../../hooks/useTranslation";
 import { Sun, Moon } from "lucide-react";
-
-// import { BiEdit, BiTrash } from "react-icons/bi";
-
 const medicines = [
   {
     p_id: "#P7865",
@@ -39,7 +36,6 @@ const medicines = [
 const WastageReturnList = () => {
   const { t } = useTranslation();
   const { theme, toggleTheme } = useTheme();
-  // const [openMenu, setOpenMenu] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
@@ -47,9 +43,6 @@ const WastageReturnList = () => {
   const [endDate, setEndDate] = useState("");
   const [selectedReason, setSelectedReason] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
-
-  // const toggleMenu = (index) => setOpenMenu(openMenu === index ? null : index);
-
   const filteredMedicines = (medicines || []).filter((med) => {
     const matchesSearch = (med?.p_id || "")
       .toLowerCase()

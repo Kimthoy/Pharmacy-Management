@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Header from "./Header";
 import ProductList from "./ProductList";
 import Cart from "./Cart";
@@ -87,12 +87,10 @@ const Sale = () => {
       typeofmedicine: "ថ្នាំធម្មតា",
     },
   ];
-
   const updatedCompoundMedicines = compoundMedicines.map((medicine) => ({
     ...medicine,
     typeofmedicine: "ថ្នាំផ្សំ",
   }));
-
   const randomizeProducts = () => {
     const randomChoice = Math.random() < 0.5;
     const selectedProducts = randomChoice
@@ -101,15 +99,9 @@ const Sale = () => {
     setCurrentProducts(selectedProducts);
     setIsCompoundMode(!randomChoice);
   };
-
-  useEffect(() => {
-    setCurrentProducts(regularProducts);
-  }, []);
-
   const handleAddToCartClick = (product) => {
     addToCart(product);
   };
-
   const addToCart = (product) => {
     setCart((prev) => {
       const existingItem = prev.find(

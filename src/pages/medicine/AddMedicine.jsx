@@ -1,12 +1,9 @@
 import { useState } from "react";
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
 import { useTranslation } from "../../hooks/useTranslation";
-// import { useTheme } from "../../context/ThemeContext";
 
 const AddMedicine = () => {
   const { t } = useTranslation();
-
-  // State for medicine form
   const [medicine, setMedicine] = useState({
     medicine_name: "",
     price: "",
@@ -18,13 +15,9 @@ const AddMedicine = () => {
     medicine_detail: "",
     barcode_number: "",
   });
-
-  // Modal states
   const [openScanner, setOpenScanner] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [torchOn, setTorchOn] = useState(false);
-
-  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setMedicine((prev) => ({
@@ -32,14 +25,10 @@ const AddMedicine = () => {
       [name]: value,
     }));
   };
-
-  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Submitted Medicine Data:", medicine);
-    alert(t("add-medicine.SuccessMessage")); // Simulate success
-    // TODO: Uncomment below to send data to backend
-    // axios.post('/api/medicine', medicine).then(...).catch(...);
+    alert(t("add-medicine.SuccessMessage")); 
   };
 
   return (
@@ -62,8 +51,6 @@ const AddMedicine = () => {
           {t("add-medicine.ButtonAddSupplier")}
         </button>
       </div>
-
-      {/* Supplier Modal Form */}
       {isFormOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg dark:shadow-gray-700 w-11/12 md:w-1/2 relative">
@@ -135,11 +122,8 @@ const AddMedicine = () => {
           </div>
         </div>
       )}
-
-      {/* Medicine Add Form */}
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* Medicine Name */}
           <div className="flex flex-col">
             <label
               htmlFor="medicine_name"
@@ -158,8 +142,6 @@ const AddMedicine = () => {
               required
             />
           </div>
-
-          {/* Price */}
           <div className="flex flex-col">
             <label
               htmlFor="price"
@@ -178,8 +160,6 @@ const AddMedicine = () => {
               required
             />
           </div>
-
-          {/* Quantity */}
           <div className="flex flex-col">
             <label
               htmlFor="quantity"
@@ -198,8 +178,6 @@ const AddMedicine = () => {
               required
             />
           </div>
-
-          {/* In Stock Date */}
           <div className="flex flex-col">
             <label
               htmlFor="in_stock_date"
@@ -217,8 +195,6 @@ const AddMedicine = () => {
               required
             />
           </div>
-
-          {/* Weight */}
           <div className="flex flex-col">
             <label
               htmlFor="weight"
@@ -237,8 +213,6 @@ const AddMedicine = () => {
               required
             />
           </div>
-
-          {/* Barcode Scanner */}
           <div className="flex flex-col relative">
             <label
               htmlFor="barcode_number"
@@ -271,8 +245,6 @@ const AddMedicine = () => {
               </button>
             </div>
           </div>
-
-          {/* Status */}
           <div className="flex flex-col">
             <label
               htmlFor="status"
@@ -293,8 +265,6 @@ const AddMedicine = () => {
               <option value="inactive">Inactive</option>
             </select>
           </div>
-
-          {/* Category */}
           <div className="flex flex-col">
             <label
               htmlFor="category"
@@ -316,8 +286,6 @@ const AddMedicine = () => {
               <option value="vitamin">Vitamin</option>
             </select>
           </div>
-
-          {/* Medicine Details */}
           <div className="flex flex-col col-span-1 md:col-span-3">
             <label
               htmlFor="medicine_detail"
@@ -336,8 +304,6 @@ const AddMedicine = () => {
             ></textarea>
           </div>
         </div>
-
-        {/* Submit Button */}
         <div className="mt-4">
           <button
             type="submit"
@@ -347,8 +313,6 @@ const AddMedicine = () => {
           </button>
         </div>
       </form>
-
-      {/* Barcode Scanner Modal */}
       {openScanner && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-4 w-full max-w-md">

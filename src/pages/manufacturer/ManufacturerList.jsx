@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { FaEllipsisH } from "react-icons/fa";
 import { BiEdit, BiShow, BiTrash } from "react-icons/bi";
 import { useTranslation } from "../../hooks/useTranslation";
-import { useTheme } from "../../context/ThemeContext";
+
 
 const manufacturers = [
   {
@@ -45,7 +45,6 @@ const manufacturers = [
 
 const Manufacturerlist = () => {
   const { t } = useTranslation();
-  const { theme } = useTheme();
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
@@ -465,8 +464,6 @@ const Manufacturerlist = () => {
           </tbody>
         </table>
       </div>
-
-      {/* Pagination Controls */}
       <div className="flex flex-wrap items-center justify-between mt-4">
         <div className="flex items-center space-x-2">
           <span className="text-gray-400 dark:text-gray-300 text-sm">

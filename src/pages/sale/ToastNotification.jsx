@@ -1,5 +1,3 @@
-import React from "react";
-
 const ToastNotification = ({ toast }) => {
   if (!toast) return null;
 

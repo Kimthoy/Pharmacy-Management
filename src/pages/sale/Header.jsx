@@ -1,5 +1,3 @@
-import React from "react";
-
 const Header = ({
   searchQuery,
   setSearchQuery,
@@ -14,20 +12,20 @@ const Header = ({
           ឱសថស្ថាន
         </h1>
         <nav className="space-x-4">
-          <a
-            href="#"
+          <button
+           
             className="text-gray-600 hover:text-gray-800"
             aria-label="ទំព័រដើម"
           >
             ទំព័រដើម
-          </a>
-          <a
-            href="#"
+          </button>
+          <button
+           
             className="text-gray-600 hover:text-gray-800"
             aria-label="ផលិតផល"
           >
             ផលិតផល
-          </a>
+          </button>
           <button
             onClick={openRetailSaleModal}
             className="text-emerald-600 hover:border-emerald-600 hover:border border border-emerald-600 px-3 py-2 rounded-md hover:bg-emerald-600 hover:text-white"

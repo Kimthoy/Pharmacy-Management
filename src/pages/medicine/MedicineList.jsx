@@ -1,10 +1,8 @@
-// src/components/MedicineList.js
 import { useState, useRef, useEffect } from "react";
 import { FaEllipsisV } from "react-icons/fa";
 import { BiEdit, BiShow, BiTrash } from "react-icons/bi";
 import { MdWarehouse } from "react-icons/md";
 import { useTranslation } from "../../hooks/useTranslation";
-// import { useTheme } from "../../context/ThemeContext";
 import { useNavigate } from "react-router-dom";
 
 const medicines = [

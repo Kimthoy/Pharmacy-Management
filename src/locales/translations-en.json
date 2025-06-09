@@ -1,4 +1,9 @@
 {
+  "error": {
+    "pageNotFound": "Page Not Found",
+    "pageNotFoundDesc": "The page you are looking for does not exist.",
+    "backToDashboard": "Back to Dashboard"
+  },
   "retailSale": {
     "title": "Retail Sale",
     "product": "Product",
@@ -190,7 +195,7 @@
   },
 
   "sidebar": {
-    "supplies":"Supplies",
+    "supplies": "Supplies",
     "categoies": "Category",
     "appName": "My App",
     "dashboards": "Dashboard",

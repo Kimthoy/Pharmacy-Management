@@ -1,4 +1,4 @@
-import  { useState } from "react";
+import { useState } from "react";
 import {
   FaCog,
   FaUsers,
@@ -11,13 +11,10 @@ import {
 import { useTranslation } from "../../hooks/useTranslation";
 import { useTheme } from "../../context/ThemeContext";
 import axios from "axios";
-
 const Setting = () => {
   const { t } = useTranslation();
   const { theme, toggleTheme } = useTheme();
-  const [activityLogs, setActivityLogs] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
-  const [deleteId, setDeleteId] = useState(null);
   const [activeTab, setActiveTab] = useState("General");
   const [registrationOption, setRegistrationOption] = useState("Enable");
   const [isMaintenance, setIsMaintenance] = useState(false);
@@ -31,45 +28,10 @@ const Setting = () => {
   const [selectedMember, setSelectedMember] = useState("");
   const [selectedDesignation, setSelectedDesignation] = useState("Pharmacist");
   const [members, setMembers] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  const handleDeleteClick = (id) => {
-    setDeleteId(id);
-    setShowPopup(true);
-  };
-
-  const confirmDelete = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setError(t("settings.authError"));
-        return;
-      }
-      await axios.delete(
-        `http://127.0.0.1:8000/api/activity-logs/${deleteId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setActivityLogs(activityLogs.filter((log) => log.id !== deleteId));
-      setShowPopup(false);
-      setDeleteId(null);
-    } catch (err) {
-      setError(
-        t("settings.deleteError") + (err.response?.data?.message || err.message)
-      );
-    }
-  };
-
   const handleAddMember = async () => {
     if (!selectedMember) return;
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setError(t("settings.authError"));
-        return;
-      }
+      
       const response = await axios.post(
         "http://127.0.0.1:8000/api/members",
         {
@@ -78,15 +40,12 @@ const Setting = () => {
           email: "",
           joinedOn: "-",
         },
-        { headers: { Authorization: `Bearer ${token}` } }
+       
       );
       setMembers([...members, response.data]);
       setSelectedMember("");
     } catch (err) {
-      setError(
-        t("settings.addMemberError") +
-          (err.response?.data?.message || err.message)
-      );
+     
     }
   };
 
@@ -99,38 +58,19 @@ const Setting = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      if (!token) {
-        setError(t("settings.authError"));
-        return;
-      }
       await axios.put(
         "http://127.0.0.1:8000/api/settings",
         { ...settings, registrationOption, maintenanceMode: isMaintenance },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setError(null);
+    
       alert(t("settings.updateSuccess"));
     } catch (err) {
-      setError(
-        t("settings.updateError") + (err.response?.data?.message || err.message)
-      );
+    
     }
   };
 
   const renderContent = () => {
-    if (loading)
-      return (
-        <div className="text-center text-gray-600 dark:text-gray-300 text-xs">
-          {t("settings.loading")}
-        </div>
-      );
-    if (error)
-      return (
-        <div className="text-center text-red-500 dark:text-red-400 text-xs">
-          {error}
-        </div>
-      );
-
     switch (activeTab) {
       case "General":
         return (
@@ -438,7 +378,7 @@ const Setting = () => {
                     className="w-full border   border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] text-xs focus:outline-none focus:ring-2 focus:ring-emerald-400 dark:bg-gray-700 dark:text-gray-200"
                   />
                 </div>
-               
+
                 <div>
                   <button
                     type="submit"
@@ -498,7 +438,7 @@ const Setting = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {activityLogs.map((log) => (
+                  {/* {activityLogs.map((log) => (
                     <tr
                       key={log.id}
                       className="border-b hover:bg-gray-100 dark:hover:bg-gray-700 text-xs"
@@ -533,7 +473,7 @@ const Setting = () => {
                         ×
                       </td>
                     </tr>
-                  ))}
+                  ))} */}
                 </tbody>
               </table>
               {showPopup && (
@@ -545,7 +485,7 @@ const Setting = () => {
                     <div className="flex justify-end space-x-4 mt-4">
                       <button
                         className="bg-red-500 dark:bg-red-400 text-white px-4 py-2 rounded-[4px] text-xs hover:bg-red-600 dark:hover:bg-red-500 transition"
-                        onClick={confirmDelete}
+                        // onClick={confirmDelete}
                       >
                         {t("settings.activity.yesDelete")}
                       </button>

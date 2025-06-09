@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useTheme } from "../../context/ThemeContext";
+
 import {
   ShieldCheckIcon,
   CurrencyRupeeIcon,
@@ -16,11 +16,9 @@ import {
 } from "@heroicons/react/24/outline";
 
 const Dashboard = () => {
-  const { theme } = useTheme();
+
   const [showDropdown, setShowDropdown] = useState(false);
   const downloadDropdownRef = useRef(null);
-
-  // Mock data for pharmacy dashboard
   const dashboardData = {
     inventoryStatus: "Good",
     revenue: "Rs. 8,55,875",
@@ -83,7 +81,7 @@ const Dashboard = () => {
 
   return (
     <div className="bg-white dark:bg-gray-900 min-h-screen p-4 sm:p-6">
-      {/* Header */}
+
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
         <div>
           <h1 className="text-lg sm:text-2xl font-bold text-gray-600 dark:text-gray-200">
@@ -128,8 +126,6 @@ const Dashboard = () => {
           )}
         </div>
       </div>
-
-      {/* Quick Actions */}
       <div className="flex flex-wrap gap-4 mb-6">
         <button
           className="flex items-center text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-4 py-2 rounded-md hover:bg-emerald-500 dark:hover:bg-emerald-400 hover:text-white dark:hover:text-white transition"
@@ -146,8 +142,6 @@ const Dashboard = () => {
           Restock Inventory
         </button>
       </div>
-
-      {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="bg-green-100 dark:bg-green-900 border border-green-300 dark:border-green-700 p-4 rounded-lg text-center">
           <ShieldCheckIcon className="h-6 w-6 text-green-800 dark:text-green-300 mx-auto" />
@@ -209,8 +203,6 @@ const Dashboard = () => {
           </p>
         </div>
       </div>
-
-      {/* Detailed Reports */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4">
           <div className="flex justify-between items-center">

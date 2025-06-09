@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "../../hooks/useTranslation";
 import { FaArrowLeft, FaSave } from "react-icons/fa";
 import axios from "axios";
-
-// Mock data (replace with API calls)
 const mockSuppliers = [
   { supplier_id: 1, name: "MediSupply Co." },
   { supplier_id: 2, name: "HealthCorp" },
@@ -13,11 +11,6 @@ const mockProducts = [
   { product_id: 1, name: "Paracetamol" },
   { product_id: 2, name: "Amoxicillin" },
 ];
-const mockUsers = [
-  { user_id: 1, username: "admin" },
-  { user_id: 2, username: "cashier" },
-];
-
 const AddSupplyForm = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -32,33 +25,9 @@ const AddSupplyForm = () => {
   const [formErrors, setFormErrors] = useState({});
   const [suppliers, setSuppliers] = useState([]);
   const [products, setProducts] = useState([]);
-  const [users, setUsers] = useState([]);
-
-  // Fetch data for dropdowns (mocked here)
   useEffect(() => {
-    // Replace with real API calls
     setSuppliers(mockSuppliers);
     setProducts(mockProducts);
-    setUsers(mockUsers);
-
-    // Example API calls:
-    /*
-    const fetchData = async () => {
-      try {
-        const [suppliersRes, productsRes, usersRes] = await Promise.all([
-          axios.get("/api/suppliers"),
-          axios.get("/api/products"),
-          axios.get("/api/users"),
-        ]);
-        setSuppliers(suppliersRes.data);
-        setProducts(productsRes.data);
-        setUsers(usersRes.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    fetchData();
-    */
   }, []);
 
   const validateForm = () => {
@@ -104,7 +73,6 @@ const AddSupplyForm = () => {
     }
 
     try {
-      // Replace with your API endpoint
       await axios.post("/api/supplies", formData);
       navigate("/supplierlist");
     } catch (error) {

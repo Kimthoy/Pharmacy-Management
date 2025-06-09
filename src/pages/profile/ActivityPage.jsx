@@ -1,15 +1,11 @@
-import { useContext } from "react";
 import { useTranslation } from "../../hooks/useTranslation";
-import { AuthContext } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
 import { Activity } from "lucide-react";
 
 const ActivityPage = () => {
-  const { user } = useContext(AuthContext);
+ 
   const { theme } = useTheme();
   const { t } = useTranslation();
-
-  // Mock activity data (replace with real data from an API in a production app)
   const activities = [
     {
       type: "login",
@@ -24,8 +20,6 @@ const ActivityPage = () => {
       timestamp: "2025-05-15T10:00:00+07:00",
     },
   ];
-
-  // Format timestamp for display
   const formatTimestamp = (timestamp) => {
     const date = new Date(timestamp);
     return date.toLocaleString("en-US", {

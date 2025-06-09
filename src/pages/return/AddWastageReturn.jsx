@@ -27,7 +27,7 @@ const AddWastageReturn = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === "amount" && !/^\d*\.?\d*$/.test(value)) {
-      return; // Only allow double/float numbers for amount
+      return; 
     }
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -37,7 +37,6 @@ const AddWastageReturn = () => {
     setError("");
     setSuccess("");
 
-    // Basic validation
     const requiredFields = [
       "customer",
       "email",
@@ -68,11 +67,8 @@ const AddWastageReturn = () => {
       setError(t("addWastageReturn.errors.invalidQuantity"));
       return;
     }
-
-    // Mock API call
     try {
       console.log("Submitting wastage return:", formData);
-      // Example: axios.post("/api/wastage-returns", formData);
       setSuccess(t("addWastageReturn.success"));
       setFormData({
         customer: "",

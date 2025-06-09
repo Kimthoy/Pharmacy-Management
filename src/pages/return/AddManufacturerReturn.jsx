@@ -1,16 +1,14 @@
 import { useState } from "react";
 import { useTheme } from "../../context/ThemeContext";
 import { useTranslation } from "../../hooks/useTranslation";
-import { Sun, Moon } from "lucide-react";
 
 const AddManufacturerReturn = () => {
   const { t } = useTranslation();
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
   const [amount, setAmount] = useState("");
 
   const handleChange = (e) => {
     const value = e.target.value;
-    // Regex to allow only double (floating-point) numbers
     if (/^\d*\.?\d*$/.test(value)) {
       setAmount(value);
     }
