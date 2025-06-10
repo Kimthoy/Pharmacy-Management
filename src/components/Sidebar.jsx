@@ -2,12 +2,11 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "../../src/hooks/useTranslation";
+import { useTheme } from "../context/ThemeContext";
 import { BiCapsule } from "react-icons/bi";
 import { CiRepeat, CiSettings } from "react-icons/ci";
 import { RiPagesLine } from "react-icons/ri";
 import { FaUserDoctor } from "react-icons/fa6";
-import { TfiSupport } from "react-icons/tfi";
-
 import {
   UserGroupIcon,
   UserPlusIcon,
@@ -20,6 +19,7 @@ import { TfiDashboard } from "react-icons/tfi";
 
 const Sidebar = ({ setSelectedPage, selectedPage }) => {
   const { t } = useTranslation();
+  const { theme } = useTheme();
   const navigate = useNavigate();
   const [activeMenuItem, setActiveMenuItem] = useState(null);
   const [isHovered, setIsHovered] = useState(false);
@@ -63,23 +63,6 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
           name: t("sidebar.staffList"),
           icon: UserPlusIcon,
           path: "/listofstaff",
-        },
-      ],
-    },
-    {
-      name: t("sidebar.supplier"),
-      icon: TfiSupport,
-      path: "/supplier",
-      subItems: [
-        {
-          name: t("sidebar.supplierlist"),
-          icon: UserPlusIcon,
-          path: "/supplierlist",
-        },
-        {
-          name: t("sidebar.supplies"),
-          icon: UserPlusIcon,
-          path: "/suppies",
         },
       ],
     },
@@ -166,7 +149,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
     >
       <div className="flex flex-col h-full">
         {/* Main Menu Items */}
-        <nav className="flex-1 px-2 py-2" role="navigation">
+        <nav className="flex-1 px-2 py-2">
           <ul className="space-y-1">
             {menuItems.map(({ name, icon: Icon, path, subItems }) => (
               <React.Fragment key={name}>
@@ -181,8 +164,6 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                         handlePageSelection(name, path);
                       }
                     }}
-                    aria-expanded={subItems && activeMenuItem === name}
-                    aria-label={name}
                     className={`flex items-center justify-between w-full text-xs p-2 rounded-md text-gray-700 dark:text-gray-200 hover:bg-green-100 dark:hover:bg-gray-700 hover:text-green-700 dark:hover:text-green-400 transition-all duration-200 ${
                       selectedPage === name
                         ? "bg-green-500 text-white dark:bg-green-600"
@@ -218,7 +199,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                     <ul
                       className={`overflow-hidden transition-all duration-300 ease-in-out ${
                         isHovered && activeMenuItem === name
-                          ? "opacity-100"
+                          ? " opacity-100"
                           : "max-h-0 opacity-0"
                       }`}
                     >
@@ -228,7 +209,6 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                             onClick={() =>
                               handlePageSelection(sub.name, sub.path)
                             }
-                            aria-label={sub.name}
                             className={`w-full text-left ml-10 mt-1 p-2 rounded text-xs text-gray-700 dark:text-gray-200 hover:bg-green-100 dark:hover:bg-gray-700 hover:text-green-700 dark:hover:text-green-400 transition-colors ${
                               selectedPage === sub.name
                                 ? "bg-green-500 text-white dark:bg-green-600"
