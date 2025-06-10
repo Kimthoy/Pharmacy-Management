@@ -3,6 +3,7 @@ import { useTranslation } from "../../src/hooks/useTranslation";
 import { AuthContext } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
+import MessageModal from "../components/MessageModal";
 import {
   MessageCircle,
   Bell,
@@ -14,20 +15,12 @@ import {
   Moon,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import Tooltip from "../components/Tooltip";
-import Modal from "../components/Modal"; // Import the new Modal component
+import Modal from "../components/Modal"; // Assuming this is your existing Modal component
+import NotificationModal from "../components/NotificationModal"; // New component for notifications
 
 const languageOptions = [
-  {
-    value: "en",
-    label: "English",
-    iconPath: "/icon_en.jpg",
-  },
-  {
-    value: "km",
-    label: "ខ្មែរ",
-    iconPath: "/icon_kh.jpg",
-  },
+  { value: "en", label: "English", iconPath: "/icon_en.jpg" },
+  { value: "km", label: "ខ្មែរ", iconPath: "/icon_kh.jpg" },
 ];
 
 const SearchBar = ({ t, onSearch }) => {
@@ -52,18 +45,6 @@ const SearchBar = ({ t, onSearch }) => {
     </div>
   );
 };
-
-const IconButton = ({ Icon, tooltip, ariaLabel, onClick }) => (
-  <Tooltip text={tooltip}>
-    <button
-      className="text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all hover:scale-110"
-      aria-label={ariaLabel}
-      onClick={onClick}
-    >
-      <Icon size={24} />
-    </button>
-  </Tooltip>
-);
 
 const LanguageSelector = ({
   langCode,
@@ -102,9 +83,8 @@ const LanguageSelector = ({
           </span>
         </div>
         <svg
-          className={`w-4 h-4 ml-2 transition-transform ${
-            open ? "rotate-180" : ""
-          } text-emerald-600 dark:text-emerald-400`}
+          className="w-4 h-4 ml-2 transition-transform text-emerald-600 dark:text-emerald-400"
+          style={{ transform: open ? "rotate(180deg)" : "none" }}
           fill="currentColor"
           viewBox="0 0 20 20"
         >
@@ -149,43 +129,31 @@ const ProfileDropdown = ({
   handleLogout,
   t,
 }) => {
-  const truncateName = (name) => {
-    if (!name) return t("topbar.unknownUser");
-    return name.length > 10 ? `${name.slice(0, 8)}...` : name;
-  };
-
-  const truncateRole = (role) => {
-    if (!role) return "";
-    return role.length > 6 ? `${role.slice(0, 4)}...` : role;
-  };
-
   return (
     <div className="relative" ref={dropdownRef}>
-      <Tooltip text={t("topbar.profile")}>
-        <button
-          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-          onKeyDown={(e) =>
-            (e.key === "Enter" || e.key === " ") &&
-            setIsDropdownOpen(!isDropdownOpen)
-          }
-          className="flex items-center   text-black rounded-md px-3 py-1 cursor-pointer transition-all space-x-1"
-          aria-expanded={isDropdownOpen}
-          aria-label={t("topbar.profile")}
-        >
-          {user?.profile_picture ? (
-            <img
-              src={user.profile_picture}
-              alt={t("topbar.profile")}
-              className="w-6 h-6 rounded-full object-cover"
-            />
-          ) : (
-            <UserCircle
-              size={24}
-              className="text-black hover:scale-125 dark:text-white dark:hover:scale-125 dark:hover:text-emerald-500 hover:text-emerald-500"
-            />
-          )}
-        </button>
-      </Tooltip>
+      <button
+        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+        onKeyDown={(e) =>
+          (e.key === "Enter" || e.key === " ") &&
+          setIsDropdownOpen(!isDropdownOpen)
+        }
+        className="flex items-center text-black rounded-md px-3 py-1 cursor-pointer transition-all space-x-1"
+        aria-expanded={isDropdownOpen}
+        aria-label={t("topbar.profile")}
+      >
+        {user?.profile_picture ? (
+          <img
+            src={user.profile_picture}
+            alt={t("topbar.profile")}
+            className="w-6 h-6 rounded-full object-cover"
+          />
+        ) : (
+          <UserCircle
+            size={24}
+            className="text-black hover:scale-125 dark:text-white dark:hover:scale-125 dark:hover:text-emerald-500 hover:text-emerald-500"
+          />
+        )}
+      </button>
       {isDropdownOpen && (
         <div className="absolute right-0 z-50 mt-2 w-56 bg-white dark:bg-gray-800 border border-emerald-200 dark:border-gray-600 shadow-lg rounded-lg py-2 animate-fade-in">
           <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-600">
@@ -265,9 +233,14 @@ const TopBar = () => {
 
   const [open, setOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal
+  const [isModalOpen, setIsModalOpen] = useState(false); // For logout confirmation
+  const [isMessageDropdownOpen, setIsMessageDropdownOpen] = useState(false); // For message dropdown
+  const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] =
+    useState(false); // For notification dropdown
   const dropdownRef = useRef(null);
   const selectorRef = useRef(null);
+  const messageDropdownRef = useRef(null);
+  const notificationDropdownRef = useRef(null);
 
   useEffect(() => {
     console.log("Auth State:", { isAuthenticated, user });
@@ -277,6 +250,18 @@ const TopBar = () => {
       }
       if (selectorRef.current && !selectorRef.current.contains(event.target)) {
         setOpen(false);
+      }
+      if (
+        messageDropdownRef.current &&
+        !messageDropdownRef.current.contains(event.target)
+      ) {
+        setIsMessageDropdownOpen(false);
+      }
+      if (
+        notificationDropdownRef.current &&
+        !notificationDropdownRef.current.contains(event.target)
+      ) {
+        setIsNotificationDropdownOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -288,7 +273,7 @@ const TopBar = () => {
   };
 
   const handleLogout = () => {
-    setIsModalOpen(true); // Open the modal instead of confirm
+    setIsModalOpen(true);
   };
 
   const confirmLogout = () => {
@@ -298,26 +283,114 @@ const TopBar = () => {
     window.location.href = "/login";
   };
 
+  // Mock data for recent chats
+  const recentChats = [
+    {
+      id: 1,
+      name: "Iliash Hossain",
+      message: "You: Please confirm if you got my la...",
+      time: "Now",
+      status: "online",
+      avatar: "/path/to/avatar1.jpg",
+    },
+    {
+      id: 2,
+      name: "Abu Bin Ishtiyak",
+      message: "Hi, I am Ishtiyak, can you help me wi...",
+      time: "4:49 AM",
+      status: "online",
+      avatar: "/path/to/avatar2.jpg",
+    },
+    {
+      id: 3,
+      name: "George Philips",
+      message: "Have you seen the claim from Rose?",
+      time: "6 Apr",
+      status: "offline",
+      avatar: "/path/to/avatar3.jpg",
+    },
+    {
+      id: 4,
+      name: "Softnio Group",
+      message: "You: I just bought a new computer b...",
+      time: "27 Mar",
+      status: "offline",
+      avatar: "/path/to/avatar4.jpg",
+    },
+  ];
+
+  // Mock data for notifications
+  const notifications = [
+    {
+      id: 1,
+      title: "New Message",
+      message: "Iliash Hossain sent you a message.",
+      time: "Now",
+      status: "unread",
+      icon: "message",
+    },
+    {
+      id: 2,
+      title: "System Update",
+      message: "Server maintenance scheduled at 10 PM.",
+      time: "2:30 PM",
+      status: "read",
+      icon: "bell",
+    },
+    {
+      id: 3,
+      title: "Alert",
+      message: "Low stock for Paracetamol.",
+      time: "9:15 AM",
+      status: "unread",
+      icon: "alert",
+    },
+  ];
+
   return (
     <div className="bg-white dark:bg-gray-900 z-10 p-4 flex flex-col sm:flex-row items-center justify-between relative shadow-sm dark:shadow-gray-800">
       <SearchBar t={t} onSearch={handleSearch} />
       <div className="flex items-center space-x-2 sm:space-x-4 md:space-x-6 mt-4 sm:mt-0">
-        <button
-          className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white"
-          onClick={() => alert(t("topbar.messagesComingSoon"))}
-        >
-          <MessageCircle></MessageCircle>
-        </button>
-        <button
-          className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white"
-          onClick={() => alert(t("topbar.notificationsComingSoon"))}
-        >
-          <Bell></Bell>
-        </button>
+        <div className="relative" ref={messageDropdownRef}>
+          <button
+            className="p-2 rounded-full hover:text-emerald-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white"
+            onClick={() => setIsMessageDropdownOpen(!isMessageDropdownOpen)}
+            aria-label={t("topbar.messages")}
+          >
+            <MessageCircle size={24} />
+          </button>
+          {isMessageDropdownOpen && (
+            <MessageModal
+              isOpen={isMessageDropdownOpen}
+              onClose={() => setIsMessageDropdownOpen(false)}
+              recentChats={recentChats}
+              t={t}
+            />
+          )}
+        </div>
+        <div className="relative" ref={notificationDropdownRef}>
+          <button
+            className="p-2 rounded-full hover:text-emerald-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white"
+            onClick={() =>
+              setIsNotificationDropdownOpen(!isNotificationDropdownOpen)
+            }
+            aria-label={t("topbar.notifications")}
+          >
+            <Bell size={24} />
+          </button>
+          {isNotificationDropdownOpen && (
+            <NotificationModal
+              isOpen={isNotificationDropdownOpen}
+              onClose={() => setIsNotificationDropdownOpen(false)}
+              notifications={notifications}
+              t={t}
+            />
+          )}
+        </div>
 
         <button
           onClick={toggleTheme}
-          className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white"
+          className="p-2 hover:text-emerald-500 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white"
         >
           {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
         </button>

@@ -500,6 +500,12 @@
     "Next": "បន្ទាប់"
   },
   "topbar": {
+  
+    "recentChats": "ថ្មីៗ",
+
+    "viewAll": "មើលទាំងអស់",
+    "close": "បិទ",
+
     "confirm": "យល់ព្រម",
     "cancel": "ថយក្រោយ",
     "search": "ស្វែងរក",

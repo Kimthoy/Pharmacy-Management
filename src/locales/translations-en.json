@@ -1,6 +1,6 @@
 {
-  "app":{
-    "title":"Panharith Pharmacy"
+  "app": {
+    "title": "Panharith Pharmacy"
   },
   "error": {
     "pageNotFound": "Page Not Found",
@@ -95,10 +95,16 @@
   },
 
   "topbar": {
+    
+    "recentChats": "Recent Chats",
+  
+    "viewAll": "View All",
+    "close": "Close",
+    "messages": "Messages",
     "confirm": "Confirm",
     "cancel": "Cancel",
     "search": "Search",
-    "messages": "Messages",
+
     "notifications": "Notifications",
     "darkMode": " ",
     "lightMode": " ",

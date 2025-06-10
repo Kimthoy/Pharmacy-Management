@@ -139,7 +139,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
   return (
     <div
       className={`h-screen flex-shrink-0 bg-white dark:bg-gray-900 shadow-lg dark:shadow-gray-800 transition-all duration-300 ${
-        isHovered ? "w-52" : "w-[80px]"
+        isHovered ? "w-52" : "w-[60px]"
       }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
@@ -182,7 +182,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                       <svg
                         className={`w-4 h-4 transition-transform ${
                           activeMenuItem === name ? "rotate-180" : ""
-                        } text-green-600 dark:text-green-400`}
+                        } text-white-600 dark:text-green-400`}
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -209,7 +209,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                             onClick={() =>
                               handlePageSelection(sub.name, sub.path)
                             }
-                            className={`w-full text-left ml-10 mt-1 p-2 rounded text-xs text-gray-700 dark:text-gray-200 hover:bg-green-100 dark:hover:bg-gray-700 hover:text-green-700 dark:hover:text-green-400 transition-colors ${
+                            className={`w-full ml-12 text-left ml-10 mt-1 p-2 rounded text-xs text-gray-700 dark:text-gray-200 hover:bg-green-100 dark:hover:bg-gray-700 hover:text-green-700 dark:hover:text-green-400 transition-colors ${
                               selectedPage === sub.name
                                 ? "bg-green-500 text-white dark:bg-green-600"
                                 : ""
