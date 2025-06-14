@@ -33,13 +33,17 @@ const SearchBar = ({ t, onSearch }) => {
   };
 
   return (
-    <div className="flex-1 max-w-xs">
+    <div className="flex-1 max-w-xs flex align-middle justify-center ">
+      <h1 className="text-2xl font-bold mr-5 dark:text-gray-300 animate-color-cycle">
+        {t("navigation.title", { username: "Panharith" })}
+      </h1>
+
       <input
         type="text"
         placeholder={t("topbar.search")}
         value={searchTerm}
         onChange={handleSearch}
-        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-800 dark:text-white"
+        className="w-full px-4 py-2 shadow hover:shadow-md hover:shadow-slate-400 focus:shadow-none border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:bg-gray-800 dark:text-white"
         aria-label={t("topbar.search")}
       />
     </div>
@@ -83,7 +87,7 @@ const LanguageSelector = ({
           </span>
         </div>
         <svg
-          className="w-4 h-4 ml-2 transition-transform text-emerald-600 dark:text-emerald-400"
+          className="w-6 h-6 ml-4 transition-transform text-emerald-600 dark:text-emerald-400"
           style={{ transform: open ? "rotate(180deg)" : "none" }}
           fill="currentColor"
           viewBox="0 0 20 20"
@@ -266,7 +270,7 @@ const TopBar = () => {
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  });
 
   const handleSearch = (term) => {
     console.log("Searching for:", term);
@@ -349,15 +353,18 @@ const TopBar = () => {
 
   return (
     <div className="bg-white dark:bg-gray-900 z-10 p-4 flex flex-col sm:flex-row items-center justify-between relative shadow-sm dark:shadow-gray-800">
-      <SearchBar t={t} onSearch={handleSearch} />
+      <SearchBar t={t} onSearch={handleSearch} className="shadow" />
       <div className="flex items-center space-x-2 sm:space-x-4 md:space-x-6 mt-4 sm:mt-0">
         <div className="relative" ref={messageDropdownRef}>
           <button
-            className="p-2 rounded-full hover:text-emerald-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white"
+            className="p-2 rounded-full hover:scale-125 hover:text-emerald-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white relative"
             onClick={() => setIsMessageDropdownOpen(!isMessageDropdownOpen)}
             aria-label={t("topbar.messages")}
           >
-            <MessageCircle size={24} />
+            <MessageCircle
+              size={24}
+              className="inline-block transition-transform duration-300 animate-bounce-hover"
+            />
           </button>
           {isMessageDropdownOpen && (
             <MessageModal
@@ -370,7 +377,7 @@ const TopBar = () => {
         </div>
         <div className="relative" ref={notificationDropdownRef}>
           <button
-            className="p-2 rounded-full hover:text-emerald-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white"
+            className="p-2 rounded-full hover:scale-125 hover:text-emerald-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white"
             onClick={() =>
               setIsNotificationDropdownOpen(!isNotificationDropdownOpen)
             }
@@ -390,7 +397,7 @@ const TopBar = () => {
 
         <button
           onClick={toggleTheme}
-          className="p-2 hover:text-emerald-500 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white"
+          className="p-2 hover:text-emerald-500 hover:scale-125 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white"
         >
           {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
         </button>

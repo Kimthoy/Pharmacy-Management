@@ -1,4 +1,6 @@
+import React from "react";
 import ProductCard from "./ProductCard";
+import MedicineTable from "./MedicineTable"; // Import the MedicineTable component
 
 const ProductList = ({
   products,
@@ -11,18 +13,29 @@ const ProductList = ({
   const safeProducts = products || [];
 
   return (
-    <div className="flex flex-1 flex-wrap justify-center gap-2">
-      {safeProducts.map((product) => (
-        <ProductCard
-          key={product.id}
-          cart={cart}
-          product={product}
+    <div className="flex flex-1 flex-col justify-center gap-2">
+      {showCompoundMedicines ? (
+        <MedicineTable
+          products={safeProducts}
           handleAddToCartClick={handleAddToCartClick}
           displayPrice={displayPrice}
           currency={currency}
-          showCompoundMedicines={showCompoundMedicines}
         />
-      ))}
+      ) : (
+        <div className="flex flex-wrap justify-center gap-2">
+          {safeProducts.map((product) => (
+            <ProductCard
+              key={product.id}
+              cart={cart}
+              product={product}
+              handleAddToCartClick={handleAddToCartClick}
+              displayPrice={displayPrice}
+              currency={currency}
+              showCompoundMedicines={showCompoundMedicines}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

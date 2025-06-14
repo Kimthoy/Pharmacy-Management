@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "../../src/hooks/useTranslation";
-import { useTheme } from "../context/ThemeContext";
+// import { useTheme } from "../context/ThemeContext";
 import { BiCapsule } from "react-icons/bi";
 import { CiRepeat, CiSettings } from "react-icons/ci";
 import { RiPagesLine } from "react-icons/ri";
@@ -19,7 +19,7 @@ import { TfiDashboard } from "react-icons/tfi";
 
 const Sidebar = ({ setSelectedPage, selectedPage }) => {
   const { t } = useTranslation();
-  const { theme } = useTheme();
+  // const { theme } = useTheme();
   const navigate = useNavigate();
   const [activeMenuItem, setActiveMenuItem] = useState(null);
   const [isHovered, setIsHovered] = useState(false);
@@ -138,8 +138,8 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
 
   return (
     <div
-      className={`h-screen flex-shrink-0 bg-white dark:bg-gray-900 shadow-lg dark:shadow-gray-800 transition-all duration-300 ${
-        isHovered ? "w-52" : "w-[60px]"
+      className={`h-screen flex-shrink-0 bg-white dark:bg-gray-900 dark:shadow-gray-800 transition-all duration-300 ${
+        isHovered ? "w-64" : "w-[80px]"
       }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
@@ -147,16 +147,20 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
         setActiveMenuItem(null);
       }}
     >
-      <div className="flex flex-col h-full">
-        {/* Main Menu Items */}
+      {/* Make only this inner div scrollable */}
+      <div className="h-full overflow-y-auto overflow-x-hidden flex flex-col">
         <nav className="flex-1 px-2 py-2">
           <ul className="space-y-1">
-            {menuItems.map(({ name, icon: Icon, path, subItems }) => (
-              <React.Fragment key={name}>
-                <li>
+            {menuItems.map(({ name, icon: Icon, path, subItems }) => {
+              const isParentActive =
+                selectedPage === name ||
+                (subItems && subItems.some((sub) => sub.name === selectedPage));
+
+              return (
+                <li key={name}>
                   <button
                     onClick={() => {
-                      if (subItems) {
+                      if (subItems?.length) {
                         setActiveMenuItem(
                           name === activeMenuItem ? null : name
                         );
@@ -164,23 +168,33 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                         handlePageSelection(name, path);
                       }
                     }}
-                    className={`flex items-center justify-between w-full text-xs p-2 rounded-md text-gray-700 dark:text-gray-200 hover:bg-green-100 dark:hover:bg-gray-700 hover:text-green-700 dark:hover:text-green-400 transition-all duration-200 ${
-                      selectedPage === name
-                        ? "bg-green-500 text-white dark:bg-green-600"
-                        : ""
-                    }`}
+                    className={`flex items-center justify-between w-full px-4 py-2 mt-1 text-md rounded-md transition-all duration-200
+                  ${
+                    isParentActive
+                      ? "bg-green-500 text-white dark:bg-green-600"
+                      : "text-gray-700 dark:text-gray-200"
+                  }
+                  hover:bg-green-100 dark:hover:bg-gray-700
+                  hover:text-green-700 dark:hover:text-green-500
+                  hover:scale-105 hover:shadow-md hover:shadow-slate-300
+                `}
                   >
-                    {/* Left section: icon + label */}
                     <div className="flex items-center">
-                      <Icon className="w-6 h-6 flex-shrink-0 text-gray-600 dark:text-gray-300" />
+                      <Icon
+                        className={`w-7 h-7 flex-shrink-0 transition-colors duration-200 ${
+                          isParentActive
+                            ? "text-white"
+                            : "text-gray-600 dark:text-gray-300"
+                        }`}
+                      />
                       {isHovered && (
-                        <span className="ml-6 whitespace-nowrap">{name}</span>
+                        <span className="ml-4 whitespace-nowrap">{name}</span>
                       )}
                     </div>
-                    {/* Right section: dropdown arrow (if applicable) */}
+
                     {isHovered && subItems && (
                       <svg
-                        className={`w-4 h-4 transition-transform ${
+                        className={`w-5 h-5 transition-transform ${
                           activeMenuItem === name ? "rotate-180" : ""
                         } text-white-600 dark:text-green-400`}
                         fill="currentColor"
@@ -194,12 +208,12 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                       </svg>
                     )}
                   </button>
-                  {/* Submenu with smooth expand */}
+
                   {subItems && (
                     <ul
-                      className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                      className={`overflow-hidden transition-all ml-0 duration-300 ease-in-out ${
                         isHovered && activeMenuItem === name
-                          ? " opacity-100"
+                          ? "opacity-100 max-h-[300px]"
                           : "max-h-0 opacity-0"
                       }`}
                     >
@@ -209,10 +223,10 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                             onClick={() =>
                               handlePageSelection(sub.name, sub.path)
                             }
-                            className={`w-full ml-12 text-left ml-10 mt-1 p-2 rounded text-xs text-gray-700 dark:text-gray-200 hover:bg-green-100 dark:hover:bg-gray-700 hover:text-green-700 dark:hover:text-green-400 transition-colors ${
+                            className={`w-full mb-1 mt-1 py-2 rounded-md hover:scale-105 hover:shadow-md hover:shadow-slate-300 transition-all text-left ml-10 px-2 text-md ${
                               selectedPage === sub.name
                                 ? "bg-green-500 text-white dark:bg-green-600"
-                                : ""
+                                : "text-gray-700 dark:text-gray-200 hover:bg-green-100 dark:hover:bg-gray-700 hover:text-green-700 dark:hover:text-green-400"
                             }`}
                           >
                             {sub.name}
@@ -222,8 +236,8 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                     </ul>
                   )}
                 </li>
-              </React.Fragment>
-            ))}
+              );
+            })}
           </ul>
         </nav>
       </div>

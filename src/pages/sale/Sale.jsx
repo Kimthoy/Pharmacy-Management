@@ -1,4 +1,3 @@
-
 import { useState, useMemo, useEffect } from "react";
 import Header from "./Header";
 import ProductList from "./ProductList";

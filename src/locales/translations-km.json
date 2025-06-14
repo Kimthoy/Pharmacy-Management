@@ -1,4 +1,49 @@
 {
+  "navigation": {
+    "title": "បញ្ញារិទ្ធ"
+  },
+  "dashboard": {
+    "title": "ផ្ទាំងគ្រប់គ្រងឱសថស្ថាន",
+    "subtitle": "ទិដ្ឋភាពទូទៅនៃប្រតិបត្តិការនិងសូចនាករឱសថស្ថាន",
+    "stats": {
+      "inventory_status": "ស្ថានភាពស្តុក",
+      "revenue": "ប្រាក់ចំណូល · មករា ២០២២",
+      "medicines_available": "ថ្នាំដែលមាន",
+      "medicine_shortage": "កង្វះថ្នាំ",
+      "expiring_soon": "ជិតផុតកំណត់",
+      "low_stock_items": "ទំនិញស្តុកទាប"
+    },
+    "info": {
+      "medicine": {
+        "title": "ថ្នាំ",
+        "content": "សរុប {count} ថ្នាំ",
+        "link": "មើល"
+      },
+      "sales_report": {
+        "title": "របាយការណ៍លក់",
+        "content": "សរុប {count} ការលក់",
+        "link": "មើល"
+      },
+      "suppliers": {
+        "title": "អ្នកផ្គត់ផ្គង់",
+        "content": "សរុប {count} អ្នកផ្គត់ផ្គង់",
+        "link": "មើល"
+      },
+      "customers": {
+        "title": "អតិថិជន",
+        "content": "សរុប {count} អតិថិជន",
+        "link": "មើល"
+      },
+      "prescriptions": {
+        "title": "វេជ្ជបញ្ជា",
+        "content": {
+          "pending": "{count} កំពុងរង់ចាំ",
+          "processed": "{count} បានដំណើរការ"
+        },
+        "link": "មើល"
+      }
+    }
+  },
   "app": {
     "title": "ឪសថស្ថានបញ្ញារិទ្ធិ"
   },
@@ -112,17 +157,7 @@
     "InvalidContact": "Please enter a valid phone number (10-12 digits)",
     "UpdateFailed": "Failed to update profile. Please try again."
   },
-  "dashboard": {
-    "title": "ផ្ទាំងគ្រប់គ្រង",
-    "subtitle": "ទិន្នន័យសារព័ត៌មានរបស់អ្នក",
-    "downloadReport": "ទាញយករបាយការណ៍",
-    "excel": "Excel",
-    "pdf": "PDF",
-    "inventoryStatus": "ស្ថានភាពសារព័ត៌",
-    "revenue": "ចំណូល",
-    "medicinesAvailable": "ថ្នាំដែលមានស្រាប់",
-    "medicineShortage": "កង្វះថ្នាំ"
-  },
+
   "inventory": {
     "title": "ព័ត៌មាន​ ផលិតផល",
     "totalMedicines": "ផលិតផល​ សរុប"
@@ -500,7 +535,6 @@
     "Next": "បន្ទាប់"
   },
   "topbar": {
-  
     "recentChats": "ថ្មីៗ",
 
     "viewAll": "មើលទាំងអស់",

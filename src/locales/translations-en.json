@@ -1,4 +1,46 @@
 {
+  "dashboard": {
+    "title": "Pharmacy Dashboard",
+    "subtitle": "Overview of pharmacy operations and metrics",
+    "stats": {
+      "inventory_status": "Inventory Status",
+      "revenue": "Revenue · Jan 2022",
+      "medicines_available": "Medicines Available",
+      "medicine_shortage": "Medicine Shortage",
+      "expiring_soon": "Expiring Soon",
+      "low_stock_items": "Low Stock Items"
+    },
+    "info": {
+      "medicine": {
+        "title": "Medicine",
+        "content": "{count} total medicines",
+        "link": "View"
+      },
+      "sales_report": {
+        "title": "Sales Report",
+        "content": "{count} total sales",
+        "link": "View"
+      },
+      "suppliers": {
+        "title": "Suppliers",
+        "content": "{count} total suppliers",
+        "link": "View"
+      },
+      "customers": {
+        "title": "Customers",
+        "content": "{count} total customers",
+        "link": "View"
+      },
+      "prescriptions": {
+        "title": "Prescriptions",
+        "content": {
+          "pending": "{count} Pending",
+          "processed": "{count} Processed"
+        },
+        "link": "View"
+      }
+    }
+  },
   "app": {
     "title": "Panharith Pharmacy"
   },
@@ -95,9 +137,8 @@
   },
 
   "topbar": {
-    
     "recentChats": "Recent Chats",
-  
+
     "viewAll": "View All",
     "close": "Close",
     "messages": "Messages",
@@ -149,16 +190,8 @@
     "goTo": "Go to"
   },
 
-  "dashboard": {
-    "title": "Dashboard",
-    "subtitle": "Overview of your pharmacy data",
-    "downloadReport": "Download Report",
-    "excel": "Excel",
-    "pdf": "PDF",
-    "inventoryStatus": "Inventory Status",
-    "revenue": "Revenue",
-    "medicinesAvailable": "Medicines Available",
-    "medicineShortage": "Medicine Shortage"
+  "navigation": {
+    "title": "Panharith"
   },
   "inventory": {
     "title": "Inventory",

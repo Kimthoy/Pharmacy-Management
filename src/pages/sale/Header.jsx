@@ -8,22 +8,20 @@ const Header = ({
   return (
     <header className="mb-6">
       <div className="flex justify-between flex-1 items-center mb-4">
-        <h1 className="text-2xl font-bold" aria-label="ឱសថស្ថាន">
+        <h1
+          className="text-2xl font-bold dark:text-white"
+          aria-label="ឱសថស្ថាន"
+        >
           ឱសថស្ថាន
         </h1>
         <nav className="space-x-4">
           <button
-           
-            className="text-gray-600 hover:text-gray-800"
+            className="text-gray-600 dark:text-white"
             aria-label="ទំព័រដើម"
           >
             ទំព័រដើម
           </button>
-          <button
-           
-            className="text-gray-600 hover:text-gray-800"
-            aria-label="ផលិតផល"
-          >
+          <button className="text-gray-600 dark:text-white" aria-label="ផលិតផល">
             ផលិតផល
           </button>
           <button

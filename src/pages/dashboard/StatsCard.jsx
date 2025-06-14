@@ -8,7 +8,7 @@ const StatsCard = ({
 }) => {
   return (
     <div
-      className={`p-4 rounded-lg text-center ${bgColor} border ${borderColor}`}
+      className={`p-4 rounded-lg hover:shadow-slate-500 hover:shadow-md transition-all text-center ${bgColor} border ${borderColor}`}
     >
       <Icon className={`h-6 w-6 mx-auto ${textColor}`} />
       <h3 className={`text-sm font-semibold mt-2 ${textColor}`}>{value}</h3>

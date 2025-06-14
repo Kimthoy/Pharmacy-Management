@@ -10,16 +10,18 @@ import {
   Cog6ToothIcon,
   BellIcon,
 } from "@heroicons/react/24/outline";
-// import { useState } from "react";
+import { useTranslation } from "../../hooks/useTranslation";
 import SystemMonitor from "./SystemMonitor";
 import QuickActions from "./QuickActions";
 import StatsCard from "./StatsCard";
 import InfoCard from "./InfoCard";
 
 const Dashboard = () => {
+  const { t } = useTranslation();
+
   const dashboardData = {
     inventoryStatus: "Good",
-    revenue: "Rs. 8,55,875",
+    revenue: "៛34,235,000",
     medicinesAvailable: 298,
     medicineShortage: 1,
     totalMedicines: 298,
@@ -58,10 +60,10 @@ const Dashboard = () => {
     <div className="bg-white dark:bg-gray-900 min-h-screen p-4 sm:p-6">
       <header className="mb-6">
         <h1 className="text-lg sm:text-2xl font-bold text-gray-600 dark:text-gray-200">
-          Pharmacy Dashboard
+          {t("dashboard.title")}
         </h1>
         <p className="text-xs sm:text-base text-gray-600 dark:text-gray-300">
-          Overview of pharmacy operations and metrics
+          {t("dashboard.subtitle")}
         </p>
       </header>
 
@@ -69,10 +71,10 @@ const Dashboard = () => {
 
       <QuickActions onAction={handleQuickAction} />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 ">
         <StatsCard
           icon={ShieldCheckIcon}
-          title="Inventory Status"
+          title={t("dashboard.stats.inventory_status")}
           value={dashboardData.inventoryStatus}
           bgColor="bg-green-100 dark:bg-green-900"
           textColor="text-green-800 dark:text-green-300"
@@ -80,7 +82,7 @@ const Dashboard = () => {
         />
         <StatsCard
           icon={CurrencyRupeeIcon}
-          title="Revenue · Jan 2022"
+          title={t("dashboard.stats.revenue")}
           value={dashboardData.revenue}
           bgColor="bg-yellow-100 dark:bg-yellow-900"
           textColor="text-yellow-800 dark:text-yellow-300"
@@ -88,7 +90,7 @@ const Dashboard = () => {
         />
         <StatsCard
           icon={ClipboardDocumentListIcon}
-          title="Medicines Available"
+          title={t("dashboard.stats.medicines_available")}
           value={dashboardData.medicinesAvailable}
           bgColor="bg-blue-100 dark:bg-blue-900"
           textColor="text-blue-500 dark:text-blue-300"
@@ -96,7 +98,7 @@ const Dashboard = () => {
         />
         <StatsCard
           icon={ExclamationTriangleIcon}
-          title="Medicine Shortage"
+          title={t("dashboard.stats.medicine_shortage")}
           value={dashboardData.medicineShortage}
           bgColor="bg-red-100 dark:bg-red-900"
           textColor="text-red-800 dark:text-red-300"
@@ -104,7 +106,7 @@ const Dashboard = () => {
         />
         <StatsCard
           icon={ClockIcon}
-          title="Expiring Soon"
+          title={t("dashboard.stats.expiring_soon")}
           value={dashboardData.expiringSoon}
           bgColor="bg-purple-100 dark:bg-purple-900"
           textColor="text-purple-800 dark:text-purple-300"
@@ -112,7 +114,7 @@ const Dashboard = () => {
         />
         <StatsCard
           icon={BellIcon}
-          title="Low Stock Items"
+          title={t("dashboard.stats.low_stock_items")}
           value={dashboardData.lowStockItems}
           bgColor="bg-orange-100 dark:bg-orange-900"
           textColor="text-orange-800 dark:text-orange-300"
@@ -123,50 +125,81 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <InfoCard
           icon={Cog6ToothIcon}
-          title="Medicine"
+          title={t("dashboard.info.medicine.title", "Medicine")}
           content={
-            <strong>{dashboardData.totalMedicines} total medicines</strong>
+            <strong>
+              {t("dashboard.info.medicine.content").replace(
+                "{count}",
+                dashboardData.totalMedicines
+              )}
+            </strong>
           }
-          linkLabel="View"
+          linkLabel={t("dashboard.info.medicine.link", "View")}
           linkTo="/listofmedicine"
         />
         <InfoCard
           icon={ShoppingCartIcon}
-          title="Sales Report"
-          content={<strong>{dashboardData.totalSales} total sales</strong>}
-          linkLabel="View"
+          title={t("dashboard.info.sales_report.title")}
+          content={
+            <strong>
+              {t("dashboard.info.sales_report.content").replace(
+                "{count}",
+                dashboardData.totalSales
+              )}
+            </strong>
+          }
+          linkLabel={t("dashboard.info.sales_report.link")}
           linkTo="/salereport"
         />
-
         <InfoCard
           icon={UserGroupIcon}
-          title="Suppliers"
+          title={t("dashboard.info.suppliers.title")}
           content={
-            <strong>{dashboardData.totalSuppliers} total suppliers</strong>
+            <strong>
+              {t("dashboard.info.suppliers.content").replace(
+                "{count}",
+                dashboardData.totalSuppliers
+              )}
+            </strong>
           }
-          linkLabel="View"
+          linkLabel={t("dashboard.info.suppliers.link")}
           linkTo="/manufacturerlist"
         />
         <InfoCard
           icon={UsersIcon}
-          title="Customers"
+          title={t("dashboard.info.customers.title")}
           content={
-            <strong>{dashboardData.totalCustomers} total customers</strong>
+            <strong>
+              {t("dashboard.info.customers.content").replace(
+                "{count}",
+                dashboardData.totalCustomers
+              )}
+            </strong>
           }
-          linkLabel="View"
+          linkLabel={t("dashboard.info.customers.link")}
           linkTo="/customerlist"
         />
         <InfoCard
           icon={ClipboardDocumentListIcon}
-          title="Prescriptions"
+          title={t("dashboard.info.prescriptions.title", "Prescriptions")}
           content={
             <>
-              <strong>{dashboardData.pendingPrescriptions}</strong> Pending
+              <strong>
+                {t("dashboard.info.prescriptions.content.pending").replace(
+                  "{count}",
+                  dashboardData.pendingPrescriptions
+                )}
+              </strong>
               <br />
-              <strong>{dashboardData.processedPrescriptions}</strong> Processed
+              <strong>
+                {t("dashboard.info.prescriptions.content.processed").replace(
+                  "{count}",
+                  dashboardData.processedPrescriptions
+                )}
+              </strong>
             </>
           }
-          linkLabel="View"
+          linkLabel={t("dashboard.info.prescriptions.link", "View")}
           linkTo="/inventory"
         />
       </div>
