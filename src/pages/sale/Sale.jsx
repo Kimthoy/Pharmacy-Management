@@ -207,6 +207,13 @@ const Sale = () => {
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
+  useEffect(() => {
+    randomizeProducts();
+  }, []);
+  useEffect(() => {
+    setCurrentProducts(regularProducts);
+    setIsCompoundMode(false);
+  }, []);
 
   return (
     <div className="flex h-screen bg-white dark:bg-gray-900 font-khmer relative">
@@ -215,10 +222,17 @@ const Sale = () => {
           <Header
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
-            randomizeProducts={randomizeProducts}
             isCompoundMode={isCompoundMode}
+            setCompoundModeType={(type) => {
+              const isCompound = type === "compound";
+              setCurrentProducts(
+                isCompound ? updatedCompoundMedicines : regularProducts
+              );
+              setIsCompoundMode(isCompound);
+            }}
             openRetailSaleModal={() => setIsRetailSaleOpen(true)}
           />
+
           <ProductList
             products={filteredProducts}
             cart={cart}

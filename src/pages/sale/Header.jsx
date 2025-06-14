@@ -1,20 +1,15 @@
 const Header = ({
   searchQuery,
   setSearchQuery,
-  randomizeProducts,
   isCompoundMode,
-  openRetailSaleModal, // New prop to trigger modal
+  setCompoundModeType, // updated prop to handle switching tab
+  openRetailSaleModal,
 }) => {
   return (
     <header className="mb-6">
       <div className="flex justify-between flex-1 items-center mb-4">
-        <h1
-          className="text-2xl font-bold dark:text-white"
-          aria-label="ឱសថស្ថាន"
-        >
-          ឱសថស្ថាន
-        </h1>
-        <nav className="space-x-4">
+        <div></div>
+        <nav className="space-x-4 mb-3">
           <button
             className="text-gray-600 dark:text-white"
             aria-label="ទំព័រដើម"
@@ -33,7 +28,8 @@ const Header = ({
           </button>
         </nav>
       </div>
-      <div className="flex justify-center">
+
+      <div className="flex justify-center items-center gap-4">
         <input
           type="text"
           placeholder="ស្វែងរកថ្នាំ ..."
@@ -42,13 +38,29 @@ const Header = ({
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        <button
-          onClick={randomizeProducts}
-          className="btn bg-emerald-500 text-white rounded-xl w-24 px-3 ml-5 transition-all duration-200 ease-in-out transform hover:scale-105 hover:bg-emerald-600 active:bg-emerald-700 active:scale-95 focus:outline-none focus:ring-2 focus:ring-emerald-400"
-          aria-label={isCompoundMode ? "ប្តូរទៅថ្នាំផ្សំ" : "ថ្នាំកាត់ផ្សំ"}
-        >
-          {isCompoundMode ? "ថ្នាំផ្សំ" : "ថ្នាំកាត់ផ្សំ"}
-        </button>
+
+        <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 border rounded-xl p-1 ml-3">
+          <button
+            onClick={() => setCompoundModeType("regular")}
+            className={`px-4 py-2 rounded-lg text-sm transition ${
+              !isCompoundMode
+                ? "bg-emerald-500 text-white"
+                : "text-gray-700 dark:text-white"
+            }`}
+          >
+            លក់ដុំ
+          </button>
+          <button
+            onClick={() => setCompoundModeType("compound")}
+            className={`px-4 py-2 rounded-lg text-sm transition ${
+              isCompoundMode
+                ? "bg-emerald-500 text-white"
+                : "text-gray-700 dark:text-white"
+            }`}
+          >
+            ថ្នាំផ្សំ
+          </button>
+        </div>
       </div>
     </header>
   );

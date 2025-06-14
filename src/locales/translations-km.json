@@ -58,7 +58,7 @@
     "selectProduct": "ជ្រើសរើសផលិតផល",
     "price": "តម្លៃ",
     "qty": "បរិមាណ",
-    "qtyPlaceholder": "បញ្ចូលបរិមាណ",
+    "qtyPlaceholder": "បញ្ចូលបរិមាណ​ (ជាគ្រាប់)",
     "errorProductRequired": "សូមជ្រើសរើសផលិតផល",
     "errorQtyInvalid": "បរិមាណត្រូវតែជាលេខវិជ្ជមាន",
     "errorQtyExceedsStock": "បរិមាណលើសពីស្តុកដែលមាន",
