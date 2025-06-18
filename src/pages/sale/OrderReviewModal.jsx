@@ -4,16 +4,24 @@ const OrderReviewModal = ({
   isOpen,
   setIsOpen,
   cart,
-  totalPrice,
   paymentMethod,
   cardNumber,
   setCardNumber,
   confirmOrder,
-  displayPrice,
+  displayPrice, // You may not need this now since price is in Riel
 }) => {
-  const safeTotalPrice = totalPrice || 0;
-  const exchangeRate = 4050;
-  const totalPriceInRiel = safeTotalPrice * exchangeRate;
+  const exchangeRate = 4050; // Riel per 1 USD
+
+  // Helper to convert Riel price to USD
+  const convertRielToUSD = (riel) => riel / exchangeRate;
+
+  // Calculate total price in USD based on cart items (assuming price in Riel)
+  const totalPrice = cart.reduce(
+    (sum, item) => sum + (item.price / exchangeRate) * item.quantity,
+    0
+  );
+
+  const totalPriceInRiel = totalPrice * exchangeRate;
 
   const [dollarAmountRaw, setDollarAmountRaw] = useState("");
   const [rielAmountRaw, setRielAmountRaw] = useState("");
@@ -47,11 +55,10 @@ const OrderReviewModal = ({
     const parsedValue = isDollar
       ? parseFloat(cleanValue)
       : parseInt(cleanValue);
-    if (isDollar && parsedValue < safeTotalPrice) {
+    if (isDollar && parsedValue < totalPrice) {
       return "Dollar is less than total price";
-    }
-    else if (!isDollar && parsedValue < totalPriceInRiel) {
-      return "Riel price is less than  total price";
+    } else if (!isDollar && parsedValue < totalPriceInRiel) {
+      return "Riel price is less than total price";
     }
     return "";
   };
@@ -134,13 +141,13 @@ const OrderReviewModal = ({
                   </span>
                   <span>
                     {item.quantity} x{" "}
-                    {(displayPrice(item.price) || 0).toLocaleString("en-US", {
+                    {convertRielToUSD(item.price).toLocaleString("en-US", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}{" "}
                     $ ={" "}
                     {(
-                      (displayPrice(item.price) || 0) * item.quantity
+                      convertRielToUSD(item.price) * item.quantity
                     ).toLocaleString("en-US", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
@@ -154,7 +161,7 @@ const OrderReviewModal = ({
               <span>សរុប:</span>
               <span className="font-semibold">
                 $
-                {safeTotalPrice.toLocaleString("en-US", {
+                {totalPrice.toLocaleString("en-US", {
                   minimumFractionDigits: 2,
                 })}
               </span>
@@ -183,7 +190,7 @@ const OrderReviewModal = ({
                   <div className="border flex items-center">
                     <input
                       type="text"
-                      value={formatNumber(dollarAmountRaw)}
+                      value={formatNumber(dollarAmountRaw, true)}
                       onChange={handleDollarChange}
                       className="w-full p-2 border-none focus:outline-none rounded-lg"
                       placeholder="ប្រាក់ដុល្លា"

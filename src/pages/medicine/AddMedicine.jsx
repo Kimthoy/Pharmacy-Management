@@ -1,133 +1,127 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
 import { useTranslation } from "../../hooks/useTranslation";
+import { createMedicine, fetchMedicineByBarcode } from "../api/medicineService";
 
 const AddMedicine = () => {
   const { t } = useTranslation();
   const [medicine, setMedicine] = useState({
     medicine_name: "",
     price: "",
-    quantity: "",
-    in_stock_date: "",
     weight: "",
+    quantity: "",
+    expire_date: "",
     status: "",
     category: "",
     medicine_detail: "",
     barcode_number: "",
   });
   const [openScanner, setOpenScanner] = useState(false);
-  const [isFormOpen, setIsFormOpen] = useState(false);
   const [torchOn, setTorchOn] = useState(false);
-  const handleChange = (e) => {
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleMedicineChange = useCallback((e) => {
     const { name, value } = e.target;
     setMedicine((prev) => ({
       ...prev,
       [name]: value,
     }));
-  };
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Submitted Medicine Data:", medicine);
-    alert(t("add-medicine.SuccessMessage")); 
-  };
+  }, []);
+
+  const handleMedicineSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      setError("");
+      setSuccess("");
+      setIsLoading(true);
+
+      if (!medicine.quantity || parseInt(medicine.quantity) < 0) {
+        setError(t("add-medicine.InvalidQuantity"));
+        setIsLoading(false);
+        return;
+      }
+      if (
+        medicine.expire_date &&
+        new Date(medicine.expire_date) <= new Date()
+      ) {
+        setError(t("add-medicine.InvalidExpireDate"));
+        setIsLoading(false);
+        return;
+      }
+      if (!medicine.barcode_number) {
+        setError(t("add-medicine.InvalidBarcode"));
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const payload = {
+          medicine_name: medicine.medicine_name,
+          price: parseFloat(medicine.price) || 0,
+          weight: medicine.weight,
+          quantity: parseInt(medicine.quantity) || 0,
+          expire_date: medicine.expire_date || null,
+          status: medicine.status,
+          category: medicine.category,
+          medicine_detail: medicine.medicine_detail || null,
+          barcode_number: medicine.barcode_number,
+        };
+
+        console.log("Sending payload:", payload);
+        await createMedicine(payload);
+        setSuccess(t("add-medicine.SuccessMessage"));
+        setMedicine({
+          medicine_name: "",
+          price: "",
+          weight: "",
+          quantity: "",
+          expire_date: "",
+          status: "",
+          category: "",
+          medicine_detail: "",
+          barcode_number: "",
+        });
+      } catch (err) {
+        console.error("Full error:", err);
+        const errorMessage = err?.message || t("add-medicine.ErrorMessage");
+        setError(errorMessage);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [t, medicine]
+  );
 
   return (
-    <div className="p-4 bg-white dark:bg-gray-900 rounded-md shadow-md dark:shadow-gray-800 w-full max-w-6xl mx-auto">
-      {/* Header */}
-      <div className="mb-4 flex flex-col md:flex-row justify-between items-start md:items-center">
+    <div className="p-6 bg-white dark:bg-gray-900 rounded-lg shadow-lg dark:shadow-gray-800 w-full max-w-6xl mx-auto">
+      <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center">
         <div>
-          <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+          <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
             {t("add-medicine.AddMedicine")}
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300">
+          </h2>
+          <p className="text-gray-500 italic text-sm dark:text-gray-400">
             {t("add-medicine.title-addmedicine")}
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => setIsFormOpen(true)}
-          className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-4 py-2 rounded-md dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition"
-        >
-          {t("add-medicine.ButtonAddSupplier")}
-        </button>
       </div>
-      {isFormOpen && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg dark:shadow-gray-700 w-11/12 md:w-1/2 relative">
-            <button
-              type="button"
-              className="absolute top-2 right-2 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100 text-2xl"
-              onClick={() => setIsFormOpen(false)}
-              aria-label="Close modal"
-            >
-              ×
-            </button>
-            <h2 className="text-xl font-bold mb-2 text-gray-800 dark:text-gray-200">
-              {t("add-medicine.SupplierFormTitle")}
-            </h2>
-            <p className="text-gray-500 dark:text-gray-300 mb-4">
-              {t("add-medicine.SupplierFormDescription")}
-            </p>
-            <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input
-                type="text"
-                placeholder={t("add-medicine.SupplierName")}
-                className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
-                required
-              />
-              <input
-                type="text"
-                placeholder={t("add-medicine.PharmacyName")}
-                className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
-                required
-              />
-              <input
-                type="text"
-                placeholder={t("add-medicine.Address")}
-                className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
-                required
-              />
-              <input
-                type="file"
-                className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
-                required
-              />
-              <input
-                type="text"
-                placeholder={t("add-medicine.InvoiceID")}
-                className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
-                required
-              />
-              <input
-                type="date"
-                className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
-                required
-              />
-              <div className="col-span-1 md:col-span-2 flex justify-end space-x-3 mt-4">
-                <button
-                  type="submit"
-                  className="border text-green-600 dark:text-green-400 hover:text-white hover:bg-green-600 dark:hover:bg-green-500 px-4 py-2 rounded-md"
-                >
-                  {t("add-medicine.Save")}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsFormOpen(false)}
-                  className="hover:text-red-600 dark:hover:text-red-400 text-gray-400 dark:text-gray-300 rounded-md"
-                >
-                  {t("add-medicine.Cancel")}
-                </button>
-              </div>
-            </form>
-          </div>
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/50 text-red-600 dark:text-red-300 text-sm rounded-md border border-red-200 dark:border-red-700">
+          {error}
         </div>
       )}
-      <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {success && (
+        <div className="mb-4 p-4 bg-green-50 dark:bg-green-900/50 text-green-600 dark:text-green-300 text-sm rounded-md border border-green-200 dark:border-green-700">
+          {success}
+        </div>
+      )}
+      <form onSubmit={handleMedicineSubmit}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="flex flex-col">
             <label
               htmlFor="medicine_name"
-              className="mb-2 text-gray-700 dark:text-gray-300"
+              className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
             >
               {t("add-medicine.Madicinename")}
             </label>
@@ -137,68 +131,32 @@ const AddMedicine = () => {
               name="medicine_name"
               placeholder={t("add-medicine.MecineName-PlaceHolder")}
               value={medicine.medicine_name}
-              onChange={handleChange}
-              className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
-              required
+              onChange={handleMedicineChange}
+              className="text-sm border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
             />
           </div>
           <div className="flex flex-col">
             <label
               htmlFor="price"
-              className="mb-2 text-gray-700 dark:text-gray-300"
+              className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
             >
               {t("add-medicine.Price")}
             </label>
             <input
-              type="text"
+              type="number"
               id="price"
               name="price"
+              step="0.01"
               placeholder={t("add-medicine.Price-PlaceHolder")}
               value={medicine.price}
-              onChange={handleChange}
-              className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
-              required
-            />
-          </div>
-          <div className="flex flex-col">
-            <label
-              htmlFor="quantity"
-              className="mb-2 text-gray-700 dark:text-gray-300"
-            >
-              {t("add-medicine.Quantity")}
-            </label>
-            <input
-              type="number"
-              id="quantity"
-              name="quantity"
-              placeholder={t("add-medicine.Quantity-PlaceHolder")}
-              value={medicine.quantity}
-              onChange={handleChange}
-              className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
-              required
-            />
-          </div>
-          <div className="flex flex-col">
-            <label
-              htmlFor="in_stock_date"
-              className="mb-2 text-gray-700 dark:text-gray-300"
-            >
-              {t("add-medicine.InStockDate")}
-            </label>
-            <input
-              type="date"
-              id="in_stock_date"
-              name="in_stock_date"
-              value={medicine.in_stock_date}
-              onChange={handleChange}
-              className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
-              required
+              onChange={handleMedicineChange}
+              className="text-sm border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
             />
           </div>
           <div className="flex flex-col">
             <label
               htmlFor="weight"
-              className="mb-2 text-gray-700 dark:text-gray-300"
+              className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
             >
               {t("add-medicine.Weight")}
             </label>
@@ -208,47 +166,88 @@ const AddMedicine = () => {
               name="weight"
               placeholder={t("add-medicine.Weight-PlaceHolder")}
               value={medicine.weight}
-              onChange={handleChange}
-              className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
-              required
+              onChange={handleMedicineChange}
+              className="text-sm border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label
+              htmlFor="quantity"
+              className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
+              {t("add-medicine.Quantity")}
+            </label>
+            <input
+              type="number"
+              id="quantity"
+              name="quantity"
+              placeholder={t("add-medicine.Quantity-PlaceHolder")}
+              value={medicine.quantity}
+              onChange={handleMedicineChange}
+              className="text-sm border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label
+              htmlFor="expire_date"
+              className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
+              {t("add-medicine.ExpireDate")} ({t("add-medicine.Optional")})
+            </label>
+            <input
+              type="date"
+              id="expire_date"
+              name="expire_date"
+              min={new Date(Date.now() + 86400000).toISOString().split("T")[0]}
+              value={medicine.expire_date}
+              onChange={handleMedicineChange}
+              className="text-sm border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
             />
           </div>
           <div className="flex flex-col relative">
             <label
               htmlFor="barcode_number"
-              className="mb-2 text-gray-700 dark:text-gray-300"
+              className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
             >
               {t("add-medicine.BarcodeScan")}
             </label>
-            <div className="border border-gray-400 dark:border-gray-600 text-xs font-light focus-within:outline-green-400 focus-within:border-green-700 rounded-sm px-6 py-2 cursor-pointer relative dark:bg-gray-700">
+            <div className="relative">
               <input
                 id="barcode_number"
                 type="text"
                 name="barcode_number"
                 value={medicine.barcode_number}
-                onChange={handleChange}
+                onChange={handleMedicineChange}
                 placeholder={t("add-medicine.BarcodeScan-PlaceHolder")}
-                className="bg-transparent focus:outline-none w-full text-gray-800 dark:text-gray-200"
-                readOnly
+                className="text-sm border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
               />
               <button
                 type="button"
                 onClick={() => setOpenScanner(true)}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2"
-                aria-label="Open scanner"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-green-500 dark:hover:text-green-400"
+                aria-label="Open barcode scanner"
               >
-                <img
-                  src="https://img.icons8.com/ios/50/barcode.png"
-                  alt="Scan"
-                  width="25"
-                />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
               </button>
             </div>
           </div>
           <div className="flex flex-col">
             <label
               htmlFor="status"
-              className="mb-2 text-gray-700 dark:text-gray-300"
+              className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
             >
               {t("add-medicine.Status")}
             </label>
@@ -256,9 +255,8 @@ const AddMedicine = () => {
               id="status"
               name="status"
               value={medicine.status}
-              onChange={handleChange}
-              className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
-              required
+              onChange={handleMedicineChange}
+              className="text-sm border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
             >
               <option value="">{t("add-medicine.Status-PlaceHolder")}</option>
               <option value="active">Active</option>
@@ -268,7 +266,7 @@ const AddMedicine = () => {
           <div className="flex flex-col">
             <label
               htmlFor="category"
-              className="mb-2 text-gray-700 dark:text-gray-300"
+              className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
             >
               {t("add-medicine.Category")}
             </label>
@@ -276,20 +274,20 @@ const AddMedicine = () => {
               id="category"
               name="category"
               value={medicine.category}
-              onChange={handleChange}
-              className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
-              required
+              onChange={handleMedicineChange}
+              className="text-sm border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
             >
               <option value="">{t("add-medicine.Category-PlaceHolder")}</option>
               <option value="tablet">Tablet</option>
               <option value="syrup">Syrup</option>
               <option value="vitamin">Vitamin</option>
+              <option value="other">Other</option>
             </select>
           </div>
           <div className="flex flex-col col-span-1 md:col-span-3">
             <label
               htmlFor="medicine_detail"
-              className="mb-2 text-gray-700 dark:text-gray-300"
+              className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
             >
               {t("add-medicine.MedicineInformation")}
             </label>
@@ -298,49 +296,43 @@ const AddMedicine = () => {
               name="medicine_detail"
               placeholder={t("add-medicine.MedicineInformation-PlaceHolder")}
               value={medicine.medicine_detail}
-              onChange={handleChange}
-              className="border border-gray-400 dark:border-gray-600 w-full h-32 px-2 py-2 rounded-[4px] font-light text-xs focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
-              required
+              onChange={handleMedicineChange}
+              className="text-sm border border-gray-300 dark:border-gray-600 w-full h-28 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
             ></textarea>
           </div>
         </div>
-        <div className="mt-4">
+        <div className="mt-6">
           <button
             type="submit"
-            className="bg-green-500 dark:bg-green-600 text-xs text-white px-3 py-3 rounded-md w-full md:w-auto shadow-md active:shadow-none hover:bg-green-600 dark:hover:bg-green-500"
+            disabled={isLoading}
+            className={`px-6 py-3 rounded-md text-sm font-medium text-white transition ${
+              isLoading
+                ? "bg-green-400 dark:bg-green-500 cursor-not-allowed"
+                : "bg-green-500 dark:bg-green-600 hover:bg-green-600 dark:hover:bg-green-500"
+            } w-full md:w-auto shadow-md`}
           >
-            {t("add-medicine.ButtonAddMedicine")}
+            {isLoading
+              ? t("add-medicine.Submitting")
+              : t("add-medicine.ButtonAddMedicine")}
           </button>
         </div>
       </form>
       {openScanner && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 w-full max-w-md">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
             <div className="relative" style={{ height: "300px" }}>
               <BarcodeScannerComponent
                 width="100%"
                 height="100%"
                 facingMode="environment"
                 torch={torchOn}
-                onUpdate={(err, result) => {
-                  if (result) {
-                    setMedicine((prev) => ({
-                      ...prev,
-                      barcode_number: result.text,
-                    }));
-                    setOpenScanner(false);
-                  }
-                  if (err) {
-                    console.error("Scanner error:", err);
-                  }
-                }}
               />
               <button
                 onClick={() => setTorchOn(!torchOn)}
-                className="absolute top-2 right-2 bg-black bg-opacity-70 text-white p-2 rounded-full"
-                aria-label={torchOn ? "Flash On" : "Flash Off"}
+                className="absolute top-2 right-2 bg-black bg-opacity-70 text-white p-2 rounded-full hover:bg-opacity-90 transition"
+                aria-label={torchOn ? "Turn flash off" : "Turn flash on"}
               >
-                {torchOn ? "🔦 Flash On" : "💡 Flash Off"}
+                {torchOn ? "🔦 Off" : "💡 On"}
               </button>
             </div>
             <div className="mt-4 flex justify-between items-center">
@@ -350,11 +342,16 @@ const AddMedicine = () => {
               </div>
               <button
                 onClick={() => setOpenScanner(false)}
-                className="px-4 py-2 bg-red-500 dark:bg-red-600 text-white rounded hover:bg-red-600 dark:hover:bg-red-500"
+                className="px-4 py-2 bg-red-500 dark:bg-red-600 text-white rounded-md hover:bg-red-600 dark:hover:bg-red-500 text-sm transition"
               >
                 {t("add-medicine.CloseScanner")}
               </button>
             </div>
+            {isLoading && (
+              <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                {t("add-medicine.LoadingMedicine")}
+              </div>
+            )}
           </div>
         </div>
       )}

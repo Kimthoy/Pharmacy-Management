@@ -107,8 +107,7 @@ const RetailSaleModal = ({ isOpen, setIsOpen, products, addToCart }) => {
               <option value="">{t("retailSale.selectProduct")}</option>
               {products.map((product) => (
                 <option key={product.id} value={product.id}>
-                  {product.name} ({t("retailSale.price")}: $
-                  {product.price.toFixed(2)})
+                  {product.name}
                 </option>
               ))}
             </select>

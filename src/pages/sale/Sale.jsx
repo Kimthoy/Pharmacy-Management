@@ -7,6 +7,7 @@ import CheckoutModal from "./CheckoutModal";
 import RetailSaleModal from "./RetailSaleModal";
 import ToastNotification from "./ToastNotification";
 import compoundMedicines from "./compoundMedicines";
+import "./sell.css";
 
 const Sale = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -77,6 +78,46 @@ const Sale = () => {
     },
     {
       id: 6,
+      supply_id: 1,
+      name: "ថ្នាំប្រឆាំងនឹងអាឡែស៊ី",
+      price: 0.9,
+      image:
+        "https://th.bing.com/th/id/OIP.F1gIKLr0bGqvir5qjXrjuQHaHa?w=172&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
+      hasBottle: false,
+      typeofmedicine: "ថ្នាំធម្មតា",
+    },
+    {
+      id: 7,
+      supply_id: 1,
+      name: "ថ្នាំប្រឆាំងនឹងអាឡែស៊ី",
+      price: 0.9,
+      image:
+        "https://th.bing.com/th/id/OIP.F1gIKLr0bGqvir5qjXrjuQHaHa?w=172&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
+      hasBottle: false,
+      typeofmedicine: "ថ្នាំធម្មតា",
+    },
+    {
+      id: 8,
+      supply_id: 1,
+      name: "ថ្នាំប្រឆាំងនឹងអាឡែស៊ី",
+      price: 0.9,
+      image:
+        "https://th.bing.com/th/id/OIP.F1gIKLr0bGqvir5qjXrjuQHaHa?w=172&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
+      hasBottle: false,
+      typeofmedicine: "ថ្នាំធម្មតា",
+    },
+    {
+      id: 9,
+      supply_id: 1,
+      name: "ថ្នាំប្រឆាំងនឹងអាឡែស៊ី",
+      price: 0.9,
+      image:
+        "https://th.bing.com/th/id/OIP.F1gIKLr0bGqvir5qjXrjuQHaHa?w=172&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
+      hasBottle: false,
+      typeofmedicine: "ថ្នាំធម្មតា",
+    },
+    {
+      id: 10,
       supply_id: 1,
       name: "ថ្នាំប្រឆាំងនឹងអាឡែស៊ី",
       price: 0.9,

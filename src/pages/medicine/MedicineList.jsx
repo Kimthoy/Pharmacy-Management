@@ -1,286 +1,290 @@
-import { useState, useRef, useEffect } from "react";
-import { FaEllipsisV } from "react-icons/fa";
-import { BiEdit, BiShow, BiTrash } from "react-icons/bi";
-import { MdWarehouse } from "react-icons/md";
-import { useTranslation } from "../../hooks/useTranslation";
-import { useNavigate } from "react-router-dom";
-
-const medicines = [
-  {
-    ProductID: 1,
-    name: "Zimax",
-    weight: "500mg",
-    category: "Tablet",
-    quantityPerPackage: 100,
-    price: "20.55 USD",
-    stock: 100,
-    date: "2025-01-20",
-    manufacturer: "Healthcare",
-    expireDate: "2020-12-19",
-    startingStock: 230,
-    manufacturePrice: 50.0,
-    wholesalePrice: 55.0,
-    sellingPrice: 60.0,
-  },
-  {
-    ProductID: 2,
-    name: "Oxidon",
-    weight: "10mg",
-    category: "Tablet",
-    quantityPerPackage: 50,
-    price: "15.00 USD",
-    stock: 50,
-    date: "2025-02-10",
-    manufacturer: "PharmaCorp",
-    expireDate: "2021-06-15",
-    startingStock: 100,
-    manufacturePrice: 40.0,
-    wholesalePrice: 45.0,
-    sellingPrice: 50.0,
-  },
-  {
-    ProductID: 3,
-    name: "MED-1008",
-    weight: "200Doses",
-    category: "Inhaler",
-    quantityPerPackage: 1,
-    price: "12.45 USD",
-    stock: 0,
-    date: "2025-03-21",
-    manufacturer: "MediTech",
-    expireDate: "2022-03-10",
-    startingStock: 50,
-    manufacturePrice: 30.0,
-    wholesalePrice: 35.0,
-    sellingPrice: 40.0,
-  },
-];
+import React, { useEffect, useState } from "react";
+import { BiShow, BiEdit, BiTrash } from "react-icons/bi";
+import { getAllMedicines, toggleProductStatus } from "../api/medicineService";
+import { GrCheckboxSelected } from "react-icons/gr";
+import { FaBan } from "react-icons/fa6";
+import { PiBackspaceBold } from "react-icons/pi";
 
 const MedicineList = () => {
-  const { t } = useTranslation();
-
-  const [openMenu, setOpenMenu] = useState(null);
-  const menuRef = useRef(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [medicines, setMedicines] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [category, setCategory] = useState("");
-  const navigate = useNavigate();
-
-  const toggleMenu = (index) => setOpenMenu(openMenu === index ? null : index);
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 10;
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [selectedMedicines, setSelectedMedicines] = useState([]);
+  const [selectedMedicine, setSelectedMedicine] = useState(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setOpenMenu(null);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    fetchMedicines();
   }, []);
-
-  const filteredMedicines = medicines.filter((med) => {
-    const matchesSearch = med.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchesCategory = category ? med.category === category : true;
-    const matchesDate =
-      (!startDate || new Date(med.date) >= new Date(startDate)) &&
-      (!endDate || new Date(med.date) <= new Date(endDate));
-    return matchesSearch && matchesCategory && matchesDate;
-  });
-
-  const totalPages = Math.ceil(filteredMedicines.length / rowsPerPage);
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const selectedMedicines = filteredMedicines.slice(
-    startIndex,
-    startIndex + rowsPerPage
-  );
-
-  const getStatus = (stock) => {
-    if (stock === 0)
-      return { text: "Out of Stock", color: "text-red-600 dark:text-red-400" };
-    if (stock <= 50)
-      return { text: "Low", color: "text-orange-500 dark:text-orange-300" };
-    return { text: "Available", color: "text-green-600 dark:text-green-400" };
+  const handleCheckboxChange = (id) => {
+    setSelectedMedicines((prevSelected) =>
+      prevSelected.includes(id)
+        ? prevSelected.filter((mid) => mid !== id)
+        : [...prevSelected, id]
+    );
+  };
+  // Handle pop view medicine
+  const handleView = (medicine) => {
+    setSelectedMedicine(medicine);
+    setIsViewModalOpen(true);
   };
 
-  return (
-    <div className="p-6 bg-white dark:bg-gray-900 shadow-md dark:shadow-gray-800 rounded-md overflow-x-auto">
-      <h2 className="text-2xl font-bold mb-2 text-gray-800 dark:text-gray-200">
-        {t("medicinelist.MedicineListTitle")}
-      </h2>
-      <p className="text-gray-600 dark:text-gray-300 mb-4">
-        {t("medicinelist.MedicineListDesc")}
-      </p>
+  const handleSelectAll = () => {
+    if (isAllSelected) {
+      setSelectedMedicines([]);
+    } else {
+      const allIds = paginatedMedicines.map((m) => m.id);
+      setSelectedMedicines(allIds);
+    }
+  };
+  const fetchMedicines = async () => {
+    setLoading(true);
+    try {
+      const data = await getAllMedicines();
+      console.log("Fetched medicines:", data);
+      setMedicines(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Failed to fetch medicines:", err);
+    }
+    setLoading(false);
+  };
 
-      <div className="flex flex-wrap gap-4 mb-4">
+  const handleToggleStatus = async (medicineId) => {
+    try {
+      await toggleProductStatus(medicineId);
+      fetchMedicines(); // Refresh list
+    } catch (err) {
+      console.error("Failed to toggle status:", err);
+    }
+  };
+
+  // 1. Filtered medicines (FIRST)
+  const filteredMedicines = medicines.filter((med) => {
+    const name = med.product?.name || "";
+    const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase());
+
+    let matchesDate = true;
+    if (startDate && endDate && med.date) {
+      const medDate = new Date(med.date);
+      matchesDate =
+        medDate >= new Date(startDate) && medDate <= new Date(endDate);
+    }
+
+    return matchesSearch && matchesDate;
+  });
+
+  // 2. Paginate after filter
+  const totalPages = Math.ceil(filteredMedicines.length / rowsPerPage);
+  const paginatedMedicines = filteredMedicines.slice(
+    (currentPage - 1) * rowsPerPage,
+    currentPage * rowsPerPage
+  );
+
+  // 3. THEN compute checkbox logic
+  const isAllSelected =
+    paginatedMedicines.length > 0 &&
+    selectedMedicines.length === paginatedMedicines.length;
+
+  return (
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4 dark:text-slate-200">
+        Medicine List
+      </h2>
+      {/* Search and Filters */}
+      <div className="mb-4 flex flex-wrap gap-4">
         <input
           type="text"
-          placeholder={t("medicinelist.MedicineListSearchByName")}
-          className="border border-gray-300 dark:border-gray-600 p-2 rounded-md focus:outline-green-500 dark:bg-gray-700 dark:text-gray-200"
+          placeholder="Search by name..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+          className="border p-2 rounded"
         />
-        <select
-          className="border border-gray-300 dark:border-gray-600 p-2 rounded-md focus:outline-green-500 dark:bg-gray-700 dark:text-gray-200"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-        >
-          <option value="">All Categories</option>
-          <option value="Tablet">Tablet</option>
-          <option value="Vitamin">Vitamin</option>
-          <option value="Inhaler">Inhaler</option>
-        </select>
       </div>
-      <div className="flex mb-4">
-        <div className="me-5">
-          <label className="me-2 text-gray-400 dark:text-gray-300">
-            {t("medicinelist.MedicineListFilterStartDate")}
-          </label>
-          <input
-            type="date"
-            className="border border-gray-300 dark:border-gray-600 p-2 rounded-md focus:outline-green-500 dark:bg-gray-700 dark:text-gray-200"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
-        </div>
-        <div>
-          <label className="me-2 text-gray-400 dark:text-gray-300">
-            {t("medicinelist.MedicineListFilterEndDate")}
-          </label>
-          <input
-            type="date"
-            className="border border-gray-300 dark:border-gray-600 p-2 rounded-md focus:outline-green-500 dark:bg-gray-700 dark:text-gray-200"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
-        </div>
-      </div>
-
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[600px] border-collapse bg-white dark:bg-gray-800 shadow-md dark:shadow-gray-700 rounded-lg">
-          <thead className="border border-gray-200 dark:border-gray-600 text-gray-400 dark:text-gray-300 rounded">
+      {error && <p className="text-red-500 mb-2">⚠️ {error}</p>}
+      {/* Loading State */}
+      {loading ? (
+        <p className="text-center mt-36 text-lg">Loading medicines...</p>
+      ) : (
+        <table className="w-full border-collapse border border-gray-300">
+          <thead className="bg-gray-200 dark:bg-slate-700 dark:text-slate-600">
             <tr>
-              <td className="p-3 text-left text-sm">
-                {t("medicinelist.MedicineListMedicineName")}
-              </td>
-              <td className="p-3 text-left text-sm">
-                {t("medicinelist.MedicineListMedicinePrice")}
-              </td>
+              <th className="border  hover:cursor-pointer px-2 py-4 dark:text-slate-200">
+                <input
+                  checked={isAllSelected}
+                  onChange={handleSelectAll}
+                  type="checkbox"
+                  name=""
+                  id=""
+                  className="w-5 h-5 accent-green-600 rounded transition-all duration-200 ease-in-out scale-100 checked:scale-110"
+                />
+              </th>
+              <td className="border px-3 dark:text-slate-100">Name</td>
+              <td className="border px-3 dark:text-slate-100">Price</td>
 
-              <td className="p-3 text-left text-sm">
-                {t("medicinelist.MedicineListMedicineStatus")}
-              </td>
-              <td className="p-3 text-left text-sm">
-                {t("medicinelist.MedicineListMedicineDate")}
-              </td>
-              <td className="p-3 text-left text-sm">
-                {t("medicinelist.MedicineListMedicineActions")}
-              </td>
+              <td className="border px-3 dark:text-slate-100">Status</td>
+              <td className="border px-3 dark:text-slate-100">Expire Date</td>
+              <td className="border px-3 dark:text-slate-100">Descriptions</td>
+              <td className="border px-3 dark:text-slate-100">Actions</td>
             </tr>
           </thead>
           <tbody>
-            {selectedMedicines.map((med, index) => {
-              const { text, color } = getStatus(med.stock);
-              return (
+            {paginatedMedicines.length > 0 ? (
+              paginatedMedicines.map((med, index) => (
                 <tr
-                  key={med.ProductID}
-                  className="border border-gray-200 dark:border-gray-600 text-xs sm:text-base"
+                  key={med.id}
+                  className="text-left transition-all hover:bg-slate-300 dark:hover:bg-slate-600"
                 >
-                  <td className="p-3 text-[13px] text-gray-400 dark:text-gray-300">
-                    {med.name}
+                  <td className=" text-center px-2 hover:cursor-pointer border  dark:text-slate-100">
+                    <input
+                      checked={selectedMedicines.includes(med.id)}
+                      onChange={() => handleCheckboxChange(med.id)}
+                      type="checkbox"
+                      className="w-5 h-5 accent-blue-600 rounded transition-all duration-200 ease-in-out scale-100 checked:scale-110"
+                    />
                   </td>
-                  <td className="p-3 text-[13px] text-gray-400 dark:text-gray-300">
-                    {med.price}
+                  <td className="border px-3 dark:text-slate-100">
+                    {med.medicine_name}
                   </td>
-
-                  <td className={`p-3 text-[13px] ${color}`}>{text}</td>
-                  <td className="p-3 text-[13px] text-gray-400 dark:text-gray-300">
-                    {med.date}
+                  <td className="border px-3 dark:text-slate-100">
+                    $ {med.price}
                   </td>
-                  <td className="p-3 text-[13px] relative">
+                  <td className="border px-3 dark:text-slate-100">
+                    {med.active ? "Active" : "Inactive"}
+                  </td>
+                  <td className="border px-3 dark:text-slate-100">
+                    {med.expire_date}
+                  </td>
+                  <td className="border px-3 dark:text-slate-100">
+                    {med.medicine_detail}
+                  </td>
+                  <td className="border-b py-5  flex flex-1">
                     <button
-                      ref={menuRef}
-                      className="p-2 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300"
-                      onClick={() => toggleMenu(index)}
+                      onClick={() => handleView(med)}
+                      className="text-white ml-2 hover:scale-110 transition-all p-1 rounded-lg bg-yellow-500"
                     >
-                      <FaEllipsisV />
+                      <BiShow className="w-5 h-5" />
                     </button>
-                    {openMenu === index && (
-                      <div className="absolute z-10 right-16 mt-2 top-2 w-36 bg-gray-100 dark:bg-gray-800 border border-green-600 dark:border-green-500 rounded-md shadow-md dark:shadow-gray-700">
-                        <button className="flex align-middle w-full text-left text-gray-600 dark:text-gray-200 py-2 hover:rounded-md hover:bg-green-500 hover:text-white dark:hover:bg-green-400 dark:hover:text-white">
-                          <MdWarehouse className="mt-1 w-10" />
-                          {t("medicinelist.MedicineListMedicineManufacturer")}
-                        </button>
-                        <button
-                          className="flex align-middle w-full text-left text-gray-600 dark:text-gray-200 py-2 hover:rounded-md hover:bg-green-500 hover:text-white dark:hover:bg-green-400 dark:hover:text-white"
-                          onClick={() => navigate(`/medicine/${med.ProductID}`)} // Updated path
-                        >
-                          <BiShow className="mt-1 w-10" />
-                          {t("medicinelist.MedicineListMedicineViewDetails")}
-                        </button>
-                        <button className="flex align-middle w-full text-left text-gray-600 dark:text-gray-200 py-2 hover:rounded-md hover:bg-green-500 hover:text-white dark:hover:bg-green-400 dark:hover:text-white">
-                          <BiEdit className="mt-1 w-10" />
-                          {t("medicinelist.MedicineListMedicineViewEdit")}
-                        </button>
-                        <button className="flex align-middle w-full text-left text-gray-600 dark:text-gray-200 py-2 hover:rounded-md hover:bg-green-500 hover:text-white dark:hover:bg-green-400 dark:hover:text-white">
-                          <BiTrash className="mt-1 w-10" />
-                          {t("medicinelist.MedicineListMedicineRemove")}
-                        </button>
-                      </div>
-                    )}
+
+                    <button
+                      to={`/medicines/edit/${med.id}`}
+                      className="text-white ml-2 p-1 hover:scale-110 transition-all rounded-lg bg-blue-700  "
+                    >
+                      <BiEdit className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={() => handleToggleStatus(med.id)}
+                      className={`p-1 rounded-lg ml-2 hover:scale-125 transition-all text-white text-lg ${
+                        med.active ? "bg-red-600 " : "bg-green-600 "
+                      }`}
+                    >
+                      {med.active ? (
+                        <FaBan className="h-5 w-5" />
+                      ) : (
+                        <GrCheckboxSelected className="h-5 w-5" />
+                      )}
+                    </button>
                   </td>
                 </tr>
-              );
-            })}
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" className="text-center p-4">
+                  No medicines found.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
-      </div>
+      )}
+      {isViewModalOpen && selectedMedicine && (
+        <div className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-md shadow-slate-300 w-[90%] max-w-md relative">
+            <PiBackspaceBold
+              className="w-6 h-6 float-end mr-4 hover:cursor-pointer hover:text-red-600"
+              onClick={() => setIsViewModalOpen(false)}
+            />
 
-      <div className="flex flex-wrap items-center justify-between mt-4">
-        <div className="flex items-center space-x-2">
-          <span className="text-gray-600 dark:text-gray-300">
-            {t("medicinelist.Rowsperpag")}
-          </span>
-          <select
-            className="border border-gray-300 dark:border-gray-600 p-2 rounded-md dark:bg-gray-700 dark:text-gray-200"
-            value={rowsPerPage}
-            onChange={(e) => {
-              setRowsPerPage(parseInt(e.target.value, 10));
-              setCurrentPage(1);
-            }}
-          >
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="15">15</option>
-          </select>
+            <h2 className="text-xl font-semibold mb-4 text-center text-gray-700 dark:text-gray-100">
+              Information
+            </h2>
+            <div className=" text-gray-800 dark:text-gray-200">
+              <table className="table-auto w-full text-left border-collapse">
+                <tbody>
+                  <tr className="border-b hover:bg-slate-200 hover:shadow-md  cursor-pointer ">
+                    <td className="pl-4 py-2 font-semibold w-1/4">Name</td>
+                    <td className="py-2 w-1/12">:</td>
+                    <td className="py-2 float-end pr-4 uppercase">
+                      {selectedMedicine.medicine_name}
+                    </td>
+                  </tr>
+                  <tr className="border-b hover:bg-slate-200 hover:shadow-md  cursor-pointer">
+                    <td className="py-2 font-semibold pl-4">Price</td>
+                    <td className="py-2">:</td>
+                    <td className="py-2 float-end pr-4">
+                      ${selectedMedicine.price}
+                    </td>
+                  </tr>
+                  <tr className="border-b hover:bg-slate-200 hover:shadow-md  cursor-pointer">
+                    <td className="py-2 font-semibold pl-4">Weight (mg)</td>
+                    <td className="py-2">:</td>
+                    <td className="py-2 float-end pr-4">
+                      {selectedMedicine.weight} mg
+                    </td>
+                  </tr>
+                  <tr className="border-b hover:bg-slate-200 hover:shadow-md  cursor-pointer">
+                    <td className="py-2 font-semibold pl-4">Category</td>
+                    <td className="py-2">:</td>
+                    <td className="py-2 float-end pr-4">
+                      {selectedMedicine.category}
+                    </td>
+                  </tr>
+                  <tr className="border-b hover:bg-slate-200 hover:shadow-md  cursor-pointer">
+                    <td className="py-2 font-semibold pl-4">Status</td>
+                    <td className="py-2">:</td>
+                    <td className="py-2 float-end pr-4">
+                      {selectedMedicine.active ? (
+                        <span className="text-green-600 font-medium">
+                          Active
+                        </span>
+                      ) : (
+                        <span className="text-red-600 font-medium">
+                          Inactive
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                  <tr className="border-b hover:bg-slate-200 hover:shadow-md  cursor-pointer">
+                    <td className="py-2 font-semibold pl-4">Expire Date</td>
+                    <td className="py-2">:</td>
+                    <td className="py-2 float-end pr-4">
+                      {selectedMedicine.expire_date}
+                    </td>
+                  </tr>
+                  <tr className="hover:bg-slate-200 hover:shadow-md  cursor-pointer">
+                    <td className="py-2 font-semibold pl-4">Description</td>
+                    <td className="py-2">:</td>
+                    <td className="py-2 float-end pr-4">
+                      {selectedMedicine.medicine_detail}
+                    </td>
+                  </tr>
+                  <tr className="hover:bg-slate-200 hover:shadow-md cursor-pointer">
+                    <td className="py-2 font-semibold pl-4">Barcode</td>
+                    <td className="py-2">:</td>
+                    <td className="py-2 float-end pr-4">
+                      {selectedMedicine.barcode_number}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
-            disabled={currentPage === 1}
-          >
-            {t("medicinelist.MedicineListMedicinePrevious")}
-          </button>
-          <span className="text-gray-700 dark:text-gray-300">
-            {t("medicinelist.MedicineListMedicinePage")} {currentPage}{" "}
-            {t("medicinelist.MedicineListMedicineof")} {totalPages}
-          </span>
-          <button
-            onClick={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-            }
-            className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
-            disabled={currentPage === totalPages}
-          >
-            {t("medicinelist.MedicineListMedicineNext")}
-          </button>
-        </div>
-      </div>
+      )}
     </div>
   );
 };

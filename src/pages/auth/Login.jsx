@@ -2,6 +2,7 @@ import { useState, useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { useTranslation } from "../../hooks/useTranslation";
 import { useNavigate, Link } from "react-router-dom";
+import axios from "axios";
 import {
   FaFacebookF,
   FaTwitter,
@@ -9,7 +10,6 @@ import {
   FaPinterestP,
   FaYoutube,
 } from "react-icons/fa";
-import { mockUsers } from "../../data/mockData"; // Import shared data
 
 const Login = () => {
   const { t } = useTranslation();
@@ -25,70 +25,77 @@ const Login = () => {
     setError("");
 
     try {
-      
-      const user = mockUsers.find(
-        (u) => u.email === email && u.password === password
-      );
+      const response = await axios.post("http://localhost:8000/api/login", {
+        email,
+        password,
+      });
 
-      if (!user) {
-        throw new Error(t("login.invalidCredentials"));
-      }
-
-     
-      if (user.status === "Inactive") {
-        throw new Error(t("login.inactiveAccount"));
-      }
-
-    
-      const response = {
-        data: {
-          token: user.token,
-          user: {
-            name: user.name,
-            email: user.email,
-            profile_picture: user.profile_picture,
-            role: user.role,
-            contact: user.contact,
-            join_date: user.join_date,
-          },
-        },
-      };
-
-      if (response.data.token) {
-        const userData = {
-          name: response.data.user.name || "User",
-          email: response.data.user.email || email,
-          profile_picture: response.data.user.profile_picture || "",
-          role: response.data.user.role || "Pharmacist",
-          contact: response.data.user.contact || "",
-          join_date:
-            response.data.user.join_date ||
-            new Date().toISOString().split("T")[0],
-        };
-        login(userData, response.data.token);
-
-        if (userData.role.toLowerCase() === "admin") {
-          navigate("/dashboard");
-        } else if (userData.role.toLowerCase() === "cashier") {
-          navigate("/saledashboard");
-        } else {
-          setError(t("login.invalidRole"));
-          return;
-        }
-
-        alert(t("login.success"));
-      } else {
+      if (!response.data.access_token) {
         throw new Error(t("login.noToken"));
       }
+
+      const userData = {
+        name: response.data.user.username || "User",
+        email: response.data.user.email || email,
+        profile_picture: "", // No profile_picture from backend, set empty string or default
+        role: response.data.user.role || "Pharmacist",
+        contact: response.data.user.phone || "", // Backend uses phone instead of contact
+        join_date: response.data.user.created_at
+          ? response.data.user.created_at.split(" ")[0]
+          : new Date().toISOString().split("T")[0],
+      };
+
+      // Store token in localStorage and set in axios headers
+      const token = response.data.access_token;
+      localStorage.setItem("token", token); // Persist token
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+      // Save user data and token via AuthContext
+      login(userData, token);
+
+      // Redirect based on role
+      const role = userData.role.toLowerCase();
+      if (role === "admin") {
+        navigate("/dashboard");
+      } else if (role === "cashier") {
+        navigate("/saledashboard");
+      } else {
+        setError(t("login.invalidRole"));
+        return;
+      }
+
+      alert(t("login.success"));
     } catch (error) {
-      console.error("Login failed:", error.message);
-      setError(error.message || t("login.invalidCredentials"));
+      console.error(
+        "Login failed:",
+        error.response?.data?.message || error.message
+      );
+      setError(
+        error.response?.data?.message === "Unauthenticated"
+          ? t("login.invalidCredentials")
+          : error.response?.data?.message ||
+              error.message ||
+              t("login.genericError")
+      );
     }
   };
 
+  // Dynamic time display
+  const currentTime = new Date().toLocaleString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "Asia/Phnom_Penh",
+  });
+  const currentDate = new Date().toLocaleDateString("km-KH", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
   return (
-    <div className="min-h-screen bg-gray-100  flex flex-col items-center justify-center font-khmer">
-    
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center font-khmer">
       <div className="w-full max-w-md mt-4 p-8 space-y-6 bg-white rounded-lg shadow-lg">
         <h2 className="text-2xl font-bold text-center text-gray-900">
           {t("login.signIn")}
@@ -154,7 +161,7 @@ const Login = () => {
               </label>
             </div>
             <div className="text-sm">
-              <button  className="font-medium text-blue-600 hover:underline">
+              <button className="font-medium text-blue-600 hover:underline">
                 {t("login.lostPassword")}
               </button>
             </div>
@@ -167,11 +174,13 @@ const Login = () => {
           </button>
         </form>
         <p className="text-sm text-gray-600 text-center">
-          ពេលវេលា: 04:34 PM +07, ថ្ងៃពុធ, 21 ឧសភា 2025
+          {t("login.currentTime", {
+            time: currentTime,
+            date: currentDate,
+          })}
         </p>
       </div>
 
-    
       <footer className="mt-8 w-full bg-gray-800 text-white py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center space-y-4">
@@ -218,18 +227,18 @@ const Login = () => {
               </a>
             </div>
             <div className="flex space-x-4 text-sm">
-              <button href="#" className="hover:underline">
+              <Link to="/" className="hover:underline">
                 {t("footer.home")}
-              </button>
-              <button href="#" className="hover:underline">
+              </Link>
+              <Link to="/about" className="hover:underline">
                 {t("footer.about")}
-              </button>
-              <button href="#" className="hover:underline">
+              </Link>
+              <Link to="/shop" className="hover:underline">
                 {t("footer.shop")}
-              </button>
-              <button href="#" className="hover:underline">
+              </Link>
+              <Link to="/contact" className="hover:underline">
                 {t("footer.contact")}
-              </button>
+              </Link>
             </div>
             <p className="text-sm">
               © 2025 Panharith Pharmacy. {t("footer.rights")}

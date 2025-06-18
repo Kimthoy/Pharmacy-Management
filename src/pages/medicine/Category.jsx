@@ -1,4 +1,4 @@
-import  { useState } from "react";
+import { useState } from "react";
 import { FaSort, FaCog, FaEdit, FaTrash } from "react-icons/fa";
 import { useTheme } from "../../context/ThemeContext";
 
@@ -281,13 +281,13 @@ const Category = () => {
                   >
                     <button
                       onClick={() => handleEditCategory(category)}
-                      className="text-emerald-500 hover:text-emerald-700 mr-4"
+                      className="text-emerald-500 hover:text-emerald-700 mr-4 hover:scale-110 hover:shadow-lg"
                     >
-                      <FaEdit />
+                      <FaEdit className="" />
                     </button>
                     <button
                       onClick={() => handleDeleteCategory(category.id)}
-                      className="text-red-500 hover:text-red-700"
+                      className="text-red-500 hover:text-red-700 hover:scale-110 hover:shadow-lg"
                     >
                       <FaTrash />
                     </button>

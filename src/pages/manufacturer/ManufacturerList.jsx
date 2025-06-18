@@ -3,7 +3,6 @@ import { FaEllipsisH } from "react-icons/fa";
 import { BiEdit, BiShow, BiTrash } from "react-icons/bi";
 import { useTranslation } from "../../hooks/useTranslation";
 
-
 const manufacturers = [
   {
     manufacturer_id: "#M-35",
@@ -393,9 +392,7 @@ const Manufacturerlist = () => {
               <th className="p-3 text-left text-gray-400 dark:text-gray-300 text-sm">
                 {t("manufacturerlist.Address")}
               </th>
-              <th className="p-3 text-left text-gray-400 dark:text-gray-300 text-sm">
-                {t("manufacturerlist.Balance")}
-              </th>
+
               <th className="p-3 text-left text-gray-400 dark:text-gray-300 text-sm">
                 {t("manufacturerlist.Status")}
               </th>
@@ -428,9 +425,7 @@ const Manufacturerlist = () => {
                   <td className="p-3 text-gray-400 dark:text-gray-300">
                     {man.address}
                   </td>
-                  <td className="p-3 text-gray-400 dark:text-gray-300">
-                    {man.balance}
-                  </td>
+
                   <td className={`p-3 ${color}`}>{text}</td>
                   <td className="p-3 relative">
                     <button
@@ -442,8 +437,8 @@ const Manufacturerlist = () => {
                       <FaEllipsisH />
                     </button>
                     {openMenu === index && (
-                      <div className="absolute z-10 right-16 top-2 w-36 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md shadow-md dark:shadow-gray-700">
-                        <button className="flex items-center w-full text-left text-gray-600 dark:text-gray-200 py-2 px-3 hover:rounded-md hover:bg-green-500 hover:text-white dark:hover:bg-green-400 dark:hover:text-white">
+                      <div className="absolute z-10 right-24 top-6 w-44 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg dark:shadow-gray-700">
+                        <button className="flex items-center w-full text-left text-gray-600 dark:text-gray-200 py-2 px-3 hover:rounded-lg hover:bg-green-500 hover:text-white dark:hover:bg-green-400 dark:hover:text-white">
                           <BiShow className="mr-2" />
                           {t("manufacturerlist.ViewDetails")}
                         </button>

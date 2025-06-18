@@ -1,15 +1,24 @@
-const Cart = ({
-  cart,
-  isCartOpen,
-  totalPrice,
-  totalQuantity,
-  clearCart,
-  saveCart,
-  placeOrder,
-  displayPrice,
-}) => {
+const Cart = ({ cart, isCartOpen, clearCart, saveCart, placeOrder }) => {
   const exchangeRate = 4000;
+
+  const calculateTotalPriceUSD = () => {
+    return cart.reduce((total, item) => {
+      const priceInUSD =
+        item.currency === "KHR" ? item.price / exchangeRate : item.price;
+      return total + priceInUSD * item.quantity;
+    }, 0);
+  };
+
+  const totalPrice = calculateTotalPriceUSD();
   const totalPriceInRiel = totalPrice * exchangeRate;
+
+  const totalQuantity = cart.reduce((total, item) => total + item.quantity, 0);
+
+  const displayPrice = (price, currency = "USD") => {
+    return currency === "KHR"
+      ? (price / exchangeRate).toFixed(2)
+      : price.toFixed(2);
+  };
 
   return (
     <div
@@ -20,6 +29,7 @@ const Cart = ({
       <div className="flex justify-between items-center mb-4 bg-white z-10 pb-2 border-b">
         <h2 className="text-sm font-bold">កន្ត្រក</h2>
       </div>
+
       {cart.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center text-gray-600">
           <span className="text-4xl mb-2">🛒</span>
@@ -47,9 +57,11 @@ const Cart = ({
                     <br />
                     <div>
                       សរុប :{" "}
-                      {(displayPrice(item.price) * item.quantity).toFixed(2)} $
-                      (<span className="text-emerald-600">{item.quantity}</span>
-                      )
+                      {(
+                        displayPrice(item.price, item.currency) * item.quantity
+                      ).toFixed(2)}{" "}
+                      $ (
+                      <span className="text-emerald-600">{item.quantity}</span>)
                     </div>
                     <span className="text-gray-500">
                       {item.typeofmedicine || "មិនបានកំណត់"}
@@ -61,6 +73,7 @@ const Cart = ({
           </ul>
         </div>
       )}
+
       {cart.length > 0 && (
         <div className="sticky bottom-0 bg-white z-10 pt-2 border-t">
           <div className="flex flex-col space-y-2 mb-4">
@@ -86,6 +99,7 @@ const Cart = ({
               </span>
             </div>
           </div>
+
           <div className="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
             <button
               onClick={clearCart}

@@ -1,8 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaSort, FaCog, FaSun, FaMoon } from "react-icons/fa";
 import { useTranslation } from "../../hooks/useTranslation";
 import { useTheme } from "../../context/ThemeContext";
-import { mockUsers } from "../../data/mockData"; 
+import { FaRegEdit } from "react-icons/fa";
+import { IoMdCheckboxOutline } from "react-icons/io";
+import { LuBan } from "react-icons/lu";
+import {
+  getUsers,
+  createUser,
+  updateUser,
+  toggleUserStatus,
+} from "../api/userService";
 
 const ManageStaff = () => {
   const { t } = useTranslation();
@@ -16,12 +24,15 @@ const ManageStaff = () => {
   const [modalMode, setModalMode] = useState("add");
   const [editUserId, setEditUserId] = useState(null);
   const [confirmation, setConfirmation] = useState("");
-  const [users, setUsers] = useState(mockUsers); 
+  const [users, setUsers] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isToggling, setIsToggling] = useState({});
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    role: "Manager",
+    role: "admin", // Changed from "Manager" to "admin"
     status: "Active",
+    password: "", // Added for createUser
   });
   const [formError, setFormError] = useState("");
 
@@ -30,9 +41,50 @@ const ManageStaff = () => {
     setCurrentPage(1);
   };
 
+  const fetchUsers = async () => {
+    setIsLoading(true);
+    try {
+      const response = await getUsers();
+      console.log("Full response:", response);
+      let transformedUsers = [];
+      if (response.data && Array.isArray(response.data)) {
+        transformedUsers = response.data.map((user) => ({
+          id: user.id,
+          name: user.username || user.name || "Unknown",
+          email: user.email || "No email",
+          role: user.role || "admin",
+          status: user.is_active ? "Active" : "Inactive",
+          username: user.username || user.name || "Unknown",
+          phone: user.phone || "",
+          gender: user.gender || "",
+        }));
+      } else {
+        console.warn("Unexpected response data format:", response.data);
+      }
+      setUsers(transformedUsers);
+    } catch (error) {
+      console.error("Failed to fetch users:", error);
+      setUsers([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
   const handleAddStaff = () => {
     setModalMode("add");
-    setFormData({ name: "", email: "", role: "Manager", status: "Active" });
+    setFormData({
+      name: "",
+      email: "",
+      role: "admin",
+      status: "Active",
+      password: "",
+      phone: "",
+      gender: "",
+    });
     setFormError("");
     setShowModal(true);
   };
@@ -41,35 +93,20 @@ const ManageStaff = () => {
     setModalMode("edit");
     setEditUserId(user.id);
     setFormData({
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      status: user.status,
+      username: user.username || user.name || "",
+      name: user.name || user.username || "",
+      email: user.email || "",
+      role: user.role || "admin",
+      status: user.is_active ? "Active" : "Inactive",
+      password: "",
+      phone: user.phone || "",
+      gender: user.gender || "",
     });
     setFormError("");
     setShowModal(true);
   };
 
-  const handleToggleStatus = (user) => {
-    const newStatus = user.status === "Active" ? "Inactive" : "Active";
-    setUsers((prev) =>
-      prev.map((u) => (u.id === user.id ? { ...u, status: newStatus } : u))
-    );
-    setConfirmation(
-      t("staff.success.statusToggled", {
-        name: user.name,
-        status: newStatus,
-      })
-    );
-    setTimeout(() => setConfirmation(""), 3000);
-  };
-
-  const handleFormChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name.trim()) {
       setFormError(t("staff.error.nameRequired"));
@@ -82,52 +119,91 @@ const ManageStaff = () => {
       setFormError(t("staff.error.invalidEmail"));
       return;
     }
-
-    if (modalMode === "add") {
-      const newUser = {
-        id: Date.now(),
-        name: formData.name.trim(),
-        email: formData.email.trim(),
-        password: "default123",
+    if (modalMode === "add" && !formData.password.trim()) {
+      setFormError(t("staff.error.passwordRequired"));
+      return;
+    }
+    try {
+      const updatedData = {
+        username: formData.name,
+        email: formData.email,
         role: formData.role,
-        status: formData.status,
-        profile_picture: "./default.jpg",
-        contact: "",
-        join_date: new Date().toISOString().split("T")[0],
-        token: `mock-token-${Date.now()}`,
+        is_active: formData.status === "Active",
+        phone: formData.phone || null,
+        gender: formData.gender || null,
       };
-      setUsers((prev) => [...prev, newUser]);
-      setConfirmation(t("staff.success.added", { name: formData.name.trim() }));
-    } else {
-      setUsers((prev) =>
-        prev.map((user) =>
-          user.id === editUserId
-            ? {
-                ...user,
-                name: formData.name.trim(),
-                email: formData.email.trim(),
-                role: formData.role,
-                status: formData.status,
-              }
-            : user
-        )
-      );
-      setConfirmation(
-        t("staff.success.edited", { name: formData.name.trim() })
+      if (formData.password.trim()) {
+        updatedData.password = formData.password;
+      }
+      if (modalMode === "add") {
+        await createUser(updatedData);
+        setConfirmation(t("staff.success.staffAdded", { name: formData.name }));
+      } else {
+        await updateUser(editUserId, updatedData);
+        setConfirmation(
+          t("staff.success.staffUpdated", { name: formData.name })
+        );
+      }
+      setShowModal(false);
+      fetchUsers();
+      setFormError("");
+      setTimeout(() => setConfirmation(""), 3000);
+    } catch (error) {
+      console.error("Error submitting form:", {
+        message: error.message,
+        response: error.response ? error.response.data : "No response",
+        status: error.response ? error.response.status : "No status",
+      });
+      setFormError(
+        error.response?.data?.message ||
+          error.response?.data?.errors?.[0] ||
+          error.message ||
+          t("staff.error.submitFailed")
       );
     }
-    setFormData({ name: "", email: "", role: "Manager", status: "Active" });
-    setFormError("");
-    setShowModal(false);
-    setEditUserId(null);
-    setTimeout(() => setConfirmation(""), 3000);
   };
 
-  const sortedList = [...users].sort((a, b) => {
-    return sortOrder === "asc"
-      ? a.name.localeCompare(b.name)
-      : b.name.localeCompare(a.name);
-  });
+  const handleToggleStatus = async (user) => {
+    setIsToggling((prev) => ({ ...prev, [user.id]: true }));
+    try {
+      const newStatus = user.status === "Active" ? "Inactive" : "Active";
+      await toggleUserStatus({ id: user.id });
+      fetchUsers();
+      setConfirmation(
+        t("staff.success.statusToggled", { name: user.name, status: newStatus })
+      );
+      setTimeout(() => setConfirmation(""), 3000);
+    } catch (err) {
+      console.error("Error toggling status:", {
+        message: err.message,
+        response: err.response ? err.response.data : "No response",
+        status: err.response ? err.response.status : "No status",
+      });
+      const errorMessage =
+        err.response?.data?.message === "Unauthenticated."
+          ? t("staff.error.unauthenticated")
+          : err.response?.data?.message ||
+            err.response?.data?.errors?.[0] ||
+            t("staff.error.statusToggleFailed", { error: "Unknown error" });
+      setConfirmation(errorMessage);
+      setTimeout(() => setConfirmation(""), 3000);
+    } finally {
+      setIsToggling((prev) => ({ ...prev, [user.id]: false }));
+    }
+  };
+
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const sortedList = Array.isArray(users)
+    ? [...users].sort((a, b) =>
+        sortOrder === "asc"
+          ? a.name.localeCompare(b.name)
+          : b.name.localeCompare(a.name)
+      )
+    : [];
 
   const filteredList = sortedList.filter((user) =>
     user.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -208,24 +284,14 @@ const ManageStaff = () => {
           </div>
         </div>
 
-        <table className="w-full border-collapse border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200">
+        <table className="w-full  dark:text-slate-200 border-collapse border border-gray-300 dark:border-gray-600">
           <thead>
-            <tr className="bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-300 text-center">
-              <th className="p-3 border border-gray-300 dark:border-gray-600">
-                {t("staff.name")}
-              </th>
-              <th className="p-3 border border-gray-300 dark:border-gray-600">
-                {t("staff.email")}
-              </th>
-              <th className="p-3 border border-gray-300 dark:border-gray-600">
-                {t("staff.role")}
-              </th>
-              <th className="p-3 border border-gray-300 dark:border-gray-600">
-                {t("staff.status")}
-              </th>
-              <th className="p-3 border border-gray-300 dark:border-gray-600">
-                {t("staff.actions")}
-              </th>
+            <tr className="text-center ">
+              <td className="py-2 px-3">{t("staff.name")}</td>
+              <td className="py-2 px-3">{t("staff.email")}</td>
+              <td className="py-2 px-3">{t("staff.role")}</td>
+              <td className="py-2 px-3">{t("staff.status")}</td>
+              <td className="py-2 px-3">{t("staff.actions")}</td>
             </tr>
           </thead>
           <tbody>
@@ -233,19 +299,25 @@ const ManageStaff = () => {
               paginatedList.map((user) => (
                 <tr
                   key={user.id}
-                  className="border border-gray-300 dark:border-gray-600 text-center"
+                  className="border dark:hover:bg-slate-700 hover:bg-slate-200 hover:cursor-pointer hover:shadow-md transition-all border-gray-300 dark:border-gray-600 text-center"
                 >
                   <td className="p-3 border border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-300">
-                    {user.name}
+                    {user.name || "No name"}
                   </td>
                   <td className="p-3 border border-gray-300 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 cursor-pointer">
-                    {user.email}
+                    {user.email || "No email"}
                   </td>
                   <td className="p-3 border border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-300">
-                    {user.role}
+                    {user.role || "No role"}
                   </td>
-                  <td className="p-3 border border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-300">
-                    {user.status}
+                  <td
+                    className={`p-3 border border-gray-300 dark:border-gray-600 ${
+                      user.status === "Active"
+                        ? "text-green-600 dark:text-green-400"
+                        : "text-red-600 dark:text-red-400"
+                    }`}
+                  >
+                    {user.status || "No status"}
                   </td>
                   <td className="p-3 border border-gray-300 dark:border-gray-600">
                     <div className="flex justify-center space-x-2">
@@ -254,30 +326,41 @@ const ManageStaff = () => {
                         disabled={user.status !== "Active"}
                         className={`text-xs border border-blue-500 dark:border-blue-400 px-2 py-1 rounded-[4px] transition ${
                           user.status === "Active"
-                            ? "text-blue-500 dark:text-blue-400 hover:text-white hover:bg-blue-500 dark:hover:bg-blue-400"
+                            ? "text-blue-600 hover:text-white hover:bg-blue-600 dark:text-blue-400 dark:hover:bg-blue-400 dark:hover:text-white dark:hover:shadow-md dark:hover:shadow-slate-300"
                             : "text-blue-300 dark:text-blue-600 opacity-50 cursor-not-allowed"
                         }`}
                         aria-label={
                           user.status === "Active"
-                            ? t("staff.edit", { name: user.name })
-                            : t("staff.editDisabled", { name: user.name })
+                            ? t("staff.edit")
+                            : t("staff.editDisabled")
                         }
                         aria-disabled={user.status !== "Active"}
                       >
-                        {t("staff.edit")}
+                        <FaRegEdit className="w-5 h-5" />
                       </button>
                       <button
                         onClick={() => handleToggleStatus(user)}
-                        className="text-xs text-orange-500 dark:text-orange-400 border border-orange-500 dark:border-orange-400 px-2 py-1 rounded-[4px] hover:text-white hover:bg-orange-500 dark:hover:bg-orange-400 transition"
-                        aria-label={
+                        disabled={isToggling[user.id]}
+                        className={`text-xs border px-2 py-1 rounded-[4px] transition ${
                           user.status === "Active"
-                            ? t("staff.disable", { name: user.name })
-                            : t("staff.enable", { name: user.name })
+                            ? "text-green-600 border-green-600 hover:text-white hover:bg-green-600 dark:text-green-600 dark:border-green-200 dark:hover:bg-green-600 dark:hover:text-white dark:hover:shadow-md dark:hover:shadow-slate-300"
+                            : "text-red-600 border-red-600 hover:text-white hover:bg-red-600 dark:text-red-600 dark:border-red-200 dark:hover:bg-red-600 dark:hover:text-white dark:hover:shadow-md dark:hover:shadow-slate-300"
+                        } ${
+                          isToggling[user.id]
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                        }`}
+                        aria-label={
+                          user.status === "Active" ? t("disable") : t("enable")
                         }
                       >
-                        {user.status === "Active"
-                          ? t("staff.disable")
-                          : t("staff.enable")}
+                        {isToggling[user.id] ? (
+                          t("staff.loading")
+                        ) : user.status === "Active" ? (
+                          <IoMdCheckboxOutline className="w-5 h-5" />
+                        ) : (
+                          <LuBan className="w-5 h-5" />
+                        )}
                       </button>
                     </div>
                   </td>
@@ -381,6 +464,29 @@ const ManageStaff = () => {
                 </div>
                 <div>
                   <label
+                    htmlFor="gender"
+                    className="block text-xs font-medium text-gray-700 dark:text-gray-200"
+                  >
+                    {t("staff.gender")}
+                  </label>
+                  <select
+                    id="gender"
+                    name="gender"
+                    value={formData.gender}
+                    onChange={handleFormChange}
+                    className="mt-1 w-full text-xs border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
+                  >
+                    <option value="">{t("staff.selectGender")}</option>
+                    <option value="male">{t("staff.male")}</option>
+                    <option value="female">{t("staff.female")}</option>
+                    <option value="other">{t("staff.other")}</option>
+                    <option value="prefer_not_to_say">
+                      {t("staff.preferNotToSay")}
+                    </option>
+                  </select>
+                </div>
+                <div>
+                  <label
                     htmlFor="email"
                     className="block text-xs font-medium text-gray-700 dark:text-gray-200"
                   >
@@ -396,6 +502,25 @@ const ManageStaff = () => {
                     aria-required="true"
                   />
                 </div>
+                {modalMode === "add" && (
+                  <div>
+                    <label
+                      htmlFor="password"
+                      className="block text-xs font-medium text-gray-700 dark:text-gray-200"
+                    >
+                      {t("staff.password")}
+                    </label>
+                    <input
+                      type="password"
+                      id="password"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleFormChange}
+                      className="mt-1 w-full text-xs border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
+                      aria-required="true"
+                    />
+                  </div>
+                )}
                 <div>
                   <label
                     htmlFor="role"
@@ -413,8 +538,7 @@ const ManageStaff = () => {
                   >
                     <option value="admin">{t("staff.roleAdmin")}</option>
                     <option value="cashier">{t("staff.roleCashier")}</option>
-                    <option value="Manager">{t("staff.roleManager")}</option>
-                    <option value="Partner">{t("staff.rolePartner")}</option>
+                    <option value="partner">{t("staff.rolePartner")}</option>
                   </select>
                 </div>
                 <div>
@@ -438,6 +562,23 @@ const ManageStaff = () => {
                     </option>
                   </select>
                 </div>
+                <div>
+                  <label
+                    htmlFor="phone"
+                    className="block text-xs font-medium text-gray-700 dark:text-gray-200"
+                  >
+                    {t("staff.phone")}
+                  </label>
+                  <input
+                    type="text"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleFormChange}
+                    className="mt-1 w-full text-xs border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
+                  />
+                </div>
+
                 <div className="flex justify-end space-x-2">
                   <button
                     type="button"
