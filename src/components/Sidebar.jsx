@@ -198,7 +198,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                           handlePageSelection(name, path);
                         }
                       }}
-                      className={`flex items-center justify-between w-full px-4 py-2 mt-1 text-md rounded-md transition-all duration-200
+                      className={`flex items-center justify-between w-full px-4 py-2 mt-1 text-md rounded-lg transition-all duration-200
                         ${
                           isParentActive
                             ? "bg-green-500 text-white dark:bg-green-600"
@@ -253,7 +253,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                               onClick={() =>
                                 handlePageSelection(sub.name, sub.path)
                               }
-                              className={`w-full mb-1 mt-1 py-2 rounded-md hover:scale-105 hover:shadow-md hover:shadow-slate-300 transition-all text-left ml-10 px-2 text-md ${
+                              className={`w-full mb-1 mt-1 py-2 rounded-lg hover:scale-105 hover:shadow-md hover:shadow-slate-300 transition-all text-left ml-10 px-2 text-md ${
                                 selectedPage === sub.name
                                   ? "bg-green-500 text-white dark:bg-green-600"
                                   : "text-gray-700 dark:text-gray-200 hover:bg-green-100 dark:hover:bg-gray-700 hover:text-green-700 dark:hover:text-green-400"

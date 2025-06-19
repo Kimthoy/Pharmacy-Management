@@ -58,3 +58,17 @@ export const toggleProductStatus = async (medicineId) => {
     throw error.response?.data || { message: "Toggle failed" };
   }
 };
+export const updateMedicine = async (id, data) => {
+  try {
+    const response = await axios.put(`${API_URL}/medicines/${id}`, data, {
+      headers: getAuthHeader(),
+    });
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw error.response.data;
+    } else {
+      throw { message: "Network error" };
+    }
+  }
+};

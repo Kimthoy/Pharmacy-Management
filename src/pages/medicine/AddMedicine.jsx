@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
 import { useTranslation } from "../../hooks/useTranslation";
-import { createMedicine, fetchMedicineByBarcode } from "../api/medicineService";
+import { createMedicine,  } from "../api/medicineService";
 
 const AddMedicine = () => {
   const { t } = useTranslation();

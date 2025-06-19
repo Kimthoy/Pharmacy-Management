@@ -1,4 +1,43 @@
 {
+  "medicine-list":{
+    "Disable":"បិទដំណើរការ",
+    "Enable":"បើកដំណើរការ"
+  },
+  "medicine-view": {
+    "Info": "ព័ត៌មានថ្នាំ",
+    "Name": "ឈ្មោះ",
+    "Price": "តម្លៃ",
+    "Weight": "ទម្ងន់",
+    "Category": "ប្រភេទ",
+    "Status": "ស្ថានភាព",
+    "Expire_Date": "ថ្ងៃខែផុតកំណត់",
+    "Description": "ការពិពណ៌នា",
+    "Barcode": "បារកូដ"
+  },
+  "modal-medicine": {
+    "Madicinename": "ឈ្មោះថ្នាំ",
+    "MecineName-PlaceHolder": "បញ្ចូលឈ្មោះថ្នាំ",
+    "Price": "តម្លៃ",
+    "Price-PlaceHolder": "បញ្ចូលតម្លៃ",
+    "Weight": "ទម្ងន់",
+    "Weight-PlaceHolder": "បញ្ចូលទម្ងន់",
+    "Quantity": "បរិមាណ",
+    "Quantity-PlaceHolder": "បញ្ចូលបរិមាណ",
+    "ExpireDate": "កាលបរិច្ឆេទផុតកំណត់",
+    "BarcodeScan": "ស្កេនកូដ",
+    "BarcodeScan-PlaceHolder": "ស្កេន ឬបញ្ចូលកូដ",
+    "Status": "ស្ថានភាព",
+    "Status-PlaceHolder": "ជ្រើសរើសស្ថានភាព",
+    "Category": "ប្រភេទ",
+    "Category-PlaceHolder": "ជ្រើសរើសប្រភេទ",
+    "MedicineInformation": "ព័ត៌មានថ្នាំ",
+    "MedicineInformation-PlaceHolder": "បញ្ចូលព័ត៌មានអំពីថ្នាំ",
+    "ButtonAddMedicine": "បន្ថែមថ្នាំ",
+    "Submitting": "កំពុងដាក់ស្នើ...",
+    "Scanned": "កូដស្កេនបាន",
+    "CloseScanner": "បិទម៉ាស៊ីនស្កេន",
+    "LoadingMedicine": "កំពុងផ្ទុកព័ត៌មានថ្នាំ..."
+  },
   "navigation": {
     "title": "បញ្ញារិទ្ធ"
   },
@@ -176,6 +215,7 @@
     "total-customer": "អតិថិជន សរុប"
   },
   "add-medicine": {
+    "ExpireDate": "ថ្ងៃខែផុតកំណត់",
     "AddMedicine": "ទម្រង់បែបបទនៃការ​​​បន្ថែម ថ្នាំ",
     "title-addmedicine": "សូមបំពេញ ព័ត៍មានទាំងអស់នេះឲ្យបានត្រឹមត្រូវ។",
     "MecineName-PlaceHolder": "សូមបញ្ជូល​ ឈ្មោះថ្នាំ",

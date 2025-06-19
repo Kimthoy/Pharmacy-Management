@@ -156,16 +156,16 @@ const Category = () => {
         <div className="flex items-center space-x-2 mt-4 md:mt-0">
           <button
             onClick={handleAddCategory}
-            className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-4 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition"
+            className="text-xs rounded-lg text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-4 py-2  dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition"
           >
             Add Category
           </button>
-          <button
+          {/* <button
             onClick={handleExportCSV}
             className="text-xs text-blue-500 dark:text-blue-400 border border-blue-500 dark:border-blue-400 px-4 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-blue-500 dark:hover:bg-blue-400 transition"
           >
             Export to CSV
-          </button>
+          </button> */}
         </div>
       </div>
 

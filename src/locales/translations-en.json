@@ -1,4 +1,43 @@
 {
+  "medicine-list": {
+    "Disable": "Disable",
+    "Enable": "Enable"
+  },
+  "medicine-view": {
+    "Info": "Informations",
+    "Name": "Name",
+    "Price": "Price",
+    "Weight": "Weight",
+    "Category": "Category",
+    "Status": "Status",
+    "Expire_Date": "Expire Date",
+    "Description": "Description",
+    "Barcode": "Barcode"
+  },
+  "modal-medicine": {
+    "Madicinename": "Medicine Name",
+    "MecineName-PlaceHolder": "Enter medicine name",
+    "Price": "Price",
+    "Price-PlaceHolder": "Enter price",
+    "Weight": "Weight",
+    "Weight-PlaceHolder": "Enter weight",
+    "Quantity": "Quantity",
+    "Quantity-PlaceHolder": "Enter quantity",
+    "ExpireDate": "Expire Date",
+    "BarcodeScan": "Barcode Scan",
+    "BarcodeScan-PlaceHolder": "Scan or enter barcode",
+    "Status": "Status",
+    "Status-PlaceHolder": "Select status",
+    "Category": "Category",
+    "Category-PlaceHolder": "Select category",
+    "MedicineInformation": "Medicine Information",
+    "MedicineInformation-PlaceHolder": "Enter details about the medicine",
+    "ButtonAddMedicine": "Add Medicine",
+    "Submitting": "Submitting...",
+    "Scanned": "Scanned Barcode",
+    "CloseScanner": "Close Scanner",
+    "LoadingMedicine": "Loading medicine details..."
+  },
   "dashboard": {
     "title": "Pharmacy Dashboard",
     "subtitle": "Overview of pharmacy operations and metrics",
@@ -210,6 +249,7 @@
     "total-customer": "Total Customer"
   },
   "add-medicine": {
+    "ExpireDate ": "Expire Date",
     "AddMedicine": "Add Medicine",
     "title-addmedicine": "You can add a medicine by filling this form.",
     "MecineName-PlaceHolder": "Enter Medincine Name",

@@ -18,16 +18,12 @@ const ActivityPage = lazy(() => import("./pages/profile/ActivityPage"));
 
 const Login = lazy(() => import("./pages/auth/Login"));
 const CustomerList = lazy(() => import("./pages/customer/ListCustomer"));
-// const CustomerLedger = lazy(() => import("./pages/customer/CustomerLedger"));
 const InsertCustomer = lazy(() => import("./pages/customer/InsertCustomer"));
 const Dashboard = lazy(() => import("./pages/dashboard/Dashboard"));
 const ManufacturerList = lazy(() =>
   import("./pages/manufacturer/ManufacturerList")
 );
 const AddManu = lazy(() => import("./pages/manufacturer/AddManufacturer"));
-// const ManuLedger = lazy(() =>
-//   import("./pages/manufacturer/ManufacturerLedger")
-// );
 const SellReport = lazy(() => import("./pages/report/ReportSell"));
 const StockReport = lazy(() => import("./pages/report/ReportStock"));
 const PurchaseReport = lazy(() => import("./pages/report/ReportPurchase"));
@@ -142,9 +138,10 @@ const App = () => {
                       />
                       <Route path="/aboutuser" element={<AboutUser />} />
                       <Route
-                        path="/addmedicinepage"
+                        path="/addmedicinepage/:id?"
                         element={<AddMedicine />}
                       />
+
                       <Route
                         path="/listofmedicine"
                         element={<MedicineList />}
