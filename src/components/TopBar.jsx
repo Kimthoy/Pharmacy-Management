@@ -357,55 +357,13 @@ const TopBar = ({ onSearch }) => {
     navigate("/profiledashboard");
   };
   return (
-    <div className="bg-white dark:bg-gray-900 z-10 p-4 flex flex-col sm:flex-row items-center justify-between shadow-sm dark:shadow-gray-800 ">
+    <div className="bg-white dark:bg-gray-900 z-10 sm:h-28 h-16 flex flex-col sm:flex-row items-center justify-between sm:shadow-sm shadow-lg dark:shadow-gray-800 ">
       <button
-        className="sm:hidden mr-2 absolute right-0 p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white "
+        className="sm:hidden mr-6 bg-gray-200 absolute right-0 mt-2 p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white "
         onClick={openProfileDashboard}
       >
         <MdOutlineSettingsSuggest size={24} />
       </button>
-
-      {isMobileDropdownOpen && (
-        <div
-          className="sm:hidden absolute right-0 mr-4 mt-16 w-48 animate-slide-in-left  bg-green-600 text-white dark:bg-gray-800 rounded-md shadow-lg z-50"
-          onClick={() => setIsMobileDropdownOpen(false)}
-          ref={mobileDropdownRef}
-        >
-          <ul className="text-white dark:text-gray-200  bg-green-700 rounded-lg">
-            <li
-              onClick={() => setIsMobileSearchOpen(true)}
-              className="px-4 py-2 hover:bg-green-500 transition-all rounded-lg cursor-pointer"
-            >
-              Search
-            </li>
-            <Link to="/message">
-              <li className="px-4 py-2 hover:bg-green-500 transition-all rounded-lg cursor-pointer">
-                Messages
-              </li>
-            </Link>
-            <Link to="/notification">
-              <li className="px-4 py-2 hover:bg-green-500 transition-all rounded-lg cursor-pointer">
-                Notifications
-              </li>
-            </Link>
-            <li className="px-4 py-2 hover:bg-green-500 transition-all rounded-lg cursor-pointer">
-              Logout
-            </li>
-            <li className="px-4 py-2 hover:bg-green-500 transition-all rounded-lg cursor-pointer">
-              <button
-                onClick={toggleTheme}
-                title={
-                  theme === "light"
-                    ? "Switch to dark mode"
-                    : "Switch to light mode"
-                }
-              >
-                {theme === "light" ? "Dark Mode" : "Light Mode"}
-              </button>
-            </li>
-          </ul>
-        </div>
-      )}
 
       {isMobileSearchOpen && (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
@@ -434,13 +392,8 @@ const TopBar = ({ onSearch }) => {
       )}
 
       {/* Left Section: Logo & Title */}
-      <div className="flex items-center justify-center w-full ">
-        <img
-          src="/logo.png"
-          alt="Logo"
-          width={70}
-          className="rounded sm:w-20 w-14"
-        />
+      <div className="flex  items-center justify-center w-full sm:mt-1 mt-1">
+        <img src="/logo.png" alt="Logo" className="rounded sm:w-20 w-12" />
         <h1 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-gray-200 animate-color-cycle">
           {t("navigation.title", { username: "Panharith" })}
         </h1>

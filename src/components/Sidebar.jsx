@@ -149,7 +149,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
     <div>
       {/* Mobile Toggle Button */}
       <button
-        className="md:hidden fixed top-4 left-4 z-50 p-2 bg-green-500 text-white rounded-md"
+        className="md:hidden fixed top-3 left-4 z-50 sm:p-2 p-1 sm:m-0  bg-green-500 text-white rounded-md"
         onClick={toggleSidebar}
       >
         {isOpen ? <HiX className="w-6 h-6" /> : <HiMenu className="w-6 h-6" />}
