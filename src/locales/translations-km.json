@@ -1,6 +1,17 @@
 {
+  "profile": {
+    "menu": {
+      "profile": "គណនី",
+      "business": "អាជីវកម្ម",
+      "storage": "ឃ្លាំង",
+      "orders": "ការបញ្ជាទិញ",
+      "bank": "ធនាគារ",
+      "support": "គាំទ្រ",
+      "language": "ភាសា"
+    }
+  },
   "footers": {
-    "home":"ទំព័រដើម",
+    "home": "ទំព័រដើម",
     "orders": "បញ្ជាទិញ",
     "foryou": "សម្រាប់អ្នក",
     "search": "ស្វែងរក",

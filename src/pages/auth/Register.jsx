@@ -1,4 +1,4 @@
-import  { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { useTranslation } from "../../hooks/useTranslation";
 import { useTheme } from "../../context/ThemeContext";
@@ -89,7 +89,7 @@ const Register = () => {
 
   return (
     <section
-      className={`flex justify-center items-center min-h-screen font-khmer ${
+      className={`flex justify-center items-center sm:mb-14   min-h-screen font-khmer ${
         theme === "dark" ? "bg-gray-900" : "bg-gray-100"
       } px-4`}
     >

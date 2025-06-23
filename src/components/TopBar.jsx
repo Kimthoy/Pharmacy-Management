@@ -351,15 +351,20 @@ const TopBar = ({ onSearch }) => {
     onSearch(value);
   };
   const navigate = useNavigate();
+  const [showTopBar, setShowTopBar] = useState(true);
+
+  const openProfileDashboard = () => {
+    navigate("/profiledashboard");
+  };
   return (
     <div className="bg-white dark:bg-gray-900 z-10 p-4 flex flex-col sm:flex-row items-center justify-between shadow-sm dark:shadow-gray-800 ">
       <button
         className="sm:hidden mr-2 absolute right-0 p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white "
-        aria-label="Open menu"
-        onClick={() => setIsMobileDropdownOpen(!isMobileDropdownOpen)}
+        onClick={openProfileDashboard}
       >
         <MdOutlineSettingsSuggest size={24} />
       </button>
+
       {isMobileDropdownOpen && (
         <div
           className="sm:hidden absolute right-0 mr-4 mt-16 w-48 animate-slide-in-left  bg-green-600 text-white dark:bg-gray-800 rounded-md shadow-lg z-50"
@@ -429,7 +434,7 @@ const TopBar = ({ onSearch }) => {
       )}
 
       {/* Left Section: Logo & Title */}
-      <div className="flex items-center justify-center space-x-4 w-full  mb-4 sm:mb-0 ">
+      <div className="flex items-center justify-center w-full ">
         <img
           src="/logo.png"
           alt="Logo"
@@ -510,28 +515,32 @@ const TopBar = ({ onSearch }) => {
         </button>
 
         {/* Language Selector */}
-        <LanguageSelector
-          langCode={language}
-          onLanguageChange={changeLanguage}
-          open={open}
-          setOpen={setOpen}
-          selectorRef={selectorRef}
-          t={t}
-        />
-
-        {/* User Authentication */}
-        {isAuthenticated ? (
-          <ProfileDropdown
-            user={user}
-            isDropdownOpen={isDropdownOpen}
-            setIsDropdownOpen={setIsDropdownOpen}
-            dropdownRef={dropdownRef}
-            handleLogout={handleLogout}
+        <div className=" sm:flex hidden">
+          <LanguageSelector
+            langCode={language}
+            onLanguageChange={changeLanguage}
+            open={open}
+            setOpen={setOpen}
+            selectorRef={selectorRef}
             t={t}
           />
-        ) : (
-          <AuthButtons t={t} />
-        )}
+        </div>
+
+        {/* User Authentication */}
+        <div className="hidden sm:flex">
+          {isAuthenticated ? (
+            <ProfileDropdown
+              user={user}
+              isDropdownOpen={isDropdownOpen}
+              setIsDropdownOpen={setIsDropdownOpen}
+              dropdownRef={dropdownRef}
+              handleLogout={handleLogout}
+              t={t}
+            />
+          ) : (
+            <AuthButtons t={t} />
+          )}
+        </div>
       </div>
 
       {/* Logout Confirmation Modal */}

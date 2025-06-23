@@ -1,4 +1,6 @@
 import React, { Suspense, lazy, useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
+
 import {
   BrowserRouter as Router,
   Route,
@@ -13,6 +15,7 @@ import Sidebar from "./components/Sidebar";
 import Register from "./pages/auth/Register";
 import { LanguageProvider } from "./context/LanguageContext";
 import { AuthProvider } from "./context/AuthContext";
+const ProfileDashboard = lazy(() => import("./pages/profile/ProfileDashboard"));
 
 const ActivityPage = lazy(() => import("./pages/profile/ActivityPage"));
 
@@ -52,11 +55,10 @@ const StaffList = lazy(() => import("./pages/staff/ManageStaff"));
 const Client = lazy(() => import("./pages/auth/Client"));
 const Profile = lazy(() => import("./pages/profile/AboutUser"));
 
-
-
 const MessagePage = lazy(() => import("./pages/setting/Message"));
 const NotificationPage = lazy(() => import("./pages/setting/Notification"));
 const App = () => {
+  const location = useLocation();
   const [langCode, setLangCode] = useState(
     localStorage.getItem("selectedLanguage") || "en"
   );
@@ -88,113 +90,112 @@ const App = () => {
       <Loader />
     </div>
   ) : (
-    <Router>
-      <ThemeProvider>
-        <AuthProvider>
-          <LanguageProvider>
-            <div className="flex h-screen bg-white dark:bg-gray-900 font-khmer">
+    <ThemeProvider>
+      <AuthProvider>
+        <LanguageProvider>
+          <div className="flex h-screen bg-white dark:bg-gray-900 font-khmer">
+            {location.pathname !== "/profiledashboard" && (
               <Sidebar
                 setSelectedPage={setSelectedPage}
                 selectedPage={selectedPage}
               />
-              <div className="flex-1 flex flex-col">
+            )}
+            <div className="flex-1  flex-col flex">
+              {location.pathname !== "/profiledashboard" && (
                 <TopBar
                   onLanguageChange={(lang) => {
                     setLangCode(lang);
                     localStorage.setItem("selectedLanguage", lang);
                   }}
                 />
-                <div className="flex-1 overflow-y-auto p-4 bg-white dark:bg-gray-900">
-                  <Suspense fallback={<Loader />}>
-                    <Routes>
-                      <Route
-                        path="/"
-                        element={<Dashboard langCode={langCode} />}
-                      />
-                      <Route path="/customerlist" element={<CustomerList />} />
+              )}
 
-                      <Route
-                        path="/insertcustomer"
-                        element={<InsertCustomer />}
-                      />
-                      <Route
-                        path="/manufacturerlist"
-                        element={<ManufacturerList />}
-                      />
-                      <Route path="/addmanu" element={<AddManu />} />
+              <div className="flex-1 overflow-y-auto p-4 bg-white dark:bg-gray-900">
+                <Suspense fallback={<Loader />}>
+                  <Routes>
+                    <Route
+                      path="/"
+                      element={<Dashboard langCode={langCode} />}
+                    />
+                    <Route path="/customerlist" element={<CustomerList />} />
 
-                      <Route path="/login" element={<Login />} />
-                      <Route path="/register" element={<Register />} />
-                      <Route path="/salereport" element={<SellReport />} />
-                      <Route
-                        path="/purchasreport"
-                        element={<PurchaseReport />}
-                      />
-                      <Route path="/stockreport" element={<StockReport />} />
-                      <Route path="/expensepage" element={<ExpensePage />} />
-                      <Route path="/incomepage" element={<IncomePage />} />
-                      <Route
-                        path="/invoicedetail"
-                        element={<InvoiceDetailsPage />}
-                      />
-                      <Route
-                        path="/invoicelist"
-                        element={<InvoiceListPage />}
-                      />
-                      <Route path="/aboutuser" element={<AboutUser />} />
-                      <Route
-                        path="/addmedicinepage/:id?"
-                        element={<AddMedicine />}
-                      />
+                    <Route
+                      path="/insertcustomer"
+                      element={<InsertCustomer />}
+                    />
+                    <Route
+                      path="/manufacturerlist"
+                      element={<ManufacturerList />}
+                    />
+                    <Route path="/addmanu" element={<AddManu />} />
 
-                      <Route
-                        path="/listofmedicine"
-                        element={<MedicineList />}
-                      />
-                      <Route
-                        path="/medicinedetail"
-                        element={<MedicineDetail />}
-                      />
-                      <Route path="/categoies" element={<Category />} />
-                      <Route path="/settingpage" element={<Setting />} />
-                      <Route
-                        path="/manufacturerreturnlist"
-                        element={<ManufacturerReturnList />}
-                      />
-                      <Route
-                        path="/addwastagereturn"
-                        element={<AddWastageReturn />}
-                      />
-                      <Route
-                        path="/addmanufacturerreturn"
-                        element={<AddManufacturerReturn />}
-                      />
-                      <Route
-                        path="/wastagereturnlist"
-                        element={<WastageReturnList />}
-                      />
-                      <Route path="/listofstaff" element={<StaffList />} />
-                      <Route path="/client" element={<Client />} />
-                      <Route path="/profile" element={<Profile />} />
-                      <Route path="/activity" element={<ActivityPage />} />
-                      <Route path="/message" element={<MessagePage />} />
-                      <Route path="/notification" element={<NotificationPage />} />
-                      <Route
-                        path="/saledashboard"
-                        element={<SaleDashboard />}
-                      />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/salereport" element={<SellReport />} />
+                    <Route path="/purchasreport" element={<PurchaseReport />} />
+                    <Route path="/stockreport" element={<StockReport />} />
+                    <Route path="/expensepage" element={<ExpensePage />} />
+                    <Route path="/incomepage" element={<IncomePage />} />
+                    <Route
+                      path="/invoicedetail"
+                      element={<InvoiceDetailsPage />}
+                    />
+                    <Route path="/invoicelist" element={<InvoiceListPage />} />
+                    <Route path="/aboutuser" element={<AboutUser />} />
+                    <Route
+                      path="/addmedicinepage/:id?"
+                      element={<AddMedicine />}
+                    />
 
-                      <Route path="*" element={<Navigate to="/" />} />
-                    </Routes>
-                  </Suspense>
-                </div>
-                <Footer />
+                    <Route path="/listofmedicine" element={<MedicineList />} />
+                    <Route
+                      path="/medicinedetail"
+                      element={<MedicineDetail />}
+                    />
+                    <Route path="/categoies" element={<Category />} />
+                    <Route path="/settingpage" element={<Setting />} />
+                    <Route
+                      path="/manufacturerreturnlist"
+                      element={<ManufacturerReturnList />}
+                    />
+                    <Route
+                      path="/addwastagereturn"
+                      element={<AddWastageReturn />}
+                    />
+                    <Route
+                      path="/addmanufacturerreturn"
+                      element={<AddManufacturerReturn />}
+                    />
+                    <Route
+                      path="/wastagereturnlist"
+                      element={<WastageReturnList />}
+                    />
+                    <Route path="/listofstaff" element={<StaffList />} />
+                    <Route path="/client" element={<Client />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/activity" element={<ActivityPage />} />
+                    <Route path="/message" element={<MessagePage />} />
+                    <Route
+                      path="/notification"
+                      element={<NotificationPage />}
+                    />
+                    <Route
+                      path="/profiledashboard"
+                      element={<ProfileDashboard />}
+                    />
+
+                    <Route path="/saledashboard" element={<SaleDashboard />} />
+
+                    <Route path="*" element={<Navigate to="/" />} />
+                  </Routes>
+                </Suspense>
               </div>
+              <Footer />
             </div>
-          </LanguageProvider>
-        </AuthProvider>
-      </ThemeProvider>
-    </Router>
+          </div>
+        </LanguageProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 };
 

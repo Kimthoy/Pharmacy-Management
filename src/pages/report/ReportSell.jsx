@@ -162,7 +162,7 @@ const SellReport = () => {
   );
 
   return (
-    <div className="p-6 bg-white dark:bg-gray-900 min-h-screen">
+    <div className="p-6 mb-14 bg-white dark:bg-gray-900 min-h-screen">
       {/* Sales Report Section */}
       <section className="mb-8">
         <h2 className="text-2xl font-bold text-gray-500 dark:text-gray-200">

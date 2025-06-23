@@ -99,7 +99,7 @@ const MedicineList = () => {
   };
 
   return (
-    <div className="p-4">
+    <div className="p-4 mb-12">
       <h2 className="text-xl font-bold mb-4 dark:text-slate-200">
         Medicine List
       </h2>

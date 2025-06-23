@@ -1,4 +1,15 @@
 {
+  "profile": {
+    "menu": {
+      "profile": "Profile",
+      "business": "Business",
+      "storage": "Storage",
+      "orders": "Orders",
+      "bank": "Bank",
+      "support": "Support",
+      "language": "Language"
+    }
+  },
   "footers": {
     "home":"Home",
     "orders": "Orders",

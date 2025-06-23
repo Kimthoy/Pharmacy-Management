@@ -57,7 +57,7 @@ const Dashboard = () => {
   const handleQuickAction = (action) => alert(`Initiated ${action}`);
 
   return (
-    <div className="bg-white dark:bg-gray-900 min-h-screen p-4 sm:p-6">
+    <div className="bg-white dark:bg-gray-900 min-h-screen p-4 sm:p-6 mb-12">
       <header className="mb-6">
         <h1 className="text-lg sm:text-2xl font-bold text-gray-600 dark:text-gray-200">
           {t("dashboard.title")}

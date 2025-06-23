@@ -257,7 +257,7 @@ const Sale = () => {
   }, []);
 
   return (
-    <div className="flex h-screen bg-white dark:bg-gray-900 font-khmer relative">
+    <div className="flex mb-14 h-screen bg-white dark:bg-gray-900 font-khmer relative">
       <div className="flex-1 flex flex-col md:flex-row">
         <div className="flex-1 p-6 overflow-auto">
           <Header

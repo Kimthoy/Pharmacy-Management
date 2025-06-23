@@ -146,7 +146,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
   };
 
   return (
-    <>
+    <div>
       {/* Mobile Toggle Button */}
       <button
         className="md:hidden fixed top-4 left-4 z-50 p-2 bg-green-500 text-white rounded-md"
@@ -165,8 +165,8 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
 
       {/* Sidebar */}
       <div
-        className={`h-screen flex-shrink-0 bg-white dark:bg-gray-900 dark:shadow-gray-800 transition-all duration-300 fixed z-50 md:static
-          ${isOpen ? "w-64" : "w-0 md:w-[80px]"} md:hover:w-64
+        className={`h-screen flex-shrink-0 bg-white dark:bg-gray-900 dark:shadow-gray-800 transition-all duration-300 fixed z-[200] md:static
+          ${isOpen ? "w-64" : "w-0 md:w-[80px]"} md:hover:w-64 
           ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         `}
         onMouseEnter={() => window.innerWidth >= 768 && setIsOpen(true)}
@@ -272,7 +272,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
           </nav>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

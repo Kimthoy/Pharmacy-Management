@@ -195,7 +195,7 @@ const SupplierList = () => {
   };
 
   return (
-    <div className="p-6 bg-white dark:bg-gray-900 shadow-md dark:shadow-gray-800 rounded-md overflow-x-auto">
+    <div className="p-6 mb-14 bg-white dark:bg-gray-900 shadow-md dark:shadow-gray-800 rounded-md overflow-x-auto">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
           {t("supplierlist.SupplierListTitle")}

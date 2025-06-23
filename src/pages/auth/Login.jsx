@@ -95,7 +95,7 @@ const Login = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center font-khmer">
+    <div className="min-h-screen mb-14 bg-gray-100 flex flex-col items-center justify-center font-khmer">
       <div className="w-full max-w-md mt-4 p-8 space-y-6 bg-white rounded-lg shadow-lg">
         <h2 className="text-2xl font-bold text-center text-gray-900">
           {t("login.signIn")}

@@ -143,7 +143,7 @@ const Category = () => {
   );
 
   return (
-    <div className="p-6 bg-gray-100 dark:bg-gray-900 min-h-screen max-w-6xl mx-auto">
+    <div className="p-6 mb-12 bg-gray-100 dark:bg-gray-900 min-h-screen max-w-6xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <div>
           <h1 className="text-xl font-bold text-gray-700 dark:text-gray-200">

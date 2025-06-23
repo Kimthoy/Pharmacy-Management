@@ -6,10 +6,10 @@ const Footer = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white shadow-inner border-t border-gray-200 flex justify-between items-center px-3 py-2 sm:hidden">
+    <div className="fixed bottom-0  left-0 right-0 z-50 bg-white shadow-inner border-t border-gray-200 flex justify-between items-center px-3 py-2 sm:hidden">
       {/* Home */}
       <div
-        className="flex flex-col items-center text-xs text-gray-600 hover:text-green-600 cursor-pointer"
+        className="flex flex-col  items-center text-xs text-gray-600 hover:text-green-600 cursor-pointer"
         onClick={() => navigate("/home")}
       >
         <Home size={22} />

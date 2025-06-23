@@ -3,7 +3,7 @@ import { useTranslation } from "../../hooks/useTranslation";
 const MedicineDetail = () => {
   const { t } = useTranslation();
   return (
-    <div className="p-6 bg-gray-100 dark:bg-gray-900 min-h-screen">
+    <div className="p-6 mb-12 bg-gray-100 dark:bg-gray-900 min-h-screen">
       <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 shadow-md dark:shadow-gray-700 rounded-lg p-6">
         <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-200">
           {t("medicinedetail.MedicineDetails")}

@@ -95,7 +95,7 @@ const AddMedicine = () => {
   );
 
   return (
-    <div className="p-6 bg-white dark:bg-gray-900 rounded-lg shadow-lg dark:shadow-gray-800 w-full max-w-6xl mx-auto">
+    <div className="p-6 mb-12 bg-white dark:bg-gray-900 rounded-lg shadow-lg dark:shadow-gray-800 w-full max-w-6xl mx-auto">
       <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center">
         <div>
           <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">

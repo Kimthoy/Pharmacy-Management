@@ -82,7 +82,7 @@ const AddSupplyForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6">
+    <div className="min-h-screen mb-14 bg-gray-100 dark:bg-gray-900 p-6">
       <div className="max-w-3xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-200">

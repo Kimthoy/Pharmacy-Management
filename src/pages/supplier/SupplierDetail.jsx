@@ -13,7 +13,7 @@ const SupplierDetail = () => {
 
   if (!supplier) {
     return (
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen mb-14 bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md dark:shadow-gray-700">
           <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
             {t("supplierdetail.notFound")}
