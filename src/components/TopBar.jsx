@@ -6,6 +6,7 @@ import { useLanguage } from "../context/LanguageContext";
 import MessageModal from "../components/MessageModal";
 import { FiMenu } from "react-icons/fi";
 import { MdOutlineSettingsSuggest } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 import {
   MessageCircle,
   Bell,
@@ -334,6 +335,7 @@ const TopBar = ({ onSearch }) => {
     setSearchTerm(value);
     onSearch(value);
   };
+  const navigate = useNavigate();
   return (
     <div className="bg-white dark:bg-gray-900 z-10 p-4 flex flex-col sm:flex-row items-center justify-between shadow-sm dark:shadow-gray-800">
       <button
@@ -355,14 +357,30 @@ const TopBar = ({ onSearch }) => {
             >
               Search
             </li>
-            <li className="px-4 py-2 hover:bg-green-700 hover:text-white dark:hover:bg-gray-700 cursor-pointer">
-              Profile
-            </li>
-            <li className="px-4 py-2 hover:bg-green-700 hover:text-white dark:hover:bg-gray-700 cursor-pointer">
-              Settings
-            </li>
+            <Link to="/message">
+              <li className="px-4 py-2 hover:bg-green-700 hover:text-white dark:hover:bg-gray-700 cursor-pointer">
+                Messages
+              </li>
+            </Link>
+            <Link to="/notification">
+              <li className="px-4 py-2 hover:bg-green-700 hover:text-white dark:hover:bg-gray-700 cursor-pointer">
+                Notifications
+              </li>
+            </Link>
             <li className="px-4 py-2 hover:bg-green-700 hover:text-white dark:hover:bg-gray-700 cursor-pointer">
               Logout
+            </li>
+            <li className="px-4 py-2 hover:bg-green-700 hover:text-white dark:hover:bg-gray-700 cursor-pointer">
+              <button
+                onClick={toggleTheme}
+                title={
+                  theme === "light"
+                    ? "Switch to dark mode"
+                    : "Switch to light mode"
+                }
+              >
+                {theme === "light" ? "Dark Mode" : "Light Mode"}
+              </button>
             </li>
           </ul>
         </div>
@@ -422,7 +440,10 @@ const TopBar = ({ onSearch }) => {
             className="p-2 rounded-full hover:scale-125 hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white"
             aria-label={t("topbar.messages")}
           >
-            <MessageCircle size={24} className="animate-bounce-hover" />
+            <MessageCircle
+              size={24}
+              className="animate-bounce-hover sm:flex hidden"
+            />
           </button>
           {isMessageDropdownOpen && (
             <MessageModal
@@ -443,7 +464,7 @@ const TopBar = ({ onSearch }) => {
             className="p-2 rounded-full hover:scale-125 hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white"
             aria-label={t("topbar.notifications")}
           >
-            <Bell size={24} />
+            <Bell size={24} className="sm:flex hidden" />
           </button>
           {isNotificationDropdownOpen && (
             <NotificationModal
@@ -461,7 +482,7 @@ const TopBar = ({ onSearch }) => {
           title={
             theme === "light" ? "Switch to dark mode" : "Switch to light mode"
           }
-          className="p-2 hover:scale-125 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white"
+          className="p-2 sm:flex hidden hover:scale-125 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white"
         >
           {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
         </button>

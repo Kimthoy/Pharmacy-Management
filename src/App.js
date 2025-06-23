@@ -51,6 +51,11 @@ const WastageReturnList = lazy(() =>
 const StaffList = lazy(() => import("./pages/staff/ManageStaff"));
 const Client = lazy(() => import("./pages/auth/Client"));
 const Profile = lazy(() => import("./pages/profile/AboutUser"));
+
+
+
+const MessagePage = lazy(() => import("./pages/setting/Message"));
+const NotificationPage = lazy(() => import("./pages/setting/Notification"));
 const App = () => {
   const [langCode, setLangCode] = useState(
     localStorage.getItem("selectedLanguage") || "en"
@@ -172,6 +177,8 @@ const App = () => {
                       <Route path="/client" element={<Client />} />
                       <Route path="/profile" element={<Profile />} />
                       <Route path="/activity" element={<ActivityPage />} />
+                      <Route path="/message" element={<MessagePage />} />
+                      <Route path="/notification" element={<NotificationPage />} />
                       <Route
                         path="/saledashboard"
                         element={<SaleDashboard />}
