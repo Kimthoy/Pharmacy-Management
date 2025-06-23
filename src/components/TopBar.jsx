@@ -4,6 +4,8 @@ import { AuthContext } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
 import MessageModal from "../components/MessageModal";
+import { FiMenu } from "react-icons/fi";
+import { MdOutlineSettingsSuggest } from "react-icons/md";
 import {
   MessageCircle,
   Bell,
@@ -22,33 +24,6 @@ const languageOptions = [
   { value: "en", label: "English", iconPath: "/icon_en.jpg" },
   { value: "km", label: "ខ្មែរ", iconPath: "/icon_kh.jpg" },
 ];
-
-const SearchBar = ({ t, onSearch }) => {
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const handleSearch = (e) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-    onSearch(value);
-  };
-
-  return (
-    <div className="flex-1 max-w-xs flex align-middle justify-center ">
-      <h1 className="text-2xl font-bold mr-5 dark:text-gray-300 animate-color-cycle">
-        {t("navigation.title", { username: "Panharith" })}
-      </h1>
-
-      <input
-        type="text"
-        placeholder={t("topbar.search")}
-        value={searchTerm}
-        onChange={handleSearch}
-        className="w-full px-4 py-2 shadow hover:shadow-md hover:shadow-slate-400 focus:shadow-none border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 dark:bg-gray-800 dark:text-white"
-        aria-label={t("topbar.search")}
-      />
-    </div>
-  );
-};
 
 const LanguageSelector = ({
   langCode,
@@ -229,7 +204,7 @@ const AuthButtons = ({ t }) => (
   </div>
 );
 
-const TopBar = () => {
+const TopBar = ({ onSearch }) => {
   const { isAuthenticated, logout, user } = useContext(AuthContext);
   const { theme, toggleTheme } = useTheme();
   const { language, changeLanguage } = useLanguage();
@@ -272,9 +247,9 @@ const TopBar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   });
 
-  const handleSearch = (term) => {
-    console.log("Searching for:", term);
-  };
+  // const handleSearch = (term) => {
+  //   console.log("Searching for:", term);
+  // };
 
   const handleLogout = () => {
     setIsModalOpen(true);
@@ -350,21 +325,104 @@ const TopBar = () => {
       icon: "alert",
     },
   ];
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isMobileDropdownOpen, setIsMobileDropdownOpen] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
 
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    onSearch(value);
+  };
   return (
-    <div className="bg-white dark:bg-gray-900 z-10 p-4 flex flex-col sm:flex-row items-center justify-between relative shadow-sm dark:shadow-gray-800">
-      <SearchBar t={t} onSearch={handleSearch} className="shadow" />
-      <div className="flex items-center space-x-2 sm:space-x-4 md:space-x-6 mt-4 sm:mt-0">
+    <div className="bg-white dark:bg-gray-900 z-10 p-4 flex flex-col sm:flex-row items-center justify-between shadow-sm dark:shadow-gray-800">
+      <button
+        className="sm:hidden mr-2 absolute right-0 p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white"
+        aria-label="Open menu"
+        onClick={() => setIsMobileDropdownOpen(!isMobileDropdownOpen)}
+      >
+        <MdOutlineSettingsSuggest size={24} />
+      </button>
+      {isMobileDropdownOpen && (
+        <div
+          className="sm:hidden absolute right-0 mr-4 mt-16 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-50"
+          onClick={() => setIsMobileDropdownOpen(false)} // optional: close on click inside
+        >
+          <ul className=" text-gray-700 dark:text-gray-200">
+            <li
+              onClick={() => setIsMobileSearchOpen(true)}
+              className="px-4 py-2 hover:bg-green-700 hover:text-white  dark:hover:bg-gray-700 cursor-pointer"
+            >
+              Search
+            </li>
+            <li className="px-4 py-2 hover:bg-green-700 hover:text-white dark:hover:bg-gray-700 cursor-pointer">
+              Profile
+            </li>
+            <li className="px-4 py-2 hover:bg-green-700 hover:text-white dark:hover:bg-gray-700 cursor-pointer">
+              Settings
+            </li>
+            <li className="px-4 py-2 hover:bg-green-700 hover:text-white dark:hover:bg-gray-700 cursor-pointer">
+              Logout
+            </li>
+          </ul>
+        </div>
+      )}
+      {isMobileSearchOpen && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white dark:bg-gray-900 p-4 rounded-lg w-11/12 max-w-md shadow-lg">
+            <div className="flex justify-between items-center mb-3">
+              <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
+                Search
+              </h2>
+              <button
+                onClick={() => setIsMobileSearchOpen(false)}
+                className="text-gray-600 hover:text-red-500 dark:text-gray-300"
+              >
+                ✕
+              </button>
+            </div>
+            <input
+              type="text"
+              placeholder={t("topbar.search")}
+              value={searchTerm}
+              onChange={handleSearch}
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              aria-label={t("topbar.search")}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Left Section: Logo & Title */}
+      <div className="flex items-center justify-center space-x-4 w-full  mb-4 sm:mb-0 ">
+        <img src="/logo.png" alt="Logo" width={70} className="rounded " />
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-200 animate-color-cycle">
+          {t("navigation.title", { username: "Panharith" })}
+        </h1>
+      </div>
+
+      {/* Center: Search + Show All */}
+      <div className="sm:flex hidden flex-col sm:flex-row items-center justify-center gap-3 w-64 max-w-xl mr-12">
+        <input
+          type="text"
+          placeholder={t("topbar.search")}
+          value={searchTerm}
+          onChange={handleSearch}
+          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+          aria-label={t("topbar.search")}
+        />
+      </div>
+
+      {/* Right: Icons + Actions */}
+      <div className="flex items-center space-x-3 mt-4 sm:mt-0">
+        {/* Message Button */}
         <div className="relative" ref={messageDropdownRef}>
           <button
-            className="p-2 rounded-full hover:scale-125 hover:text-emerald-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white relative"
             onClick={() => setIsMessageDropdownOpen(!isMessageDropdownOpen)}
+            className="p-2 rounded-full hover:scale-125 hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white"
             aria-label={t("topbar.messages")}
           >
-            <MessageCircle
-              size={24}
-              className="inline-block transition-transform duration-300 animate-bounce-hover"
-            />
+            <MessageCircle size={24} className="animate-bounce-hover" />
           </button>
           {isMessageDropdownOpen && (
             <MessageModal
@@ -375,12 +433,14 @@ const TopBar = () => {
             />
           )}
         </div>
+
+        {/* Notification Button */}
         <div className="relative" ref={notificationDropdownRef}>
           <button
-            className="p-2 rounded-full hover:scale-125 hover:text-emerald-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white"
             onClick={() =>
               setIsNotificationDropdownOpen(!isNotificationDropdownOpen)
             }
+            className="p-2 rounded-full hover:scale-125 hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white"
             aria-label={t("topbar.notifications")}
           >
             <Bell size={24} />
@@ -395,13 +455,18 @@ const TopBar = () => {
           )}
         </div>
 
+        {/* Theme Toggle */}
         <button
           onClick={toggleTheme}
-          className="p-2 hover:text-emerald-500 hover:scale-125 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white"
+          title={
+            theme === "light" ? "Switch to dark mode" : "Switch to light mode"
+          }
+          className="p-2 hover:scale-125 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white"
         >
           {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
         </button>
 
+        {/* Language Selector */}
         <LanguageSelector
           langCode={language}
           onLanguageChange={changeLanguage}
@@ -410,6 +475,8 @@ const TopBar = () => {
           selectorRef={selectorRef}
           t={t}
         />
+
+        {/* User Authentication */}
         {isAuthenticated ? (
           <ProfileDropdown
             user={user}
@@ -423,6 +490,8 @@ const TopBar = () => {
           <AuthButtons t={t} />
         )}
       </div>
+
+      {/* Logout Confirmation Modal */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

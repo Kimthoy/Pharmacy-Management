@@ -1,4 +1,7 @@
 {
+  "navigation": {
+    "title": "Panharith Pharmacy"
+  },
   "medicine-list": {
     "Disable": "Disable",
     "Enable": "Enable"
