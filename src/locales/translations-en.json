@@ -1,4 +1,11 @@
 {
+  "footers": {
+    "home":"Home",
+    "orders": "Orders",
+    "foryou": "For You",
+    "search": "Search",
+    "popular": "Popular"
+  },
   "navigation": {
     "title": "Panharith Pharmacy"
   },
@@ -233,7 +240,7 @@
   },
 
   "navigation": {
-    "title": "Panharith"
+    "title": "Panharith Pharmacy"
   },
   "inventory": {
     "title": "Inventory",

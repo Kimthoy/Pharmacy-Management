@@ -1,32 +1,22 @@
+// tailwind.config.js
 module.exports = {
   darkMode: "class",
-  content: ["./src/**/*.{html,js,jsx,ts,tsx}"],
+  content: ["./src/**/*.{js,jsx,ts,tsx,html}"],
   theme: {
     extend: {
-      screens: {
-        samsung: "360px",
-        iphone: "430px",
-        ipad: "1024px",
-        tablet: "1280px",
-        computer: "1536px",
-      },
-      fontFamily: {
-        sans: ["Inter", "sans-serif"],
-        khmer: ["Kantumruy", "Nokora", "Moul", "serif"], // Add your Khmer fonts
-      },
       keyframes: {
-        "color-cycle": {
-          "0%": { color: "#6366F1" }, // indigo-500
-          "25%": { color: "#EC4899" }, // pink-500
-          "50%": { color: "#F59E0B" }, // amber-500
-          "75%": { color: "#10B981" }, // emerald-500
-          "100%": { color: "#6366F1" }, // indigo-500
+        "slide-in-left": {
+          "0%": { transform: "translateX(100%)", opacity: "0" },
+          "100%": { transform: "translateX(0)", opacity: "1" },
         },
-       
+        "slide-in-bottom": {
+          "0%": { transform: "translateY(100%)", opacity: "0" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
+        },
       },
       animation: {
-        "color-cycle": "color-cycle 3s ease-in-out infinite",
-       
+        "slide-in-left": "slide-in-left 0.4s ease-out forwards",
+        "slide-in-bottom": "slide-in-bottom 0.4s ease-out forwards",
       },
     },
   },

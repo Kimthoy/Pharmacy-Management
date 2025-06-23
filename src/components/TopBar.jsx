@@ -48,7 +48,7 @@ const LanguageSelector = ({
         onKeyDown={(e) =>
           (e.key === "Enter" || e.key === " ") && setOpen(!open)
         }
-        className="flex items-center bg-white dark:bg-gray-800 border border-emerald-500 dark:border-emerald-400 rounded-md px-3 py-1 shadow-sm hover:border-emerald-600 dark:hover:border-emerald-300 transition-all duration-200 w-32 justify-between"
+        className="flex items-center bg-white dark:bg-gray-800 border border-emerald-500 dark:border-emerald-400  px-3 py-1 shadow-sm hover:border-emerald-600 dark:hover:border-emerald-300 transition-all rounded-lg duration-200 w-32 justify-between"
         aria-expanded={open}
         aria-label={t("topbar.selectLanguage")}
       >
@@ -221,6 +221,21 @@ const TopBar = ({ onSearch }) => {
   const selectorRef = useRef(null);
   const messageDropdownRef = useRef(null);
   const notificationDropdownRef = useRef(null);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        mobileDropdownRef.current &&
+        !mobileDropdownRef.current.contains(event.target)
+      ) {
+        setIsMobileDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     console.log("Auth State:", { isAuthenticated, user });
@@ -329,7 +344,7 @@ const TopBar = ({ onSearch }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isMobileDropdownOpen, setIsMobileDropdownOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
-
+  const mobileDropdownRef = useRef(null);
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
@@ -337,9 +352,9 @@ const TopBar = ({ onSearch }) => {
   };
   const navigate = useNavigate();
   return (
-    <div className="bg-white dark:bg-gray-900 z-10 p-4 flex flex-col sm:flex-row items-center justify-between shadow-sm dark:shadow-gray-800">
+    <div className="bg-white dark:bg-gray-900 z-10 p-4 flex flex-col sm:flex-row items-center justify-between shadow-sm dark:shadow-gray-800 ">
       <button
-        className="sm:hidden mr-2 absolute right-0 p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white"
+        className="sm:hidden mr-2 absolute right-0 p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white "
         aria-label="Open menu"
         onClick={() => setIsMobileDropdownOpen(!isMobileDropdownOpen)}
       >
@@ -347,30 +362,31 @@ const TopBar = ({ onSearch }) => {
       </button>
       {isMobileDropdownOpen && (
         <div
-          className="sm:hidden absolute right-0 mr-4 mt-16 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-50"
-          onClick={() => setIsMobileDropdownOpen(false)} // optional: close on click inside
+          className="sm:hidden absolute right-0 mr-4 mt-16 w-48 animate-slide-in-left  bg-green-600 text-white dark:bg-gray-800 rounded-md shadow-lg z-50"
+          onClick={() => setIsMobileDropdownOpen(false)}
+          ref={mobileDropdownRef}
         >
-          <ul className=" text-gray-700 dark:text-gray-200">
+          <ul className="text-white dark:text-gray-200  bg-green-700 rounded-lg">
             <li
               onClick={() => setIsMobileSearchOpen(true)}
-              className="px-4 py-2 hover:bg-green-700 hover:text-white  dark:hover:bg-gray-700 cursor-pointer"
+              className="px-4 py-2 hover:bg-green-500 transition-all rounded-lg cursor-pointer"
             >
               Search
             </li>
             <Link to="/message">
-              <li className="px-4 py-2 hover:bg-green-700 hover:text-white dark:hover:bg-gray-700 cursor-pointer">
+              <li className="px-4 py-2 hover:bg-green-500 transition-all rounded-lg cursor-pointer">
                 Messages
               </li>
             </Link>
             <Link to="/notification">
-              <li className="px-4 py-2 hover:bg-green-700 hover:text-white dark:hover:bg-gray-700 cursor-pointer">
+              <li className="px-4 py-2 hover:bg-green-500 transition-all rounded-lg cursor-pointer">
                 Notifications
               </li>
             </Link>
-            <li className="px-4 py-2 hover:bg-green-700 hover:text-white dark:hover:bg-gray-700 cursor-pointer">
+            <li className="px-4 py-2 hover:bg-green-500 transition-all rounded-lg cursor-pointer">
               Logout
             </li>
-            <li className="px-4 py-2 hover:bg-green-700 hover:text-white dark:hover:bg-gray-700 cursor-pointer">
+            <li className="px-4 py-2 hover:bg-green-500 transition-all rounded-lg cursor-pointer">
               <button
                 onClick={toggleTheme}
                 title={
@@ -385,10 +401,11 @@ const TopBar = ({ onSearch }) => {
           </ul>
         </div>
       )}
+
       {isMobileSearchOpen && (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white dark:bg-gray-900 p-4 rounded-lg w-11/12 max-w-md shadow-lg">
-            <div className="flex justify-between items-center mb-3">
+          <div className="bg-white dark:bg-gray-600 p-4 rounded-lg w-11/12 max-w-md shadow-lg animate-slide-in-left">
+            <div className="flex justify-between items-center">
               <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
                 Search
               </h2>
@@ -413,8 +430,13 @@ const TopBar = ({ onSearch }) => {
 
       {/* Left Section: Logo & Title */}
       <div className="flex items-center justify-center space-x-4 w-full  mb-4 sm:mb-0 ">
-        <img src="/logo.png" alt="Logo" width={70} className="rounded " />
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-200 animate-color-cycle">
+        <img
+          src="/logo.png"
+          alt="Logo"
+          width={70}
+          className="rounded sm:w-20 w-14"
+        />
+        <h1 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-gray-200 animate-color-cycle">
           {t("navigation.title", { username: "Panharith" })}
         </h1>
       </div>

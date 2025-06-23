@@ -1,7 +1,14 @@
 {
-  "medicine-list":{
-    "Disable":"បិទដំណើរការ",
-    "Enable":"បើកដំណើរការ"
+  "footers": {
+    "home":"ទំព័រដើម",
+    "orders": "បញ្ជាទិញ",
+    "foryou": "សម្រាប់អ្នក",
+    "search": "ស្វែងរក",
+    "popular": "ពេញនិយម"
+  },
+  "medicine-list": {
+    "Disable": "បិទដំណើរការ",
+    "Enable": "បើកដំណើរការ"
   },
   "medicine-view": {
     "Info": "ព័ត៌មានថ្នាំ",

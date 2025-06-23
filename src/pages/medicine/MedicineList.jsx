@@ -222,7 +222,7 @@ const MedicineList = () => {
                           t("medicine-list.Enable")
                         )}
                       </button>
-                      <button
+                      {/* <button
                         onClick={() => handleEditClick(med)}
                         disabled={med.status !== "active"}
                         className={`text-white p-1 rounded-lg bg-blue-700 transition-all ${
@@ -232,7 +232,7 @@ const MedicineList = () => {
                         }`}
                       >
                         Add to Stock
-                      </button>
+                      </button> */}
                     </div>
                   </td>
                 </tr>
