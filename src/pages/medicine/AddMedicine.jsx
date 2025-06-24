@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
-import BarcodeScannerComponent from "react-qr-barcode-scanner";
+import BarcodeScanner from "../../components/BarcodeScanner";
+
 import { useTranslation } from "../../hooks/useTranslation";
 import { createMedicine } from "../api/medicineService";
 import { LuScanBarcode } from "react-icons/lu";
@@ -94,7 +95,19 @@ const AddMedicine = () => {
     },
     [t, medicine]
   );
+  const handleDetected = (barcode) => {
+    if (!medicine.barcode_number) {
+      setMedicine((prev) => ({ ...prev, barcode_number: barcode }));
+      // fetchMedicineDetails(barcode); // example async fetch
+    }
+  };
+  const [showScanner, setShowScanner] = useState(false);
+  const [barcode, setBarcode] = useState("");
 
+  const handleScan = (result) => {
+    setBarcode(result);
+    setShowScanner(false);
+  };
   return (
     <div className="p-6 mb-12 bg-white dark:bg-gray-900 rounded-lg shadow-lg dark:shadow-gray-800 w-full max-w-6xl mx-auto">
       <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center">
@@ -213,44 +226,24 @@ const AddMedicine = () => {
               {t("add-medicine.BarcodeScan")}
             </label>
             <div className="relative">
-              <input
-                id="barcode_number"
-                type="text"
-                name="barcode_number"
-                value={medicine.barcode_number}
-                onChange={handleMedicineChange}
-                placeholder={t("add-medicine.BarcodeScan-PlaceHolder")}
-                className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
-              />
               <button
-                type="button"
-                onClick={() => setOpenScanner(true)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-green-500 dark:hover:text-green-400"
-                aria-label="Open barcode scanner"
+                onClick={() => setShowScanner(true)}
+                className="bg-blue-500 text-white px-4 py-2 rounded-md"
               >
-                <LuScanBarcode className="w-5 h-5" />
+                Scan Barcode
               </button>
+
+              <input value={barcode} readOnly className="border p-2 mt-2" />
+
+              {showScanner && (
+                <BarcodeScanner
+                  onScanSuccess={handleScan}
+                  onClose={() => setShowScanner(false)}
+                />
+              )}
             </div>
           </div>
-          <div className="flex flex-col">
-            <label
-              htmlFor="status"
-              className="mb-2 text-md font-medium text-gray-700 dark:text-gray-300"
-            >
-              {t("add-medicine.Status")}
-            </label>
-            <select
-              id="status"
-              name="status"
-              value={medicine.status}
-              onChange={handleMedicineChange}
-              className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
-            >
-              <option value="">{t("add-medicine.Status-PlaceHolder")}</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
-          </div>
+          
           <div className="flex flex-col">
             <label
               htmlFor="category"
@@ -306,27 +299,25 @@ const AddMedicine = () => {
         </div>
       </form>
       {openScanner && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
-            <div className="relative" style={{ height: "300px" }}>
-              <BarcodeScannerComponent
-                width="100%"
-                height="100%"
-                facingMode="environment"
-                torch={torchOn}
-              />
-              <button
-                onClick={() => setTorchOn(!torchOn)}
-                className="absolute top-2 right-2 bg-black bg-opacity-70 text-white p-2 rounded-full hover:bg-opacity-90 transition"
-                aria-label={torchOn ? "Turn flash off" : "Turn flash on"}
-              >
-                {torchOn ? "🔦 Off" : "💡 On"}
-              </button>
-            </div>
-            <div className="mt-4 flex justify-between items-center">
-              <div className="text-md text-gray-600 dark:text-gray-300">
-                {medicine.barcode_number &&
-                  `${t("add-medicine.Scanned")}: ${medicine.barcode_number}`}
+        <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center px-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md shadow-lg relative">
+           
+
+            {/* Info & Actions */}
+            <div className="mt-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+              <div className="text-md text-gray-700 dark:text-gray-300 text-center sm:text-left">
+                {medicine.barcode_number ? (
+                  <>
+                    <span className="font-semibold">
+                      {t("add-medicine.Scanned")}:
+                    </span>{" "}
+                    {medicine.barcode_number}
+                  </>
+                ) : (
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    {t("add-medicine.ScanPrompt")}
+                  </span>
+                )}
               </div>
               <button
                 onClick={() => setOpenScanner(false)}
@@ -335,8 +326,10 @@ const AddMedicine = () => {
                 {t("add-medicine.CloseScanner")}
               </button>
             </div>
+
+            {/* Loading Message */}
             {isLoading && (
-              <div className="mt-2 text-md text-gray-500 dark:text-gray-400">
+              <div className="mt-2 text-sm text-gray-500 dark:text-gray-400 text-center">
                 {t("add-medicine.LoadingMedicine")}
               </div>
             )}
