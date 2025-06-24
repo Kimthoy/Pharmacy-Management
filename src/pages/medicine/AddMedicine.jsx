@@ -1,7 +1,8 @@
 import { useState, useCallback } from "react";
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
 import { useTranslation } from "../../hooks/useTranslation";
-import { createMedicine,  } from "../api/medicineService";
+import { createMedicine } from "../api/medicineService";
+import { LuScanBarcode } from "react-icons/lu";
 
 const AddMedicine = () => {
   const { t } = useTranslation();
@@ -101,18 +102,18 @@ const AddMedicine = () => {
           <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
             {t("add-medicine.AddMedicine")}
           </h2>
-          <p className="text-gray-500 italic text-sm dark:text-gray-400">
+          <p className="text-gray-500 italic text-md dark:text-gray-400">
             {t("add-medicine.title-addmedicine")}
           </p>
         </div>
       </div>
       {error && (
-        <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/50 text-red-600 dark:text-red-300 text-sm rounded-md border border-red-200 dark:border-red-700">
+        <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/50 text-red-600 dark:text-red-300 text-md rounded-md border border-red-200 dark:border-red-700">
           {error}
         </div>
       )}
       {success && (
-        <div className="mb-4 p-4 bg-green-50 dark:bg-green-900/50 text-green-600 dark:text-green-300 text-sm rounded-md border border-green-200 dark:border-green-700">
+        <div className="mb-4 p-4 bg-green-50 dark:bg-green-900/50 text-green-600 dark:text-green-300 text-md rounded-md border border-green-200 dark:border-green-700">
           {success}
         </div>
       )}
@@ -121,7 +122,7 @@ const AddMedicine = () => {
           <div className="flex flex-col">
             <label
               htmlFor="medicine_name"
-              className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+              className="mb-2 text-md font-medium text-gray-700 dark:text-gray-300"
             >
               {t("add-medicine.Madicinename")}
             </label>
@@ -132,13 +133,13 @@ const AddMedicine = () => {
               placeholder={t("add-medicine.MecineName-PlaceHolder")}
               value={medicine.medicine_name}
               onChange={handleMedicineChange}
-              className="text-sm border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
+              className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
             />
           </div>
           <div className="flex flex-col">
             <label
               htmlFor="price"
-              className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+              className="mb-2 text-md font-medium text-gray-700 dark:text-gray-300"
             >
               {t("add-medicine.Price")}
             </label>
@@ -150,13 +151,13 @@ const AddMedicine = () => {
               placeholder={t("add-medicine.Price-PlaceHolder")}
               value={medicine.price}
               onChange={handleMedicineChange}
-              className="text-sm border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
+              className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
             />
           </div>
           <div className="flex flex-col">
             <label
               htmlFor="weight"
-              className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+              className="mb-2 text-md font-medium text-gray-700 dark:text-gray-300"
             >
               {t("add-medicine.Weight")}
             </label>
@@ -167,13 +168,13 @@ const AddMedicine = () => {
               placeholder={t("add-medicine.Weight-PlaceHolder")}
               value={medicine.weight}
               onChange={handleMedicineChange}
-              className="text-sm border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
+              className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
             />
           </div>
           <div className="flex flex-col">
             <label
               htmlFor="quantity"
-              className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+              className="mb-2 text-md font-medium text-gray-700 dark:text-gray-300"
             >
               {t("add-medicine.Quantity")}
             </label>
@@ -184,13 +185,13 @@ const AddMedicine = () => {
               placeholder={t("add-medicine.Quantity-PlaceHolder")}
               value={medicine.quantity}
               onChange={handleMedicineChange}
-              className="text-sm border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
+              className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
             />
           </div>
           <div className="flex flex-col">
             <label
               htmlFor="expire_date"
-              className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+              className="mb-2 text-md font-medium text-gray-700 dark:text-gray-300"
             >
               {t("add-medicine.ExpireDate")} ({t("add-medicine.Optional")})
             </label>
@@ -201,13 +202,13 @@ const AddMedicine = () => {
               min={new Date(Date.now() + 86400000).toISOString().split("T")[0]}
               value={medicine.expire_date}
               onChange={handleMedicineChange}
-              className="text-sm border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
+              className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
             />
           </div>
           <div className="flex flex-col relative">
             <label
               htmlFor="barcode_number"
-              className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+              className="mb-2 text-md font-medium text-gray-700 dark:text-gray-300"
             >
               {t("add-medicine.BarcodeScan")}
             </label>
@@ -219,7 +220,7 @@ const AddMedicine = () => {
                 value={medicine.barcode_number}
                 onChange={handleMedicineChange}
                 placeholder={t("add-medicine.BarcodeScan-PlaceHolder")}
-                className="text-sm border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
+                className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
               />
               <button
                 type="button"
@@ -227,27 +228,14 @@ const AddMedicine = () => {
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-green-500 dark:hover:text-green-400"
                 aria-label="Open barcode scanner"
               >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4v16m8-8H4"
-                  />
-                </svg>
+                <LuScanBarcode className="w-5 h-5" />
               </button>
             </div>
           </div>
           <div className="flex flex-col">
             <label
               htmlFor="status"
-              className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+              className="mb-2 text-md font-medium text-gray-700 dark:text-gray-300"
             >
               {t("add-medicine.Status")}
             </label>
@@ -256,7 +244,7 @@ const AddMedicine = () => {
               name="status"
               value={medicine.status}
               onChange={handleMedicineChange}
-              className="text-sm border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
+              className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
             >
               <option value="">{t("add-medicine.Status-PlaceHolder")}</option>
               <option value="active">Active</option>
@@ -266,7 +254,7 @@ const AddMedicine = () => {
           <div className="flex flex-col">
             <label
               htmlFor="category"
-              className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+              className="mb-2 text-md font-medium text-gray-700 dark:text-gray-300"
             >
               {t("add-medicine.Category")}
             </label>
@@ -275,7 +263,7 @@ const AddMedicine = () => {
               name="category"
               value={medicine.category}
               onChange={handleMedicineChange}
-              className="text-sm border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
+              className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
             >
               <option value="">{t("add-medicine.Category-PlaceHolder")}</option>
               <option value="tablet">Tablet</option>
@@ -287,7 +275,7 @@ const AddMedicine = () => {
           <div className="flex flex-col col-span-1 md:col-span-3">
             <label
               htmlFor="medicine_detail"
-              className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+              className="mb-2 text-md font-medium text-gray-700 dark:text-gray-300"
             >
               {t("add-medicine.MedicineInformation")}
             </label>
@@ -297,7 +285,7 @@ const AddMedicine = () => {
               placeholder={t("add-medicine.MedicineInformation-PlaceHolder")}
               value={medicine.medicine_detail}
               onChange={handleMedicineChange}
-              className="text-sm border border-gray-300 dark:border-gray-600 w-full h-28 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
+              className="text-md border border-gray-300 dark:border-gray-600 w-full sm:h-28 h-16 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
             ></textarea>
           </div>
         </div>
@@ -305,7 +293,7 @@ const AddMedicine = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className={`px-6 py-3 rounded-md text-sm font-medium text-white transition ${
+            className={`px-6 py-3 rounded-md text-md font-medium text-white transition ${
               isLoading
                 ? "bg-green-400 dark:bg-green-500 cursor-not-allowed"
                 : "bg-green-500 dark:bg-green-600 hover:bg-green-600 dark:hover:bg-green-500"
@@ -336,19 +324,19 @@ const AddMedicine = () => {
               </button>
             </div>
             <div className="mt-4 flex justify-between items-center">
-              <div className="text-sm text-gray-600 dark:text-gray-300">
+              <div className="text-md text-gray-600 dark:text-gray-300">
                 {medicine.barcode_number &&
                   `${t("add-medicine.Scanned")}: ${medicine.barcode_number}`}
               </div>
               <button
                 onClick={() => setOpenScanner(false)}
-                className="px-4 py-2 bg-red-500 dark:bg-red-600 text-white rounded-md hover:bg-red-600 dark:hover:bg-red-500 text-sm transition"
+                className="px-4 py-2 bg-red-500 dark:bg-red-600 text-white rounded-md hover:bg-red-600 dark:hover:bg-red-500 text-md transition"
               >
                 {t("add-medicine.CloseScanner")}
               </button>
             </div>
             {isLoading && (
-              <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              <div className="mt-2 text-md text-gray-500 dark:text-gray-400">
                 {t("add-medicine.LoadingMedicine")}
               </div>
             )}

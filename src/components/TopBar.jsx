@@ -207,7 +207,7 @@ const AuthButtons = ({ t }) => (
 
 const TopBar = ({ onSearch }) => {
   const { isAuthenticated, logout, user } = useContext(AuthContext);
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme } = useTheme(false);
   const { language, changeLanguage } = useLanguage();
   const { t } = useTranslation();
 

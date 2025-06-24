@@ -216,29 +216,21 @@ const ManageStaff = () => {
   );
 
   return (
-    <div className="p-6 mb-14 bg-gray-100 dark:bg-gray-900 min-h-screen max-w-6xl mx-auto">
+    <div className="sm:p-2  mb-14  dark:bg-gray-900 min-h-screen max-w-6xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <div>
           <h1 className="text-xl font-bold text-gray-700 dark:text-gray-200">
             {t("staff.StaffDashboard")}
           </h1>
-          <span className="text-xs font-normal text-gray-400 dark:text-gray-300">
+          <span className="text-md font-normal text-gray-400 dark:text-gray-300">
             {t("staff.StaffDashboardDesc")}
           </span>
         </div>
         <div className="flex items-center space-x-2 mt-4 md:mt-0">
-          <button
-            onClick={toggleTheme}
-            className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition"
-            aria-label={
-              theme === "light" ? "Switch to dark mode" : "Switch to light mode"
-            }
-          >
-            {theme === "light" ? <FaMoon /> : <FaSun />}
-          </button>
+         
           <button
             onClick={handleAddStaff}
-            className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-4 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition"
+            className="text-md text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-4 py-1 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition"
             aria-label={t("staff.addStaff")}
           >
             {t("staff.addStaff")}
@@ -247,14 +239,14 @@ const ManageStaff = () => {
       </div>
 
       {confirmation && (
-        <div className="mb-4 p-3 bg-emerald-100 dark:bg-emerald-800 text-emerald-700 dark:text-emerald-300 text-xs rounded-[4px]">
+        <div className="mb-4 p-3 bg-emerald-100 dark:bg-emerald-800 text-emerald-700 dark:text-emerald-300 text-md rounded-[4px]">
           {confirmation}
         </div>
       )}
 
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md dark:shadow-gray-700 border border-gray-200 dark:border-gray-600">
+      <div className="bg-white dark:bg-gray-800  rounded-lg  border-gray-200 dark:border-gray-600">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-gray-700 dark:text-gray-200">
+          <h2 className="text-md font-bold text-gray-700 dark:text-gray-200">
             {t("staff.staffList")}
           </h2>
           <div className="flex items-center space-x-3">
@@ -263,7 +255,7 @@ const ManageStaff = () => {
               placeholder={t("staff.searchPlaceholder")}
               value={searchQuery}
               onChange={handleSearch}
-              className="text-xs border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
+              className="text-md border border-gray-400 dark:border-gray-600 px-3 py-1 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
               aria-label={t("staff.searchPlaceholder")}
             />
             <button
@@ -276,7 +268,7 @@ const ManageStaff = () => {
               <FaSort />
             </button>
             <button
-              className="bg-white dark:bg-gray-700 px-4 py-2 rounded-[4px] shadow-md dark:shadow-gray-600 flex items-center space-x-2 border border-gray-400 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600"
+              className="bg-white hidden sm:flex dark:bg-gray-700 px-4 py-2 rounded-[4px] shadow-md dark:shadow-gray-600  items-center space-x-2 border border-gray-400 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600"
               aria-label="Settings"
             >
               <FaCog />
@@ -284,108 +276,112 @@ const ManageStaff = () => {
           </div>
         </div>
 
-        <table className="w-full  dark:text-slate-200 border-collapse border border-gray-300 dark:border-gray-600">
-          <thead>
-            <tr className="text-center ">
-              <td className="py-2 px-3">{t("staff.name")}</td>
-              <td className="py-2 px-3">{t("staff.email")}</td>
-              <td className="py-2 px-3">{t("staff.role")}</td>
-              <td className="py-2 px-3">{t("staff.status")}</td>
-              <td className="py-2 px-3">{t("staff.actions")}</td>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedList.length > 0 ? (
-              paginatedList.map((user) => (
-                <tr
-                  key={user.id}
-                  className="border dark:hover:bg-slate-700 hover:bg-slate-200 hover:cursor-pointer hover:shadow-md transition-all border-gray-300 dark:border-gray-600 text-center"
-                >
-                  <td className="p-3 border border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-300">
-                    {user.name || "No name"}
-                  </td>
-                  <td className="p-3 border border-gray-300 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 cursor-pointer">
-                    {user.email || "No email"}
-                  </td>
-                  <td className="p-3 border border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-300">
-                    {user.role || "No role"}
-                  </td>
-                  <td
-                    className={`p-3 border border-gray-300 dark:border-gray-600 ${
-                      user.status === "Active"
-                        ? "text-green-600 dark:text-green-400"
-                        : "text-red-600 dark:text-red-400"
-                    }`}
+        <div className="w-[444px]">
+          <table className="w-full  dark:text-slate-100 border-collapse border border-gray-300 dark:border-gray-600">
+            <thead>
+              <tr className="text-center ">
+                <td className="py-2 px-3">{t("staff.name")}</td>
+                <td className="py-2 px-3 sm:flex hidden">{t("staff.email")}</td>
+                <td className="py-2 px-3">{t("staff.role")}</td>
+                <td className="py-2 px-3">{t("staff.status")}</td>
+                <td className="py-2 px-3">{t("staff.actions")}</td>
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedList.length > 0 ? (
+                paginatedList.map((user) => (
+                  <tr
+                    key={user.id}
+                    className="border dark:hover:bg-slate-700 hover:bg-slate-200 hover:cursor-pointer hover:shadow-md transition-all border-gray-300 dark:border-gray-600 text-center"
                   >
-                    {user.status || "No status"}
-                  </td>
-                  <td className="p-3 border border-gray-300 dark:border-gray-600">
-                    <div className="flex justify-center space-x-2">
-                      <button
-                        onClick={() => handleEditStaff(user)}
-                        disabled={user.status !== "Active"}
-                        className={`text-xs border border-blue-500 dark:border-blue-400 px-2 py-1 rounded-[4px] transition ${
-                          user.status === "Active"
-                            ? "text-blue-600 hover:text-white hover:bg-blue-600 dark:text-blue-400 dark:hover:bg-blue-400 dark:hover:text-white dark:hover:shadow-md dark:hover:shadow-slate-300"
-                            : "text-blue-300 dark:text-blue-600 opacity-50 cursor-not-allowed"
-                        }`}
-                        aria-label={
-                          user.status === "Active"
-                            ? t("staff.edit")
-                            : t("staff.editDisabled")
-                        }
-                        aria-disabled={user.status !== "Active"}
-                      >
-                        <FaRegEdit className="w-5 h-5" />
-                      </button>
-                      <button
-                        onClick={() => handleToggleStatus(user)}
-                        disabled={isToggling[user.id]}
-                        className={`text-xs border px-2 py-1 rounded-[4px] transition ${
-                          user.status === "Active"
-                            ? "text-green-600 border-green-600 hover:text-white hover:bg-green-600 dark:text-green-600 dark:border-green-200 dark:hover:bg-green-600 dark:hover:text-white dark:hover:shadow-md dark:hover:shadow-slate-300"
-                            : "text-red-600 border-red-600 hover:text-white hover:bg-red-600 dark:text-red-600 dark:border-red-200 dark:hover:bg-red-600 dark:hover:text-white dark:hover:shadow-md dark:hover:shadow-slate-300"
-                        } ${
-                          isToggling[user.id]
-                            ? "opacity-50 cursor-not-allowed"
-                            : ""
-                        }`}
-                        aria-label={
-                          user.status === "Active" ? t("disable") : t("enable")
-                        }
-                      >
-                        {isToggling[user.id] ? (
-                          t("staff.loading")
-                        ) : user.status === "Active" ? (
-                          <IoMdCheckboxOutline className="w-5 h-5" />
-                        ) : (
-                          <LuBan className="w-5 h-5" />
-                        )}
-                      </button>
-                    </div>
+                    <td className="p-3 border border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-300">
+                      {user.name || "No name"}
+                    </td>
+                    <td className="sm:flex hidden p-3 border border-gray-300 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 cursor-pointer">
+                      {user.email || "No email"}
+                    </td>
+                    <td className="p-3 border border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-300">
+                      {user.role || "No role"}
+                    </td>
+                    <td
+                      className={`p-3 border border-gray-300 dark:border-gray-600 ${
+                        user.status === "Active"
+                          ? "text-green-600 dark:text-green-400"
+                          : "text-red-600 dark:text-red-400"
+                      }`}
+                    >
+                      {user.status || "No status"}
+                    </td>
+                    <td className="p-3 border border-gray-300 dark:border-gray-600">
+                      <div className="flex justify-center space-x-2">
+                        <button
+                          onClick={() => handleEditStaff(user)}
+                          disabled={user.status !== "Active"}
+                          className={`text-md border border-blue-500 dark:border-blue-400 px-2 py-1 rounded-[4px] transition ${
+                            user.status === "Active"
+                              ? "text-blue-600 hover:text-white hover:bg-blue-600 dark:text-blue-400 dark:hover:bg-blue-400 dark:hover:text-white dark:hover:shadow-md dark:hover:shadow-slate-300"
+                              : "text-blue-300 dark:text-blue-600 opacity-50 cursor-not-allowed"
+                          }`}
+                          aria-label={
+                            user.status === "Active"
+                              ? t("staff.edit")
+                              : t("staff.editDisabled")
+                          }
+                          aria-disabled={user.status !== "Active"}
+                        >
+                          <FaRegEdit className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => handleToggleStatus(user)}
+                          disabled={isToggling[user.id]}
+                          className={`text-md border px-2 py-1 rounded-[4px] transition ${
+                            user.status === "Active"
+                              ? "text-green-600 border-green-600 hover:text-white hover:bg-green-600 dark:text-green-600 dark:border-green-200 dark:hover:bg-green-600 dark:hover:text-white dark:hover:shadow-md dark:hover:shadow-slate-300"
+                              : "text-red-600 border-red-600 hover:text-white hover:bg-red-600 dark:text-red-600 dark:border-red-200 dark:hover:bg-red-600 dark:hover:text-white dark:hover:shadow-md dark:hover:shadow-slate-300"
+                          } ${
+                            isToggling[user.id]
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
+                          }`}
+                          aria-label={
+                            user.status === "Active"
+                              ? t("disable")
+                              : t("enable")
+                          }
+                        >
+                          {isToggling[user.id] ? (
+                            t("staff.loading")
+                          ) : user.status === "Active" ? (
+                            <IoMdCheckboxOutline className="w-5 h-5" />
+                          ) : (
+                            <LuBan className="w-5 h-5" />
+                          )}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan="5"
+                    className="p-16 border border-gray-300 dark:border-gray-600 text-center text-gray-500 dark:text-gray-400"
+                  >
+                    {t("staff.noRecords")}
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan="5"
-                  className="p-16 border border-gray-300 dark:border-gray-600 text-center text-gray-500 dark:text-gray-400"
-                >
-                  {t("staff.noRecords")}
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
 
         <div className="flex flex-col md:flex-row justify-between items-center mt-4">
-          <div className="flex items-center space-x-2">
-            <span className="text-gray-400 dark:text-gray-300 text-xs">
+          <div className="hidden items-center space-x-2 sm:flex">
+            <span className="text-gray-400 dark:text-gray-300 text-md">
               {t("staff.show")}
             </span>
             <select
-              className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
+              className="text-md border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
               value={itemsPerPage}
               onChange={(e) => {
                 setItemsPerPage(Number(e.target.value));
@@ -397,7 +393,7 @@ const ManageStaff = () => {
               <option value={10}>10</option>
               <option value={15}>15</option>
             </select>
-            <span className="text-gray-400 dark:text-gray-300 text-xs">
+            <span className="text-gray-400 dark:text-gray-300 text-md">
               {t("staff.entries")}
             </span>
           </div>
@@ -405,18 +401,18 @@ const ManageStaff = () => {
             <button
               disabled={currentPage === 1}
               onClick={() => setCurrentPage(currentPage - 1)}
-              className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition disabled:opacity-50"
+              className="text-md text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition disabled:opacity-50"
               aria-label="Previous page"
             >
               {t("staff.previous")}
             </button>
-            <span className="text-gray-700 dark:text-gray-200 text-xs">
+            <span className="text-gray-700 dark:text-gray-200 text-md">
               {t("staff.page")} {currentPage} {t("staff.of")} {totalPages}
             </span>
             <button
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage(currentPage + 1)}
-              className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition disabled:opacity-50"
+              className="text-md text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition disabled:opacity-50"
               aria-label="Next page"
             >
               {t("staff.next")}
@@ -441,14 +437,14 @@ const ManageStaff = () => {
               </button>
               <form onSubmit={handleFormSubmit} className="mt-4 space-y-4">
                 {formError && (
-                  <p className="text-red-500 dark:text-red-400 text-xs">
+                  <p className="text-red-500 dark:text-red-400 text-md">
                     {formError}
                   </p>
                 )}
                 <div>
                   <label
                     htmlFor="name"
-                    className="block text-xs font-medium text-gray-700 dark:text-gray-200"
+                    className="block text-md font-medium text-gray-700 dark:text-gray-200"
                   >
                     {t("staff.name")}
                   </label>
@@ -458,14 +454,14 @@ const ManageStaff = () => {
                     name="name"
                     value={formData.name}
                     onChange={handleFormChange}
-                    className="mt-1 w-full text-xs border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
+                    className="mt-1 w-full text-md border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
                     aria-required="true"
                   />
                 </div>
                 <div>
                   <label
                     htmlFor="gender"
-                    className="block text-xs font-medium text-gray-700 dark:text-gray-200"
+                    className="block text-md font-medium text-gray-700 dark:text-gray-200"
                   >
                     {t("staff.gender")}
                   </label>
@@ -474,7 +470,7 @@ const ManageStaff = () => {
                     name="gender"
                     value={formData.gender}
                     onChange={handleFormChange}
-                    className="mt-1 w-full text-xs border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
+                    className="mt-1 w-full text-md border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
                   >
                     <option value="">{t("staff.selectGender")}</option>
                     <option value="male">{t("staff.male")}</option>
@@ -488,7 +484,7 @@ const ManageStaff = () => {
                 <div>
                   <label
                     htmlFor="email"
-                    className="block text-xs font-medium text-gray-700 dark:text-gray-200"
+                    className="block text-md font-medium text-gray-700 dark:text-gray-200"
                   >
                     {t("staff.email")}
                   </label>
@@ -498,7 +494,7 @@ const ManageStaff = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleFormChange}
-                    className="mt-1 w-full text-xs border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
+                    className="mt-1 w-full text-md border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
                     aria-required="true"
                   />
                 </div>
@@ -506,7 +502,7 @@ const ManageStaff = () => {
                   <div>
                     <label
                       htmlFor="password"
-                      className="block text-xs font-medium text-gray-700 dark:text-gray-200"
+                      className="block text-md font-medium text-gray-700 dark:text-gray-200"
                     >
                       {t("staff.password")}
                     </label>
@@ -516,7 +512,7 @@ const ManageStaff = () => {
                       name="password"
                       value={formData.password}
                       onChange={handleFormChange}
-                      className="mt-1 w-full text-xs border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
+                      className="mt-1 w-full text-md border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
                       aria-required="true"
                     />
                   </div>
@@ -524,7 +520,7 @@ const ManageStaff = () => {
                 <div>
                   <label
                     htmlFor="role"
-                    className="block text-xs font-medium text-gray-700 dark:text-gray-200"
+                    className="block text-md font-medium text-gray-700 dark:text-gray-200"
                   >
                     {t("staff.role")}
                   </label>
@@ -533,7 +529,7 @@ const ManageStaff = () => {
                     name="role"
                     value={formData.role}
                     onChange={handleFormChange}
-                    className="mt-1 w-full text-xs border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
+                    className="mt-1 w-full text-md border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
                     aria-required="true"
                   >
                     <option value="admin">{t("staff.roleAdmin")}</option>
@@ -544,7 +540,7 @@ const ManageStaff = () => {
                 <div>
                   <label
                     htmlFor="status"
-                    className="block text-xs font-medium text-gray-700 dark:text-gray-200"
+                    className="block text-md font-medium text-gray-700 dark:text-gray-200"
                   >
                     {t("staff.status")}
                   </label>
@@ -553,7 +549,7 @@ const ManageStaff = () => {
                     name="status"
                     value={formData.status}
                     onChange={handleFormChange}
-                    className="mt-1 w-full text-xs border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
+                    className="mt-1 w-full text-md border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
                     aria-required="true"
                   >
                     <option value="Active">{t("staff.statusActive")}</option>
@@ -565,7 +561,7 @@ const ManageStaff = () => {
                 <div>
                   <label
                     htmlFor="phone"
-                    className="block text-xs font-medium text-gray-700 dark:text-gray-200"
+                    className="block text-md font-medium text-gray-700 dark:text-gray-200"
                   >
                     {t("staff.phone")}
                   </label>
@@ -575,7 +571,7 @@ const ManageStaff = () => {
                     name="phone"
                     value={formData.phone}
                     onChange={handleFormChange}
-                    className="mt-1 w-full text-xs border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
+                    className="mt-1 w-full text-md border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
                   />
                 </div>
 
@@ -583,14 +579,14 @@ const ManageStaff = () => {
                   <button
                     type="button"
                     onClick={() => setShowModal(false)}
-                    className="text-xs text-gray-500 dark:text-gray-400 border border-gray-400 dark:border-gray-600 px-4 py-2 rounded-[4px] hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="text-md text-gray-500 dark:text-gray-400 border border-gray-400 dark:border-gray-600 px-4 py-2 rounded-[4px] hover:bg-gray-100 dark:hover:bg-gray-700"
                     aria-label="Cancel"
                   >
                     {t("staff.cancel")}
                   </button>
                   <button
                     type="submit"
-                    className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-4 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition"
+                    className="text-md text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-4 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition"
                     aria-label={
                       modalMode === "add" ? "Add staff" : "Save changes"
                     }

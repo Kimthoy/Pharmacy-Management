@@ -16,7 +16,7 @@ const AddManufacturerReturn = () => {
 
   return (
     <div
-      className={`p-4 rounded-md shadow-md w-full max-w-6xl mx-auto ${
+      className={`p-4 mb-16 rounded-md sm:shadow-lg w-full max-w-6xl mx-auto ${
         theme === "dark" ? "bg-gray-800 text-white" : "bg-white text-gray-900"
       }`}
     >
@@ -46,12 +46,12 @@ const AddManufacturerReturn = () => {
               name="company"
               id="company"
               placeholder={t("addManufacturerReturn.companyPlaceholder")}
-              className={`border px-2 text-sm py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+              className={`border px-2 text-md py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 theme === "dark"
                   ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                   : "bg-white border-gray-400 text-gray-900 placeholder-gray-500"
               }`}
-              required
+              
             />
           </div>
 
@@ -64,12 +64,12 @@ const AddManufacturerReturn = () => {
               id="email"
               placeholder={t("addManufacturerReturn.emailPlaceholder")}
               name="email"
-              className={`border px-2 text-sm py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+              className={`border px-2 text-md py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 theme === "dark"
                   ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                   : "bg-white border-gray-400 text-gray-900 placeholder-gray-500"
               }`}
-              required
+              
             />
           </div>
 
@@ -82,12 +82,12 @@ const AddManufacturerReturn = () => {
               id="phone"
               placeholder={t("addManufacturerReturn.phonePlaceholder")}
               name="phone"
-              className={`border px-2 text-sm py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+              className={`border px-2 text-md py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 theme === "dark"
                   ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                   : "bg-white border-gray-400 text-gray-900 placeholder-gray-500"
               }`}
-              required
+              
             />
           </div>
 
@@ -100,12 +100,12 @@ const AddManufacturerReturn = () => {
               id="productname"
               placeholder={t("addManufacturerReturn.productNamePlaceholder")}
               name="productname"
-              className={`border px-2 text-sm py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+              className={`border px-2 text-md py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 theme === "dark"
                   ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                   : "bg-white border-gray-400 text-gray-900 placeholder-gray-500"
               }`}
-              required
+              
             />
           </div>
 
@@ -118,12 +118,12 @@ const AddManufacturerReturn = () => {
               id="genericname"
               placeholder={t("addManufacturerReturn.genericNamePlaceholder")}
               name="genericname"
-              className={`border px-2 text-sm py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+              className={`border px-2 text-md py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 theme === "dark"
                   ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                   : "bg-white border-gray-400 text-gray-900 placeholder-gray-500"
               }`}
-              required
+              
             />
           </div>
 
@@ -134,12 +134,12 @@ const AddManufacturerReturn = () => {
             <select
               id="category"
               name="category"
-              className={`border px-2 text-sm py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+              className={`border px-2 text-md py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 theme === "dark"
                   ? "bg-gray-700 border-gray-600 text-white"
                   : "bg-white border-gray-400 text-gray-900"
               }`}
-              required
+              
             >
               <option value="tablet">
                 {t("addManufacturerReturn.categories.tablet")}
@@ -165,12 +165,12 @@ const AddManufacturerReturn = () => {
               id="invoiceno"
               name="invoiceno"
               placeholder={t("addManufacturerReturn.invoiceNoPlaceholder")}
-              className={`border px-2 text-sm py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+              className={`border px-2 text-md py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 theme === "dark"
                   ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                   : "bg-white border-gray-400 text-gray-900 placeholder-gray-500"
               }`}
-              required
+              
             />
           </div>
 
@@ -185,12 +185,12 @@ const AddManufacturerReturn = () => {
               value={amount}
               onChange={handleChange}
               placeholder={t("addManufacturerReturn.amountPlaceholder")}
-              className={`border px-2 text-sm py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+              className={`border px-2 text-md py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 theme === "dark"
                   ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                   : "bg-white border-gray-400 text-gray-900 placeholder-gray-500"
               }`}
-              required
+              
             />
           </div>
 
@@ -201,12 +201,12 @@ const AddManufacturerReturn = () => {
             <select
               id="reason"
               name="reason"
-              className={`border px-2 text-sm py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+              className={`border px-2 text-md py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 theme === "dark"
                   ? "bg-gray-700 border-gray-600 text-white"
                   : "bg-white border-gray-400 text-gray-900"
               }`}
-              required
+              
             >
               <option value="wrong_medication">
                 {t("addManufacturerReturn.reasons.wrongMedication")}
@@ -229,12 +229,12 @@ const AddManufacturerReturn = () => {
               id="quantity"
               name="quantity"
               placeholder={t("addManufacturerReturn.quantityPlaceholder")}
-              className={`border px-2 text-sm py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+              className={`border px-2 text-md py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 theme === "dark"
                   ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                   : "bg-white border-gray-400 text-gray-900 placeholder-gray-500"
               }`}
-              required
+              
             />
           </div>
 
@@ -246,12 +246,12 @@ const AddManufacturerReturn = () => {
               type="date"
               id="date"
               name="date"
-              className={`border px-2 text-sm py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+              className={`border px-2 text-md py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 theme === "dark"
                   ? "bg-gray-700 border-gray-600 text-white"
                   : "bg-white border-gray-400 text-gray-900"
               }`}
-              required
+              
             />
           </div>
 
@@ -262,12 +262,12 @@ const AddManufacturerReturn = () => {
             <select
               id="status"
               name="status"
-              className={`border px-2 text-sm py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+              className={`border px-2 text-md py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 theme === "dark"
                   ? "bg-gray-700 border-gray-600 text-white"
                   : "bg-white border-gray-400 text-gray-900"
               }`}
-              required
+              
             >
               <option value="active">
                 {t("addManufacturerReturn.statuses.active")}
@@ -286,12 +286,12 @@ const AddManufacturerReturn = () => {
               id="description"
               name="description"
               placeholder={t("addManufacturerReturn.descriptionPlaceholder")}
-              className={`border w-full h-[200px] px-2 text-sm py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+              className={`border w-full sm:h-[200px] px-2 text-md py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 theme === "dark"
                   ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                   : "bg-white border-gray-400 text-gray-900 placeholder-gray-500"
               }`}
-              required
+              
             ></textarea>
           </div>
         </div>

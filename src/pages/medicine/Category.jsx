@@ -143,7 +143,7 @@ const Category = () => {
   );
 
   return (
-    <div className="p-6 mb-12 bg-gray-100 dark:bg-gray-900 min-h-screen max-w-6xl mx-auto">
+    <div className="p-6 mb-3  dark:bg-gray-900 min-h-screen max-w-6xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <div>
           <h1 className="text-xl font-bold text-gray-700 dark:text-gray-200">
@@ -160,18 +160,13 @@ const Category = () => {
           >
             Add Category
           </button>
-          {/* <button
-            onClick={handleExportCSV}
-            className="text-xs text-blue-500 dark:text-blue-400 border border-blue-500 dark:border-blue-400 px-4 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-blue-500 dark:hover:bg-blue-400 transition"
-          >
-            Export to CSV
-          </button> */}
+         
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md dark:shadow-gray-700 border border-gray-200 dark:border-gray-600">
+      <div className="bg-white dark:bg-gray-800  rounded-lg dark:shadow-gray-700  dark:border-gray-600">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-gray-700 dark:text-gray-200">
+          <h2 className="text-md font-bold text-gray-700 dark:text-gray-200">
             Category List
           </h2>
           <div className="flex items-center space-x-3">
@@ -180,7 +175,7 @@ const Category = () => {
               placeholder="Search categories..."
               value={searchQuery}
               onChange={handleSearch}
-              className="text-xs border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
+              className="text-md border border-gray-400 dark:border-gray-600 px-1 py-1 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
             />
             <button
               onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
@@ -299,7 +294,7 @@ const Category = () => {
         )}
 
         <div className="flex flex-col md:flex-row justify-between items-center mt-4">
-          <div className="flex items-center space-x-2">
+          <div className="sm:flex hidden items-center space-x-2">
             <span className="text-gray-400 dark:text-gray-300 text-xs">
               Show
             </span>

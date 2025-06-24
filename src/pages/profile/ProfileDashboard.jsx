@@ -36,13 +36,13 @@ const ProfileDashboard = () => {
   return (
     <div className="mb-10">
       <div className="fixed  bg-white shadow-md w-full h-11 top-0 left-0">
-        <span
+        <div
           className="flex hover:text-green-600 cursor-pointer"
           onClick={handleGoBack}
         >
           <TiArrowBack className=" ml-14 mt-2 w-7 h-7" />
           <h4 className=" mt-3">គណនី</h4>
-        </span>
+        </div>
       </div>
       <div
         className={`flex-1 p-6 overflow-auto min-h-screen ${

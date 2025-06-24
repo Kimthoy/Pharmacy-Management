@@ -11,7 +11,7 @@
     }
   },
   "footers": {
-    "home":"Home",
+    "home": "Home",
     "orders": "Orders",
     "foryou": "For You",
     "search": "Search",
@@ -416,6 +416,7 @@
     "ButtonAddCustomer": "Add Customer"
   },
   "customerlist": {
+    "View": "Details",
     "CustomerListTitle": "Customer Lists",
     "SearchPlaceholder": "Search by name...",
     "Customer": "Customer",

@@ -92,7 +92,7 @@ const AddWastageReturn = () => {
 
   return (
     <div
-      className={`p-4 rounded-md shadow-md w-full max-w-6xl mx-auto ${
+      className={`p-4 mb-16 rounded-md sm:shadow-md w-full max-w-6xl mx-auto ${
         theme === "dark" ? "bg-gray-800 text-white" : "bg-white text-gray-900"
       }`}
     >
@@ -109,17 +109,7 @@ const AddWastageReturn = () => {
             {t("addWastageReturn.description")}
           </p>
         </div>
-        <button
-          onClick={toggleTheme}
-          className={`p-2 rounded-full ${
-            theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-200"
-          }`}
-          aria-label={
-            theme === "dark" ? t("client.lightMode") : t("client.darkMode")
-          }
-        >
-          {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
-        </button>
+        
       </div>
 
       {error && <p className="text-red-500 mb-4">{error}</p>}
@@ -138,7 +128,7 @@ const AddWastageReturn = () => {
               value={formData.customer}
               onChange={handleChange}
               placeholder={t("addWastageReturn.customerPlaceholder")}
-              className={`border px-2 text-sm py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+              className={`border px-2 text-md py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 theme === "dark"
                   ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                   : "bg-white border-gray-400 text-gray-900 placeholder-gray-500"
@@ -159,7 +149,7 @@ const AddWastageReturn = () => {
               value={formData.email}
               onChange={handleChange}
               placeholder={t("addWastageReturn.emailPlaceholder")}
-              className={`border px-2 text-sm py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+              className={`border px-2 text-md py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 theme === "dark"
                   ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                   : "bg-white border-gray-400 text-gray-900 placeholder-gray-500"
@@ -180,7 +170,7 @@ const AddWastageReturn = () => {
               value={formData.purchaseId}
               onChange={handleChange}
               placeholder={t("addWastageReturn.purchaseIdPlaceholder")}
-              className={`border px-2 text-sm py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+              className={`border px-2 text-md py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 theme === "dark"
                   ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                   : "bg-white border-gray-400 text-gray-900 placeholder-gray-500"
@@ -201,7 +191,7 @@ const AddWastageReturn = () => {
               value={formData.productName}
               onChange={handleChange}
               placeholder={t("addWastageReturn.productNamePlaceholder")}
-              className={`border px-2 text-sm py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+              className={`border px-2 text-md py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 theme === "dark"
                   ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                   : "bg-white border-gray-400 text-gray-900 placeholder-gray-500"
@@ -222,7 +212,7 @@ const AddWastageReturn = () => {
               value={formData.genericName}
               onChange={handleChange}
               placeholder={t("addWastageReturn.genericNamePlaceholder")}
-              className={`border px-2 text-sm py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+              className={`border px-2 text-md py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 theme === "dark"
                   ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                   : "bg-white border-gray-400 text-gray-900 placeholder-gray-500"
@@ -241,7 +231,7 @@ const AddWastageReturn = () => {
               id="category"
               value={formData.category}
               onChange={handleChange}
-              className={`border px-2 text-sm py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+              className={`border px-2 text-md py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 theme === "dark"
                   ? "bg-gray-700 border-gray-600 text-white"
                   : "bg-white border-gray-400 text-gray-900"
@@ -275,7 +265,7 @@ const AddWastageReturn = () => {
               value={formData.invoiceNo}
               onChange={handleChange}
               placeholder={t("addWastageReturn.invoiceNoPlaceholder")}
-              className={`border px-2 text-sm py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+              className={`border px-2 text-md py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 theme === "dark"
                   ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                   : "bg-white border-gray-400 text-gray-900 placeholder-gray-500"
@@ -296,7 +286,7 @@ const AddWastageReturn = () => {
               value={formData.amount}
               onChange={handleChange}
               placeholder={t("addWastageReturn.amountPlaceholder")}
-              className={`border px-2 text-sm py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+              className={`border px-2 text-md py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 theme === "dark"
                   ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                   : "bg-white border-gray-400 text-gray-900 placeholder-gray-500"
@@ -315,7 +305,7 @@ const AddWastageReturn = () => {
               id="reason"
               value={formData.reason}
               onChange={handleChange}
-              className={`border px-2 text-sm py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+              className={`border px-2 text-md py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 theme === "dark"
                   ? "bg-gray-700 border-gray-600 text-white"
                   : "bg-white border-gray-400 text-gray-900"
@@ -346,7 +336,7 @@ const AddWastageReturn = () => {
               value={formData.quantity}
               onChange={handleChange}
               placeholder={t("addWastageReturn.quantityPlaceholder")}
-              className={`border px-2 text-sm py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+              className={`border px-2 text-md py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 theme === "dark"
                   ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                   : "bg-white border-gray-400 text-gray-900 placeholder-gray-500"
@@ -366,7 +356,7 @@ const AddWastageReturn = () => {
               id="date"
               value={formData.date}
               onChange={handleChange}
-              className={`border px-2 text-sm py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+              className={`border px-2 text-md py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 theme === "dark"
                   ? "bg-gray-700 border-gray-600 text-white"
                   : "bg-white border-gray-400 text-gray-900"
@@ -385,7 +375,7 @@ const AddWastageReturn = () => {
               id="status"
               value={formData.status}
               onChange={handleChange}
-              className={`border px-2 text-sm py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+              className={`border px-2 text-md py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 theme === "dark"
                   ? "bg-gray-700 border-gray-600 text-white"
                   : "bg-white border-gray-400 text-gray-900"
@@ -412,7 +402,7 @@ const AddWastageReturn = () => {
               value={formData.description}
               onChange={handleChange}
               placeholder={t("addWastageReturn.descriptionPlaceholder")}
-              className={`border w-full h-[200px] px-2 text-sm py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+              className={`border w-full sm:h-[200px]  px-2 text-md py-2 rounded-[4px] font-light focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                 theme === "dark"
                   ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                   : "bg-white border-gray-400 text-gray-900 placeholder-gray-500"

@@ -1,8 +1,8 @@
-import  { useState } from "react";
+import { useState } from "react";
 import { FaEllipsisH } from "react-icons/fa";
 import { BiEdit, BiTrash } from "react-icons/bi";
 import { useTranslation } from "../../hooks/useTranslation";
-
+import { RiTableView } from "react-icons/ri";
 
 const customers = [
   {
@@ -68,14 +68,11 @@ const CustomerList = () => {
   };
 
   return (
-    <div className="p-3 bg-white dark:bg-gray-900 shadow-md dark:shadow-gray-800 rounded-md overflow-x-auto">
-      <div className="flex justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+    <div className="p-3 bg-white dark:bg-gray-900 shadow-md dark:shadow-gray-800 rounded-md">
+      <div className="flex flex-col sm:flex-row sm:justify-between gap-3 mb-6">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-200">
           {t("customerlist.CustomerListTitle")}
         </h2>
-      </div>
-
-      <div className="flex flex-wrap gap-4 mb-4">
         <input
           type="text"
           placeholder={t("customerlist.SearchPlaceholder")}
@@ -85,80 +82,91 @@ const CustomerList = () => {
         />
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[600px] bg-white dark:bg-gray-800 shadow-md dark:shadow-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
-          <thead className="border border-gray-200 dark:border-gray-600">
+      <div className="w-full overflow-x-auto">
+        <table className="min-w-[420px] w-full bg-white dark:bg-gray-800 shadow-md rounded-lg border border-gray-200 dark:border-gray-600">
+          <thead className="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 text-sm">
             <tr>
-              <td className="px-6 py-2 text-left text-gray-400 dark:text-gray-300">
+              <th className="px-4 py-2 text-left whitespace-nowrap">
                 {t("customerlist.Customer")}
-              </td>
-              <td className="px-6 py-2 text-left text-gray-400 dark:text-gray-300">
+              </th>
+              {/* Only show ID on mobile */}
+              <th className="block sm:hidden px-4 py-2 text-left whitespace-nowrap">
                 {t("customerlist.ID")}
-              </td>
-              <td className="px-6 py-2 text-left text-gray-400 dark:text-gray-300">
+              </th>
+              <th className="px-4 py-2 text-left whitespace-nowrap">
                 {t("customerlist.Phone")}
-              </td>
-              <td className="px-6 py-2 text-left text-gray-400 dark:text-gray-300">
+              </th>
+              {/* Show these only on larger screens */}
+              <th className="hidden sm:table-cell px-4 py-2 text-left whitespace-nowrap">
                 {t("customerlist.PurchaseDetails")}
-              </td>
-              <td className="px-6 py-2 text-left text-gray-400 dark:text-gray-300">
+              </th>
+              <th className="hidden sm:table-cell px-4 py-2 text-left whitespace-nowrap">
                 {t("customerlist.Amount")}
-              </td>
-              <td className="px-6 py-2 text-left text-gray-400 dark:text-gray-300">
+              </th>
+              <th className="hidden sm:table-cell px-4 py-2 text-left whitespace-nowrap">
                 {t("customerlist.Status")}
-              </td>
-              <td className="p-3 text-left text-gray-400 dark:text-gray-300">
+              </th>
+              <th className="px-4 py-2 text-left whitespace-nowrap">
                 {t("customerlist.Actions")}
-              </td>
+              </th>
             </tr>
           </thead>
-          <tbody className="border border-gray-200 dark:border-gray-600">
+          <tbody className="text-sm text-gray-700 dark:text-gray-200">
             {selectedCustomers.map((cus, index) => {
               const { text, color } = getStatus(cus.status);
               return (
                 <tr
                   key={index}
-                  className="border-b border-gray-200 dark:border-gray-600 text-sm"
+                  className="border-t border-gray-200 dark:border-gray-700"
                 >
-                  <td className="px-6 py-6 font-medium text-gray-400 dark:text-gray-300">
+                  <td className="px-4 py-3">
                     {cus.customer}
                     <br />
-                    <span className="font-normal">{cus.email}</span>
+                    <span className="text-xs text-gray-400">{cus.email}</span>
                   </td>
-                  <td className="px-6 py-2 text-green-400 dark:text-green-300 font-semibold">
-                    <span className="hover:cursor-pointer hover:underline active:cursor-grabbing">
-                      {cus.cus_id}
-                    </span>
+
+                  {/* ID on mobile only */}
+                  <td className="block sm:hidden px-4 py-3 text-green-500">
+                    {cus.cus_id}
                   </td>
-                  <td className="px-6 py-2 text-gray-400 dark:text-gray-300">
-                    {cus.phone}
+
+                  <td className="px-4 py-3">{cus.phone}</td>
+
+                  {/* Desktop only cells */}
+                  <td className="hidden sm:table-cell px-4 py-3">
+                    {cus.item} <br /> {cus.quantity}
                   </td>
-                  <td className="px-6 py-2 text-gray-400 dark:text-gray-300">
-                    {t("customerlist.Item")}: {cus.item}
-                    <br />
-                    {t("customerlist.Quantity")}: {cus.quantity}
+                  <td className="hidden sm:table-cell px-4 py-3 font-semibold">
+                    ${cus.amount}
                   </td>
-                  <td className="px-6 py-2 text-gray-600 dark:text-gray-200">
-                    <span className="font-bold">{cus.amount}</span> $
+                  <td className={`hidden sm:table-cell px-4 py-3 ${color}`}>
+                    {text}
                   </td>
-                  <td className={`px-6 py-2 ${color}`}>{text}</td>
-                  <td className="p-3 relative">
+
+                  <td className="px-4 py-3 relative">
                     <button
-                      className="hover:text-green-400 dark:hover:text-green-300 text-gray-400 dark:text-gray-300 text-xl"
                       onClick={() => toggleMenu(index)}
+                      className="text-xl text-gray-400 hover:text-green-500"
                     >
                       <FaEllipsisH />
                     </button>
                     {openMenu === index && (
-                      <div className="absolute right-14 top-10 w-36 bg-gray-100 dark:bg-gray-800 rounded-md shadow-md dark:shadow-gray-700 border border-gray-200 dark:border-gray-600">
+                      <div className="absolute right-16 top-5 mt-2 z-50 w-36 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded shadow-md">
                         <a
                           href="/insertcustomer"
-                          className="flex w-full py-2 text-gray-600 dark:text-gray-200 hover:bg-green-400 dark:hover:bg-green-500 hover:text-white dark:hover:text-white rounded-md"
+                          className="flex items-center px-4 py-2 text-sm hover:bg-green-100 dark:hover:bg-green-600"
                         >
-                          <BiEdit className="w-10" /> {t("customerlist.Edit")}
+                          <RiTableView className="mr-2" />{" "}
+                          {t("customerlist.View")}
                         </a>
-                        <button className="flex w-full py-2 text-gray-600 dark:text-gray-200 hover:bg-green-400 dark:hover:bg-green-500 hover:text-white dark:hover:text-white rounded-md">
-                          <BiTrash className="w-10" />{" "}
+                        <a
+                          href="/insertcustomer"
+                          className="flex items-center px-4 py-2 text-sm hover:bg-green-100 dark:hover:bg-green-600"
+                        >
+                          <BiEdit className="mr-2" /> {t("customerlist.Edit")}
+                        </a>
+                        <button className="flex items-center w-full px-4 py-2 text-sm hover:bg-red-100 dark:hover:bg-red-600">
+                          <BiTrash className="mr-2" />
                           {t("customerlist.Remove")}
                         </button>
                       </div>
@@ -171,7 +179,7 @@ const CustomerList = () => {
         </table>
       </div>
 
-      <div className="flex flex-wrap justify-between mt-4">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
         <select
           className="border border-gray-300 dark:border-gray-600 p-2 rounded-md dark:bg-gray-700 dark:text-gray-200"
           value={rowsPerPage}
@@ -186,18 +194,18 @@ const CustomerList = () => {
         </select>
         <div className="flex items-center space-x-2">
           <button
-            className="text-green-600 dark:text-green-400 border border-green-600 dark:border-green-400 px-2 rounded-[5px] hover:text-white hover:bg-green-500 dark:hover:bg-green-400 hover:border-none disabled:opacity-50"
+            className="text-green-600 dark:text-green-400 border border-green-600 dark:border-green-400 px-3 py-1 rounded-md hover:text-white hover:bg-green-500 dark:hover:bg-green-400 disabled:opacity-50"
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
           >
             {t("customerlist.Previous")}
           </button>
-          <span className="text-gray-600 dark:text-gray-300">
+          <span className="text-gray-600 dark:text-gray-300 text-sm">
             {t("customerlist.Page")} {currentPage} {t("customerlist.Of")}{" "}
             {totalPages}
           </span>
           <button
-            className="text-green-600 dark:text-green-400 border border-green-600 dark:border-green-400 px-2 rounded-[5px] hover:text-white hover:bg-green-500 dark:hover:bg-green-400 hover:border-none disabled:opacity-50"
+            className="text-green-600 dark:text-green-400 border border-green-600 dark:border-green-400 px-3 py-1 rounded-md hover:text-white hover:bg-green-500 dark:hover:bg-green-400 disabled:opacity-50"
             onClick={() =>
               setCurrentPage(Math.min(currentPage + 1, totalPages))
             }

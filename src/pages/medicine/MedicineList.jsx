@@ -99,7 +99,7 @@ const MedicineList = () => {
   };
 
   return (
-    <div className="p-4 mb-12">
+    <div className="p-4 mb-16">
       <h2 className="text-xl font-bold mb-4 dark:text-slate-200">
         Medicine List
       </h2>
@@ -204,7 +204,7 @@ const MedicineList = () => {
                       <button
                         onClick={() => handleToggleStatus(med.id)}
                         disabled={statusLoadingId === med.id}
-                        className={`p-1 rounded-lg text-white transition-all ${
+                        className={`p-1 rounded-lg sm:flex hidden text-white transition-all ${
                           med.status === "active"
                             ? "bg-red-600"
                             : "bg-green-600"

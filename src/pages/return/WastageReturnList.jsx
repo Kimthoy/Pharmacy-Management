@@ -110,23 +110,13 @@ const WastageReturnList = () => {
 
   return (
     <div
-      className={`p-3 shadow-md rounded-md overflow-x-auto ${
+      className={` sm:p-3 mb-16 sm:shadow-md sm:rounded-md overflow-x-auto ${
         theme === "dark" ? "bg-gray-800 text-white" : "bg-white text-gray-900"
       }`}
     >
       <div className="flex justify-between mb-6 items-center">
-        <h2 className="text-2xl font-bold">{t("wastageReturnList.title")}</h2>
-        <button
-          onClick={toggleTheme}
-          className={`p-2 rounded-full ${
-            theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-200"
-          }`}
-          aria-label={
-            theme === "dark" ? t("client.lightMode") : t("client.darkMode")
-          }
-        >
-          {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
-        </button>
+        <h2 className="text-lg font-bold">{t("wastageReturnList.title")}</h2>
+       
       </div>
 
       <div className="flex flex-wrap gap-4 mb-4">
@@ -230,9 +220,9 @@ const WastageReturnList = () => {
         </select>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="w-[444px]">
         <table
-          className={`w-full min-w-[600px] shadow-md rounded-lg border ${
+          className={`sm:w-full sm:min-w-[600px] shadow-md rounded-lg border ${
             theme === "dark"
               ? "bg-gray-800 border-gray-600"
               : "bg-white border-gray-200"
@@ -244,22 +234,22 @@ const WastageReturnList = () => {
             }`}
           >
             <tr>
-              <th className="px-6 py-2 text-left text-gray-400">
+              <th className="sm:flex hidden px-5 py-3 text-left text-gray-400">
                 {t("wastageReturnList.headers.purchaseId")}
               </th>
-              <th className="px-6 py-2 text-left text-gray-400">
+              <th className="px-5 py-3 text-left text-gray-400">
                 {t("wastageReturnList.headers.customer")}
               </th>
-              <th className="px-6 py-2 text-left text-gray-400">
+              <th className="sm:flex hidden px-5 py-3 text-left text-gray-400">
                 {t("wastageReturnList.headers.date")}
               </th>
-              <th className="px-6 py-2 text-left text-gray-400">
+              <th className="px-5 py-3 text-left text-gray-400">
                 {t("wastageReturnList.headers.reason")}
               </th>
-              <th className="px-6 py-2 text-left text-gray-400">
+              <th className="px-5 py-3 text-left text-gray-400">
                 {t("wastageReturnList.headers.status")}
               </th>
-              <th className="px-6 py-2 text-left text-gray-400">
+              <th className="sm:flex hidden px-5 py-3 text-left text-gray-400">
                 {t("wastageReturnList.headers.amount")}
               </th>
               <th className="p-3 text-left text-gray-400"></th>
@@ -280,36 +270,36 @@ const WastageReturnList = () => {
                     theme === "dark" ? "border-gray-600" : "border-gray-200"
                   } text-sm`}
                 >
-                  <td className="text-emerald-600 px-6 py-6 font-medium">
+                  <td className="sm:flex hidden text-emerald-600 px-6 py-6 font-medium">
                     <span className="hover:cursor-pointer hover:underline active:cursor-grabbing">
                       {med.p_id}
                     </span>
                   </td>
-                  <td className="px-6 py-2 text-gray-400 text-sm">
+                  <td className="px-5 py-3 text-gray-400 text-sm">
                     <span>
                       {med.customer} <br />
-                      <span className="font-normal">{med.email}</span>
+                      <span className="sm:flex hidden font-normal">{med.email}</span>
                     </span>
                   </td>
                   <td
-                    className={`px-6 py-2 ${
+                    className={`sm:flex hidden px-5 py-3 ${
                       theme === "dark" ? "text-gray-300" : "text-gray-400"
                     }`}
                   >
                     {med.date}
                   </td>
-                  <td className="px-6 py-2">
-                    <span className={`inline-block px-1 ${reason.color}`}>
+                  <td className="px-5  py-3">
+                    <span className={`inline-block  ${reason.color}`}>
                       {reason.text}
                     </span>
                   </td>
-                  <td className={`px-6 py-2 ${color}`}>{text}</td>
+                  <td className={`px-5 py-3 ${color}`}>{text}</td>
                   <td
-                    className={`px-6 py-2 ${
+                    className={`sm:flex hidden px-5 py-3 ${
                       theme === "dark" ? "text-gray-300" : "text-gray-600"
                     }`}
                   >
-                    <span className="font-bold">{med.amount}</span> $
+                    <span className="font-bold ">{med.amount}</span> $
                   </td>
                   <td className="p-3">
                     <FaEllipsisH
@@ -329,7 +319,7 @@ const WastageReturnList = () => {
 
       <div className="flex justify-between mt-4 items-center">
         <select
-          className={`border p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+          className={`border sm:flex hidden p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
             theme === "dark"
               ? "bg-gray-700 border-gray-600 text-white"
               : "bg-white border-emerald-600 text-gray-900"

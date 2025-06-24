@@ -76,49 +76,49 @@ const Dashboard = () => {
           icon={ShieldCheckIcon}
           title={t("dashboard.stats.inventory_status")}
           value={dashboardData.inventoryStatus}
-          bgColor="bg-green-100 dark:bg-green-900"
-          textColor="text-green-800 dark:text-green-300"
+          bgColor="bg-green-600 dark:bg-green-900"
+          textColor="text-white dark:text-white"
           borderColor="border-green-300 dark:border-green-700"
         />
         <StatsCard
           icon={CurrencyRupeeIcon}
           title={t("dashboard.stats.revenue")}
           value={dashboardData.revenue}
-          bgColor="bg-yellow-100 dark:bg-yellow-900"
-          textColor="text-yellow-800 dark:text-yellow-300"
+          bgColor="bg-yellow-600 dark:bg-yellow-900"
+          textColor="text-white dark:text-white"
           borderColor="border-yellow-300 dark:border-yellow-700"
         />
         <StatsCard
           icon={ClipboardDocumentListIcon}
           title={t("dashboard.stats.medicines_available")}
           value={dashboardData.medicinesAvailable}
-          bgColor="bg-blue-100 dark:bg-blue-900"
-          textColor="text-blue-500 dark:text-blue-300"
-          borderColor="border-blue-300 dark:border-blue-700"
+          bgColor="bg-blue-600 dark:bg-blue-900"
+          textColor="text-white dark:text-white"
+          borderColor="border-blue-600 dark:border-blue-700"
         />
         <StatsCard
           icon={ExclamationTriangleIcon}
           title={t("dashboard.stats.medicine_shortage")}
           value={dashboardData.medicineShortage}
-          bgColor="bg-red-100 dark:bg-red-900"
-          textColor="text-red-800 dark:text-red-300"
+          bgColor="bg-red-500 dark:bg-red-900"
+          textColor="text-white dark:text-white"
           borderColor="border-red-300 dark:border-red-700"
         />
         <StatsCard
           icon={ClockIcon}
           title={t("dashboard.stats.expiring_soon")}
           value={dashboardData.expiringSoon}
-          bgColor="bg-purple-100 dark:bg-purple-900"
-          textColor="text-purple-800 dark:text-purple-300"
-          borderColor="border-purple-300 dark:border-purple-700"
+          bgColor="bg-purple-600 dark:bg-purple-900"
+          textColor="text-white dark:text-white"
+          borderColor="border-purple-600 dark:border-purple-700"
         />
         <StatsCard
           icon={BellIcon}
           title={t("dashboard.stats.low_stock_items")}
           value={dashboardData.lowStockItems}
-          bgColor="bg-orange-100 dark:bg-orange-900"
-          textColor="text-orange-800 dark:text-orange-300"
-          borderColor="border-orange-300 dark:border-orange-700"
+          bgColor="bg-orange-600 dark:bg-orange-900"
+          textColor="text-white dark:text-white text-lg"
+          borderColor="border-orange-600 dark:border-orange-700"
         />
       </div>
 
