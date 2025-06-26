@@ -120,20 +120,20 @@ const Expense = () => {
   );
 
   return (
-    <div className="p-6 bg-gray-100 dark:bg-gray-900 min-h-screen">
+    <div className="sm:p-6 mb-20 sm:bg-gray-100 dark:bg-gray-900 min-h-screen">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <div>
           <h1 className="text-xl font-bold text-gray-700 dark:text-gray-200">
             {t("expenses.ExpenseDashboard")}
           </h1>
-          <span className="text-xs font-normal text-gray-400 dark:text-gray-300">
+          <span className="text-md font-normal text-gray-400 dark:text-gray-300">
             {t("expenses.ExpenseDashboardDesc")}
           </span>
         </div>
         <div className="flex items-center space-x-2 mt-4 md:mt-0">
           <button
             onClick={toggleTheme}
-            className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition"
+            className="sm:flex hidden text-md text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition"
             aria-label={
               theme === "light" ? "Switch to dark mode" : "Switch to light mode"
             }
@@ -142,7 +142,7 @@ const Expense = () => {
           </button>
           <div className="relative">
             <button
-              className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-4 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition"
+              className="text-md text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-4 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition"
               onClick={() => setShowFilter(!showFilter)}
             >
               {t("expenses.ExpenseDashboardFilteredBy")}: {selectedFilter}
@@ -151,26 +151,26 @@ const Expense = () => {
               <div className="absolute top-[100%] mt-1 left-0 min-w-[160px] bg-white dark:bg-gray-800 shadow-md dark:shadow-gray-700 rounded-[4px] p-2 z-[100]">
                 <button
                   onClick={() => filterExpense("All")}
-                  className="block w-full text-left px-4 py-2 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600 rounded-[4px] text-xs"
+                  className="block w-full text-left px-4 py-2 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600 rounded-[4px] text-md"
                 >
                   {t("expenses.filterOptions.all")}
                 </button>
                 <button
                   onClick={() => filterExpense(3)}
-                  className="block w-full text-left px-4 py-2 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600 rounded-[4px] text-xs"
+                  className="block w-full text-left px-4 py-2 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600 rounded-[4px] text-md"
                 >
                   {t("expenses.filterOptions.last3Days")}
                 </button>
                 <button
                   onClick={() => filterExpense(7)}
-                  className="block w-full text-left px-4 py-2 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600 rounded-[4px] text-xs"
+                  className="block w-full text-left px-4 py-2 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600 rounded-[4px] text-md"
                 >
                   {t("expenses.filterOptions.last7Days")}
                 </button>
               </div>
             )}
           </div>
-          <button className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-4 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition">
+          <button className="text-md text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-4 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition">
             {t("expenses.addExpense")}
           </button>
         </div>
@@ -214,7 +214,7 @@ const Expense = () => {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md dark:shadow-gray-700 border border-gray-200 dark:border-gray-600">
+      <div className="bg-white dark:bg-gray-800 sm:p-6 sm:rounded-lg sm:shadow-md  dark:shadow-gray-700 sm:border border-gray-200 dark:border-gray-600">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-gray-700 dark:text-gray-200">
             {t("expenses.expensesList")}
@@ -225,7 +225,7 @@ const Expense = () => {
               placeholder={t("expenses.searchPlaceholder")}
               value={searchQuery}
               onChange={handleSearch}
-              className="text-xs border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
+              className="text-md border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
             />
             <button
               onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
@@ -241,10 +241,10 @@ const Expense = () => {
         <table className="w-full border-collapse border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200">
           <thead>
             <tr className="bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-300 text-center">
-              <th className="p-3 border border-gray-300 dark:border-gray-600">
+              <th className="sm:flex hidden p-3 border border-gray-300 dark:border-gray-600">
                 {t("expenses.category")}
               </th>
-              <th className="p-3 border border-gray-300 dark:border-gray-600">
+              <th className="sm:flex hidden p-3 border border-gray-300 dark:border-gray-600">
                 {t("expenses.invoiceId")}
               </th>
               <th className="p-3 border border-gray-300 dark:border-gray-600">
@@ -265,10 +265,10 @@ const Expense = () => {
                   key={index}
                   className="border border-gray-300 dark:border-gray-600 text-center"
                 >
-                  <td className="p-3 border border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-300">
+                  <td className="sm:flex hidden p-3 border border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-300">
                     {item.category}
                   </td>
-                  <td className="p-3 border border-gray-300 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 cursor-pointer">
+                  <td className="sm:flex hidden p-3 border border-gray-300 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 cursor-pointer">
                     {item.id}
                   </td>
                   <td className="p-3 border border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-300">
@@ -295,12 +295,12 @@ const Expense = () => {
           </tbody>
         </table>
         <div className="flex flex-col md:flex-row justify-between items-center mt-4">
-          <div className="flex items-center space-x-2">
-            <span className="text-gray-400 dark:text-gray-300 text-xs">
+          <div className="sm:flex hidden items-center space-x-2">
+            <span className="text-gray-400 dark:text-gray-300 text-md">
               {t("expenses.show")}
             </span>
             <select
-              className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
+              className="text-md border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
               value={itemsPerPage}
               onChange={(e) => {
                 setItemsPerPage(Number(e.target.value));
@@ -311,7 +311,7 @@ const Expense = () => {
               <option value={10}>10</option>
               <option value={15}>15</option>
             </select>
-            <span className="text-gray-400 dark:text-gray-300 text-xs">
+            <span className="text-gray-400 dark:text-gray-300 text-md">
               {t("expenses.entries")}
             </span>
           </div>
@@ -319,17 +319,17 @@ const Expense = () => {
             <button
               disabled={currentPage === 1}
               onClick={() => setCurrentPage(currentPage - 1)}
-              className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition disabled:opacity-50"
+              className="text-md text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition disabled:opacity-50"
             >
               {t("expenses.previous")}
             </button>
-            <span className="text-gray-700 dark:text-gray-200 text-xs">
+            <span className="text-gray-700 dark:text-gray-200 text-md">
               {t("expenses.page")} {currentPage} {t("expenses.of")} {totalPages}
             </span>
             <button
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage(currentPage + 1)}
-              className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition disabled:opacity-50"
+              className="text-md text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition disabled:opacity-50"
             >
               {t("expenses.next")}
             </button>

@@ -56,27 +56,18 @@ const InvoiceDetail = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-100 dark:bg-gray-900 min-h-screen max-w-6xl mx-auto">
+    <div className="sm:p-6 mb-20 sm:bg-gray-100 dark:bg-gray-900 min-h-screen max-w-6xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
         <Link to="/invoicelist">
-          <button className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] flex items-center space-x-1 dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition">
+          <button className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-lg flex items-center space-x-1 dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition">
             <MdOutlineKeyboardDoubleArrowLeft className="text-lg" />
             <span>{t("invoiceDetail.back")}</span>
           </button>
         </Link>
-        <div className="flex items-center space-x-2 mt-4 md:mt-0">
-          <button
-            onClick={toggleTheme}
-            className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition print:hidden"
-            aria-label={
-              theme === "light" ? "Switch to dark mode" : "Switch to light mode"
-            }
-          >
-            {theme === "light" ? <FaMoon /> : <FaSun />}
-          </button>
+        <div className=" items-center  mt-4 md:mt-0">
           <button
             onClick={handlePrint}
-            className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-4 py-2 rounded-[4px] flex items-center space-x-2 dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition print:hidden"
+            className="text-md sm:text-emerald-500  text-white sm:bg-white bg-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-4 py-2 rounded-lg flex items-center space-x-2 dark:hover:text-white sm:hover:text-white sm:hover:bg-emerald-500 dark:hover:bg-emerald-400 transition print:hidden"
           >
             <BsFillPrinterFill className="text-lg" />
             <span>{t("invoiceDetail.print")}</span>
@@ -84,24 +75,24 @@ const InvoiceDetail = () => {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md dark:shadow-gray-700 border border-gray-200 dark:border-gray-600 invoice-print-area">
+      <div className="bg-white dark:bg-gray-800 p-8 sm:rounded-lg sm:shadow-md dark:shadow-gray-700 sm:border border-gray-200 dark:border-gray-600 invoice-print-area">
         <div className="flex flex-col md:flex-row justify-between items-start mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-700 dark:text-gray-200">
+            <h1 className="sm:text-2xl text-lg font-bold text-gray-700 dark:text-gray-200">
               {t("invoiceDetail.invoice")}
             </h1>
-            <p className="text-sm text-gray-400 dark:text-gray-300">
+            <p className="text-md text-gray-400 dark:text-gray-300">
               {t("invoiceDetail.invoiceId")}: {invoice.id}
             </p>
           </div>
           <div className="text-left md:text-right mt-4 md:mt-0">
-            <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-200">
+            <h2 className="sm:text-2xl text-lg font-bold text-gray-700 dark:text-gray-200">
               {invoice.companyName}
             </h2>
-            <p className="text-sm text-gray-400 dark:text-gray-300">
+            <p className="text-md text-gray-400 dark:text-gray-300">
               {invoice.companyAddress}
             </p>
-            <p className="text-sm text-gray-400 dark:text-gray-300">
+            <p className="text-md text-gray-400 dark:text-gray-300">
               {invoice.companyPhone}
             </p>
           </div>
@@ -133,7 +124,7 @@ const InvoiceDetail = () => {
         <table className="w-full border-collapse border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 mb-8">
           <thead>
             <tr className="bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-300 text-center">
-              <th className="p-3 border border-gray-300 dark:border-gray-600">
+              <th className="sm:flex hidden p-3 border border-gray-300 dark:border-gray-600">
                 {t("invoiceDetail.tableHeaders.itemId")}
               </th>
               <th className="p-3 border border-gray-300 dark:border-gray-600">
@@ -156,7 +147,7 @@ const InvoiceDetail = () => {
                 key={index}
                 className="border border-gray-300 dark:border-gray-600 text-center"
               >
-                <td className="p-3 border border-gray-300 dark:border-gray-600">
+                <td className="sm:flex hidden p-3 border border-gray-300 dark:border-gray-600">
                   {item.id}
                 </td>
                 <td className="p-3 border border-gray-300 dark:border-gray-600">

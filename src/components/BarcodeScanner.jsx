@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Html5QrcodeScanner } from "html5-qrcode";
-
+import { LiaWindowCloseSolid } from "react-icons/lia";
 const BarcodeScanner = ({ onScanSuccess, onClose }) => {
   const scannerRef = useRef(null);
 
@@ -29,13 +29,10 @@ const BarcodeScanner = ({ onScanSuccess, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
+      <div className="bg-white relative  dark:bg-gray-800 rounded-lg p-3 w-full max-w-md">
         <div id="scanner" ref={scannerRef} style={{ width: "100%" }}></div>
-        <button
-          onClick={onClose}
-          className="mt-4 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
-        >
-          Close Scanner
+        <button onClick={onClose} className="  text-red-600 rounded-md  ">
+          <LiaWindowCloseSolid className="w-7  h-7 absolute bottom-1 right-2 hover:scale-125 transition-all hover:rounded-lg" />
         </button>
       </div>
     </div>

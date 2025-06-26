@@ -110,13 +110,14 @@ const ManufacturerReturnList = () => {
 
   return (
     <div
-      className={`p-3 shadow-md rounded-md overflow-x-auto ${
+      className={`p-3 mb-20 sm:shadow-md sm:rounded-md overflow-x-auto ${
         theme === "dark" ? "bg-gray-800 text-white" : "bg-white text-gray-900"
       }`}
     >
       <div className="flex justify-between mb-6 items-center">
-        <h2 className="text-2xl font-bold">{t("manufacturerReturnList.title")}</h2>
-       
+        <h2 className="text-2xl font-bold">
+          {t("manufacturerReturnList.title")}
+        </h2>
       </div>
 
       <div className="flex flex-wrap gap-4 mb-4">
@@ -135,7 +136,12 @@ const ManufacturerReturnList = () => {
 
       <div className="flex flex-wrap gap-4 mb-4">
         <div>
-          <label htmlFor="startDate" className={`me-2 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+          <label
+            htmlFor="startDate"
+            className={`me-2 ${
+              theme === "dark" ? "text-gray-400" : "text-gray-600"
+            }`}
+          >
             {t("manufacturerReturnList.startDateLabel")}
           </label>
           <input
@@ -152,7 +158,12 @@ const ManufacturerReturnList = () => {
         </div>
 
         <div>
-          <label htmlFor="endDate" className={`me-2 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+          <label
+            htmlFor="endDate"
+            className={`me-2 ${
+              theme === "dark" ? "text-gray-400" : "text-gray-600"
+            }`}
+          >
             {t("manufacturerReturnList.endDateLabel")}
           </label>
           <input
@@ -180,9 +191,15 @@ const ManufacturerReturnList = () => {
           onChange={(e) => setSelectedReason(e.target.value)}
         >
           <option value="">{t("manufacturerReturnList.reasonFilter")}</option>
-          <option value="wrong_medication">{t("manufacturerReturnList.reasons.wrongMedication")}</option>
-          <option value="wrong_dispensing">{t("manufacturerReturnList.reasons.wrongDispensing")}</option>
-          <option value="subsidence_symptoms">{t("manufacturerReturnList.reasons.subsidenceSymptoms")}</option>
+          <option value="wrong_medication">
+            {t("manufacturerReturnList.reasons.wrongMedication")}
+          </option>
+          <option value="wrong_dispensing">
+            {t("manufacturerReturnList.reasons.wrongDispensing")}
+          </option>
+          <option value="subsidence_symptoms">
+            {t("manufacturerReturnList.reasons.subsidenceSymptoms")}
+          </option>
         </select>
 
         <select
@@ -195,36 +212,64 @@ const ManufacturerReturnList = () => {
           onChange={(e) => setSelectedStatus(e.target.value)}
         >
           <option value="">{t("manufacturerReturnList.statusFilter")}</option>
-          <option value="Active">{t("manufacturerReturnList.statuses.active")}</option>
-          <option value="Inactive">{t("manufacturerReturnList.statuses.inactive")}</option>
+          <option value="Active">
+            {t("manufacturerReturnList.statuses.active")}
+          </option>
+          <option value="Inactive">
+            {t("manufacturerReturnList.statuses.inactive")}
+          </option>
         </select>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className=" sm:w-full w-[420px]  ">
         <table
-          className={`w-full min-w-[600px] shadow-md rounded-lg border ${
-            theme === "dark" ? "bg-gray-800 border-gray-600" : "bg-white border-gray-200"
+          className={`w-full  sm:shadow-md sm:rounded-lg border ${
+            theme === "dark"
+              ? "bg-gray-800 border-gray-600"
+              : "bg-white border-gray-200"
           }`}
         >
-          <thead className={`border-b ${theme === "dark" ? "border-gray-600" : "border-gray-200"}`}>
+          <thead
+            className={`border-b ${
+              theme === "dark" ? "border-gray-600" : "border-gray-200"
+            }`}
+          >
             <tr>
-              <th className="px-6 py-2 text-left text-gray-400">{t("manufacturerReturnList.headers.purchaseId")}</th>
-              <th className="px-6 py-2 text-left text-gray-400">{t("manufacturerReturnList.headers.customer")}</th>
-              <th className="px-6 py-2 text-left text-gray-400">{t("manufacturerReturnList.headers.date")}</th>
-              <th className="px-6 py-2 text-left text-gray-400">{t("manufacturerReturnList.headers.reason")}</th>
-              <th className="px-6 py-2 text-left text-gray-400">{t("manufacturerReturnList.headers.status")}</th>
-              <th className="px-6 py-2 text-left text-gray-400">{t("manufacturerReturnList.headers.amount")}</th>
+              <th className="px-6 py-2 text-left text-gray-400">
+                {t("manufacturerReturnList.headers.purchaseId")}
+              </th>
+              <th className="px-6 py-2 text-left text-gray-400">
+                {t("manufacturerReturnList.headers.customer")}
+              </th>
+              <th className="sm:flex hidden px-6 py-2 text-left text-gray-400">
+                {t("manufacturerReturnList.headers.date")}
+              </th>
+              <th className="sm:flex hidden px-6 py-2 text-left text-gray-400">
+                {t("manufacturerReturnList.headers.reason")}
+              </th>
+              <th className="px-6 py-2 text-left text-gray-400">
+                {t("manufacturerReturnList.headers.status")}
+              </th>
+              <th className="sm:flex hidden px-6 py-2 text-left text-gray-400">
+                {t("manufacturerReturnList.headers.amount")}
+              </th>
               <th className="p-3 text-left text-gray-400"></th>
             </tr>
           </thead>
-          <tbody className={`border-t ${theme === "dark" ? "border-gray-600" : "border-gray-200"}`}>
+          <tbody
+            className={` ${
+              theme === "dark" ? "border-gray-600" : "border-gray-200"
+            }`}
+          >
             {selectedMedicines.map((med, index) => {
               const reason = getReason(med.reason || "Unknown");
               const { text, color } = getStatus(med.status);
               return (
                 <tr
                   key={index}
-                  className={`border-b ${theme === "dark" ? "border-gray-600" : "border-gray-200"} text-sm`}
+                  className={`border-b ${
+                    theme === "dark" ? "border-gray-600" : "border-gray-200"
+                  } text-sm`}
                 >
                   <td className="text-emerald-600 px-6 py-6 font-medium">
                     <span className="hover:cursor-pointer hover:underline active:cursor-grabbing">
@@ -237,22 +282,32 @@ const ManufacturerReturnList = () => {
                       <span className="font-normal">{med.email}</span>
                     </span>
                   </td>
-                  <td className={`px-6 py-2 ${theme === "dark" ? "text-gray-300" : "text-gray-400"}`}>
+                  <td
+                    className={`sm:flex hidden px-6 py-2 ${
+                      theme === "dark" ? "text-gray-300" : "text-gray-400"
+                    }`}
+                  >
                     {med.date}
                   </td>
-                  <td className="px-6 py-2">
+                  <td className="sm:flex hidden px-6 py-2">
                     <span className={`inline-block px-1 ${reason.color}`}>
                       {reason.text}
                     </span>
                   </td>
                   <td className={`px-6 py-2 ${color}`}>{text}</td>
-                  <td className={`px-6 py-2 ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
+                  <td
+                    className={`sm:flex hidden px-6 py-2 ${
+                      theme === "dark" ? "text-gray-300" : "text-gray-600"
+                    }`}
+                  >
                     <span className="font-bold">{med.amount}</span> $
                   </td>
                   <td className="p-3">
                     <FaEllipsisH
                       className={`text-xl cursor-pointer ${
-                        theme === "dark" ? "text-gray-400 hover:text-emerald-500" : "text-gray-400 hover:text-emerald-600"
+                        theme === "dark"
+                          ? "text-gray-400 hover:text-emerald-500"
+                          : "text-gray-400 hover:text-emerald-600"
                       }`}
                     />
                   </td>
@@ -265,7 +320,7 @@ const ManufacturerReturnList = () => {
 
       <div className="flex justify-between mt-4 items-center">
         <select
-          className={`border p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+          className={`border sm:flex hidden p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
             theme === "dark"
               ? "bg-gray-700 border-gray-600 text-white"
               : "bg-white border-emerald-600 text-gray-900"
@@ -292,8 +347,13 @@ const ManufacturerReturnList = () => {
           >
             {t("manufacturerReturnList.previous")}
           </button>
-          <span className={theme === "dark" ? "text-gray-300" : "text-gray-600"}>
-            {t("manufacturerReturnList.page", { current: currentPage, total: totalPages })}
+          <span
+            className={theme === "dark" ? "text-gray-300" : "text-gray-600"}
+          >
+            {t("manufacturerReturnList.page", {
+              current: currentPage,
+              total: totalPages,
+            })}
           </span>
           <button
             className={`px-2 py-1 rounded-[5px] border text-center hover:text-white hover:bg-emerald-500 hover:border-none ${
@@ -301,7 +361,9 @@ const ManufacturerReturnList = () => {
                 ? "border-gray-600 text-gray-300 disabled:opacity-50"
                 : "border-emerald-600 text-emerald-600 disabled:opacity-50"
             }`}
-            onClick={() => setCurrentPage(Math.min(currentPage + 1, totalPages))}
+            onClick={() =>
+              setCurrentPage(Math.min(currentPage + 1, totalPages))
+            }
             disabled={currentPage === totalPages}
           >
             {t("manufacturerReturnList.next")}

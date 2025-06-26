@@ -198,24 +198,23 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                           handlePageSelection(name, path);
                         }
                       }}
-                      className={`flex items-center justify-between w-full px-4 py-2 mt-1 text-md rounded-lg transition-all duration-200
+                      className={`group flex items-center justify-between w-full px-4 py-2 mt-1 text-md rounded-lg transition-all duration-200
                         ${
                           isParentActive
                             ? "bg-green-500 text-white dark:bg-green-600"
                             : "text-gray-700 dark:text-gray-200"
                         }
-                        hover:bg-green-500 dark:hover:bg-gray-700
-                        hover:text-white dark:hover:text-green-500
+                        hover:bg-green-500 hover:text-white
+                        dark:hover:bg-gray-700 dark:hover:text-white
                         hover:scale-105 hover:shadow-md hover:shadow-slate-300
                       `}
                     >
                       <div className="flex items-center">
                         <Icon
-                          className={`w-7 h-7 flex-shrink-0 transition-colors duration-200 ${
-                            isParentActive
-                              ? "text-white"
-                              : "text-gray-600 dark:text-gray-300"
-                          }`}
+                          className={`w-6 h-6 flex-shrink-0 transition-colors duration-200
+    ${isParentActive ? "text-white" : "text-gray-600 dark:text-gray-300"}
+    group-hover:text-white
+  `}
                         />
                         {isOpen && (
                           <span className="ml-4 whitespace-nowrap">{name}</span>

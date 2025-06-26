@@ -1,6 +1,6 @@
 {
   "name": "phamacy-mgt",
-  "proxy": "http://localhost:8080",
+  "proxy": "http://localhost:8000",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -24,7 +24,7 @@
     "chart.js": "^4.4.9",
     "cra-template": "1.2.0",
     "dayjs": "^1.11.13",
-    "framer-motion": "^12.18.1",
+    "framer-motion": "^12.19.1",
     "html5-qrcode": "^2.3.8",
     "i18next": "^21.9.1",
     "jspdf": "^3.0.1",
@@ -46,7 +46,7 @@
   },
   "homepage": ".",
   "scripts": {
-    "start": "react-scripts start",
+    "start": "react-scripts start --no-source-maps",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",

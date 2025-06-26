@@ -7,16 +7,19 @@ import CheckoutModal from "./CheckoutModal";
 import RetailSaleModal from "./RetailSaleModal";
 import ToastNotification from "./ToastNotification";
 import compoundMedicines from "./compoundMedicines";
+import { HiMiniShoppingCart } from "react-icons/hi2";
+
 import "./sell.css";
 
 const Sale = () => {
+  const [isCartOpen, setCartOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [cart, setCart] = useState(() => {
     const savedCart = localStorage.getItem("cart");
     return savedCart ? JSON.parse(savedCart) : [];
   });
   const [isOrderReviewModalOpen, setIsOrderReviewModalOpen] = useState(false);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  // const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isRetailSaleOpen, setIsRetailSaleOpen] = useState(false);
   const [toast, setToast] = useState(null);
@@ -255,7 +258,7 @@ const Sale = () => {
     setCurrentProducts(regularProducts);
     setIsCompoundMode(false);
   }, []);
-
+  // const [isCartOpen, setCartOpen] = useState(false);
   return (
     <div className="flex mb-14 h-screen bg-white dark:bg-gray-900 font-khmer relative">
       <div className="flex-1 flex flex-col md:flex-row">
@@ -285,20 +288,21 @@ const Sale = () => {
         <Cart
           cart={cart}
           isCartOpen={isCartOpen}
-          setIsCartOpen={setIsCartOpen}
+          // setIsCartOpen={setIsCartOpen}
           totalPrice={totalPrice}
           totalQuantity={totalQuantity}
           clearCart={clearCart}
           saveCart={saveCart}
           placeOrder={placeOrder}
           displayPrice={displayPrice}
+          onClose={() => setCartOpen(false)}
         />
         <button
-          className="md:hidden fixed bottom-4 right-4 bg-green-600 text-white p-4 rounded-full shadow-lg"
-          onClick={() => setIsCartOpen(true)}
+          className="md:hidden fixed bottom-4 mb-14 flex right-0 focus:shadow-none bg-green-600 text-white p-3 rounded-md  shadow-lg"
+          onClick={() => setCartOpen(true)}
           aria-label="បើកកន្ត្រក"
         >
-          🛒 ({totalQuantity})
+          <HiMiniShoppingCart className="w-6 h-6" /> ({totalQuantity})
         </button>
       </div>
       <OrderReviewModal

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FaSort, FaCog, FaSun, FaMoon } from "react-icons/fa";
 import { useTranslation } from "../../hooks/useTranslation";
 import { useTheme } from "../../context/ThemeContext";
@@ -101,7 +101,7 @@ const Income = () => {
   ];
 
   const [incomeList, setIncomeList] = useState(originalIncomeList);
-
+  const filterRef = useRef(null);
   const filterIncome = (days) => {
     if (days === "All") {
       setSelectedFilter("All");
@@ -118,7 +118,16 @@ const Income = () => {
     setShowFilter(false);
     setCurrentPage(1);
   };
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (filterRef.current && !filterRef.current.contains(event.target)) {
+        setShowFilter(false);
+      }
+    };
 
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
     setCurrentPage(1);
@@ -141,20 +150,20 @@ const Income = () => {
   );
 
   return (
-    <div className="p-6 bg-gray-100 dark:bg-gray-900 min-h-screen max-w-6xl mx-auto">
+    <div className="sm:p-6 mb-20 sm:bg-gray-100 dark:bg-gray-900 min-h-screen max-w-6xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <div>
           <h1 className="text-xl font-bold text-gray-700 dark:text-gray-200">
             {t("income.IncomeDashboard")}
           </h1>
-          <span className="text-xs font-normal text-gray-400 dark:text-gray-300">
+          <span className="text-md font-normal text-gray-400 dark:text-gray-300">
             {t("income.IncomeDashboardDesc")}
           </span>
         </div>
         <div className="flex items-center space-x-2 mt-4 md:mt-0">
           <button
             onClick={toggleTheme}
-            className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition"
+            className="text-md sm:flex hidden text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-lg dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition"
             aria-label={
               theme === "light" ? "Switch to dark mode" : "Switch to light mode"
             }
@@ -163,41 +172,44 @@ const Income = () => {
           </button>
           <div className="relative">
             <button
-              className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-4 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition"
+              className="text-md sm:text-emerald-500 bg-emerald-500 text-white dark:text-emerald-400 border sm:border-emerald-500 dark:border-emerald-400 px-4 py-2 rounded-lg dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition"
               onClick={() => setShowFilter(!showFilter)}
             >
               {t("income.IncomeDashboardFilteredBy")}: {selectedFilter}
             </button>
             {showFilter && (
-              <div className="absolute top-[100%] mt-1 left-0 min-w-[160px] bg-white dark:bg-gray-800 shadow-md dark:shadow-gray-700 rounded-[4px] p-2 z-[100]">
+              <div
+                ref={filterRef}
+                className="absolute top-[100%] mt-1 left-0 min-w-[160px] bg-white dark:bg-gray-800 shadow-md dark:shadow-gray-700 rounded-lg p-2 z-[100]"
+              >
                 <button
                   onClick={() => filterIncome("All")}
-                  className="block w-full text-left px-4 py-2 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600 rounded-[4px] text-xs"
+                  className="block w-full text-left px-4 py-2 text-emerald-500 dark:text-emerald-400 sm:hover:bg-emerald-100 dark:hover:bg-emerald-600 rounded-lg text-md hover:bg-emerald-600 hover:text-white"
                 >
                   {t("income.filterOptions.all")}
                 </button>
                 <button
                   onClick={() => filterIncome(3)}
-                  className="block w-full text-left px-4 py-2 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600 rounded-[4px] text-xs"
+                  className="block w-full text-left px-4 py-2 text-emerald-500 dark:text-emerald-400 sm:hover:bg-emerald-100 dark:hover:bg-emerald-600 rounded-lg text-md hover:bg-emerald-600 hover:text-white"
                 >
                   {t("income.filterOptions.last3Days")}
                 </button>
                 <button
                   onClick={() => filterIncome(7)}
-                  className="block w-full text-left px-4 py-2 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600 rounded-[4px] text-xs"
+                  className="block w-full text-left px-4 py-2 text-emerald-500 dark:text-emerald-400 sm:hover:bg-emerald-100 dark:hover:bg-emerald-600 rounded-lg text-md hover:bg-emerald-600 hover:text-white"
                 >
                   {t("income.filterOptions.last7Days")}
                 </button>
               </div>
             )}
           </div>
-          <button className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-4 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition">
+          <button className="text-md sm:text-emerald-500 text-white bg-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-4 py-2 rounded-lg dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition">
             {t("income.addIncome")}
           </button>
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white dark:bg-gray-800 grid gap-2 p-4 rounded-lg shadow-md dark:shadow-gray-700 text-center hover:shadow-emerald-200 dark:hover:shadow-emerald-600 duration-100 ease-in-out">
+        <div className="bg-white dark:bg-gray-800 grid gap-2 p-4 sm:rounded-lg sm:shadow-md shadow-lg dark:shadow-gray-700 text-center sm:hover:shadow-emerald-200 sm:dark:hover:shadow-emerald-600 duration-100 ease-in-out">
           <h2 className="text-md font-semibold text-gray-400 dark:text-gray-300">
             {t("income.summaryCards.todaysIncome")}
           </h2>
@@ -206,7 +218,7 @@ const Income = () => {
             ↑ 4.63% {t("income.summaryCards.vsYesterday")}
           </p>
         </div>
-        <div className="bg-white dark:bg-gray-800 grid gap-2 p-4 rounded-lg shadow-md dark:shadow-gray-700 text-center hover:shadow-emerald-200 dark:hover:shadow-emerald-600 duration-100 ease-in-out">
+        <div className="bg-white dark:bg-gray-800 grid gap-2 p-4 sm:rounded-lg sm:shadow-md shadow-lg dark:shadow-gray-700 text-center sm:hover:shadow-emerald-200 dark:hover:shadow-emerald-600 duration-100 ease-in-out">
           <h2 className="text-md font-semibold text-gray-400 dark:text-gray-300">
             {t("income.summaryCards.thisWeekIncome")}
           </h2>
@@ -215,7 +227,7 @@ const Income = () => {
             ↓ 2.34% {t("income.summaryCards.vsLastWeek")}
           </p>
         </div>
-        <div className="bg-white dark:bg-gray-800 grid gap-2 p-4 rounded-lg shadow-md dark:shadow-gray-700 text-center hover:shadow-emerald-200 dark:hover:shadow-emerald-600 duration-100 ease-in-out">
+        <div className="bg-white dark:bg-gray-800 grid gap-2 p-4 sm:rounded-lg sm:shadow-md shadow-lg dark:shadow-gray-700 text-center sm:hover:shadow-emerald-200 dark:hover:shadow-emerald-600 duration-100 ease-in-out">
           <h2 className="text-md font-semibold text-gray-400 dark:text-gray-300">
             {t("income.summaryCards.vsLastMonth")}
           </h2>
@@ -224,7 +236,7 @@ const Income = () => {
             ↑ 4.63% {t("income.summaryCards.vsLastMonth")}
           </p>
         </div>
-        <div className="bg-white dark:bg-gray-800 grid gap-2 p-4 rounded-lg shadow-md dark:shadow-gray-700 text-center hover:shadow-emerald-200 dark:hover:shadow-emerald-600 duration-100 ease-in-out">
+        <div className="bg-white dark:bg-gray-800 grid gap-2 p-4 sm:rounded-lg sm:shadow-md shadow-lg dark:shadow-gray-700 text-center sm:hover:shadow-emerald-200 dark:hover:shadow-emerald-600 duration-100 ease-in-out">
           <h2 className="text-md font-semibold text-gray-400 dark:text-gray-300">
             {t("income.summaryCards.thisYearIncome")}
           </h2>
@@ -246,15 +258,15 @@ const Income = () => {
               placeholder={t("income.searchPlaceholder")}
               value={searchQuery}
               onChange={handleSearch}
-              className="text-xs border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
+              className="text-md border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-lg font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
             />
             <button
               onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-              className="bg-white dark:bg-gray-700 px-4 py-2 rounded-[4px] shadow-md dark:shadow-gray-600 flex items-center space-x-2 border border-gray-400 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600"
+              className="sm:flex hidden bg-white dark:bg-gray-700 px-4 py-2 rounded-lg shadow-md dark:shadow-gray-600  items-center space-x-2 border border-gray-400 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600"
             >
               <FaSort />
             </button>
-            <button className="bg-white dark:bg-gray-700 px-4 py-2 rounded-[4px] shadow-md dark:shadow-gray-600 flex items-center space-x-2 border border-gray-400 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600">
+            <button className="sm:flex hidden bg-white dark:bg-gray-700 px-4 py-2 rounded-lg shadow-md dark:shadow-gray-600  items-center space-x-2 border border-gray-400 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600">
               <FaCog />
             </button>
           </div>
@@ -316,12 +328,12 @@ const Income = () => {
           </tbody>
         </table>
         <div className="flex flex-col md:flex-row justify-between items-center mt-4">
-          <div className="flex items-center space-x-2">
-            <span className="text-gray-400 dark:text-gray-300 text-xs">
+          <div className="sm:flex hidden items-center space-x-2">
+            <span className="text-gray-400 dark:text-gray-300 text-md">
               {t("income.show")}
             </span>
             <select
-              className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
+              className="text-md border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-lg font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
               value={itemsPerPage}
               onChange={(e) => {
                 setItemsPerPage(Number(e.target.value));
@@ -332,7 +344,7 @@ const Income = () => {
               <option value={10}>10</option>
               <option value={15}>15</option>
             </select>
-            <span className="text-gray-400 dark:text-gray-300 text-xs">
+            <span className="text-gray-400 dark:text-gray-300 text-md">
               {t("income.entries")}
             </span>
           </div>
@@ -340,17 +352,17 @@ const Income = () => {
             <button
               disabled={currentPage === 1}
               onClick={() => setCurrentPage(currentPage - 1)}
-              className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition disabled:opacity-50"
+              className="text-md text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-lg dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition disabled:opacity-50"
             >
               {t("income.previous")}
             </button>
-            <span className="text-gray-700 dark:text-gray-200 text-xs">
+            <span className="text-gray-700 dark:text-gray-200 text-md">
               {t("income.page")} {currentPage} {t("income.of")} {totalPages}
             </span>
             <button
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage(currentPage + 1)}
-              className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition disabled:opacity-50"
+              className="text-md text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-lg dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition disabled:opacity-50"
             >
               {t("income.next")}
             </button>

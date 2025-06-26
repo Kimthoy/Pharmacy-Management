@@ -162,26 +162,26 @@ const SellReport = () => {
   );
 
   return (
-    <div className="p-6 mb-14 bg-white dark:bg-gray-900 min-h-screen">
+    <div className="sm:p-6 mb-32 bg-white dark:bg-gray-900 min-h-screen">
       {/* Sales Report Section */}
       <section className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-500 dark:text-gray-200">
+        <h2 className="sm:text-lg text-md font-bold text-gray-500 dark:text-gray-200">
           {t("sellreport.SalesReportTitle")}
         </h2>
-        <p className="text-gray-500 dark:text-gray-300">
+        <p className="text-gray-500 dark:text-gray-300 text-xs">
           {t("sellreport.SalesReportDesc")}
         </p>
       </section>
 
       <div className="grid md:grid-cols-2 gap-6">
         {/* Total Sales Card */}
-        <div className="bg-white dark:bg-gray-800 p-6 shadow-md dark:shadow-gray-700 rounded-lg">
+        <div className="bg-white dark:bg-gray-800 sm:p-6 sm:shadow-md dark:shadow-gray-700 sm:rounded-lg">
           <div className="flex justify-between mb-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+              <h3 className="sm:text-lg underline text-md mb-4 font-semibold text-gray-800 dark:text-gray-200">
                 {t("sellreport.TotalSales")}
               </h3>
-              <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
+              <p className="sm:text-md text-md font-bold text-emerald-600 dark:text-emerald-400">
                 ${totalSales.toFixed(2)}
               </p>
               <p className="text-gray-500 dark:text-gray-300">
@@ -193,11 +193,11 @@ const SellReport = () => {
             </button>
           </div>
 
-          <div className="mb-4">
+          <div className="mb-4 w-full">
             <p className="text-gray-600 dark:text-gray-200">
               {t("sellreport.WeeklyProgress")}
             </p>
-            <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+            <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
               $1,338.72
             </p>
             <p className="flex items-center text-green-500 dark:text-green-400">
@@ -238,14 +238,14 @@ const SellReport = () => {
         </div>
 
         {/* Medicine Sales Card */}
-        <div className="bg-white dark:bg-gray-800 p-6 shadow-md dark:shadow-gray-700 rounded-lg">
+        <div className="bg-white dark:bg-gray-800 sm:p-6 sm:shadow-md dark:shadow-gray-700 sm:rounded-lg">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+            <h3 className="text-md  font-semibold text-gray-800 dark:text-gray-200">
               {t("sellreport.MostSoldMedicine")}
             </h3>
             <select
               id="timePeriod"
-              className="border border-gray-300 dark:border-gray-600 p-2 rounded-md text-sm focus:outline-emerald-500 dark:bg-gray-700 dark:text-gray-200"
+              className="border border-gray-300 dark:border-gray-600 p-2 rounded-md text-md focus:outline-emerald-500 dark:bg-gray-700 dark:text-gray-200"
               value={timePeriod}
               onChange={(e) => setTimePeriod(e.target.value)}
               aria-label={t("sellreport.TimePeriod")}
@@ -259,7 +259,7 @@ const SellReport = () => {
           {/* Medicine progress bars */}
           {filteredProgressData.map((med) => (
             <div key={med.id} className="mb-4">
-              <div className="flex justify-between text-sm text-gray-600 dark:text-gray-200">
+              <div className="flex justify-between text-md text-gray-600 dark:text-gray-200">
                 <span>{med.category}</span>
                 <span>{med.percentage}%</span>
               </div>
@@ -277,17 +277,17 @@ const SellReport = () => {
       </div>
 
       {/* Sales Records Section */}
-      <div className="bg-white dark:bg-gray-800 p-6 shadow-md dark:shadow-gray-700 rounded-lg mt-6">
-        <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6">
+      <div className="bg-white dark:bg-gray-800 sm:p-6 sm:shadow-md dark:shadow-gray-700 rounded-lg mt-6">
+        <h3 className="text-md underline font-semibold text-gray-800 dark:text-gray-200 mb-6">
           {t("sellreport.SalesRecords")}
         </h3>
 
         {/* Filter controls */}
-        <div className="flex flex-wrap gap-4 mb-6">
+        <div className="sm:flex flex-wrap gap-4 mb-6">
           <div>
             <label
               htmlFor="search"
-              className="block text-gray-400 dark:text-gray-300 mb-1 text-sm"
+              className="block text-gray-400 dark:text-gray-300 mb-1 text-md"
             >
               {t("sellreport.Search")}
             </label>
@@ -295,7 +295,7 @@ const SellReport = () => {
               type="text"
               id="search"
               placeholder={t("sellreport.SearchPlaceholder")}
-              className="border border-gray-300 dark:border-gray-600 p-2 rounded-md focus:outline-emerald-500 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
+              className="border w-full border-gray-300 dark:border-gray-600 p-2 rounded-md focus:outline-emerald-500 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
               value={filters.searchTerm}
               onChange={(e) =>
                 setFilters((prev) => ({ ...prev, searchTerm: e.target.value }))
@@ -305,14 +305,14 @@ const SellReport = () => {
           <div>
             <label
               htmlFor="startDate"
-              className="block text-gray-400 dark:text-gray-300 mb-1 text-sm"
+              className="block w-full text-gray-400 dark:text-gray-300 mb-1 text-md"
             >
               {t("sellreport.StartDate")}
             </label>
             <input
               type="date"
               id="startDate"
-              className="border border-gray-300 dark:border-gray-600 p-2 rounded-md focus:outline-emerald-500 dark:bg-gray-700 dark:text-gray-200"
+              className="border w-full border-gray-300 dark:border-gray-600 p-2 rounded-md focus:outline-emerald-500 dark:bg-gray-700 dark:text-gray-200"
               value={filters.startDate}
               onChange={(e) =>
                 setFilters((prev) => ({ ...prev, startDate: e.target.value }))
@@ -322,14 +322,14 @@ const SellReport = () => {
           <div>
             <label
               htmlFor="endDate"
-              className="block text-gray-400 dark:text-gray-300 mb-1 text-sm"
+              className="block  text-gray-400 dark:text-gray-300 mb-1 text-md"
             >
               {t("sellreport.EndDate")}
             </label>
             <input
               type="date"
               id="endDate"
-              className="border border-gray-300 dark:border-gray-600 p-2 rounded-md focus:outline-emerald-500 dark:bg-gray-700 dark:text-gray-200"
+              className="border w-full border-gray-300 dark:border-gray-600 p-2 rounded-md focus:outline-emerald-500 dark:bg-gray-700 dark:text-gray-200"
               value={filters.endDate}
               onChange={(e) =>
                 setFilters((prev) => ({ ...prev, endDate: e.target.value }))
@@ -339,13 +339,13 @@ const SellReport = () => {
           <div>
             <label
               htmlFor="category"
-              className="block text-gray-400 dark:text-gray-300 mb-1 text-sm"
+              className="block text-gray-400 dark:text-gray-300 mb-1 text-md"
             >
               {t("sellreport.Category")}
             </label>
             <select
               id="category"
-              className="border border-gray-300 dark:border-gray-600 p-2 rounded-md focus:outline-emerald-500 dark:bg-gray-700 dark:text-gray-200"
+              className="border w-full border-gray-300 dark:border-gray-600 p-2 rounded-md focus:outline-emerald-500 dark:bg-gray-700 dark:text-gray-200"
               value={filters.category}
               onChange={(e) =>
                 setFilters((prev) => ({ ...prev, category: e.target.value }))
@@ -364,22 +364,22 @@ const SellReport = () => {
         <table className="w-full bg-white dark:bg-gray-800 shadow-md dark:shadow-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
           <thead>
             <tr className="border-b border-gray-200 dark:border-gray-600">
-              <th className="px-6 py-3 text-left text-gray-400 dark:text-gray-300 text-sm">
+              <th className="px-6 py-3 text-left text-gray-400 dark:text-gray-300 text-md">
                 {t("sellreport.MedicineName")}
               </th>
-              <th className="px-6 py-3 text-left text-gray-400 dark:text-gray-300 text-sm">
+              <th className="sm:flex hidden px-6 py-3 text-left text-gray-400 dark:text-gray-300 text-md">
                 {t("sellreport.TotalSalesAmount")}
               </th>
-              <th className="px-6 py-3 text-left text-gray-400 dark:text-gray-300 text-sm">
+              <th className="px-6 py-3 text-left text-gray-400 dark:text-gray-300 text-md">
                 {t("sellreport.Category")}
               </th>
-              <th className="px-6 py-3 text-left text-gray-400 dark:text-gray-300 text-sm">
+              <th className="sm:flex hidden px-6 py-3 text-left text-gray-400 dark:text-gray-300 text-md">
                 {t("sellreport.SalesPercentage")}
               </th>
-              <th className="px-6 py-3 text-left text-gray-400 dark:text-gray-300 text-sm">
+              <th className="px-6 py-3 text-left text-gray-400 dark:text-gray-300 text-md">
                 {t("sellreport.Date")}
               </th>
-              <th className="px-6 py-3 text-left text-gray-400 dark:text-gray-300 text-sm">
+              <th className="px-6 py-3 text-left text-gray-400 dark:text-gray-300 text-md">
                 {t("sellreport.Actions")}
               </th>
             </tr>
@@ -393,13 +393,13 @@ const SellReport = () => {
                 <td className="px-6 py-4 text-gray-800 dark:text-gray-200 font-medium">
                   {med.medicine_name}
                 </td>
-                <td className="px-6 py-4 text-gray-500 dark:text-gray-300 font-semibold">
+                <td className="sm:flex hidden px-6 py-4 text-gray-500 dark:text-gray-300 font-semibold">
                   ${med.amount}
                 </td>
                 <td className="px-6 py-4 text-gray-500 dark:text-gray-300">
                   {med.category}
                 </td>
-                <td className="px-6 py-4 text-gray-500 dark:text-gray-300 font-bold">
+                <td className="sm:flex hidden px-6 py-4 text-gray-500 dark:text-gray-300 font-bold">
                   {med.percentage}%
                 </td>
                 <td className="px-6 py-4 text-gray-500 dark:text-gray-300">
@@ -417,7 +417,7 @@ const SellReport = () => {
                     <FaEllipsisH />
                   </button>
                   {openMenu === med.id && (
-                    <div className="absolute z-10 right-16 top-2 w-36 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md shadow-md dark:shadow-gray-700">
+                    <div className=" absolute z-10 sm:right-[120px] right-[85px] sm:top-5 top-5 sm:w-40 w-40 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md shadow-md dark:shadow-gray-700">
                       <button className="flex items-center w-full text-left text-gray-600 dark:text-gray-200 py-2 px-3 hover:rounded-md hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-400 dark:hover:text-white">
                         <BiShow className="mr-2" />
                         {t("sellreport.ViewDetails")}
@@ -440,10 +440,10 @@ const SellReport = () => {
 
         {/* Pagination controls */}
         <div className="flex justify-between items-center mt-4">
-          <div className="flex items-center gap-2">
+          <div className="sm:flex hidden items-center gap-2">
             <label
               htmlFor="rowsPerPage"
-              className="text-gray-400 dark:text-gray-300 text-sm"
+              className="text-gray-400 dark:text-gray-300 text-md"
             >
               {t("sellreport.RowsPerPage")}
             </label>
@@ -466,7 +466,7 @@ const SellReport = () => {
           </div>
           <div className="flex items-center gap-3">
             <button
-              className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-gray-400 dark:text-gray-300 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
+              className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-emerald-600 text-white dark:text-gray-300 text-md  dark:hover:bg-gray-700 disabled:opacity-50"
               onClick={() =>
                 setPagination((prev) => ({
                   ...prev,
@@ -477,12 +477,12 @@ const SellReport = () => {
             >
               {t("sellreport.Previous")}
             </button>
-            <span className="text-gray-400 dark:text-gray-300 text-sm">
+            <span className="text-gray-400 dark:text-gray-300 text-md">
               {t("sellreport.Page")} {pagination.currentPage}{" "}
               {t("sellreport.Of")} {totalPages}
             </span>
             <button
-              className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-gray-400 dark:text-gray-300 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
+              className="px-3 bg-emerald-600 text-white py-1 border border-gray-300 dark:border-gray-600 rounded-md  dark:text-gray-300 text-md  dark:hover:bg-gray-700 disabled:opacity-50"
               onClick={() =>
                 setPagination((prev) => ({
                   ...prev,

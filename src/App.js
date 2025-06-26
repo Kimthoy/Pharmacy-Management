@@ -86,14 +86,14 @@ const App = () => {
   }, []);
 
   return isLoading ? (
-    <div className="flex items-center justify-center h-screen bg-white dark:bg-gray-900">
+    <div className="flex items-center  justify-center  h-screen bg-white dark:bg-gray-900">
       <Loader />
     </div>
   ) : (
     <ThemeProvider>
       <AuthProvider>
         <LanguageProvider>
-          <div className="flex h-screen bg-white dark:bg-gray-900 font-khmer">
+          <div className="flex font-battambang h-screen  font-notoserifkhmer  bg-white dark:bg-gray-900">
             {location.pathname !== "/profiledashboard" && (
               <Sidebar
                 setSelectedPage={setSelectedPage}

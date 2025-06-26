@@ -11,9 +11,9 @@ const ProductCard = ({ product, handleAddToCartClick, displayPrice }) => {
 
   return (
     <motion.div
-      whileTap={{ scale: 0.95 }} // Shrinks slightly when clicked
-      whileHover={{ scale: 1.05 }} // Grows slightly on hover
-      className="bg-white rounded-lg shadow-lg p-1 w-56 text-center transition cursor-pointer"
+      whileTap={{ scale: 0.95 }}
+      whileHover={{ scale: 1.03 }}
+      className="bg-white rounded-2xl shadow-md p-3 w-full text-center transition cursor-pointer h-full flex flex-col justify-between"
     >
       <div onClick={() => handleAddToCartClick(product)}>
         <img
@@ -23,18 +23,21 @@ const ProductCard = ({ product, handleAddToCartClick, displayPrice }) => {
             (e.target.src =
               "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mN8z8DwHwAFBQIA/rB/WQAAAABJRU5ErkJggg==")
           }
-          className="w-full h-40 object-contain mb-2 rounded mx-auto transition-all"
+          className="w-full h-32 sm:h-40 object-contain mb-2 rounded transition-all"
         />
 
-        <h3 className="text-sm font-semibold mb-2">{product.name}</h3>
-        <p className="text-gray-600">
+        <h3 className="text-sm font-semibold mb-1 truncate px-1">
+          {product.name}
+        </h3>
+        <p className="text-gray-600 text-sm">
           $ {displayPrice(product.price).toFixed(2)}
         </p>
-        <p className="text-gray-500 text-sm">
+        <p className="text-gray-500 text-xs">
           ៛ {formatKhmerCurrency(product.price * exchangeRate)}
         </p>
       </div>
-      <button className="mb-2 hover:text-md mt-4 text-emerald-500 hover:underline">
+
+      <button className="mt-2 text-sm text-emerald-500 hover:underline">
         តាមដានស្តុក
       </button>
     </motion.div>

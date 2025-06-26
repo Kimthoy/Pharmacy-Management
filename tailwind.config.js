@@ -4,6 +4,15 @@ module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx,html}"],
   theme: {
     extend: {
+      fontFamily: {
+        kantumruy: ["Kantumruy", "sans-serif"],
+        inter: ["Inter", "sans-serif"],
+        nokora: ["Nokora", "serif"],
+        notosans: ["Noto Sans", "sans-serif"],
+        notoserifkhmer: ["Noto Serif Khmer", "serif"],
+        opensans: ["Open Sans", "sans-serif"],
+        roboto: ["Roboto", "sans-serif"],
+      },
       keyframes: {
         "slide-in-left": {
           "0%": { transform: "translateX(100%)", opacity: "0" },

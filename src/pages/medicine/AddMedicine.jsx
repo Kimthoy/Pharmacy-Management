@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import BarcodeScanner from "../../components/BarcodeScanner";
+import { LiaWindowCloseSolid } from "react-icons/lia";
 
 import { useTranslation } from "../../hooks/useTranslation";
 import { createMedicine } from "../api/medicineService";
@@ -106,8 +107,9 @@ const AddMedicine = () => {
 
   const handleScan = (result) => {
     setBarcode(result);
-    setShowScanner(false);
+    setShowScanner(true);
   };
+
   return (
     <div className="p-6 mb-12 bg-white dark:bg-gray-900 rounded-lg shadow-lg dark:shadow-gray-800 w-full max-w-6xl mx-auto">
       <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center">
@@ -221,19 +223,25 @@ const AddMedicine = () => {
           <div className="flex flex-col relative">
             <label
               htmlFor="barcode_number"
-              className="mb-2 text-md font-medium text-gray-700 dark:text-gray-300"
+              className=" text-md  text-gray-700 dark:text-gray-300"
             >
               {t("add-medicine.BarcodeScan")}
             </label>
-            <div className="relative">
+            <div className="relative ">
               <button
                 onClick={() => setShowScanner(true)}
-                className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                className=" text-green-700 px-2 py-2  rounded-md absolute right-0 top-1"
               >
-                Scan Barcode
+                <LuScanBarcode className="w-7 h-7 hover:scale-110 transition-all" />
               </button>
 
-              <input value={barcode} readOnly className="border p-2 mt-2" />
+              <input
+                type="text"
+                value={barcode}
+                onChange={(e) => setBarcode(e.target.value)}
+                placeholder="Enter barcode"
+                className="border  rounded-lg border-slate-600 outline-none p-2 mt-2 block w-full"
+              />
 
               {showScanner && (
                 <BarcodeScanner
@@ -243,7 +251,7 @@ const AddMedicine = () => {
               )}
             </div>
           </div>
-          
+
           <div className="flex flex-col">
             <label
               htmlFor="category"
@@ -298,44 +306,6 @@ const AddMedicine = () => {
           </button>
         </div>
       </form>
-      {openScanner && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center px-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md shadow-lg relative">
-           
-
-            {/* Info & Actions */}
-            <div className="mt-4 flex flex-col sm:flex-row justify-between items-center gap-2">
-              <div className="text-md text-gray-700 dark:text-gray-300 text-center sm:text-left">
-                {medicine.barcode_number ? (
-                  <>
-                    <span className="font-semibold">
-                      {t("add-medicine.Scanned")}:
-                    </span>{" "}
-                    {medicine.barcode_number}
-                  </>
-                ) : (
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    {t("add-medicine.ScanPrompt")}
-                  </span>
-                )}
-              </div>
-              <button
-                onClick={() => setOpenScanner(false)}
-                className="px-4 py-2 bg-red-500 dark:bg-red-600 text-white rounded-md hover:bg-red-600 dark:hover:bg-red-500 text-md transition"
-              >
-                {t("add-medicine.CloseScanner")}
-              </button>
-            </div>
-
-            {/* Loading Message */}
-            {isLoading && (
-              <div className="mt-2 text-sm text-gray-500 dark:text-gray-400 text-center">
-                {t("add-medicine.LoadingMedicine")}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 };

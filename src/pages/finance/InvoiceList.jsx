@@ -1,17 +1,19 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { FaSort, FaCog, FaFilter, FaSun, FaMoon } from "react-icons/fa";
 import { useTranslation } from "../../hooks/useTranslation";
 import { useTheme } from "../../context/ThemeContext";
 
-const InvoiceList = () => {
+const InvoiceList = ({ invoices }) => {
   const { t } = useTranslation();
   const { theme, toggleTheme } = useTheme();
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [showFilter, setShowFilter] = useState(false);
-  const [setSelectedFilter] = useState("All");
+
   const [sortOrder, setSortOrder] = useState("asc");
   const [searchQuery, setSearchQuery] = useState("");
+  const [showFilter, setShowFilter] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState("All");
+  const [filteredInvoices, setFilteredInvoices] = useState(invoices);
 
   const originalInvoiceList = [
     {
@@ -77,21 +79,33 @@ const InvoiceList = () => {
   ];
 
   const [invoiceList, setInvoiceList] = useState(originalInvoiceList);
-
+  const filterRef = useRef(null);
   const filterInvoices = (status) => {
+    if (!Array.isArray(originalInvoiceList)) return;
+
+    setSelectedFilter(status);
     if (status === "All") {
       setInvoiceList(originalInvoiceList);
     } else {
-      const filteredList = originalInvoiceList.filter(
+      const filtered = originalInvoiceList.filter(
         (item) => item.status === status
       );
-      setInvoiceList(filteredList);
+      setInvoiceList(filtered);
     }
-    setSelectedFilter(status);
     setShowFilter(false);
     setCurrentPage(1);
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (filterRef.current && !filterRef.current.contains(event.target)) {
+        setShowFilter(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
   const sortedList = [...invoiceList].sort((a, b) => {
     const dateA = new Date(a.date);
     const dateB = new Date(b.date);
@@ -109,33 +123,33 @@ const InvoiceList = () => {
   );
 
   return (
-    <div className="p-6 bg-gray-100 dark:bg-gray-900 min-h-screen max-w-6xl mx-auto">
+    <div className="sm:p-6 mb-20 sm:bg-gray-100 dark:bg-gray-900 min-h-screen max-w-6xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-700 dark:text-gray-200">
             {t("invoice.title")}
           </h1>
           <span className="text-xs font-normal text-gray-400 dark:text-gray-300">
-            {t("invoice.description", { count: invoiceList.length })}
+            {t("invoice.description").replace("{count}", invoiceList.length)}
           </span>
         </div>
-        <div className="flex items-center space-x-2 mt-4 md:mt-0">
-          <button
+        <div className="flex items-center  mt-4 md:mt-0">
+          {/* <button
             onClick={toggleTheme}
-            className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition"
+            className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-lg dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition"
             aria-label={
               theme === "light" ? "Switch to dark mode" : "Switch to light mode"
             }
           >
             {theme === "light" ? <FaMoon /> : <FaSun />}
-          </button>
-          <button className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-4 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition">
+          </button> */}
+          <button className="text-xs sm:text-emerald-500 text-white sm:bg-white bg-emerald-600 dark:text-emerald-400 border sm:border-emerald-500 dark:border-emerald-400 px-4 py-2 rounded-lg dark:hover:text-white hover:text-white sm:hover:bg-emerald-500 dark:hover:bg-emerald-400 transition">
             {t("invoice.addInvoice")}
           </button>
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md dark:shadow-gray-700 border border-gray-200 dark:border-gray-600">
+      <div className="bg-white dark:bg-gray-800 sm:p-6 sm:rounded-lg sm:shadow-md dark:shadow-gray-700 sm:border border-gray-200 dark:border-gray-600">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-200">
             {t("invoice.allInvoices")}
@@ -146,51 +160,54 @@ const InvoiceList = () => {
               placeholder={t("invoice.searchPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="text-xs border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
+              className="text-xs border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-lg font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
             />
             <button
               onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-              className="bg-white dark:bg-gray-700 px-4 py-2 rounded-[4px] shadow-md dark:shadow-gray-600 flex items-center space-x-2 border border-gray-400 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600"
+              className="sm:flex hidden bg-white dark:bg-gray-700 px-4 py-2 rounded-lg shadow-md dark:shadow-gray-600  items-center space-x-2 border border-gray-400 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600"
             >
               <FaSort />
             </button>
             <div className="relative">
               <button
                 onClick={() => setShowFilter(!showFilter)}
-                className="bg-white dark:bg-gray-700 px-4 py-2 rounded-[4px] shadow-md dark:shadow-gray-600 flex items-center space-x-2 border border-gray-400 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600"
+                className="bg-white dark:bg-gray-700 px-4 py-2 rounded-lg shadow-md dark:shadow-gray-600 flex items-center space-x-2 border border-gray-400 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600"
               >
                 <FaFilter />
               </button>
               {showFilter && (
-                <div className="absolute top-12 right-0 bg-white dark:bg-gray-700 shadow-md dark:shadow-gray-600 rounded-[4px] w-40 p-2 z-10">
+                <div
+                  ref={filterRef}
+                  className="absolute top-12 right-0 bg-white dark:bg-gray-700 shadow-md dark:shadow-gray-600 rounded-lg w-40 p-2 z-10"
+                >
                   <button
                     onClick={() => filterInvoices("All")}
-                    className="block w-full text-left px-4 py-2 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600 rounded-[4px] text-xs"
+                    className="block w-full text-left px-4 py-2 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600 rounded-lg text-xs"
                   >
                     {t("invoice.filterAll")}
                   </button>
                   <button
                     onClick={() => filterInvoices("Complete")}
-                    className="block w-full text-left px-4 py-2 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600 rounded-[4px] text-xs"
+                    className="block w-full text-left px-4 py-2 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600 rounded-lg text-xs"
                   >
                     {t("invoice.filterComplete")}
                   </button>
                   <button
                     onClick={() => filterInvoices("Pending")}
-                    className="block w-full text-left px-4 py-2 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600 rounded-[4px] text-xs"
+                    className="block w-full text-left px-4 py-2 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600 rounded-lg text-xs"
                   >
                     {t("invoice.filterPending")}
                   </button>
                   <button
                     onClick={() => filterInvoices("Cancelled")}
-                    className="block w-full text-left px-4 py-2 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600 rounded-[4px] text-xs"
+                    className="block w-full text-left px-4 py-2 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600 rounded-lg text-xs"
                   >
                     {t("invoice.filterCancelled")}
                   </button>
                 </div>
               )}
             </div>
-            <button className="bg-white dark:bg-gray-700 px-4 py-2 rounded-[4px] shadow-md dark:shadow-gray-600 flex items-center space-x-2 border border-gray-400 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600">
+            <button className="sm:flex hidden bg-white dark:bg-gray-700 px-4 py-2 rounded-lg shadow-md dark:shadow-gray-600  items-center space-x-2 border border-gray-400 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600">
               <FaCog />
             </button>
           </div>
@@ -263,12 +280,12 @@ const InvoiceList = () => {
           </tbody>
         </table>
         <div className="flex flex-col md:flex-row justify-between items-center mt-4">
-          <div className="flex items-center space-x-2">
+          <div className="sm:flex hidden items-center space-x-2">
             <span className="text-gray-400 dark:text-gray-300 text-xs">
               {t("invoice.show")}
             </span>
             <select
-              className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
+              className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-lg font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
               value={itemsPerPage}
               onChange={(e) => {
                 setItemsPerPage(Number(e.target.value));
@@ -287,7 +304,7 @@ const InvoiceList = () => {
             <button
               disabled={currentPage === 1}
               onClick={() => setCurrentPage(currentPage - 1)}
-              className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition disabled:opacity-50"
+              className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-lg dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition disabled:opacity-50"
             >
               {t("invoice.previous")}
             </button>
@@ -297,7 +314,7 @@ const InvoiceList = () => {
             <button
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage(currentPage + 1)}
-              className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition disabled:opacity-50"
+              className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-lg dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition disabled:opacity-50"
             >
               {t("invoice.next")}
             </button>

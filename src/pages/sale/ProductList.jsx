@@ -13,7 +13,7 @@ const ProductList = ({
   const safeProducts = products || [];
 
   return (
-    <div className="flex flex-1 flex-col justify-center gap-2">
+    <div className="flex flex-1 flex-col justify-center ">
       {showCompoundMedicines ? (
         <MedicineTable
           products={safeProducts}
@@ -22,16 +22,13 @@ const ProductList = ({
           currency={currency}
         />
       ) : (
-        <div className="flex flex-wrap justify-center gap-2">
-          {safeProducts.map((product) => (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 w-full">
+          {products.map((product) => (
             <ProductCard
               key={product.id}
-              cart={cart}
               product={product}
               handleAddToCartClick={handleAddToCartClick}
               displayPrice={displayPrice}
-              currency={currency}
-              showCompoundMedicines={showCompoundMedicines}
             />
           ))}
         </div>
