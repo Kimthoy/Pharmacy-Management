@@ -118,8 +118,8 @@ const OrderReviewModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 mb-14 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-md w-full font-khmer">
+    <div className="fixed inset-0  sm:mb-0 mb-16  z-50 flex items-center justify-center bg-black bg-opacity-40">
+      <div className="bg-white  dark:bg-gray-800 p-5 rounded-lg max-w-md w-full font-khmer">
         <h2 className="text-xl font-bold mb-4" aria-label="បញ្ជាក់ការបញ្ជាទិញ">
           បញ្ជាក់ការបញ្ជាទិញ
         </h2>
@@ -127,7 +127,7 @@ const OrderReviewModal = ({
           <p className="text-center text-gray-600">កន្ត្រកទទេ!</p>
         ) : (
           <>
-            <ul className="space-y-2 mb-4">
+            <ul className="space-y-2 mb-4 h-16 overflow-y-auto">
               {cart.map((item, index) => (
                 <li
                   key={`${item.id}-${item.packaging || "default"}`}
