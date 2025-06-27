@@ -105,11 +105,10 @@ const AddMedicine = () => {
   const [showScanner, setShowScanner] = useState(false);
   const [barcode, setBarcode] = useState("");
 
-  const handleScan = (result) => {
-    setBarcode(result);
-    setShowScanner(true);
+  const handleScan = (scannedValue) => {
+    setBarcode(scannedValue);
+    setShowScanner(false);
   };
-
   return (
     <div className="p-6 mb-12 bg-white dark:bg-gray-900 rounded-lg shadow-lg dark:shadow-gray-800 w-full max-w-6xl mx-auto">
       <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center">
@@ -227,22 +226,26 @@ const AddMedicine = () => {
             >
               {t("add-medicine.BarcodeScan")}
             </label>
-            <div className="relative ">
+            <div className="relative">
+              {/* Barcode Scan Button */}
               <button
                 onClick={() => setShowScanner(true)}
-                className=" text-green-700 px-2 py-2  rounded-md absolute right-0 top-1"
+                className="text-green-700 px-2 py-2 rounded-md absolute right-0 top-1"
+                type="button"
               >
                 <LuScanBarcode className="w-7 h-7 hover:scale-110 transition-all" />
               </button>
 
+              {/* Barcode Text Input */}
               <input
                 type="text"
                 value={barcode}
                 onChange={(e) => setBarcode(e.target.value)}
                 placeholder="Enter barcode"
-                className="border  rounded-lg border-slate-600 outline-none p-2 mt-2 block w-full"
+                className="border rounded-lg border-slate-600 outline-none p-2 mt-2 block w-full"
               />
 
+              {/* Barcode Scanner Popup */}
               {showScanner && (
                 <BarcodeScanner
                   onScanSuccess={handleScan}
