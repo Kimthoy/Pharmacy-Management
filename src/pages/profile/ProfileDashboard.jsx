@@ -35,7 +35,7 @@ const ProfileDashboard = () => {
 
   return (
     <div className="mb-10">
-      <div className="fixed  bg-white shadow-md w-full h-11 top-0 left-0">
+      <div className="fixed  bg-white sm:shadow-lg w-full h-11 top-0 left-0">
         <div
           className="flex hover:text-green-600 cursor-pointer"
           onClick={handleGoBack}
@@ -45,7 +45,7 @@ const ProfileDashboard = () => {
         </div>
       </div>
       <div
-        className={`flex-1 p-6 overflow-auto min-h-screen ${
+        className={`flex-1 sm:p-6 mt-4 overflow-auto min-h-screen ${
           theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-gray-900"
         }`}
       >
@@ -78,9 +78,9 @@ const ProfileDashboard = () => {
           </div>
         </div>
 
-        <div className="mt-6 space-y-4 mb-8">
-          <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-            <li className="flex items-center bg-gray-200 mb-2 p-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
+        <div className="mt-6  mb-8">
+          <ul className="  divide-gray-200 dark:divide-gray-700">
+            <li className="w-full flex items-center bg-gray-200 mb-2 p-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
               <UserCircle className="w-5 h-5 text-green-600 mr-3" />
               <span className="text-green-500">Profile</span>
             </li>

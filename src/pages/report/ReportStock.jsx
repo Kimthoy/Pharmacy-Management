@@ -160,13 +160,13 @@ const StockReport = () => {
   );
 
   return (
-    <div className="sm:p-6 mb-20 bg-white dark:bg-gray-900 min-h-screen">
+    <div className="sm:p-6 mb-24 bg-white dark:bg-gray-900 min-h-screen">
       {/* Stock Report Section */}
       <section className="mb-8">
         <h2 className="sm:text-lg text-md font-bold text-gray-500 dark:text-gray-200">
           {t("stockreport.StockReportTitle")}
         </h2>
-        <p className="text-gray-500 text-xs dark:text-gray-300">
+        <p className="text-gray-500 text-md dark:text-gray-300">
           {t("stockreport.StockReportDesc")}
         </p>
       </section>
@@ -199,7 +199,7 @@ const StockReport = () => {
         </div>
 
         {/* Stock by Category Chart */}
-        <div className="bg-white dark:bg-gray-800 p-6 shadow-lg dark:shadow-gray-700 rounded-lg">
+        <div className="bg-white dark:bg-gray-800 sm:p-6 sm:shadow-lg dark:shadow-gray-700 sm:rounded-lg">
           <h3 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-4">
             {t("stockreport.StockByCategory")}
           </h3>
@@ -231,7 +231,7 @@ const StockReport = () => {
       </div>
 
       {/* Stock Inventory Section */}
-      <div className="bg-white dark:bg-gray-800 sm:p-6 sm:shadow-md dark:shadow-gray-700 sm:rounded-lg mt-6">
+      <div className="bg-white dark:bg-gray-800 sm:p-6 sm:shadow-lg dark:shadow-gray-700 sm:rounded-lg mt-6">
         <h3 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-6">
           {t("stockreport.StockInventory")}
         </h3>
@@ -241,7 +241,7 @@ const StockReport = () => {
           <div>
             <label
               htmlFor="search"
-              className="block  text-gray-400 dark:text-gray-300 mb-1 text-sm"
+              className="block  text-gray-400 dark:text-gray-300 mb-1 text-md"
             >
               {t("stockreport.Search")}
             </label>
@@ -259,7 +259,7 @@ const StockReport = () => {
           <div>
             <label
               htmlFor="startDate"
-              className="block text-gray-400 dark:text-gray-300 mb-1 text-sm"
+              className="block text-gray-400 dark:text-gray-300 mb-1 text-md"
             >
               {t("stockreport.StartDate")}
             </label>
@@ -276,7 +276,7 @@ const StockReport = () => {
           <div>
             <label
               htmlFor="endDate"
-              className="block text-gray-400 dark:text-gray-300 mb-1 text-sm"
+              className="block text-gray-400 dark:text-gray-300 mb-1 text-md"
             >
               {t("stockreport.EndDate")}
             </label>
@@ -293,7 +293,7 @@ const StockReport = () => {
           <div>
             <label
               htmlFor="category"
-              className="block text-gray-400 dark:text-gray-300 mb-1 text-sm"
+              className="block text-gray-400 dark:text-gray-300 mb-1 text-md"
             >
               {t("stockreport.Category")}
             </label>
@@ -315,28 +315,20 @@ const StockReport = () => {
         </div>
 
         {/* Stock table */}
-        <table className="w-full bg-white dark:bg-gray-800 sm:shadow-md dark:shadow-gray-700 sm:rounded-lg border border-gray-300 dark:border-gray-600">
+        <table className="sm:w-full w-[420px] bg-white dark:bg-gray-800 sm:shadow-lg dark:shadow-gray-700 sm:rounded-lg border border-gray-300 dark:border-gray-600">
           <thead>
             <tr className="border-b border-gray-200 dark:border-gray-600">
-              <th className="px-5 py-3 text-left text-gray-400 dark:text-gray-300 text-sm">
+              <th className="px-5 py-3 text-left text-gray-400 dark:text-gray-300 text-md">
                 {t("stockreport.MedicineName")}
               </th>
-              <th className="px-5 py-3 text-left text-gray-400 dark:text-gray-300 text-sm">
+              <th className="px-5 py-3 text-left text-gray-400 dark:text-gray-300 text-md">
                 {t("stockreport.Category")}
               </th>
-              <th className="px-5 py-3 text-left text-gray-400 dark:text-gray-300 text-sm">
+              <th className="px-5 py-3 text-left text-gray-400 dark:text-gray-300 text-md">
                 {t("stockreport.Quantity")}
               </th>
-              <th className="sm:flex hidden px-5 py-3 text-left text-gray-400 dark:text-gray-300 text-sm">
-                {t("stockreport.ReorderLevel")}
-              </th>
-              <th className="sm:flex hidden px-5 py-3 text-left text-gray-400 dark:text-gray-300 text-sm">
-                {t("stockreport.StockValue")}
-              </th>
-              <th className="sm:flex hidden px-5 py-3 text-left text-gray-400 dark:text-gray-300 text-sm">
-                {t("stockreport.LastUpdated")}
-              </th>
-              <th className="px-5 py-3 text-left text-gray-400 dark:text-gray-300 text-sm">
+
+              <th className="px-5 py-3 text-left text-gray-400 dark:text-gray-300 text-md">
                 {t("stockreport.Actions")}
               </th>
             </tr>
@@ -347,14 +339,14 @@ const StockReport = () => {
                 key={item.id}
                 className="border-b border-gray-200 dark:border-gray-600"
               >
-                <td className="px-5 py-4 text-gray-800 dark:text-gray-200 font-medium">
+                <td className="px-5 py-3 text-gray-800 dark:text-gray-200 font-medium">
                   {item.medicine_name}
                 </td>
-                <td className="px-5 py-4 text-gray-500 dark:text-gray-300">
+                <td className="px-5 py-3 text-gray-500 dark:text-gray-300">
                   {item.category}
                 </td>
                 <td
-                  className={`px-5 py-4 font-semibold ${
+                  className={`px-5 py-3 font-semibold ${
                     item.quantity <= item.reorder_level
                       ? "text-red-500 dark:text-red-400"
                       : "text-gray-500 dark:text-gray-300"
@@ -362,16 +354,8 @@ const StockReport = () => {
                 >
                   {item.quantity}
                 </td>
-                <td className="sm:flex hidden px-5 py-4 text-gray-500 dark:text-gray-300">
-                  {item.reorder_level}
-                </td>
-                <td className="sm:flex hidden px-5 py-4 text-gray-500 dark:text-gray-300">
-                  ${item.stock_value}
-                </td>
-                <td className="sm:flex hidden px-5 py-4 text-gray-500 dark:text-gray-300">
-                  {item.last_updated}
-                </td>
-                <td className="px-5 py-4 relative">
+
+                <td className="px-5 py-3 relative">
                   <button
                     ref={menuRef}
                     className="p-2 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300"
@@ -383,7 +367,7 @@ const StockReport = () => {
                     <FaEllipsisH />
                   </button>
                   {openMenu === item.id && (
-                    <div className="absolute z-10 right-16 top-2 w-36 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md shadow-md dark:shadow-gray-700">
+                    <div className="absolute z-10 sm:right-[230px] right-[87px] sm:top-4 top-5 sm:w-44 w-40 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md shadow-md dark:shadow-gray-700">
                       <button className="flex items-center w-full text-left text-gray-600 dark:text-gray-200 py-2 px-3 hover:rounded-md hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-400 dark:hover:text-white">
                         <BiShow className="mr-2" />
                         {t("stockreport.ViewDetails")}
@@ -409,7 +393,7 @@ const StockReport = () => {
           <div className="sm:flex hidden items-center gap-2">
             <label
               htmlFor="rowsPerPage"
-              className="text-gray-400 dark:text-gray-300 text-sm"
+              className="text-gray-400 dark:text-gray-300 text-md"
             >
               {t("stockreport.RowsPerPage")}
             </label>
@@ -432,7 +416,7 @@ const StockReport = () => {
           </div>
           <div className="flex items-center gap-3">
             <button
-              className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-gray-400 dark:text-gray-300 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
+              className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-gray-400 dark:text-gray-300 text-md hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
               onClick={() =>
                 setPagination((prev) => ({
                   ...prev,
@@ -443,12 +427,12 @@ const StockReport = () => {
             >
               {t("stockreport.Previous")}
             </button>
-            <span className="text-gray-400 dark:text-gray-300 text-sm">
+            <span className="text-gray-400 dark:text-gray-300 text-md">
               {t("stockreport.Page")} {pagination.currentPage}{" "}
               {t("stockreport.Of")} {totalPages}
             </span>
             <button
-              className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-gray-400 dark:text-gray-300 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
+              className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-gray-400 dark:text-gray-300 text-md hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
               onClick={() =>
                 setPagination((prev) => ({
                   ...prev,
