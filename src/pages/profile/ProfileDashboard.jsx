@@ -1,7 +1,9 @@
 import { useTranslation } from "../../hooks/useTranslation";
 import { useTheme } from "../../context/ThemeContext";
+
 import { TiArrowBack } from "react-icons/ti";
 import { useNavigate } from "react-router-dom";
+// import { useTheme } from "../context/ThemeContext";
 import {
   UserCircle,
   Crown,
@@ -11,12 +13,13 @@ import {
   Bell,
   Moon,
   LogOut,
+  Sun,
 } from "lucide-react";
 
 const ProfileDashboard = () => {
   const { t } = useTranslation();
-  const { theme } = useTheme();
-
+  // const { theme } = useTheme();
+  const { theme, toggleTheme } = useTheme(true);
   const user = {
     name: "បញា​អុន", // បញ្ញា៉ឹន
     membership: "សាមាចាក​មាស", // សមាជិក មាស
@@ -92,11 +95,33 @@ const ProfileDashboard = () => {
               <Bell className="w-5 h-5 text-green-600 mr-3" />
               <span className="text-green-500">Notifications</span>
             </li>
-            <li className="flex items-center bg-gray-200 mb-2 p-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
-              <Moon className="w-5 h-5 text-green-600 mr-3" />
-              <spa className="text-green-500">Dark Mode</spa>
+            <li
+              onClick={toggleTheme}
+              className="flex items-center bg-gray-200 mb-2 p-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+            >
+              <button
+                title={
+                  theme === "light"
+                    ? "Switch to dark mode"
+                    : "Switch to light mode"
+                }
+                className="p-2  flex dark:text-green-500  text-green-600  dark:hover:bg-gray-700 transition "
+              >
+                {theme === "light"
+                  ? [
+                      <Moon
+                        size={20}
+                        className="w-5 h-5 text-green-600 mr-3"
+                      />,
+                      "Dark Mode",
+                    ]
+                  : [
+                      <Sun size={20} className="w-5 h-5 text-green-600 mr-3" />,
+                      "Light Mode",
+                    ]}
+              </button>
             </li>
-            <li className="flex items-center bg-gray-200 mb-2 p-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
+            <li className="flex items-center bg-gray-200 mb-2 p-4 cursor-pointer sm:hover:bg-gray-100  dark:hover:bg-gray-700 rounded-md">
               <LogOut className="w-5 h-5 text-green-600 mr-3" />
               <span className="text-green-500">Logout/Login</span>
             </li>
