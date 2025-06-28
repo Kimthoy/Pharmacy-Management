@@ -22,7 +22,7 @@ const ProductList = ({
           currency={currency}
         />
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 w-full">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 w-full mb-24">
           {products.map((product) => (
             <ProductCard
               key={product.id}

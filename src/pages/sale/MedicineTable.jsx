@@ -62,95 +62,94 @@ const MedicineTable = ({ products, handleAddToCartClick, currency = "៛" }) => 
     }));
   };
 
-
-    return (
-      <div className="w-full overflow-x-auto">
-        <table className="min-w-full table-auto border-collapse">
-          <thead>
-            <tr className="bg-gray-100 dark:bg-gray-700">
-              <th className="sm:table-cell hidden border border-gray-300 dark:border-gray-600 p-2 text-left dark:text-gray-300">
-                ID
-              </th>
-              <th className="border border-gray-300 dark:border-gray-600 p-2 text-left dark:text-gray-300">
-                Name
-              </th>
-              <th className="border border-gray-300 dark:border-gray-600 p-2 text-left dark:text-gray-300">
-                Price ({currency})
-              </th>
-              <th className="border border-gray-300 dark:border-gray-600 p-2 text-left dark:text-gray-300">
-                Quantity
-              </th>
-              <th className="border border-gray-300 dark:border-gray-600 p-2 text-left dark:text-gray-300">
-                Image
-              </th>
-              <th className="border border-gray-300 dark:border-gray-600 p-2 text-left dark:text-gray-300">
-                Action
-              </th>
+  return (
+    <div className="sm:w-full w-[420px]  mb-14 overflow-x-auto">
+      <table className=" table-auto border-collapse">
+        <thead>
+          <tr className="bg-gray-100 dark:bg-gray-700">
+            <th className="sm:table-cell hidden border border-gray-300 dark:border-gray-600 p-2 text-left dark:text-gray-300">
+              ID
+            </th>
+            <th className="border border-gray-300 dark:border-gray-600 p-2 text-left dark:text-gray-300">
+              Name
+            </th>
+            <th className="border border-gray-300 dark:border-gray-600 p-2 text-left dark:text-gray-300">
+              Price ({currency})
+            </th>
+            <th className="border border-gray-300 dark:border-gray-600 p-2 text-left dark:text-gray-300">
+              Quantity
+            </th>
+            <th className="border border-gray-300 dark:border-gray-600 p-2 text-left dark:text-gray-300">
+              Image
+            </th>
+            <th className="border border-gray-300 dark:border-gray-600 p-2 text-left dark:text-gray-300">
+              Action
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {products.map((medicine) => (
+            <tr
+              key={medicine.id}
+              className="hover:bg-gray-50 dark:hover:bg-gray-800"
+            >
+              <td className="sm:table-cell hidden border border-gray-300 dark:border-gray-600 p-2 dark:text-gray-300">
+                {medicine.id}
+              </td>
+              <td className="border border-gray-300 dark:border-gray-600 p-2 dark:text-gray-300">
+                {medicine.name}
+              </td>
+              <td className="border border-gray-300 dark:border-gray-600 p-2 dark:text-gray-300 whitespace-nowrap">
+                <input
+                  type="text"
+                  value={formatPriceKHR(medicineInputs[medicine.id]?.price)}
+                  onChange={(e) =>
+                    handlePriceChange(medicine.id, e.target.value)
+                  }
+                  className="w-24 p-1 focus:font-semibold text-center border focus:w-28 focus:h-12 text-md rounded dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                  aria-label={`Price for ${medicine.name} in KHR`}
+                />
+                <span className="ml-2">{currency}</span>
+              </td>
+              <td className="border border-gray-300 dark:border-gray-600 p-2">
+                <input
+                  type="number"
+                  min="1"
+                  value={medicineInputs[medicine.id]?.qty || 1}
+                  onChange={(e) => handleQtyChange(medicine.id, e.target.value)}
+                  className="w-16 p-1 border focus:font-semibold focus:w-28 text-center focus:h-12 text-md rounded dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                  aria-label={`Quantity for ${medicine.name}`}
+                />
+              </td>
+              <td className="border border-gray-300 dark:border-gray-600 p-2 dark:text-gray-300">
+                {medicine.image.startsWith("http") ? (
+                  <img
+                    src={medicine.image}
+                    alt={medicine.name}
+                    className="w-12 h-auto"
+                    onError={(e) =>
+                      (e.target.src = "https://via.placeholder.com/50")
+                    }
+                  />
+                ) : (
+                  "No Image"
+                )}
+              </td>
+              <td className="border border-gray-300 dark:border-gray-600 p-2">
+                <button
+                  className="bg-blue-600 active:shadow-none transition-all text-white px-4 hover:shadow-md hover:shadow-slate-500 shadow py-2 rounded hover:bg-blue-700 dark:hover:bg-blue-500"
+                  onClick={() => handleAddToCart(medicine)}
+                  aria-label={`Add ${medicine.name} to cart`}
+                >
+                  បន្ថែម
+                </button>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {products.map((medicine) => (
-              <tr
-                key={medicine.id}
-                className="hover:bg-gray-50 dark:hover:bg-gray-800"
-              >
-                <td className="sm:table-cell hidden border border-gray-300 dark:border-gray-600 p-2 dark:text-gray-300">
-                  {medicine.id}
-                </td>
-                <td className="border border-gray-300 dark:border-gray-600 p-2 dark:text-gray-300">
-                  {medicine.name}
-                </td>
-                <td className="border border-gray-300 dark:border-gray-600 p-2 dark:text-gray-300 whitespace-nowrap">
-                  <input
-                    type="text"
-                    value={formatPriceKHR(medicineInputs[medicine.id]?.price)}
-                    onChange={(e) => handlePriceChange(medicine.id, e.target.value)}
-                    className="w-24 p-1 focus:font-semibold text-center border focus:w-28 focus:h-12 text-md rounded dark:bg-gray-800 dark:text-white dark:border-gray-600"
-                    aria-label={`Price for ${medicine.name} in KHR`}
-                  />
-                  <span className="ml-2">{currency}</span>
-                </td>
-                <td className="border border-gray-300 dark:border-gray-600 p-2">
-                  <input
-                    type="number"
-                    min="1"
-                    value={medicineInputs[medicine.id]?.qty || 1}
-                    onChange={(e) => handleQtyChange(medicine.id, e.target.value)}
-                    className="w-16 p-1 border focus:font-semibold focus:w-28 text-center focus:h-12 text-md rounded dark:bg-gray-800 dark:text-white dark:border-gray-600"
-                    aria-label={`Quantity for ${medicine.name}`}
-                  />
-                </td>
-                <td className="border border-gray-300 dark:border-gray-600 p-2 dark:text-gray-300">
-                  {medicine.image.startsWith("http") ? (
-                    <img
-                      src={medicine.image}
-                      alt={medicine.name}
-                      className="w-12 h-auto"
-                      onError={(e) =>
-                        (e.target.src = "https://via.placeholder.com/50")
-                      }
-                    />
-                  ) : (
-                    "No Image"
-                  )}
-                </td>
-                <td className="border border-gray-300 dark:border-gray-600 p-2">
-                  <button
-                    className="bg-blue-600 active:shadow-none transition-all text-white px-4 hover:shadow-md hover:shadow-slate-500 shadow py-2 rounded hover:bg-blue-700 dark:hover:bg-blue-500"
-                    onClick={() => handleAddToCart(medicine)}
-                    aria-label={`Add ${medicine.name} to cart`}
-                  >
-                    បន្ថែម
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-    
- 
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 };
 
 export default MedicineTable;

@@ -13,7 +13,7 @@ const ProductCard = ({ product, handleAddToCartClick, displayPrice }) => {
     <motion.div
       whileTap={{ scale: 0.95 }}
       whileHover={{ scale: 1.03 }}
-      className="bg-white rounded-2xl shadow-md p-3 w-full text-center transition cursor-pointer h-full flex flex-col justify-between"
+      className="bg-white  rounded-2xl shadow-lg p-3 w-full text-center transition cursor-pointer h-full flex flex-col justify-between"
     >
       <div onClick={() => handleAddToCartClick(product)}>
         <img

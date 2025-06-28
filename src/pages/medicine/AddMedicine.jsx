@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import BarcodeScanner from "../../components/BarcodeScanner";
-import { LiaWindowCloseSolid } from "react-icons/lia";
+// import { LiaWindowCloseSolid } from "react-icons/lia";
 
 import { useTranslation } from "../../hooks/useTranslation";
 import { createMedicine } from "../api/medicineService";
@@ -19,8 +19,8 @@ const AddMedicine = () => {
     medicine_detail: "",
     barcode_number: "",
   });
-  const [openScanner, setOpenScanner] = useState(false);
-  const [torchOn, setTorchOn] = useState(false);
+  // const [openScanner, setOpenScanner] = useState(false);
+  // const [torchOn, setTorchOn] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -41,7 +41,7 @@ const AddMedicine = () => {
       setIsLoading(true);
 
       if (!medicine.quantity || parseInt(medicine.quantity) < 0) {
-        setError(t("add-medicine.InvalidQuantity"));
+        setError("Please enter the quantity of product !  ");
         setIsLoading(false);
         return;
       }
@@ -49,12 +49,7 @@ const AddMedicine = () => {
         medicine.expire_date &&
         new Date(medicine.expire_date) <= new Date()
       ) {
-        setError(t("add-medicine.InvalidExpireDate"));
-        setIsLoading(false);
-        return;
-      }
-      if (!medicine.barcode_number) {
-        setError(t("add-medicine.InvalidBarcode"));
+        setError(t("Ops! the expire date not enter yet!"));
         setIsLoading(false);
         return;
       }
@@ -207,7 +202,7 @@ const AddMedicine = () => {
               htmlFor="expire_date"
               className="mb-2 text-md font-medium text-gray-700 dark:text-gray-300"
             >
-              {t("add-medicine.ExpireDate")} ({t("add-medicine.Optional")})
+              {t("add-medicine.ExpireDate")}
             </label>
             <input
               type="date"
@@ -303,9 +298,7 @@ const AddMedicine = () => {
                 : "bg-green-500 dark:bg-green-600 hover:bg-green-600 dark:hover:bg-green-500"
             } w-full md:w-auto shadow-md`}
           >
-            {isLoading
-              ? t("add-medicine.Submitting")
-              : t("add-medicine.ButtonAddMedicine")}
+            {isLoading ? "Creating" : "Create"}
           </button>
         </div>
       </form>
