@@ -54,3 +54,14 @@ export const toggleUserStatus = async (userData) => {
     throw error;
   }
 };
+export const deleteUser = async (userId) => {
+  try {
+    const response = await axios.delete(`${API_URL}/users/${userId}`, {
+      headers: getAuthHeader(),
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+

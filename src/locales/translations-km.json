@@ -22,6 +22,8 @@
     "Enable": "បើកដំណើរការ"
   },
   "medicine-view": {
+    "Quantity":"ចំនួន",
+    "Image": "រូបភាព",
     "Info": "ព័ត៌មានថ្នាំ",
     "Name": "ឈ្មោះ",
     "Price": "តម្លៃ",
@@ -233,6 +235,7 @@
     "total-customer": "អតិថិជន សរុប"
   },
   "add-medicine": {
+    "Photo": "រូបភាព",
     "ExpireDate": "ថ្ងៃខែផុតកំណត់",
     "AddMedicine": "ទម្រង់បែបបទនៃការ​​​បន្ថែម ថ្នាំ",
     "title-addmedicine": "សូមបំពេញ ព័ត៍មានទាំងអស់នេះឲ្យបានត្រឹមត្រូវ។",
@@ -377,7 +380,7 @@
     "ButtonAddCustomer": "បន្ថែមអតិថិជន"
   },
   "customerlist": {
-    "View":"មើលលម្អិត",
+    "View": "មើលលម្អិត",
     "CustomerListTitle": "បញ្ជីអតិថិជន",
     "SearchPlaceholder": "ស្វែងរកតាមឈ្មោះ...",
     "Customer": "ឈ្មោះ",
@@ -456,7 +459,7 @@
     "ErrorBalanceRequired": "ត្រូវការសមតុល្យ",
     "ErrorBalanceInvalid": "សមតុល្យត្រូវតែជាលេខត្រឹមត្រូវ"
   },
-  
+
   "sellreport": {
     "SalesReportTitle": "របាយការណ៍ការលក់",
     "SalesReportDesc": "នេះជារបាយការណ៍ការលក់ប្រចាំខែនេះ។ ទិដ្ឋភាពទូទៅនៃការអនុវត្តការលក់ប្រចាំខែ",

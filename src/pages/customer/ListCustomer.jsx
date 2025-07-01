@@ -1,43 +1,71 @@
-import { useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import { FaEllipsisH } from "react-icons/fa";
 import { BiEdit, BiTrash } from "react-icons/bi";
 import { useTranslation } from "../../hooks/useTranslation";
 import { RiTableView } from "react-icons/ri";
-
-const customers = [
-  {
-    customer: "Abu Bin Ishtiyak",
-    email: "larson@example.com",
-    cus_id: "#P7865",
-    phone: "+928 73 292",
-    item: "Omidon10mg",
-    quantity: "10pcs",
-    amount: 20.55,
-    status: "active",
-    category: "Tablet",
-    date: "2024-03-15",
-  },
-  {
-    customer: "Abu Bin Ishtiyak",
-    email: "larson@example.com",
-    cus_id: "#P7865",
-    phone: "+928 73 292",
-    item: "Omidon10mg",
-    quantity: "10pcs",
-    amount: 20.55,
-    status: "Inactive",
-    category: "Tablet",
-    date: "2024-03-15",
-  },
-];
-
+import {
+  getAllCustomer,
+  updateCustomer,
+  deleteCustomer,
+} from "../api/customerService";
+import EditCustomerModal from "../../components/Customer/EditCustomerModal";
 const CustomerList = () => {
   const { t } = useTranslation();
-
+  const menuRef = useRef(null);
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [openMenu, setOpenMenu] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
+  // View Customer
+  const [showModal, setShowModal] = useState(false);
+  //Update Customer
+  const [editingCustomer, setEditingCustomer] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const fetchCustomer = async () => {
+    setLoading(true);
+    try {
+      const customers = await getAllCustomer();
+      setCustomers(customers);
+    } catch (err) {
+      console.error("Fetch error:", err);
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCustomer();
+  }, []);
+  const closeModal = () => {
+    setIsEditModalOpen(false);
+    setSelectedCustomer(null);
+  };
+  const handleDeleteClick = async (id) => {
+    if (!window.confirm(t("customerlist.ConfirmDelete"))) return;
+
+    const success = await deleteCustomer(id, t);
+
+    if (success) {
+      // Optionally update the state to remove the customer from the list
+      setCustomers((prev) => prev.filter((cus) => cus.id !== id));
+    }
+  };
+
+  const handleSaveCustomer = async (id, updatedData) => {
+    try {
+      await updateCustomer(id, updatedData);
+      await fetchCustomer(); // Refresh the list
+      setShowEditModal(false); // Close the modal
+    } catch (error) {
+      console.error("Update failed:", error);
+    }
+  };
 
   const toggleMenu = (index) => setOpenMenu(openMenu === index ? null : index);
 
@@ -69,8 +97,8 @@ const CustomerList = () => {
 
   return (
     <div className="p-3 bg-white dark:bg-gray-900 shadow-md dark:shadow-gray-800 rounded-md">
-      <div className="flex flex-col sm:flex-row sm:justify-between gap-3 mb-6">
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-200">
+      <div className="flex flex-col md:flex-row md:justify-between gap-3 mb-6">
+        <h2 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-200">
           {t("customerlist.CustomerListTitle")}
         </h2>
         <input
@@ -82,28 +110,22 @@ const CustomerList = () => {
         />
       </div>
 
-      <div className="w-full overflow-x-auto">
+      <div className="w-full h-96 overflow-x-auto">
         <table className="min-w-[420px] w-full bg-white dark:bg-gray-800 shadow-md rounded-lg border border-gray-200 dark:border-gray-600">
-          <thead className="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 text-sm">
+          <thead className="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 text-md">
             <tr>
               <th className="px-4 py-2 text-left whitespace-nowrap">
                 {t("customerlist.Customer")}
               </th>
-              {/* Only show ID on mobile */}
-              <th className="block sm:hidden px-4 py-2 text-left whitespace-nowrap">
-                {t("customerlist.ID")}
-              </th>
+
               <th className="px-4 py-2 text-left whitespace-nowrap">
                 {t("customerlist.Phone")}
               </th>
-              {/* Show these only on larger screens */}
-              <th className="hidden sm:table-cell px-4 py-2 text-left whitespace-nowrap">
-                {t("customerlist.PurchaseDetails")}
-              </th>
-              <th className="hidden sm:table-cell px-4 py-2 text-left whitespace-nowrap">
+
+              <th className="hidden md:table-cell px-4 py-2 text-left whitespace-nowrap">
                 {t("customerlist.Amount")}
               </th>
-              <th className="hidden sm:table-cell px-4 py-2 text-left whitespace-nowrap">
+              <th className="hidden md:table-cell px-4 py-2 text-left whitespace-nowrap">
                 {t("customerlist.Status")}
               </th>
               <th className="px-4 py-2 text-left whitespace-nowrap">
@@ -111,7 +133,7 @@ const CustomerList = () => {
               </th>
             </tr>
           </thead>
-          <tbody className="text-sm text-gray-700 dark:text-gray-200">
+          <tbody className="text-md text-gray-700 dark:text-gray-200">
             {selectedCustomers.map((cus, index) => {
               const { text, color } = getStatus(cus.status);
               return (
@@ -120,26 +142,21 @@ const CustomerList = () => {
                   className="border-t border-gray-200 dark:border-gray-700"
                 >
                   <td className="px-4 py-3">
-                    {cus.customer}
+                    {cus.name}
                     <br />
                     <span className="text-xs text-gray-400">{cus.email}</span>
-                  </td>
-
-                  {/* ID on mobile only */}
-                  <td className="block sm:hidden px-4 py-3 text-green-500">
-                    {cus.cus_id}
                   </td>
 
                   <td className="px-4 py-3">{cus.phone}</td>
 
                   {/* Desktop only cells */}
-                  <td className="hidden sm:table-cell px-4 py-3">
+                  <td className="hidden md:table-cell px-4 py-3">
                     {cus.item} <br /> {cus.quantity}
                   </td>
-                  <td className="hidden sm:table-cell px-4 py-3 font-semibold">
+                  <td className="hidden md:table-cell px-4 py-3 font-semibold">
                     ${cus.amount}
                   </td>
-                  <td className={`hidden sm:table-cell px-4 py-3 ${color}`}>
+                  <td className={`hidden md:table-cell px-4 py-3 ${color}`}>
                     {text}
                   </td>
 
@@ -151,21 +168,37 @@ const CustomerList = () => {
                       <FaEllipsisH />
                     </button>
                     {openMenu === index && (
-                      <div className="absolute right-16 top-5 mt-2 z-50 w-36 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded shadow-md">
-                        <a
-                          href="/insertcustomer"
-                          className="flex items-center px-4 py-2 text-sm hover:bg-green-100 dark:hover:bg-green-600"
+                      <div
+                        ref={menuRef}
+                        className="absolute sm:right-24 right-16  top-5 mt-2 z-50 w-36 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded shadow-md"
+                      >
+                        <button
+                          onClick={() => {
+                            setSelectedCustomer(cus);
+                            setShowModal(true);
+                            setOpenMenu(null);
+                          }}
+                          className="flex items-center w-full px-4 py-2 text-md hover:bg-green-100 dark:hover:bg-green-600"
                         >
                           <RiTableView className="mr-2" />{" "}
                           {t("customerlist.View")}
-                        </a>
-                        <a
-                          href="/insertcustomer"
-                          className="flex items-center px-4 py-2 text-sm hover:bg-green-100 dark:hover:bg-green-600"
+                        </button>
+                        <button
+                          onClick={() => {
+                            setEditingCustomer(cus);
+                            setShowEditModal(true);
+                            setOpenMenu(null);
+                          }}
+                          className="flex items-center w-full px-4 py-2 text-md hover:bg-green-100 dark:hover:bg-green-600"
                         >
                           <BiEdit className="mr-2" /> {t("customerlist.Edit")}
-                        </a>
-                        <button className="flex items-center w-full px-4 py-2 text-sm hover:bg-red-100 dark:hover:bg-red-600">
+                        </button>
+
+                        <button
+                          key={cus.id}
+                          onClick={() => handleDeleteClick(cus.id)}
+                          className="flex items-center w-full px-4 py-2 text-md hover:bg-red-100 dark:hover:bg-red-600"
+                        >
                           <BiTrash className="mr-2" />
                           {t("customerlist.Remove")}
                         </button>
@@ -176,10 +209,59 @@ const CustomerList = () => {
               );
             })}
           </tbody>
+          {showModal && selectedCustomer && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-md p-6 relative">
+                <h2 className="text-xl font-bold mb-4">
+                  {t("customerlist.CustomerDetails")}
+                </h2>
+
+                <p>
+                  <strong>{t("customerlist.Name")}:</strong>{" "}
+                  {selectedCustomer.customer}
+                </p>
+                <p>
+                  <strong>{t("customerlist.Email")}:</strong>{" "}
+                  {selectedCustomer.email}
+                </p>
+                <p>
+                  <strong>{t("customerlist.Phone")}:</strong>{" "}
+                  {selectedCustomer.phone}
+                </p>
+                <p>
+                  <strong>{t("customerlist.Item")}:</strong>{" "}
+                  {selectedCustomer.item}
+                </p>
+                <p>
+                  <strong>{t("customerlist.Quantity")}:</strong>{" "}
+                  {selectedCustomer.quantity}
+                </p>
+                <p>
+                  <strong>{t("customerlist.Amount")}:</strong> $
+                  {selectedCustomer.amount}
+                </p>
+
+                <button
+                  className="absolute top-2 right-2 text-gray-600 dark:text-gray-300 hover:text-red-500"
+                  onClick={() => setShowModal(false)}
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          )}
+          {showEditModal && editingCustomer && (
+            <EditCustomerModal
+              isOpen={showEditModal}
+              onClose={() => setShowEditModal(false)}
+              onSave={handleSaveCustomer}
+              customer={editingCustomer}
+            />
+          )}
         </table>
       </div>
 
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mt-6">
         <select
           className="border border-gray-300 dark:border-gray-600 p-2 rounded-md dark:bg-gray-700 dark:text-gray-200"
           value={rowsPerPage}
@@ -200,7 +282,7 @@ const CustomerList = () => {
           >
             {t("customerlist.Previous")}
           </button>
-          <span className="text-gray-600 dark:text-gray-300 text-sm">
+          <span className="text-gray-600 dark:text-gray-300 text-md">
             {t("customerlist.Page")} {currentPage} {t("customerlist.Of")}{" "}
             {totalPages}
           </span>

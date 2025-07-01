@@ -1,16 +1,75 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useTranslation } from "../../hooks/useTranslation";
-
+import { createCustomer } from "../api/customerService";
 const AddCustomer = () => {
   const { t } = useTranslation();
   const [amount, setAmount] = useState("");
-
-  const handleChange = (e) => {
-    const value = e.target.value;
-    if (/^\d*\.?\d*$/.test(value)) {
-      setAmount(value);
-    }
+  const [customer, setCustomer] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    address: "",
+    item: "",
+    quantity: "",
+    amount: "",
+  });
+  const handleCustomerChange = (e) => {
+    const { name, value } = e.target;
+    setCustomer((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      setError("");
+      setSuccess("");
+      setIsLoading(true);
+
+      if (!customer.quantity || parseInt(customer.quantity) < 0) {
+        setError("Please enter the quantity of product !  ");
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const payload = {
+          name: customer.name,
+          phone: customer.phone,
+          email: customer.email,
+          address: customer.address,
+          item: customer.item,
+          quantity: parseInt(customer.quantity) || 0,
+          amount: parseFloat(customer.amount) || 0,
+        };
+
+        console.log("Sending payload:", payload);
+        await createCustomer(payload);
+        setSuccess("Customer is create successfully !");
+        setCustomer({
+          name: "",
+          phone: "",
+          email: "",
+          address: "",
+          item: "",
+          quantity: "",
+          amount: "",
+        });
+      } catch (err) {
+        console.error("Full error:", err);
+        const errorMessage = err?.message;
+        setError(errorMessage);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [customer]
+  );
+
 
   return (
     <div className=" mb-20  bg-white dark:bg-gray-900 rounded-md  dark:shadow-gray-800 w-full max-w-6xl mx-auto">
@@ -25,21 +84,21 @@ const AddCustomer = () => {
         </div>
       </div>
 
-      <form>
+      <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="flex flex-col">
             <label
-              htmlFor="name"
+              htmlFor=" "
               className="mb-2 text-gray-700 dark:text-gray-300"
             >
               {t("add-customer.Name")}
             </label>
             <input
               type="text"
-              name="name"
-              placeholder={t("add-customer.NamePlaceholder")}
               className="border border-gray-400 dark:border-gray-600 px-2 text-md py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 focus:placeholder:text-green-400 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
-              required
+              name="name"
+              value={customer.name}
+              onChange={handleCustomerChange}
             />
           </div>
 
@@ -55,7 +114,8 @@ const AddCustomer = () => {
               placeholder={t("add-customer.PhonePlaceholder")}
               name="phone"
               className="border border-gray-400 dark:border-gray-600 px-2 text-md py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 focus:placeholder:text-green-400 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
-              required
+              value={customer.phone}
+              onChange={handleCustomerChange}
             />
           </div>
 
@@ -67,11 +127,12 @@ const AddCustomer = () => {
               {t("add-customer.Email")}
             </label>
             <input
-              type="text"
+              type="email"
               placeholder={t("add-customer.EmailPlaceholder")}
               name="email"
               className="border border-gray-400 dark:border-gray-600 px-2 text-md py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 focus:placeholder:text-green-400 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
-              required
+              value={customer.email}
+              onChange={handleCustomerChange}
             />
           </div>
 
@@ -87,7 +148,8 @@ const AddCustomer = () => {
               placeholder={t("add-customer.AddressPlaceholder")}
               name="address"
               className="border border-gray-400 dark:border-gray-600 px-2 text-md py-2 rounded-[4px] font-light focus纲绿-400 focus:border-green-700 focus:placeholder:text-green-400 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
-              required
+              value={customer.address}
+              onChange={handleCustomerChange}
             />
           </div>
 
@@ -103,7 +165,8 @@ const AddCustomer = () => {
               placeholder={t("add-customer.PurchasedItemPlaceholder")}
               name="item"
               className="border border-gray-400 dark:border-gray-600 px-2 text-md py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 focus:placeholder:text-green-400 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
-              required
+              value={customer.item}
+              onChange={handleCustomerChange}
             />
           </div>
 
@@ -115,11 +178,11 @@ const AddCustomer = () => {
               {t("add-customer.PurchasedQuantity")}
             </label>
             <input
-              type="text"
+              type="number"
               name="quantity"
-              placeholder={t("add-customer.PurchasedQuantityPlaceholder")}
               className="border border-gray-400 dark:border-gray-600 px-2 text-md py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 focus:placeholder:text-green-400 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
-              required
+              value={customer.quantity}
+              onChange={handleCustomerChange}
             />
           </div>
 
@@ -131,48 +194,12 @@ const AddCustomer = () => {
               {t("add-customer.Amount")}
             </label>
             <input
-              type="text"
+              type="number"
               name="amount"
-              value={amount}
-              onChange={handleChange}
-              placeholder={t("add-customer.AmountPlaceholder")}
+              value={customer.amount}
+              onChange={handleCustomerChange}
               className="border border-gray-400 dark:border-gray-600 px-2 text-md py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 focus:placeholder:text-green-400 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
-              required
             />
-          </div>
-
-          <div className="flex flex-col">
-            <label
-              htmlFor="status"
-              className="mb-2 text-gray-700 dark:text-gray-300"
-            >
-              {t("add-customer.Status")}
-            </label>
-            <select
-              name="status"
-              className="border border-gray-400 dark:border-gray-600 px-2 text-md py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 dark:bg-gray-700 dark:text-gray-200"
-              required
-            >
-              <option value="active">{t("add-customer.StatusActive")}</option>
-              <option value="inactive">
-                {t("add-customer.StatusInactive")}
-              </option>
-            </select>
-          </div>
-
-          <div className="flex flex-col">
-            <label
-              htmlFor="customer_detail"
-              className="mb-2 text-gray-700 dark:text-gray-300"
-            >
-              {t("add-customer.CustomerDetails")}
-            </label>
-            <textarea
-              placeholder={t("add-customer.CustomerDetailsPlaceholder")}
-              name="customer_detail"
-              required
-              className="border border-gray-400 dark:border-gray-600 px-2 text-md py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 focus:placeholder:text-green-400 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
-            ></textarea>
           </div>
         </div>
         <div className="mt-4">

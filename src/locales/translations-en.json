@@ -25,6 +25,8 @@
     "Enable": "Enable"
   },
   "medicine-view": {
+    "Quantity":"Quantity",
+    "Image":"Image",
     "Info": "Informations",
     "Name": "Name",
     "Price": "Price",
@@ -270,6 +272,7 @@
     "total-customer": "Total Customer"
   },
   "add-medicine": {
+    "Photo":"Photo",
     "ExpireDate ": "Expire Date",
     "AddMedicine": "Add Medicine",
     "title-addmedicine": "You can add a medicine by filling this form.",

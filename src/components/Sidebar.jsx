@@ -7,6 +7,7 @@ import { CiRepeat, CiSettings } from "react-icons/ci";
 import { RiPagesLine } from "react-icons/ri";
 import { FaUserDoctor } from "react-icons/fa6";
 import { MdPointOfSale } from "react-icons/md";
+import { FiLogOut } from "react-icons/fi";
 import {
   UserGroupIcon,
   UserPlusIcon,
@@ -165,7 +166,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
 
       {/* Sidebar */}
       <div
-        className={`h-screen flex-shrink-0 bg-white dark:bg-gray-900 dark:shadow-gray-800 transition-all duration-300 fixed z-[200] md:static
+        className={`h-screen flex-shrink-0 bg-green-600 dark:bg-gray-900 dark:shadow-gray-800 transition-all duration-300 fixed z-[200] md:static
           ${isOpen ? "w-64" : "w-0 md:w-[80px]"} md:hover:w-64 
           ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         `}
@@ -187,7 +188,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                     subItems.some((sub) => sub.name === selectedPage));
 
                 return (
-                  <li key={name}>
+                  <li key={name} className="relative">
                     <button
                       onClick={() => {
                         if (subItems?.length) {
@@ -198,23 +199,27 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                           handlePageSelection(name, path);
                         }
                       }}
-                      className={`group flex items-center justify-between w-full px-4 py-2 mt-1 text-md rounded-lg transition-all duration-200
+                      className={`group hover:shadow-lg flex items-center justify-between w-full px-4    py-2 mt-1 text-md rounded-lg transition-all duration-200
                         ${
                           isParentActive
-                            ? "bg-green-500 text-white dark:bg-green-600"
-                            : "text-gray-700 dark:text-gray-200"
+                            ? "bg-white text-green-700 dark:bg-green-600"
+                            : "text-white dark:text-gray-200"
                         }
-                        hover:bg-green-500 hover:text-white
+                        hover:bg-white  hover:text-green-700
                         dark:hover:bg-gray-700 dark:hover:text-white
-                        hover:scale-105 hover:shadow-md hover:shadow-slate-300
+                        hover:scale-105 hover:shadow-lg
                       `}
                     >
                       <div className="flex items-center">
                         <Icon
-                          className={`w-6 h-6 flex-shrink-0 transition-colors duration-200
-    ${isParentActive ? "text-white" : "text-gray-600 dark:text-gray-300"}
-    group-hover:text-white
-  `}
+                          className={` w-7 h-6 flex-shrink-0 transition-colors duration-200
+                            ${
+                              isParentActive
+                                ? "text-green-700"
+                                : "text-white  dark:text-gray-300"
+                            }
+                            group-hover:text-green-700 font-extrabold
+                          `}
                         />
                         {isOpen && (
                           <span className="ml-4 whitespace-nowrap">{name}</span>
@@ -225,7 +230,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                         <svg
                           className={`w-5 h-5 transition-transform ${
                             activeMenuItem === name ? "rotate-180" : ""
-                          } text-white  dark:text-green-400`}
+                          } hover:text-green-700  dark:text-green-400`}
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >
@@ -255,7 +260,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                               className={`w-full mb-1 mt-1 py-2 rounded-lg hover:scale-105 hover:shadow-md transition-all text-left ml-12 px-2 text-md ${
                                 selectedPage === sub.name
                                   ? "bg-green-500 text-white dark:bg-green-600"
-                                  : "text-gray-700 dark:text-gray-200 hover:bg-green-600 dark:hover:bg-gray-700 hover:text-white dark:hover:text-green-400"
+                                  : "text-white dark:text-gray-200 hover:bg-white dark:hover:bg-gray-700 hover:text-green-600 dark:hover:text-green-400"
                               }`}
                             >
                               {sub.name}
@@ -268,6 +273,23 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                 );
               })}
             </ul>
+            <hr className="h-3 text-white w-full" />
+            <button
+              className="shadow-lg flex items-center w-full px-5 py-3 mt-2 text-md transition-all duration-300 ease-in-out 
+             rounded-lg bg-red-600 text-white hover:bg-red-700 hover:scale-105 hover:shadow-md overflow-hidden"
+            >
+              <FiLogOut className="w-6 h-6 flex-shrink-0 transition-all duration-300" />
+              <span
+                className={`ml-3 overflow-hidden transition-all duration-300 whitespace-nowrap 
+                ${
+                  isOpen
+                    ? "opacity-100 max-w-[200px]"
+                    : "opacity-0 max-w-0 ml-0"
+                }`}
+              >
+                Log Out
+              </span>
+            </button>
           </nav>
         </div>
       </div>

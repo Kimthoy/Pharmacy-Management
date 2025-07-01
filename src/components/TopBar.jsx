@@ -4,7 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
 import MessageModal from "../components/MessageModal";
-import { FiMenu } from "react-icons/fi";
+// import { FiMenu } from "react-icons/fi";
 import { MdOutlineSettingsSuggest } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import {
@@ -117,7 +117,7 @@ const ProfileDropdown = ({
           (e.key === "Enter" || e.key === " ") &&
           setIsDropdownOpen(!isDropdownOpen)
         }
-        className="flex items-center text-black rounded-md px-3 py-1 cursor-pointer transition-all space-x-1"
+        className="flex hover:bg-slate-100 mr-6 dark:hover:bg-gray-700 hover:rounded-lg items-center text-black rounded-md p-3 cursor-pointer hover:shadow-lg space-x-1"
         aria-expanded={isDropdownOpen}
         aria-label={t("topbar.profile")}
       >
@@ -128,10 +128,7 @@ const ProfileDropdown = ({
             className="w-6 h-6 rounded-full object-cover"
           />
         ) : (
-          <UserCircle
-            size={24}
-            className="text-black hover:scale-125 dark:text-white dark:hover:scale-125 dark:hover:text-emerald-500 hover:text-emerald-500"
-          />
+          <UserCircle size={24} className="text-green-700 dark:text-white " />
         )}
       </button>
       {isDropdownOpen && (
@@ -185,21 +182,13 @@ const ProfileDropdown = ({
 };
 
 const AuthButtons = ({ t }) => (
-  <div className="flex items-center space-x-3">
+  <div className="flex items-center mr-6 space-x-3">
     <Link to="/login">
       <button
         className="px-4 py-2 bg-emerald-500 dark:bg-emerald-600 text-white rounded-md hover:bg-emerald-600 dark:hover:bg-emerald-500 transition-colors"
         aria-label={t("topbar.login")}
       >
         {t("topbar.login")}
-      </button>
-    </Link>
-    <Link to="/register">
-      <button
-        className="px-4 py-2 border border-emerald-500 dark:border-emerald-400 text-emerald-500 dark:text-emerald-400 rounded-md hover:bg-emerald-50 dark:hover:bg-gray-700 transition-colors"
-        aria-label={t("topbar.register")}
-      >
-        {t("topbar.register")}
       </button>
     </Link>
   </div>
@@ -357,7 +346,7 @@ const TopBar = ({ onSearch }) => {
     navigate("/profiledashboard");
   };
   return (
-    <div className="bg-white dark:bg-gray-900 z-10 sm:h-28 h-16 flex flex-col sm:flex-row items-center justify-between sm:shadow-sm shadow-lg dark:shadow-gray-800 ">
+    <div className="bg-white dark:bg-gray-900 z-10 sm:h-20 h-16 flex flex-col sm:flex-row items-center justify-between sm:shadow-sm shadow-lg dark:shadow-gray-800 ">
       <button
         className="sm:hidden mr-6 bg-gray-200 absolute right-0 mt-2 p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white "
         onClick={openProfileDashboard}
@@ -392,32 +381,30 @@ const TopBar = ({ onSearch }) => {
       )}
 
       {/* Left Section: Logo & Title */}
-      <div className="flex  items-center justify-center w-full sm:mt-1 mt-1">
-        <img src="/logo.png" alt="Logo" className="rounded sm:w-20 w-12" />
+      <div className="sm:flex flex justify-center  items-center  w-full sm:mt-1 mt-1">
+        <img src="/logo.png" alt="Logo" className="rounded sm:w-16 w-12 ml-6" />
         <h1 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-gray-200 animate-color-cycle">
           {t("navigation.title", { username: "Panharith" })}
         </h1>
+
+        <div className="ml-5 sm:flex hidden">
+          {" "}
+          <input
+            type="text"
+            placeholder={t("topbar.search")}
+            value={searchTerm}
+            onChange={handleSearch}
+            className="w-full px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-lg  dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            aria-label={t("topbar.search")}
+          />
+        </div>
       </div>
 
-      {/* Center: Search + Show All */}
-      <div className="sm:flex hidden flex-col sm:flex-row items-center justify-center gap-3 w-64 max-w-xl mr-12">
-        <input
-          type="text"
-          placeholder={t("topbar.search")}
-          value={searchTerm}
-          onChange={handleSearch}
-          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
-          aria-label={t("topbar.search")}
-        />
-      </div>
-
-      {/* Right: Icons + Actions */}
       <div className="flex items-center space-x-3 mt-4 sm:mt-0">
-        {/* Message Button */}
         <div className="relative" ref={messageDropdownRef}>
           <button
             onClick={() => setIsMessageDropdownOpen(!isMessageDropdownOpen)}
-            className="p-2 rounded-full hover:scale-125 hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white"
+            className="p-3 hover:shadow-lg rounded-lg  hover:bg-gray-100 dark:hover:bg-gray-700 transition dark:text-white text-green-600"
             aria-label={t("topbar.messages")}
           >
             <MessageCircle
@@ -441,7 +428,7 @@ const TopBar = ({ onSearch }) => {
             onClick={() =>
               setIsNotificationDropdownOpen(!isNotificationDropdownOpen)
             }
-            className="p-2 rounded-full hover:scale-125 hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white"
+            className="p-3 hover:shadow-lg rounded-lg  hover:bg-slate-100 dark:hover:bg-gray-700 transition dark:text-white text-green-600 b"
             aria-label={t("topbar.notifications")}
           >
             <Bell size={24} className="sm:flex hidden" />
@@ -456,19 +443,21 @@ const TopBar = ({ onSearch }) => {
           )}
         </div>
 
-        {/* Theme Toggle */}
         <button
           onClick={toggleTheme}
           title={
             theme === "light" ? "Switch to dark mode" : "Switch to light mode"
           }
-          className="p-2 sm:flex hidden hover:scale-125 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white"
+          className="p-3 sm:flex hidden  rounded-lg hover:bg-gray-100 hover:shadow-lg dark:hover:bg-gray-700 transition dark:text-white"
         >
-          {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
+          {theme === "light" ? (
+            <Moon size={25} className="text-green-600" />
+          ) : (
+            <Sun size={25} className="text-white" />
+          )}
         </button>
 
-        {/* Language Selector */}
-        <div className=" sm:flex hidden">
+        <div className=" sm:flex hidden shadow-lg rounded-lg">
           <LanguageSelector
             langCode={language}
             onLanguageChange={changeLanguage}
@@ -479,7 +468,6 @@ const TopBar = ({ onSearch }) => {
           />
         </div>
 
-        {/* User Authentication */}
         <div className="hidden sm:flex">
           {isAuthenticated ? (
             <ProfileDropdown

@@ -1,6 +1,6 @@
 import { useTranslation } from "../../hooks/useTranslation";
 import { useTheme } from "../../context/ThemeContext";
-
+import { IoIosArrowForward } from "react-icons/io";
 import { TiArrowBack } from "react-icons/ti";
 import { useNavigate } from "react-router-dom";
 // import { useTheme } from "../context/ThemeContext";
@@ -21,8 +21,8 @@ const ProfileDashboard = () => {
   // const { theme } = useTheme();
   const { theme, toggleTheme } = useTheme(true);
   const user = {
-    name: "បញា​អុន", // បញ្ញា៉ឹន
-    membership: "សាមាចាក​មាស", // សមាជិក មាស
+    name: "គឹម​ ថូយ", // បញ្ញា៉ឹន
+    membership: " ", // សមាជិក មាស
     stats: {
       wallet: 0,
       alert: 0,
@@ -68,9 +68,6 @@ const ProfileDashboard = () => {
 
           <div className="flex justify-around py-4 border-t border-gray-200 dark:border-gray-700 text-sm">
             <div className="text-center">
-              <div className="font-semibold">{user.stats.wallet}</div>
-            </div>
-            <div className="text-center">
               <AlertCircle className="mx-auto w-4 h-4" />
               <div className="font-semibold">{user.stats.alert}</div>
             </div>
@@ -83,47 +80,64 @@ const ProfileDashboard = () => {
 
         <div className="mt-6  mb-8">
           <ul className="  divide-gray-200 dark:divide-gray-700">
-            <li className="w-full flex items-center bg-gray-200 mb-2 p-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
-              <UserCircle className="w-5 h-5 text-green-600 mr-3" />
-              <span className="text-green-500">Profile</span>
+            <li className="w-full shadow-lg flex justify-between items-center bg-gray-200 mb-2 p-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
+              <div className="flex">
+                <UserCircle className="w-5 h-5 text-green-600 mr-3" />
+                <span className="text-green-500">Profile</span>
+              </div>
+              <IoIosArrowForward className="w-5 h-5 text-green-600" />
             </li>
-            <li className="flex items-center bg-gray-200 mb-2 p-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
-              <MessageCircle className="w-5 h-5 text-green-600 mr-3" />
-              <span className="text-green-500">Message</span>
+            <li className="flex shadow-lg justify-between items-center bg-gray-200 mb-2 p-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
+              <div className="flex">
+                <MessageCircle className="w-5 h-5 text-green-600 mr-3" />
+                <span className="text-green-500">Message</span>
+              </div>
+              <IoIosArrowForward className="w-5 h-5 text-green-600" />
             </li>
-            <li className="flex items-center bg-gray-200 mb-2 p-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
-              <Bell className="w-5 h-5 text-green-600 mr-3" />
-              <span className="text-green-500">Notifications</span>
+            <li className="flex shadow-lg justify-between items-center bg-gray-200 mb-2 p-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
+              <div className="flex">
+                <Bell className="w-5 h-5 text-green-600 mr-3" />
+                <span className="text-green-500">Notifications</span>
+              </div>
+              <IoIosArrowForward className="w-5 h-5 text-green-600" />
             </li>
             <li
               onClick={toggleTheme}
-              className="flex items-center bg-gray-200 mb-2 p-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+              className="flex shadow-lg justify-between items-center bg-gray-200 mb-2 p-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
             >
-              <button
-                title={
-                  theme === "light"
-                    ? "Switch to dark mode"
-                    : "Switch to light mode"
-                }
-                className="p-2  flex dark:text-green-500  text-green-600  dark:hover:bg-gray-700 transition "
-              >
-                {theme === "light"
-                  ? [
-                      <Moon
-                        size={20}
-                        className="w-5 h-5 text-green-600 mr-3"
-                      />,
-                      "Dark Mode",
-                    ]
-                  : [
-                      <Sun size={20} className="w-5 h-5 text-green-600 mr-3" />,
-                      "Light Mode",
-                    ]}
-              </button>
+              <div>
+                <button
+                  title={
+                    theme === "light"
+                      ? "Switch to dark mode"
+                      : "Switch to light mode"
+                  }
+                  className="p-2  flex dark:text-green-500  text-green-600  dark:hover:bg-gray-700 transition "
+                >
+                  {theme === "light"
+                    ? [
+                        <Moon
+                          size={20}
+                          className="w-5 h-5 text-green-600 mr-3"
+                        />,
+                        "Dark Mode",
+                      ]
+                    : [
+                        <Sun
+                          size={20}
+                          className="w-5 h-5 text-green-600 mr-3"
+                        />,
+                        "Light Mode",
+                      ]}
+                </button>
+              </div>
             </li>
-            <li className="flex items-center bg-gray-200 mb-2 p-4 cursor-pointer sm:hover:bg-gray-100  dark:hover:bg-gray-700 rounded-md">
-              <LogOut className="w-5 h-5 text-green-600 mr-3" />
-              <span className="text-green-500">Logout/Login</span>
+            <li className="shadow-lg flex justify-between items-center bg-gray-200 mb-2 p-4 cursor-pointer sm:hover:bg-gray-100  dark:hover:bg-gray-700 rounded-md">
+              <div className="flex">
+                <LogOut className="w-5 h-5 text-green-600 mr-3" />
+                <span className="text-green-500">Logout/Login</span>
+              </div>
+              <IoIosArrowForward className="w-5 h-5 text-green-600" />
             </li>
           </ul>
         </div>

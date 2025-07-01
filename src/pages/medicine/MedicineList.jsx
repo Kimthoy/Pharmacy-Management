@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { BiShow, BiEdit, BiTrash } from "react-icons/bi";
-import { getAllMedicines, toggleProductStatus } from "../api/medicineService";
-// import { GrCheckboxSelected } from "react-icons/gr";
-// import { FaBan } from "react-icons/fa6";
+import Swal from "sweetalert2";
+import {
+  getAllMedicines,
+  toggleProductStatus,
+  deleteMedicine,
+} from "../api/medicineService";
 import { PiBackspaceBold } from "react-icons/pi";
 import { useTranslation } from "../../hooks/useTranslation";
 import EditMedicineModal from "./EditMedicineModal";
-
+import { TbHttpDelete } from "react-icons/tb";
 const MedicineList = () => {
   const { t } = useTranslation();
   const [statusLoadingId, setStatusLoadingId] = useState(null);
   const [medicines, setMedicines] = useState([]);
+  const [success, setSuccess] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -21,6 +25,34 @@ const MedicineList = () => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editMedicineData, setEditMedicineData] = useState(null);
+  //delete alert
+  const confirmDelete = (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        handleDeleteMedicine(id);
+      }
+    });
+  };
+  const handleDeleteMedicine = async (id) => {
+    try {
+      setStatusLoadingId(id);
+      await deleteMedicine(id);
+      setSuccess("Medicine deleted successfully.");
+      await fetchMedicines();
+    } catch (err) {
+      setError(err.message || "Failed to delete medicine.");
+    } finally {
+      setStatusLoadingId(null);
+    }
+  };
 
   const handleToggleStatus = async (medicineId) => {
     setStatusLoadingId(medicineId);
@@ -67,8 +99,8 @@ const MedicineList = () => {
     setLoading(true);
     try {
       const medicinesData = await getAllMedicines();
-      console.log("Fetched medicines:", medicinesData); // Should be an array
-      setMedicines(medicinesData); // ✅ Must be an array
+      console.log("Fetched medicines:", medicinesData);
+      setMedicines(medicinesData);
     } catch (err) {
       console.error("Failed to fetch medicines", err);
     } finally {
@@ -120,12 +152,12 @@ const MedicineList = () => {
 
       {/* Table loading state */}
       {medicines.length === 0 ? (
-        <p className="text-center mt-36 text-lg dark:text-slate-300">
+        <p className="text-center mt-36 text-md dark:text-slate-300">
           Loading medicines...
         </p>
       ) : (
         <div className="w-full overflow-x-auto">
-          <table className="min-w-full border-collapse border border-gray-300">
+          <table className="w-full border-collapse border border-gray-300">
             <thead className="bg-gray-200 dark:bg-slate-700 dark:text-slate-600">
               <tr>
                 <th className="border px-2 py-4 dark:text-slate-200 hidden sm:table-cell">
@@ -141,6 +173,12 @@ const MedicineList = () => {
                 <td className="border px-3 py-2 dark:text-slate-100">
                   Expire Date
                 </td>
+                <td className=" border px-3 py-2 dark:text-slate-100">
+                  Status
+                </td>
+                <td className="sm:flex hidden border px-3 py-2 dark:text-slate-100">
+                  Image
+                </td>
                 <td className="border px-3 py-2 dark:text-slate-100 hidden sm:table-cell">
                   Descriptions
                 </td>
@@ -152,10 +190,7 @@ const MedicineList = () => {
 
             <tbody>
               {medicines.map((med) => (
-                <tr
-                  key={med.id}
-                  className="text-left transition-all hover:bg-slate-300 dark:hover:bg-slate-600"
-                >
+                <tr key={med.id} className="text-left transition-all ">
                   <td className="text-center px-2 border dark:text-slate-100 hidden sm:table-cell">
                     <input
                       checked={selectedMedicines.includes(med.id)}
@@ -165,74 +200,57 @@ const MedicineList = () => {
                       className="w-5 h-5 accent-blue-600 hover:cursor-pointer rounded transition-all duration-200 ease-in-out scale-100 checked:scale-110"
                     />
                   </td>
-                  <td className="border px-3 py-2 dark:text-slate-100">
+                  <td
+                    className="border px-3 py-2 max-w-[100px] sm:max-w-[200px]  truncate whitespace-nowrap overflow-hidden text-ellipsis dark:text-slate-100"
+                    title={med.medicine_name}
+                  >
                     {med.medicine_name}
                   </td>
+
                   <td className="border px-3 py-2 dark:text-slate-100">
-                    $ {med.price}
+                    ${med.price}
                   </td>
                   <td className="border px-3 py-2 dark:text-slate-100">
-                    {med.expire_date}
+                    {new Date(med.expire_date).toLocaleDateString("en-GB")}
+                  </td>
+                  <td className=" border px-3 py-2 dark:text-slate-100">
+                    {med.status}
+                  </td>
+                  <td className="sm:flex hidden border px-3 py-2 dark:text-slate-100">
+                    <img
+                      src={med.image}
+                      alt="Medicine"
+                      className="w-16 h-16 object-cover"
+                    />
                   </td>
                   <td className="border px-3 py-2 dark:text-slate-100 hidden sm:table-cell">
                     {med.medicine_detail}
                   </td>
-                  <td className="border px-3 py-2">
-                    <div className="flex flex-wrap gap-2">
+                  <td className="border px-3 py-2 ">
+                    <div className="flex flex-wrap gap-2 ">
                       <button
                         onClick={() => handleView(med)}
-                        disabled={med.status !== "active"}
-                        className={`text-white p-1 rounded-lg bg-yellow-500 transition-all ${
-                          med.status !== "active"
-                            ? "opacity-50 cursor-not-allowed"
-                            : "hover:scale-110"
-                        }`}
+                        className={`text-yellow-500  rounded-lg  transition-all sm:over:bg-slate-700 sm:dark:hover:bg-opacity-50 sm:hover:rounded-lg sm:p-3 sm:hover:bg-opacity-20`}
                       >
-                        <BiShow className="w-5 h-5" />
+                        <BiShow className="sm:w-7 w-5 sm:h-7 h-5" />
                       </button>
                       <button
                         onClick={() => handleEditClick(med)}
-                        disabled={med.status !== "active"}
-                        className={`text-white p-1 rounded-lg bg-blue-700 transition-all ${
-                          med.status !== "active"
-                            ? "opacity-50 cursor-not-allowed"
-                            : "hover:scale-110"
-                        }`}
+                        className={`text-blue-600 rounded-lg  transition-all sm:hover:bg-slate-700 dark:hover:bg-opacity-50 sm:hover:rounded-lg sm:p-3 sm:hover:bg-opacity-15`}
                       >
-                        <BiEdit className="w-5 h-5" />
+                        <BiEdit className="sm:w-7 w-5 sm:h-7 h-5" />
                       </button>
                       <button
-                        onClick={() => handleToggleStatus(med.id)}
+                        onClick={() => confirmDelete(med.id)}
                         disabled={statusLoadingId === med.id}
-                        className={`p-1 rounded-lg sm:flex hidden text-white transition-all ${
-                          med.status === "active"
-                            ? "bg-red-600"
-                            : "bg-green-600"
-                        } ${
-                          statusLoadingId === med.id
-                            ? "opacity-50 cursor-not-allowed"
-                            : ""
-                        }`}
+                        className={`rounded-lg text-red-600 transition-all sm:hover:bg-slate-700 dark:hover:bg-opacity-50 sm:hover:rounded-lg sm:p-3 sm:hover:bg-opacity-15`}
                       >
                         {statusLoadingId === med.id ? (
                           <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        ) : med.status === "active" ? (
-                          t("medicine-list.Disable")
                         ) : (
-                          t("medicine-list.Enable")
+                          <TbHttpDelete className="sm:w-7 w-5 sm:h-7 h-5" />
                         )}
                       </button>
-                      {/* <button
-                        onClick={() => handleEditClick(med)}
-                        disabled={med.status !== "active"}
-                        className={`text-white p-1 rounded-lg bg-blue-700 transition-all ${
-                          med.status !== "active"
-                            ? "opacity-50 cursor-not-allowed"
-                            : "hover:scale-110"
-                        }`}
-                      >
-                        Add to Stock
-                      </button> */}
                     </div>
                   </td>
                 </tr>
@@ -245,7 +263,7 @@ const MedicineList = () => {
       {/* View Modal */}
       {isViewModalOpen && selectedMedicine && (
         <div className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-md w-[90%] max-w-md relative">
+          <div className="bg-white sm:mb-0 mb-14 dark:bg-slate-800 sm:p-6 p-2 shadow-lg w-[90%] max-w-md relative">
             <PiBackspaceBold
               className="w-6 h-6 float-end mr-4 hover:cursor-pointer hover:text-red-600 dark:text-slate-200 dark:hover:text-red-500"
               onClick={() => setIsViewModalOpen(false)}
@@ -254,57 +272,89 @@ const MedicineList = () => {
               {t("medicine-view.Info")}
             </h2>
             <div className="text-gray-800 dark:text-gray-200">
-              <table className="table-auto w-full text-left border-collapse">
+              <table className="table-auto w-full text-left border-collapse ">
                 <tbody>
-                  <tr className="border-b hover:bg-slate-200 dark:hover:bg-slate-600">
+                  <tr className="border-b hover:bg-slate-200 dark:hover:bg-slate-600 hover:text-green-600">
                     <td className="pl-4 py-2 font-semibold w-1/3">
                       {t("medicine-view.Name")}
                     </td>
                     <td className="py-2 w-1/12">:</td>
-                    <td className="py-2 pr-4">
+                    <td className="py-2 pr-4 uppercase ">
                       {selectedMedicine.medicine_name}
                     </td>
                   </tr>
-                  <tr className="border-b hover:bg-slate-200 dark:hover:bg-slate-600">
+                  <tr className="border-b hover:bg-slate-200 dark:hover:bg-slate-600 hover:text-green-600">
                     <td className="pl-4 py-2 font-semibold">
                       {t("medicine-view.Price")}
                     </td>
                     <td className="py-2">:</td>
                     <td className="py-2 pr-4">${selectedMedicine.price}</td>
                   </tr>
-                  <tr className="border-b hover:bg-slate-200 dark:hover:bg-slate-600">
+                  <tr className="border-b hover:bg-slate-200 dark:hover:bg-slate-600 hover:text-green-600">
+                    <td className="pl-4 py-2 font-semibold">
+                      {t("medicine-view.Quantity")}
+                    </td>
+                    <td className="py-2">:</td>
+                    <td className="py-2 pr-4">
+                      {selectedMedicine.quantity} (ប្រអប់)
+                    </td>
+                  </tr>
+                  <tr className="border-b hover:bg-slate-200 dark:hover:bg-slate-600 hover:text-green-600">
                     <td className="pl-4 py-2 font-semibold">
                       {t("medicine-view.Weight")} (mg)
                     </td>
                     <td className="py-2">:</td>
                     <td className="py-2 pr-4">{selectedMedicine.weight}</td>
                   </tr>
-                  <tr className="border-b hover:bg-slate-200 dark:hover:bg-slate-600">
+                  <tr className="border-b hover:bg-slate-200 dark:hover:bg-slate-600 hover:text-green-600">
                     <td className="pl-4 py-2 font-semibold">
                       {t("medicine-view.Category")}
                     </td>
                     <td className="py-2">:</td>
-                    <td className="py-2 pr-4">{selectedMedicine.category}</td>
+                    <td className="py-2 pr-4">
+                      {selectedMedicine.categories &&
+                      selectedMedicine.categories.length > 0 ? (
+                        <ul className="list-disc list-inside space-y-1">
+                          {selectedMedicine.categories.map((cat) => (
+                            <p key={cat.id}>{cat.category_name}</p>
+                          ))}
+                        </ul>
+                      ) : (
+                        <span className="italic text-gray-500">
+                          No categories
+                        </span>
+                      )}
+                    </td>
                   </tr>
-                  <tr className="border-b hover:bg-slate-200 dark:hover:bg-slate-600">
+                  <tr className="border-b hover:bg-slate-200 dark:hover:bg-slate-600 hover:text-green-600">
                     <td className="pl-4 py-2 font-semibold">
                       {t("medicine-view.Status")}
                     </td>
                     <td className="py-2">:</td>
                     <td className="py-2 pr-4">
-                      {selectedMedicine.active ? "Active" : "Inactive"}
+                      <span
+                        className={`px-2 py-1  text-sm font-medium ${
+                          selectedMedicine.status === "active"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {selectedMedicine.status}
+                      </span>
                     </td>
                   </tr>
-                  <tr className="border-b hover:bg-slate-200 dark:hover:bg-slate-600">
+                  <tr className="border-b hover:bg-slate-200 dark:hover:bg-slate-600 hover:text-green-600">
                     <td className="pl-4 py-2 font-semibold">
                       {t("medicine-view.Expire_Date")}
                     </td>
                     <td className="py-2">:</td>
                     <td className="py-2 pr-4">
-                      {selectedMedicine.expire_date}
+                      {new Date(
+                        selectedMedicine.expire_date
+                      ).toLocaleDateString("en-GB")}
                     </td>
                   </tr>
-                  <tr className="border-b hover:bg-slate-200 dark:hover:bg-slate-600">
+                  <tr className="border-b hover:bg-slate-200 dark:hover:bg-slate-600 hover:text-green-600">
                     <td className="pl-4 py-2 font-semibold">
                       {t("medicine-view.Description")}
                     </td>
@@ -313,13 +363,30 @@ const MedicineList = () => {
                       {selectedMedicine.medicine_detail}
                     </td>
                   </tr>
-                  <tr className="hover:bg-slate-200 dark:hover:bg-slate-600">
+                  <tr className="hover:bg-slate-200 dark:hover:bg-slate-600 hover:text-green-600">
                     <td className="pl-4 py-2 font-semibold">
                       {t("medicine-view.Barcode")}
                     </td>
                     <td className="py-2">:</td>
                     <td className="py-2 pr-4">
                       {selectedMedicine.barcode_number}
+                    </td>
+                  </tr>
+                  <tr className="hover:bg-slate-200 dark:hover:bg-slate-600 hover:text-green-600">
+                    <td className="pl-4 py-2 font-semibold">
+                      {t("medicine-view.Image")}
+                    </td>
+                    <td className="py-2">:</td>
+                    <td className="py-2 pr-4">
+                      <img
+                        src={
+                          selectedMedicine.image
+                            ? selectedMedicine.image
+                            : "/placeholder-image.png"
+                        }
+                        alt="Medicine"
+                        className="w-20 h-auto rounded"
+                      />
                     </td>
                   </tr>
                 </tbody>

@@ -1,529 +1,351 @@
-import { useState } from "react";
-import { FaSort, FaCog, FaEdit, FaTrash } from "react-icons/fa";
-import { useTheme } from "../../context/ThemeContext";
+import React, { useEffect, useState, useCallback } from "react";
+import { FaEdit, FaTrash } from "react-icons/fa";
+import Swal from "sweetalert2";
+import { useTranslation } from "../../hooks/useTranslation";
+import {
+  getAllCategory,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+} from "../api/categoryService";
 
-const mockCategories = [
-  {
-    id: 1,
-    name: "Antibiotics",
-    description: "Medicines to treat bacterial infections.",
-  },
-  {
-    id: 2,
-    name: "Painkillers",
-    description: "Relieves pain and inflammation.",
-  },
-  { id: 3, name: "Antacids", description: "Reduces stomach acidity." },
-];
-
-const Category = () => {
-  const { theme, toggleTheme } = useTheme();
-  const [categories, setCategories] = useState(mockCategories);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortOrder, setSortOrder] = useState("asc");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+const CategoryDashboard = () => {
+  const { t } = useTranslation();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [currentCategory, setCurrentCategory] = useState(null);
-  const [formData, setFormData] = useState({ name: "", description: "" });
-  const [showSettings, setShowSettings] = useState(false);
-  const [showDescription, setShowDescription] = useState(true);
-  const [showGridLines, setShowGridLines] = useState(true);
-  const [tableFontSize, setTableFontSize] = useState("text-sm");
+  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  // const [deleteLoadingId, setDeleteLoadingId] = useState(null);
 
-  const handleAddCategory = () => {
-    setIsEditMode(false);
-    setFormData({ name: "", description: "" });
-    setShowModal(true);
+  const [category, setCategory] = useState({
+    category_name: "",
+    description: "",
+  });
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+
+  //pagination
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const filtered = categories.filter((cat) =>
+    cat.category_name?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filtered.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  const confirmDelete = (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        handleDeleteCategory(id);
+      }
+    });
+  };
+  const handleDeleteCategory = async (id) => {
+    try {
+      // setDeleteLoadingId(id);
+      const success = await deleteCategory(id);
+      if (success) {
+        setSuccess("Category deleted successfully.");
+        await fetchCategory();
+      } else {
+        setError("Failed to delete category.");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("An unexpected error occurred.");
+    }
+  };
+
+  const handleUpdateCategory = async () => {
+    try {
+      await updateCategory(selectedCategory.id, {
+        category_name: selectedCategory.category_name,
+        description: selectedCategory.description,
+      });
+      setShowEditModal(false);
+      fetchCategory(); // Refresh the list
+    } catch (error) {
+      console.error("Error updating category:", error);
+    }
   };
 
   const handleEditCategory = (category) => {
-    setIsEditMode(true);
-    setCurrentCategory(category);
-    setFormData({
-      name: category.name,
-      description: category.description || "",
-    });
-    setShowModal(true);
+    setSelectedCategory(category);
+    setShowEditModal(true);
   };
 
-  const handleDeleteCategory = (id) => {
-    if (!window.confirm("Are you sure you want to delete this category?")) {
-      return;
-    }
-    setCategories(categories.filter((category) => category.id !== id));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (isEditMode) {
-      setCategories(
-        categories.map((category) =>
-          category.id === currentCategory.id
-            ? { ...category, ...formData }
-            : category
-        )
-      );
-    } else {
-      const newCategory = { id: categories.length + 1, ...formData };
-      setCategories([...categories, newCategory]);
-    }
-    setShowModal(false);
-  };
-
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-    setCurrentPage(1);
-  };
-
-  const handleSettings = () => {
-    setShowSettings(true);
-  };
-
-  const handleExportCSV = () => {
-    const headers = showDescription ? "id,name,description" : "id,name";
-    const rows = categories
-      .map((cat) =>
-        showDescription
-          ? `${cat.id},"${cat.name}","${cat.description || ""}"`
-          : `${cat.id},"${cat.name}"`
-      )
-      .join("\n");
-    const csvContent = `${headers}\n${rows}`;
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "categories.csv";
-    link.click();
-  };
-
-  const handleSaveSettings = (e) => {
-    e.preventDefault();
-    const newItemsPerPage = parseInt(e.target.elements.itemsPerPage.value, 10);
-    const newSortOrder = e.target.elements.sortOrder.value;
-    const newShowDescription = e.target.elements.showDescription.checked;
-    const newShowGridLines = e.target.elements.showGridLines.checked;
-    const newTableFontSize = e.target.elements.tableFontSize.value;
-    if (newItemsPerPage > 0) {
-      setItemsPerPage(newItemsPerPage);
-      setSortOrder(newSortOrder);
-      setShowDescription(newShowDescription);
-      setShowGridLines(newShowGridLines);
-      setTableFontSize(newTableFontSize);
-      setCurrentPage(1);
-      setShowSettings(false);
+  const fetchCategory = async () => {
+    setLoading(true);
+    try {
+      const data = await getAllCategory();
+      setCategories(data);
+    } catch (err) {
+      console.error("Fetch error:", err);
+      setError("Failed to fetch categories.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleResetSettings = () => {
-    setItemsPerPage(5);
-    setSortOrder("asc");
-    setShowDescription(true);
-    setShowGridLines(true);
-    setTableFontSize("text-sm");
-    setCurrentPage(1);
-    setShowSettings(false);
+  useEffect(() => {
+    fetchCategory();
+  }, []);
+
+  const handleCategoryChange = (e) => {
+    const { name, value } = e.target;
+    setCategory((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  const sortedList = [...categories].sort((a, b) =>
-    sortOrder === "asc"
-      ? a.name.localeCompare(b.name)
-      : b.name.localeCompare(b.name)
-  );
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      setError("");
+      setSuccess("");
+      setIsLoading(true);
+      try {
+        const payload = {
+          category_name: category.category_name,
+          description: category.description,
+        };
 
-  const filteredList = sortedList.filter((category) =>
-    category.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const totalPages = Math.ceil(filteredList.length / itemsPerPage);
-  const paginatedList = filteredList.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+        console.log("Sending payload:", payload);
+        await createCategory(payload);
+        setSuccess("category is create successfully !");
+        setCategory({ category_name: "", description: "" });
+        setShowModal(false);
+        fetchCategory(); // Refresh list after create
+      } catch (err) {
+        console.error("Full error:", err);
+        const errorMessage = err?.message || "Failed to create category.";
+        setError(errorMessage);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [category]
   );
 
   return (
-    <div className="p-6 mb-3  dark:bg-gray-900 min-h-screen max-w-6xl mx-auto">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-        <div>
-          <h1 className="text-xl font-bold text-gray-700 dark:text-gray-200">
-            Category Dashboard
-          </h1>
-          <span className="text-xs font-normal text-gray-400 dark:text-gray-300">
-            Manage medicine categories in the pharmacy.
-          </span>
-        </div>
-        <div className="flex items-center space-x-2 mt-4 md:mt-0">
-          <button
-            onClick={handleAddCategory}
-            className="text-xs rounded-lg text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-4 py-2  dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition"
-          >
-            Add Category
-          </button>
-         
-        </div>
+    <div className="sm:p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Category Dashboard</h1>
+        <button
+          onClick={() => setShowModal(true)}
+          className="bg-blue-600 text-white px-4 py-2 shadow-lg active:shadow-none rounded-lg hover:bg-blue-700"
+        >
+          New
+        </button>
       </div>
 
-      <div className="bg-white dark:bg-gray-800  rounded-lg dark:shadow-gray-700  dark:border-gray-600">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-md font-bold text-gray-700 dark:text-gray-200">
-            Category List
-          </h2>
-          <div className="flex items-center space-x-3">
-            <input
-              type="text"
-              placeholder="Search categories..."
-              value={searchQuery}
-              onChange={handleSearch}
-              className="text-md border border-gray-400 dark:border-gray-600 px-1 py-1 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
-            />
-            <button
-              onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-              className="bg-white dark:bg-gray-700 px-4 py-2 rounded-[4px] shadow-md dark:shadow-gray-600 flex items-center space-x-2 border border-gray-400 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600"
-            >
-              <FaSort />
-            </button>
-            <button
-              onClick={handleSettings}
-              className="bg-white dark:bg-gray-700 px-4 py-2 rounded-[4px] shadow-md dark:shadow-gray-600 flex items-center space-x-2 border border-gray-400 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600"
-            >
-              <FaCog />
-            </button>
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
+          <div className="bg-white sm:p-6 p-3 rounded-lg shadow-md w-full max-w-md">
+            <h2 className="text-lg font-bold mb-2">Create Category</h2>
+            <p className="text-sm text-gray-600 mb-4">
+              Add a new category using the form below.
+            </p>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {success && <p className="text-green-600 text-sm">{success}</p>}
+              {error && <p className="text-red-600 text-sm">{error}</p>}
+              <div>
+                <label className="block mb-1 text-sm font-medium">
+                  Category Name
+                </label>
+                <input
+                  type="text"
+                  name="category_name"
+                  value={category.category_name}
+                  onChange={handleCategoryChange}
+                  required
+                  className="w-full border px-3 py-2 rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block mb-1 text-sm font-medium">
+                  Description
+                </label>
+                <textarea
+                  name="description"
+                  value={category.description}
+                  onChange={handleCategoryChange}
+                  className="w-full border px-3 py-2 rounded-lg"
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 border rounded-lg shadow-lg active:shadow-none text-red-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="bg-green-600 shadow-lg active:shadow-none text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                >
+                  {isLoading ? "Saving..." : "Save"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
+      )}
 
-        {filteredList.length === 0 && (
-          <p className="text-center text-gray-500 dark:text-gray-400">
-            No categories found.
+      <div className="overflow-x-auto">
+        <table className="min-w-full table-auto border-collapse border border-gray-300">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="border px-4 py-2 text-left">Category</th>
+              <th className="border px-4 py-2 text-left">Description</th>
+              <th className="border px-4 py-2 text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="text-md text-gray-700 dark:text-gray-200">
+            {currentItems.map((cat, index) => (
+              <tr
+                key={index}
+                className="border-t border-gray-200 dark:border-gray-700"
+              >
+                <td
+                  className="px-4 py-3 max-w-[150px] truncate"
+                  title={cat.category_name}
+                >
+                  {cat.category_name}
+                </td>
+
+                <td
+                  className="px-4 py-3 max-w-[200px] truncate"
+                  title={cat.description}
+                >
+                  {cat.description}
+                </td>
+                <td className="px-4 py-3 flex gap-2">
+                  <button
+                    onClick={() => handleEditCategory(cat)}
+                    className="text-blue-600  sm:hover:bg-slate-700 sm:hover:rounded-lg sm:p-4 sm:hover:bg-opacity-20"
+                  >
+                    <FaEdit className="sm:w-5 w-4 sm:h-5 h-4" />
+                  </button>
+
+                  <button
+                    onClick={() => confirmDelete(cat.id)}
+                    className="text-red-600 ml-5  sm:hover:bg-slate-700 sm:hover:rounded-lg sm:p-4 sm:hover:bg-opacity-20"
+                  >
+                    <FaTrash className="sm:w-5 w-4 sm:h-5 h-4" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {showEditModal && selectedCategory && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div className="bg-white p-6 rounded-lg-lg shadow-lg w-full max-w-md dark:bg-slate-800">
+              <h2 className="text-xl font-semibold mb-4">Edit Category</h2>
+
+              <label className="block mb-2 text-sm">Category Name</label>
+              <input
+                type="text"
+                value={selectedCategory.category_name}
+                onChange={(e) =>
+                  setSelectedCategory({
+                    ...selectedCategory,
+                    category_name: e.target.value,
+                  })
+                }
+                className="w-full border px-3 py-2 rounded-lg mb-4"
+              />
+
+              <label className="block mb-2 text-sm">Description</label>
+              <textarea
+                value={selectedCategory.description}
+                onChange={(e) =>
+                  setSelectedCategory({
+                    ...selectedCategory,
+                    description: e.target.value,
+                  })
+                }
+                className="w-full border px-3 py-2 rounded-lg mb-4"
+              />
+
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="px-4 py-2 bg-gray-400 text-white transition-all rounded-lg shadow-lg hover:bg-opacity-65 hover:text-red-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleUpdateCategory}
+                  className="px-4 py-2 bg-blue-600 text-white  rounded-lg hover:bg-opacity-50 hover:text-blue-700  shadow-lg"
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {loading && (
+          <p className="text-center p-16 text-xl text-gray-500 dark:text-gray-400 mt-4">
+            {t("Loading ...")}
           </p>
         )}
+      </div>
+      <div className="flex justify-center items-center mt-4 gap-2">
+        <button
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+          className="px-3 py-1 bg-gray-300 rounded-lg disabled:opacity-50"
+        >
+          Prev
+        </button>
 
-        {filteredList.length > 0 && (
-          <table
-            className={`w-full border-collapse ${
-              showGridLines ? "border border-gray-300 dark:border-gray-600" : ""
-            } ${tableFontSize} text-gray-700 dark:text-gray-200`}
+        {Array.from({ length: totalPages }, (_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrentPage(i + 1)}
+            className={`px-3 py-1 rounded-lg ${
+              currentPage === i + 1
+                ? "bg-blue-600 text-white shadow-lg"
+                : "bg-gray-200 text-gray-700 shadow-lg"
+            }`}
           >
-            <thead>
-              <tr className="bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-300 text-center">
-                <th
-                  className={`p-3 ${
-                    showGridLines
-                      ? "border border-gray-300 dark:border-gray-600"
-                      : ""
-                  }`}
-                >
-                  Name
-                </th>
-                {showDescription && (
-                  <th
-                    className={`p-3 ${
-                      showGridLines
-                        ? "border border-gray-300 dark:border-gray-600"
-                        : ""
-                    }`}
-                  >
-                    Description
-                  </th>
-                )}
-                <th
-                  className={`p-3 ${
-                    showGridLines
-                      ? "border border-gray-300 dark:border-gray-600"
-                      : ""
-                  }`}
-                >
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginatedList.map((category) => (
-                <tr
-                  key={category.id}
-                  className={`${
-                    showGridLines
-                      ? "border border-gray-300 dark:border-gray-600"
-                      : ""
-                  } text-center`}
-                >
-                  <td
-                    className={`p-3 ${
-                      showGridLines
-                        ? "border border-gray-300 dark:border-gray-600"
-                        : ""
-                    } text-gray-400 dark:text-gray-300`}
-                  >
-                    {category.name}
-                  </td>
-                  {showDescription && (
-                    <td
-                      className={`p-3 ${
-                        showGridLines
-                          ? "border border-gray-300 dark:border-gray-600"
-                          : ""
-                      } text-gray-400 dark:text-gray-300`}
-                    >
-                      {category.description || "N/A"}
-                    </td>
-                  )}
-                  <td
-                    className={`p-3 ${
-                      showGridLines
-                        ? "border border-gray-300 dark:border-gray-600"
-                        : ""
-                    } text-gray-800 dark:text-gray-200`}
-                  >
-                    <button
-                      onClick={() => handleEditCategory(category)}
-                      className="text-emerald-500 hover:text-emerald-700 mr-4 hover:scale-110 hover:shadow-lg"
-                    >
-                      <FaEdit className="" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteCategory(category.id)}
-                      className="text-red-500 hover:text-red-700 hover:scale-110 hover:shadow-lg"
-                    >
-                      <FaTrash />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+            {i + 1}
+          </button>
+        ))}
 
-        <div className="flex flex-col md:flex-row justify-between items-center mt-4">
-          <div className="sm:flex hidden items-center space-x-2">
-            <span className="text-gray-400 dark:text-gray-300 text-xs">
-              Show
-            </span>
-            <select
-              className="text-xs border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-[4px] font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
-              value={itemsPerPage}
-              onChange={(e) => {
-                setItemsPerPage(Number(e.target.value));
-                setCurrentPage(1);
-              }}
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={15}>15</option>
-            </select>
-            <span className="text-gray-400 dark:text-gray-300 text-xs">
-              entries
-            </span>
-          </div>
-          <div className="flex items-center space-x-2 mt-4 md:mt-0">
-            <button
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage(currentPage - 1)}
-              className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition disabled:opacity-50"
-            >
-              Previous
-            </button>
-            <span className="text-gray-700 dark:text-gray-200 text-xs">
-              Page {currentPage} of {totalPages}
-            </span>
-            <button
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage(currentPage + 1)}
-              className="text-xs text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-[4px] dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition disabled:opacity-50"
-            >
-              Next
-            </button>
-          </div>
-        </div>
-
-        {showModal && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md">
-              <h3 className="text-lg font-bold text-gray-700 dark:text-gray-200">
-                {isEditMode ? "Edit Category" : "Add Category"}
-              </h3>
-              <form onSubmit={handleSubmit} className="mt-4">
-                <div className="mb-4">
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-200"
-                  >
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-700 dark:text-gray-200"
-                    required
-                  />
-                </div>
-                <div className="mb-4">
-                  <label
-                    htmlFor="description"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-200"
-                  >
-                    Description
-                  </label>
-                  <textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) =>
-                      setFormData({ ...formData, description: e.target.value })
-                    }
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-700 dark:text-gray-200"
-                    rows="3"
-                  />
-                </div>
-                <div className="flex justify-end space-x-2">
-                  <button
-                    type="button"
-                    onClick={() => setShowModal(false)}
-                    className="px-4 py-2 text-sm text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 text-sm text-white bg-emerald-500 rounded-md hover:bg-emerald-600"
-                  >
-                    {isEditMode ? "Update" : "Create"}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {showSettings && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md">
-              <h3 className="text-lg font-bold text-gray-700 dark:text-gray-200">
-                Settings
-              </h3>
-              <form onSubmit={handleSaveSettings} className="mt-4">
-                <div className="mb-4">
-                  <label
-                    htmlFor="itemsPerPage"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-200"
-                  >
-                    Items per Page
-                  </label>
-                  <input
-                    type="number"
-                    id="itemsPerPage"
-                    min="1"
-                    defaultValue={itemsPerPage}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-700 dark:text-gray-200"
-                    required
-                  />
-                </div>
-                <div className="mb-4">
-                  <label
-                    htmlFor="sortOrder"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-200"
-                  >
-                    Default Sort Order
-                  </label>
-                  <select
-                    id="sortOrder"
-                    defaultValue={sortOrder}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-700 dark:text-gray-200"
-                  >
-                    <option value="asc">Ascending</option>
-                    <option value="desc">Descending</option>
-                  </select>
-                </div>
-                <div className="mb-4">
-                  <label
-                    htmlFor="tableFontSize"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-200"
-                  >
-                    Table Font Size
-                  </label>
-                  <select
-                    id="tableFontSize"
-                    defaultValue={tableFontSize}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-700 dark:text-gray-200"
-                  >
-                    <option value="text-xs">Small</option>
-                    <option value="text-sm">Medium</option>
-                    <option value="text-base">Large</option>
-                  </select>
-                </div>
-                <div className="mb-4">
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="showDescription"
-                      defaultChecked={showDescription}
-                      className="mr-2 text-emerald-500 focus:ring-emerald-500 border-gray-300 dark:border-gray-600 rounded"
-                    />
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                      Show Description Column
-                    </span>
-                  </label>
-                </div>
-                <div className="mb-4">
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="showGridLines"
-                      defaultChecked={showGridLines}
-                      className="mr-2 text-emerald-500 focus:ring-emerald-500 border-gray-300 dark:border-gray-600 rounded"
-                    />
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                      Show Table Grid Lines
-                    </span>
-                  </label>
-                </div>
-                <div className="mb-4">
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="darkMode"
-                      checked={theme === "dark"}
-                      onChange={toggleTheme}
-                      className="mr-2 text-emerald-500 focus:ring-emerald-500 border-gray-300 dark:border-gray-600 rounded"
-                    />
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                      Dark Mode
-                    </span>
-                  </label>
-                </div>
-                <div className="flex justify-between space-x-2">
-                  <button
-                    type="button"
-                    onClick={handleResetSettings}
-                    className="px-4 py-2 text-sm text-red-500 border border-red-500 rounded-md hover:bg-red-50 dark:hover:bg-red-900"
-                  >
-                    Reset to Default
-                  </button>
-                  <div className="flex space-x-2">
-                    <button
-                      type="button"
-                      onClick={() => setShowSettings(false)}
-                      className="px-4 py-2 text-sm text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-4 py-2 text-sm text-white bg-emerald-500 rounded-md hover:bg-emerald-600"
-                    >
-                      Save
-                    </button>
-                  </div>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
+        <button
+          onClick={() =>
+            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+          }
+          disabled={currentPage === totalPages}
+          className="px-3 py-1 bg-gray-300 rounded-lg disabled:opacity-50"
+        >
+          Next
+        </button>
       </div>
     </div>
   );
 };
 
-export default Category;
+export default CategoryDashboard;

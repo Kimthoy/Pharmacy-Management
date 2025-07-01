@@ -63,13 +63,10 @@ const MedicineTable = ({ products, handleAddToCartClick, currency = "៛" }) => 
   };
 
   return (
-    <div className="sm:w-full w-[420px]  mb-14 overflow-x-auto">
-      <table className=" table-auto border-collapse">
+    <div className="w-full  mb-14 overflow-x-auto">
+      <table className="sm:w-full table-auto border-collapse">
         <thead>
           <tr className="bg-gray-100 dark:bg-gray-700">
-            <th className="sm:table-cell hidden border border-gray-300 dark:border-gray-600 p-2 text-left dark:text-gray-300">
-              ID
-            </th>
             <th className="border border-gray-300 dark:border-gray-600 p-2 text-left dark:text-gray-300">
               Name
             </th>
@@ -87,18 +84,19 @@ const MedicineTable = ({ products, handleAddToCartClick, currency = "៛" }) => 
             </th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="w-full">
           {products.map((medicine) => (
             <tr
               key={medicine.id}
               className="hover:bg-gray-50 dark:hover:bg-gray-800"
             >
-              <td className="sm:table-cell hidden border border-gray-300 dark:border-gray-600 p-2 dark:text-gray-300">
-                {medicine.id}
-              </td>
-              <td className="border border-gray-300 dark:border-gray-600 p-2 dark:text-gray-300">
+              <td
+                className="border max-w-[90px] sm:max-w-[200px] border-gray-300 dark:border-gray-600 p-2 dark:text-gray-300  truncate whitespace-nowrap overflow-hidden text-ellipsis"
+                title={medicine.name}
+              >
                 {medicine.name}
               </td>
+
               <td className="border border-gray-300 dark:border-gray-600 p-2 dark:text-gray-300 whitespace-nowrap">
                 <input
                   type="text"
@@ -106,7 +104,7 @@ const MedicineTable = ({ products, handleAddToCartClick, currency = "៛" }) => 
                   onChange={(e) =>
                     handlePriceChange(medicine.id, e.target.value)
                   }
-                  className="w-24 p-1 focus:font-semibold text-center border focus:w-28 focus:h-12 text-md rounded dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                  className="w-24 p-1 focus:font-semibold text-center border  text-md rounded dark:bg-gray-800 dark:text-white dark:border-gray-600"
                   aria-label={`Price for ${medicine.name} in KHR`}
                 />
                 <span className="ml-2">{currency}</span>
@@ -117,7 +115,7 @@ const MedicineTable = ({ products, handleAddToCartClick, currency = "៛" }) => 
                   min="1"
                   value={medicineInputs[medicine.id]?.qty || 1}
                   onChange={(e) => handleQtyChange(medicine.id, e.target.value)}
-                  className="w-16 p-1 border focus:font-semibold focus:w-28 text-center focus:h-12 text-md rounded dark:bg-gray-800 dark:text-white dark:border-gray-600"
+                  className="w-16 p-1 border focus:font-semibold  text-center  text-md rounded dark:bg-gray-800 dark:text-white dark:border-gray-600"
                   aria-label={`Quantity for ${medicine.name}`}
                 />
               </td>
@@ -135,9 +133,9 @@ const MedicineTable = ({ products, handleAddToCartClick, currency = "៛" }) => 
                   "No Image"
                 )}
               </td>
-              <td className="border border-gray-300 dark:border-gray-600 p-2">
+              <td className="border border-gray-300 dark:border-gray-600 sm:p-3">
                 <button
-                  className="bg-blue-600 active:shadow-none transition-all text-white px-4 hover:shadow-md hover:shadow-slate-500 shadow py-2 rounded hover:bg-blue-700 dark:hover:bg-blue-500"
+                  className="bg-blue-600 active:shadow-none transition-all shadow-lg text-white sm:px-4 px-1 hover:shadow-md hover:shadow-slate-500  sm:py-2 py-1 sm:ml-3 ml-2 rounded hover:bg-blue-700 dark:hover:bg-blue-500"
                   onClick={() => handleAddToCart(medicine)}
                   aria-label={`Add ${medicine.name} to cart`}
                 >

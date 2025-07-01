@@ -1,11 +1,11 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import BarcodeScanner from "../../components/BarcodeScanner";
 // import { LiaWindowCloseSolid } from "react-icons/lia";
-
 import { useTranslation } from "../../hooks/useTranslation";
 import { createMedicine } from "../api/medicineService";
+import { getAllCategory } from "../api/categoryService";
 import { LuScanBarcode } from "react-icons/lu";
-
+import Select from "react-select";
 const AddMedicine = () => {
   const { t } = useTranslation();
   const [medicine, setMedicine] = useState({
@@ -14,23 +14,73 @@ const AddMedicine = () => {
     weight: "",
     quantity: "",
     expire_date: "",
-    status: "",
+    status: "active",
     category: "",
     medicine_detail: "",
     barcode_number: "",
+    image: "",
   });
-  // const [openScanner, setOpenScanner] = useState(false);
-  // const [torchOn, setTorchOn] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
+
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   const handleMedicineChange = useCallback((e) => {
-    const { name, value } = e.target;
-    setMedicine((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    const { name, value, type, files, options } = e.target;
+
+    if (type === "file") {
+      const file = files?.[0];
+      if (file) {
+        setMedicine((prev) => ({
+          ...prev,
+          [name]: file,
+        }));
+        setImagePreview(URL.createObjectURL(file));
+      }
+    } else if (type === "select-multiple") {
+      const values = Array.from(options)
+        .filter((option) => option.selected)
+        .map((option) => option.value);
+      setMedicine((prev) => ({
+        ...prev,
+        [name]: values,
+      }));
+    } else {
+      setMedicine((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+  }, []);
+
+  const [category, setCategory] = useState([]);
+  useEffect(() => {
+    const fetchCategory = async () => {
+      try {
+        const result = await getAllCategory();
+        setCategory(result);
+      } catch (e) {
+        console.error("Failed to load categories");
+      }
+    };
+    fetchCategory();
+  }, []);
+  const fetchCategory = async () => {
+    setLoading(true);
+    try {
+      const data = await getAllCategory();
+      setCategory(data);
+    } catch (err) {
+      console.error("Fetch error:", err);
+      setError("Failed to fetch categories.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategory();
   }, []);
 
   const handleMedicineSubmit = useCallback(
@@ -40,11 +90,14 @@ const AddMedicine = () => {
       setSuccess("");
       setIsLoading(true);
 
+      // 🧪 Quantity validation
       if (!medicine.quantity || parseInt(medicine.quantity) < 0) {
-        setError("Please enter the quantity of product !  ");
+        setError("Please enter the quantity of product!");
         setIsLoading(false);
         return;
       }
+
+      // 🧪 Expire date validation
       if (
         medicine.expire_date &&
         new Date(medicine.expire_date) <= new Date()
@@ -55,35 +108,53 @@ const AddMedicine = () => {
       }
 
       try {
-        const payload = {
-          medicine_name: medicine.medicine_name,
-          price: parseFloat(medicine.price) || 0,
-          weight: medicine.weight,
-          quantity: parseInt(medicine.quantity) || 0,
-          expire_date: medicine.expire_date || null,
-          status: medicine.status,
-          category: medicine.category,
-          medicine_detail: medicine.medicine_detail || null,
-          barcode_number: medicine.barcode_number,
-        };
+        // ✅ Prepare FormData for Laravel + image
+        const formData = new FormData();
+        formData.append("medicine_name", medicine.medicine_name);
+        formData.append("price", parseFloat(medicine.price) || 0);
+        formData.append("weight", medicine.weight || "");
+        formData.append("quantity", parseInt(medicine.quantity) || 0);
+        formData.append("expire_date", medicine.expire_date || "");
+        formData.append("status", medicine.status);
+        formData.append("medicine_detail", medicine.medicine_detail || "");
+        formData.append("barcode_number", medicine.barcode_number);
 
-        console.log("Sending payload:", payload);
-        await createMedicine(payload);
-        setSuccess(t("add-medicine.SuccessMessage"));
+        // ✅ Append category_ids[] for Laravel array
+        medicine.category_ids.forEach((id) => {
+          formData.append("category_ids[]", id);
+        });
+
+        // ✅ Append image file only if valid
+        if (medicine.image instanceof File) {
+          formData.append("image", medicine.image);
+        }
+
+        // ✅ Debug: log FormData content
+        for (let [key, value] of formData.entries()) {
+          console.log(`${key}:`, value);
+        }
+
+        // ✅ Call API
+        await createMedicine(formData);
+
+        // ✅ Show success + reset form
+        setSuccess("Success");
         setMedicine({
           medicine_name: "",
           price: "",
           weight: "",
           quantity: "",
           expire_date: "",
-          status: "",
+          status: "active",
           category: "",
           medicine_detail: "",
           barcode_number: "",
+          category_ids: [],
+          image: null, // ✅ set to null (not empty string)
         });
       } catch (err) {
         console.error("Full error:", err);
-        const errorMessage = err?.message || t("add-medicine.ErrorMessage");
+        const errorMessage = err?.message || "Something went wrong";
         setError(errorMessage);
       } finally {
         setIsLoading(false);
@@ -91,6 +162,7 @@ const AddMedicine = () => {
     },
     [t, medicine]
   );
+
   const handleDetected = (barcode) => {
     if (!medicine.barcode_number) {
       setMedicine((prev) => ({ ...prev, barcode_number: barcode }));
@@ -100,9 +172,22 @@ const AddMedicine = () => {
   const [showScanner, setShowScanner] = useState(false);
   const [barcode, setBarcode] = useState("");
 
-  const handleScan = (scannedValue) => {
-    setBarcode(scannedValue);
+  const handleScan = (scannedBarcode) => {
+    setMedicine((prev) => ({ ...prev, barcode_number: scannedBarcode }));
     setShowScanner(false);
+  };
+
+  const categoryOptions = category.map((cat) => ({
+    value: cat.id,
+    label: cat.category_name,
+  }));
+
+  const handleCategoryChange = (selectedOptions) => {
+    const selectedIds = selectedOptions.map((opt) => opt.value);
+    setMedicine((prev) => ({
+      ...prev,
+      category_ids: selectedIds,
+    }));
   };
   return (
     <div className="p-6 mb-12 bg-white dark:bg-gray-900 rounded-lg shadow-lg dark:shadow-gray-800 w-full max-w-6xl mx-auto">
@@ -156,7 +241,7 @@ const AddMedicine = () => {
               type="number"
               id="price"
               name="price"
-              step="0.01"
+              defaultValue={"0"}
               placeholder={t("add-medicine.Price-PlaceHolder")}
               value={medicine.price}
               onChange={handleMedicineChange}
@@ -234,8 +319,10 @@ const AddMedicine = () => {
               {/* Barcode Text Input */}
               <input
                 type="text"
-                value={barcode}
-                onChange={(e) => setBarcode(e.target.value)}
+                value={medicine.barcode_number}
+                onChange={(e) =>
+                  setMedicine({ ...medicine, barcode_number: e.target.value })
+                }
                 placeholder="Enter barcode"
                 className="border rounded-lg border-slate-600 outline-none p-2 mt-2 block w-full"
               />
@@ -250,27 +337,59 @@ const AddMedicine = () => {
             </div>
           </div>
 
-          <div className="flex flex-col">
-            <label
-              htmlFor="category"
-              className="mb-2 text-md font-medium text-gray-700 dark:text-gray-300"
-            >
-              {t("add-medicine.Category")}
-            </label>
-            <select
-              id="category"
-              name="category"
-              value={medicine.category}
-              onChange={handleMedicineChange}
-              className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
-            >
-              <option value="">{t("add-medicine.Category-PlaceHolder")}</option>
-              <option value="tablet">Tablet</option>
-              <option value="syrup">Syrup</option>
-              <option value="vitamin">Vitamin</option>
-              <option value="other">Other</option>
-            </select>
+          <div>
+            <label htmlFor=""> {t("add-medicine.Category")}</label>
+            <Select
+              isMulti
+              name="category_ids"
+              options={categoryOptions}
+              value={categoryOptions.filter(
+                (opt) =>
+                  Array.isArray(medicine.category_ids) &&
+                  medicine.category_ids.includes(opt.value)
+              )}
+              onChange={handleCategoryChange}
+              className="basic-multi-select"
+              classNamePrefix="select"
+              styles={{
+                container: (base) => ({
+                  ...base,
+                  maxHeight: "150px",
+                  marginBottom: "2.3rem", // or '16px', '20px', etc.
+                  marginTop: "0.5rem",
+                }),
+              }}
+            />
           </div>
+
+          <div className="flex flex-col w-full max-w-lg relative">
+            <label
+              htmlFor="medicine-image"
+              className="mb-2 text-md text-gray-900 dark:text-gray-100 tracking-wide"
+            >
+              {t("add-medicine.Photo")}
+            </label>
+
+            <input
+              id="medicine-image"
+              name="image"
+              type="file"
+              accept="image/*"
+              onChange={handleMedicineChange}
+              className="mb-2 border px-3 py-2 rounded-lg"
+            />
+
+            {imagePreview && (
+              <div className="absolute right-0 top-0">
+                <img
+                  src={imagePreview}
+                  alt="Selected Preview"
+                  className="w-24 h-24 object-cover rounded shadow border border-gray-300"
+                />
+              </div>
+            )}
+          </div>
+
           <div className="flex flex-col col-span-1 md:col-span-3">
             <label
               htmlFor="medicine_detail"
