@@ -25,6 +25,16 @@ const MedicineList = () => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editMedicineData, setEditMedicineData] = useState(null);
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+  const filtered = medicines.filter((med) =>
+    med.medicine_name?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filtered.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
   //delete alert
   const confirmDelete = (id) => {
     Swal.fire({
@@ -40,30 +50,6 @@ const MedicineList = () => {
         handleDeleteMedicine(id);
       }
     });
-  };
-  const handleDeleteMedicine = async (id) => {
-    try {
-      setStatusLoadingId(id);
-      await deleteMedicine(id);
-      setSuccess("Medicine deleted successfully.");
-      await fetchMedicines();
-    } catch (err) {
-      setError(err.message || "Failed to delete medicine.");
-    } finally {
-      setStatusLoadingId(null);
-    }
-  };
-
-  const handleToggleStatus = async (medicineId) => {
-    setStatusLoadingId(medicineId);
-    try {
-      await toggleProductStatus(medicineId);
-      fetchMedicines();
-    } catch (err) {
-      console.error("Failed to toggle status:", err);
-    } finally {
-      setStatusLoadingId(null);
-    }
   };
 
   const handleCheckboxChange = (id) => {
@@ -107,18 +93,6 @@ const MedicineList = () => {
       setLoading(false);
     }
   };
-
-  const filteredMedicines = medicines.filter((med) => {
-    const name = med.product?.name || "";
-    const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesSearch;
-  });
-
-  const isAllSelected =
-    filteredMedicines.length > 0 &&
-    selectedMedicines.length ===
-      filteredMedicines.filter((med) => med.status === "active").length;
-
   const handleEditClick = (medicine) => {
     setEditMedicineData(medicine);
     setEditModalOpen(true);
@@ -130,11 +104,53 @@ const MedicineList = () => {
     fetchMedicines();
   };
 
+  const [toast, setToast] = useState({ message: "", type: "" });
+
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+    setTimeout(() => {
+      setToast({ message: "", type: "" });
+    }, 3000); // hide after 3 seconds
+  };
+
+  const handleDeleteMedicine = async (id) => {
+    try {
+      setStatusLoadingId(id);
+      await deleteMedicine(id);
+      await fetchMedicines();
+      showToast("ថ្នាំត្រូវបានលុបដោយជោគជ័យ!", "success");
+    } catch (err) {
+      showToast("បរាជ័យក្នុងការលុបថ្នាំ!", "error");
+    } finally {
+      setStatusLoadingId(null);
+    }
+  };
+
   return (
     <div className="p-4 mb-16">
       <h2 className="text-xl font-bold mb-4 dark:text-slate-200">
         Medicine List
       </h2>
+      {toast.message && (
+        <div
+          style={{
+            position: "fixed",
+            top: "20px",
+            right: "20px",
+            backgroundColor: toast.type === "success" ? "#4CAF50" : "#F44336",
+            color: "white",
+            padding: "12px 20px",
+            borderRadius: "6px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+            zIndex: 9999,
+            minWidth: "250px",
+            fontWeight: "bold",
+            userSelect: "none",
+          }}
+        >
+          {toast.message}
+        </div>
+      )}
 
       {/* Search Box */}
       <div className="mb-4 flex flex-wrap gap-4">
@@ -156,107 +172,145 @@ const MedicineList = () => {
           Loading medicines...
         </p>
       ) : (
-        <div className="w-full overflow-x-auto">
-          <table className="w-full border-collapse border border-gray-300">
-            <thead className="bg-gray-200 dark:bg-slate-700 dark:text-slate-600">
-              <tr>
-                <th className="border px-2 py-4 dark:text-slate-200 hidden sm:table-cell">
-                  <input
-                    checked={isAllSelected}
-                    onChange={handleSelectAll}
-                    type="checkbox"
-                    className="w-5 h-5 hover:cursor-pointer accent-green-600 rounded transition-all duration-200 ease-in-out scale-100 checked:scale-110"
-                  />
-                </th>
-                <td className="border px-3 py-2 dark:text-slate-100">Name</td>
-                <td className="border px-3 py-2 dark:text-slate-100">Price</td>
-                <td className="border px-3 py-2 dark:text-slate-100">
-                  Expire Date
-                </td>
-                <td className=" border px-3 py-2 dark:text-slate-100">
-                  Status
-                </td>
-                <td className="sm:flex hidden border px-3 py-2 dark:text-slate-100">
-                  Image
-                </td>
-                <td className="border px-3 py-2 dark:text-slate-100 hidden sm:table-cell">
-                  Descriptions
-                </td>
-                <td className="border px-3 py-2 dark:text-slate-100">
-                  Actions
-                </td>
-              </tr>
-            </thead>
-
-            <tbody>
-              {medicines.map((med) => (
-                <tr key={med.id} className="text-left transition-all ">
-                  <td className="text-center px-2 border dark:text-slate-100 hidden sm:table-cell">
+        <div>
+          <div className="w-full overflow-x-auto relative">
+            <table className="w-full border-collapse border border-gray-300">
+              <thead className="bg-gray-200 dark:bg-slate-700 dark:text-slate-600">
+                <tr>
+                  <th className="border px-2 py-4 dark:text-slate-200 hidden sm:table-cell">
                     <input
-                      checked={selectedMedicines.includes(med.id)}
-                      disabled={med.status !== "active"}
-                      onChange={() => handleCheckboxChange(med.id)}
+                      // checked={isAllSelected}
+                      onChange={handleSelectAll}
                       type="checkbox"
-                      className="w-5 h-5 accent-blue-600 hover:cursor-pointer rounded transition-all duration-200 ease-in-out scale-100 checked:scale-110"
+                      className="w-5 h-5 hover:cursor-pointer accent-green-600 rounded transition-all duration-200 ease-in-out scale-100 checked:scale-110"
                     />
-                  </td>
-                  <td
-                    className="border px-3 py-2 max-w-[100px] sm:max-w-[200px]  truncate whitespace-nowrap overflow-hidden text-ellipsis dark:text-slate-100"
-                    title={med.medicine_name}
-                  >
-                    {med.medicine_name}
-                  </td>
-
+                  </th>
+                  <td className="border px-3 py-2 dark:text-slate-100">Name</td>
                   <td className="border px-3 py-2 dark:text-slate-100">
-                    ${med.price}
+                    Price
                   </td>
                   <td className="border px-3 py-2 dark:text-slate-100">
-                    {new Date(med.expire_date).toLocaleDateString("en-GB")}
+                    Expire Date
                   </td>
                   <td className=" border px-3 py-2 dark:text-slate-100">
-                    {med.status}
+                    Status
                   </td>
                   <td className="sm:flex hidden border px-3 py-2 dark:text-slate-100">
-                    <img
-                      src={med.image}
-                      alt="Medicine"
-                      className="w-16 h-16 object-cover"
-                    />
+                    Image
                   </td>
                   <td className="border px-3 py-2 dark:text-slate-100 hidden sm:table-cell">
-                    {med.medicine_detail}
+                    Descriptions
                   </td>
-                  <td className="border px-3 py-2 ">
-                    <div className="flex flex-wrap gap-2 ">
-                      <button
-                        onClick={() => handleView(med)}
-                        className={`text-yellow-500  rounded-lg  transition-all sm:over:bg-slate-700 sm:dark:hover:bg-opacity-50 sm:hover:rounded-lg sm:p-3 sm:hover:bg-opacity-20`}
-                      >
-                        <BiShow className="sm:w-7 w-5 sm:h-7 h-5" />
-                      </button>
-                      <button
-                        onClick={() => handleEditClick(med)}
-                        className={`text-blue-600 rounded-lg  transition-all sm:hover:bg-slate-700 dark:hover:bg-opacity-50 sm:hover:rounded-lg sm:p-3 sm:hover:bg-opacity-15`}
-                      >
-                        <BiEdit className="sm:w-7 w-5 sm:h-7 h-5" />
-                      </button>
-                      <button
-                        onClick={() => confirmDelete(med.id)}
-                        disabled={statusLoadingId === med.id}
-                        className={`rounded-lg text-red-600 transition-all sm:hover:bg-slate-700 dark:hover:bg-opacity-50 sm:hover:rounded-lg sm:p-3 sm:hover:bg-opacity-15`}
-                      >
-                        {statusLoadingId === med.id ? (
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        ) : (
-                          <TbHttpDelete className="sm:w-7 w-5 sm:h-7 h-5" />
-                        )}
-                      </button>
-                    </div>
+                  <td className="border px-3 py-2 dark:text-slate-100">
+                    Actions
                   </td>
                 </tr>
+              </thead>
+
+              <tbody>
+                {currentItems.map((med) => (
+                  <tr key={med.id} className="text-left transition-all ">
+                    <td className="text-center px-2 border dark:text-slate-100 hidden sm:table-cell">
+                      <input
+                        checked={selectedMedicines.includes(med.id)}
+                        disabled={med.status !== "active"}
+                        onChange={() => handleCheckboxChange(med.id)}
+                        type="checkbox"
+                        className="w-5 h-5 accent-blue-600 hover:cursor-pointer rounded transition-all duration-200 ease-in-out scale-100 checked:scale-110"
+                      />
+                    </td>
+                    <td
+                      className="border px-3 py-2 max-w-[100px] sm:max-w-[200px]  truncate whitespace-nowrap overflow-hidden text-ellipsis dark:text-slate-100"
+                      title={med.medicine_name}
+                    >
+                      {med.medicine_name}
+                    </td>
+
+                    <td className="border px-3 py-2 dark:text-slate-100">
+                      ${med.price}
+                    </td>
+                    <td className="border px-3 py-2 dark:text-slate-100">
+                      {new Date(med.expire_date).toLocaleDateString("en-GB")}
+                    </td>
+                    <td className=" border px-3 py-2 dark:text-slate-100">
+                      {med.status}
+                    </td>
+                    <td className="sm:flex hidden border px-3 dark:text-slate-100">
+                      <img
+                        src={med.image}
+                        alt="Medicine"
+                        className="w-20 h-20 object-cover"
+                      />
+                    </td>
+                    <td className="border px-3 py-2 dark:text-slate-100 hidden sm:table-cell">
+                      {med.medicine_detail}
+                    </td>
+                    <td className="border px-3 py-2 ">
+                      <div className="flex flex-wrap gap-2 ">
+                        <button
+                          onClick={() => handleView(med)}
+                          className={`text-yellow-500  rounded-lg  transition-all sm:hover:bg-slate-700 sm:over:bg-slate-700 sm:dark:hover:bg-opacity-50 sm:hover:rounded-lg sm:p-3 sm:hover:bg-opacity-20`}
+                        >
+                          <BiShow className="sm:w-6 w-5 sm:h-6 h-5" />
+                        </button>
+                        <button
+                          onClick={() => handleEditClick(med)}
+                          className={`text-blue-600 rounded-lg  transition-all sm:hover:bg-slate-700 dark:hover:bg-opacity-50 sm:hover:rounded-lg sm:p-3 sm:hover:bg-opacity-15`}
+                        >
+                          <BiEdit className="sm:w-6 w-5 sm:h-6 h-5" />
+                        </button>
+                        <button
+                          onClick={() => confirmDelete(med.id)}
+                          disabled={statusLoadingId === med.id}
+                          className={`rounded-lg text-red-600 transition-all sm:hover:bg-slate-700 dark:hover:bg-opacity-50 sm:hover:rounded-lg sm:p-3 sm:hover:bg-opacity-15`}
+                        >
+                          {statusLoadingId === med.id ? (
+                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          ) : (
+                            <TbHttpDelete className="sm:w-6 w-5 sm:h-6 h-5" />
+                          )}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {/* Pagination */}
+            <div className="flex  absolute right-0 justify-center items-center mt-4 gap-2">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1 bg-gray-300 rounded-lg disabled:opacity-50"
+              >
+                Prev
+              </button>
+
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`px-3 py-1 rounded-lg ${
+                    currentPage === i + 1
+                      ? "bg-blue-600 text-white shadow-lg"
+                      : "bg-gray-200 text-gray-700 shadow-lg"
+                  }`}
+                >
+                  {i + 1}
+                </button>
               ))}
-            </tbody>
-          </table>
+
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 bg-gray-300 rounded-lg disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

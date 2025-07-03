@@ -36,6 +36,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
         { name: t("sidebar.medicineList"), path: "/listofmedicine" },
         // { name: t("sidebar.medicineDetail"), path: "/medicinedetail" },
         { name: t("sidebar.categoies"), path: "/categoies" },
+        { name: t("sidebar.units"), path: "/units" },
       ],
     },
     {

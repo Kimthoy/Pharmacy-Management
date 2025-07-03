@@ -25,8 +25,8 @@
     "Enable": "Enable"
   },
   "medicine-view": {
-    "Quantity":"Quantity",
-    "Image":"Image",
+    "Quantity": "Quantity",
+    "Image": "Image",
     "Info": "Informations",
     "Name": "Name",
     "Price": "Price",
@@ -272,7 +272,8 @@
     "total-customer": "Total Customer"
   },
   "add-medicine": {
-    "Photo":"Photo",
+    "Unit":"Unit",
+    "Photo": "Photo",
     "ExpireDate ": "Expire Date",
     "AddMedicine": "Add Medicine",
     "title-addmedicine": "You can add a medicine by filling this form.",
@@ -310,6 +311,7 @@
   },
 
   "sidebar": {
+    "units": "Unit",
     "supplies": "Supplies",
     "categoies": "Category",
     "appName": "My App",
@@ -419,7 +421,13 @@
     "ButtonAddCustomer": "Add Customer"
   },
   "customerlist": {
+    "CustomerDetails": "Customer Details",
+    "Name": "Name",
+    "Email": "Email",
+    "Update": "Update",
+    "Cancel": "Cancel",
     "View": "Details",
+    "Address": "Address",
     "CustomerListTitle": "Customer Lists",
     "SearchPlaceholder": "Search by name...",
     "Customer": "Customer",
@@ -946,6 +954,7 @@
   },
 
   "staff": {
+    "password": "Password",
     "StaffDashboard": "Staff Dashboard",
     "StaffDashboardDesc": "Manage your staff members efficiently",
     "addStaff": "Add Staff",

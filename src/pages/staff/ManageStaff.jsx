@@ -5,6 +5,8 @@ import { useTheme } from "../../context/ThemeContext";
 import { FaRegEdit } from "react-icons/fa";
 import { TbHttpDelete } from "react-icons/tb";
 import { GrView } from "react-icons/gr";
+import Select from "react-select";
+
 import {
   getUsers,
   createUser,
@@ -38,7 +40,22 @@ const ManageStaff = () => {
   const [formError, setFormError] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const genderOptions = [
+    { value: "", label: t("staff.selectGender") },
+    { value: "male", label: t("staff.male") },
+    { value: "female", label: t("staff.female") },
+    { value: "other", label: t("staff.other") },
+    { value: "prefer_not_to_say", label: t("staff.preferNotToSay") },
+  ];
+  const roleOptions = [
+    { value: "admin", label: t("staff.roleAdmin") },
+    { value: "cashier", label: t("staff.roleCashier") },
+    { value: "partner", label: t("staff.rolePartner") },
+  ];
+  const statusOptions = [
+    { value: "Active", label: t("staff.statusActive") },
+    { value: "Inactive", label: t("staff.statusInactive") },
+  ];
   const handleViewDetail = (user) => {
     setSelectedUser(user);
     setIsModalOpen(true);
@@ -355,8 +372,16 @@ const ManageStaff = () => {
                           <GrView className="w-5 h-5" />
                         </button>
                         <button
-                          onClick={() => handleDeleteStaff(user)}
-                          className={`text-md border border-red-500 dark:border-red-400 px-2 py-1 rounded-lg transition text-red-600 hover:bg-red-600 hover:text-white`}
+                          onClick={() => {
+                            if (
+                              window.confirm(
+                                "Are you sure you want to delete this staff member?"
+                              )
+                            ) {
+                              handleDeleteStaff(user);
+                            }
+                          }}
+                          className="text-md border border-red-500 dark:border-red-400 px-2 py-1 rounded-lg transition align-middle text-red-600 hover:bg-red-600 hover:text-white"
                         >
                           <TbHttpDelete className="w-5 h-5" />
                         </button>
@@ -377,35 +402,67 @@ const ManageStaff = () => {
             </tbody>
           </table>
           {isModalOpen && selectedUser && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-md">
-                <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
-                  User Details
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 px-4">
+              <div className="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 sm:p-8 overflow-hidden">
+                {/* Close Button (top-right) */}
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="absolute top-3 right-3 text-gray-500 hover:text-red-500 dark:text-gray-300 dark:hover:text-red-400 transition"
+                  aria-label="Close modal"
+                >
+                  ✕
+                </button>
+
+                {/* Modal Heading */}
+                <h2 className="text-2xl font-semibold mb-6 text-gray-800 dark:text-white text-center">
+                  👤 User Details
                 </h2>
-                <ul className="text-sm text-gray-700 dark:text-gray-200">
+
+                {/* User Info List */}
+                <ul className="space-y-3 text-sm text-gray-700 dark:text-gray-200">
                   <li>
-                    <strong>Username:</strong> {selectedUser.username}
+                    <span className="font-medium text-gray-600 dark:text-gray-400">
+                      👤 Username:
+                    </span>{" "}
+                    {selectedUser.username}
                   </li>
                   <li>
-                    <strong>Email:</strong> {selectedUser.email}
+                    <span className="font-medium text-gray-600 dark:text-gray-400">
+                      📧 Email:
+                    </span>{" "}
+                    {selectedUser.email}
                   </li>
                   <li>
-                    <strong>Role:</strong> {selectedUser.role}
+                    <span className="font-medium text-gray-600 dark:text-gray-400">
+                      🔐 Role:
+                    </span>{" "}
+                    {selectedUser.role}
                   </li>
                   <li>
-                    <strong>Phone:</strong> {selectedUser.phone}
+                    <span className="font-medium text-gray-600 dark:text-gray-400">
+                      📱 Phone:
+                    </span>{" "}
+                    {selectedUser.phone}
                   </li>
                   <li>
-                    <strong>Status:</strong> {selectedUser.status}
+                    <span className="font-medium text-gray-600 dark:text-gray-400">
+                      📈 Status:
+                    </span>{" "}
+                    {selectedUser.status}
                   </li>
                   <li>
-                    <strong>Gender:</strong> {selectedUser.gender}
+                    <span className="font-medium text-gray-600 dark:text-gray-400">
+                      ⚧ Gender:
+                    </span>{" "}
+                    {selectedUser.gender}
                   </li>
                 </ul>
-                <div className="mt-6 text-right">
+
+                {/* Bottom Close Button (fallback on mobile) */}
+                <div className="mt-8 text-center">
                   <button
                     onClick={() => setIsModalOpen(false)}
-                    className="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700"
+                    className="inline-block px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition"
                   >
                     Close
                   </button>
@@ -462,7 +519,7 @@ const ManageStaff = () => {
 
         {showModal && (
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md">
+            <div className="bg-white sm:mb-12 mb-16 sm:overflow-hidden overflow-y-auto sm:max-h-[90vh] max-h-[85vh] w-[95%] dark:bg-gray-800 p-6  shadow-lg  max-w-md">
               <h3 className="text-lg font-bold text-gray-700 dark:text-gray-200">
                 {modalMode === "add"
                   ? t("staff.addStaff")
@@ -475,52 +532,64 @@ const ManageStaff = () => {
               >
                 ×
               </button>
-              <form onSubmit={handleFormSubmit} className="mt-4 space-y-4">
+              <form onSubmit={handleFormSubmit} className="mt-4 space-y-4 ">
                 {formError && (
                   <p className="text-red-500 dark:text-red-400 text-md">
                     {formError}
                   </p>
                 )}
-                <div className="flex">
-                  <label
-                    htmlFor="name"
-                    className="block text-md font-medium text-gray-700 dark:text-gray-200"
-                  >
-                    {t("staff.name")}
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleFormChange}
-                    className="mt-1 w-full text-md border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-lg font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
-                    aria-required="true"
-                  />
 
-                  <label
-                    htmlFor="gender"
-                    className="block text-md font-medium text-gray-700 dark:text-gray-200"
-                  >
-                    {t("staff.gender")}
-                  </label>
-                  <select
-                    id="gender"
-                    name="gender"
-                    value={formData.gender}
-                    onChange={handleFormChange}
-                    className="mt-1 w-full text-md border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-lg font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
-                  >
-                    <option value="">{t("staff.selectGender")}</option>
-                    <option value="male">{t("staff.male")}</option>
-                    <option value="female">{t("staff.female")}</option>
-                    <option value="other">{t("staff.other")}</option>
-                    <option value="prefer_not_to_say">
-                      {t("staff.preferNotToSay")}
-                    </option>
-                  </select>
+                {/* Name & Gender */}
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex flex-col flex-1 min-w-[180px]">
+                    <label
+                      htmlFor="name"
+                      className="block text-md font-medium text-gray-700 dark:text-gray-200"
+                    >
+                      {t("staff.name")}
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleFormChange}
+                      className="mt-1 w-full text-md border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-lg font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
+                      aria-required="true"
+                    />
+                  </div>
+
+                  <div className="flex  flex-col flex-1 min-w-[180px] mt-4 sm:mt-0">
+                    <label
+                      htmlFor="gender"
+                      className="block text-md font-medium text-gray-700 dark:text-gray-200"
+                    >
+                      {t("staff.gender")}
+                    </label>
+                    <Select
+                      name="gender"
+                      options={genderOptions}
+                      value={
+                        genderOptions.find(
+                          (opt) => opt.value === formData.gender
+                        ) || null
+                      }
+                      onChange={(selectedOption) =>
+                        handleFormChange({
+                          target: {
+                            name: "gender",
+                            value: selectedOption ? selectedOption.value : "",
+                          },
+                        })
+                      }
+                      classNamePrefix="select"
+                      className="mt-1  w-full text-md  border-gray-400 dark:border-gray-600  rounded-lg font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
+                    />
+                  </div>
                 </div>
-                <div>
+
+                {/* Email */}
+                <div className="flex flex-col flex-1 min-w-[180px]">
                   <label
                     htmlFor="email"
                     className="block text-md font-medium text-gray-700 dark:text-gray-200"
@@ -537,8 +606,10 @@ const ManageStaff = () => {
                     aria-required="true"
                   />
                 </div>
+
+                {/* Password (only for add mode) */}
                 {modalMode === "add" && (
-                  <div>
+                  <div className="flex flex-col flex-1 min-w-[180px]">
                     <label
                       htmlFor="password"
                       className="block text-md font-medium text-gray-700 dark:text-gray-200"
@@ -556,48 +627,70 @@ const ManageStaff = () => {
                     />
                   </div>
                 )}
-                <div>
-                  <label
-                    htmlFor="role"
-                    className="block text-md font-medium text-gray-700 dark:text-gray-200"
-                  >
-                    {t("staff.role")}
-                  </label>
-                  <select
-                    id="role"
-                    name="role"
-                    value={formData.role}
-                    onChange={handleFormChange}
-                    className="mt-1 w-full text-md border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-lg font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
-                    aria-required="true"
-                  >
-                    <option value="admin">{t("staff.roleAdmin")}</option>
-                    <option value="cashier">{t("staff.roleCashier")}</option>
-                    <option value="partner">{t("staff.rolePartner")}</option>
-                  </select>
+
+                {/* Role & Status */}
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex flex-col flex-1 min-w-[180px]">
+                    <label
+                      htmlFor="role"
+                      className="block text-md font-medium text-gray-700 dark:text-gray-200"
+                    >
+                      {t("staff.role")}
+                    </label>
+                    <Select
+                      name="role"
+                      options={roleOptions}
+                      value={
+                        roleOptions.find(
+                          (opt) => opt.value === formData.role
+                        ) || null
+                      }
+                      onChange={(selectedOption) =>
+                        handleFormChange({
+                          target: {
+                            name: "role",
+                            value: selectedOption ? selectedOption.value : "",
+                          },
+                        })
+                      }
+                      classNamePrefix="select"
+                      className="mt-1 w-full text-md  border-gray-400 dark:border-gray-600  rounded-lg font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
+                      aria-required="true"
+                    />
+                  </div>
+
+                  <div className="flex flex-col flex-1 min-w-[180px] mt-4 sm:mt-0">
+                    <label
+                      htmlFor="status"
+                      className="block text-md font-medium text-gray-700 dark:text-gray-200"
+                    >
+                      {t("staff.status")}
+                    </label>
+                    <Select
+                      name="status"
+                      options={statusOptions}
+                      value={
+                        statusOptions.find(
+                          (opt) => opt.value === formData.status
+                        ) || null
+                      }
+                      onChange={(selectedOption) =>
+                        handleFormChange({
+                          target: {
+                            name: "status",
+                            value: selectedOption ? selectedOption.value : "",
+                          },
+                        })
+                      }
+                      classNamePrefix="select"
+                      className="mt-1 w-full text-md   dark:border-gray-600  rounded-lg font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
+                      aria-required="true"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label
-                    htmlFor="status"
-                    className="block text-md font-medium text-gray-700 dark:text-gray-200"
-                  >
-                    {t("staff.status")}
-                  </label>
-                  <select
-                    id="status"
-                    name="status"
-                    value={formData.status}
-                    onChange={handleFormChange}
-                    className="mt-1 w-full text-md border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-lg font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
-                    aria-required="true"
-                  >
-                    <option value="Active">{t("staff.statusActive")}</option>
-                    <option value="Inactive">
-                      {t("staff.statusInactive")}
-                    </option>
-                  </select>
-                </div>
-                <div>
+
+                {/* Phone */}
+                <div className="flex flex-col flex-1 min-w-[180px]">
                   <label
                     htmlFor="phone"
                     className="block text-md font-medium text-gray-700 dark:text-gray-200"
@@ -614,7 +707,8 @@ const ManageStaff = () => {
                   />
                 </div>
 
-                <div className="flex justify-end space-x-2">
+                {/* Buttons */}
+                <div className="flex  justify-end space-x-2 ">
                   <button
                     type="button"
                     onClick={() => setShowModal(false)}

@@ -12,6 +12,7 @@ import EditCustomerModal from "../../components/Customer/EditCustomerModal";
 const CustomerList = () => {
   const { t } = useTranslation();
   const menuRef = useRef(null);
+
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -38,6 +39,18 @@ const CustomerList = () => {
       setLoading(false);
     }
   };
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setOpenMenu(null); // close the dropdown
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     fetchCustomer();
@@ -46,13 +59,16 @@ const CustomerList = () => {
     setIsEditModalOpen(false);
     setSelectedCustomer(null);
   };
+  const [deletingId, setDeletingId] = useState(null);
+
   const handleDeleteClick = async (id) => {
     if (!window.confirm(t("customerlist.ConfirmDelete"))) return;
 
+    setDeletingId(id);
     const success = await deleteCustomer(id, t);
+    setDeletingId(null);
 
     if (success) {
-      // Optionally update the state to remove the customer from the list
       setCustomers((prev) => prev.filter((cus) => cus.id !== id));
     }
   };
@@ -70,10 +86,9 @@ const CustomerList = () => {
   const toggleMenu = (index) => setOpenMenu(openMenu === index ? null : index);
 
   const filteredCustomers = (customers || []).filter((cus) => {
-    const matchesSearch = (cus?.customer || "")
-      .toLowerCase()
-      .includes((searchTerm || "").toLowerCase());
-    return matchesSearch;
+    const name = (cus?.name || "").toLowerCase();
+    const search = (searchTerm || "").toLowerCase();
+    return name.includes(search);
   });
 
   const totalPages = Math.ceil(filteredCustomers.length / rowsPerPage) || 1;
@@ -134,7 +149,7 @@ const CustomerList = () => {
             </tr>
           </thead>
           <tbody className="text-md text-gray-700 dark:text-gray-200">
-            {selectedCustomers.map((cus, index) => {
+            {filteredCustomers.map((cus, index) => {
               const { text, color } = getStatus(cus.status);
               return (
                 <tr
@@ -151,7 +166,8 @@ const CustomerList = () => {
 
                   {/* Desktop only cells */}
                   <td className="hidden md:table-cell px-4 py-3">
-                    {cus.item} <br /> {cus.quantity}
+                    {cus.item} <br />
+                    {cus.quantity}
                   </td>
                   <td className="hidden md:table-cell px-4 py-3 font-semibold">
                     ${cus.amount}
@@ -210,43 +226,73 @@ const CustomerList = () => {
             })}
           </tbody>
           {showModal && selectedCustomer && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-md p-6 relative">
-                <h2 className="text-xl font-bold mb-4">
-                  {t("customerlist.CustomerDetails")}
-                </h2>
-
-                <p>
-                  <strong>{t("customerlist.Name")}:</strong>{" "}
-                  {selectedCustomer.customer}
-                </p>
-                <p>
-                  <strong>{t("customerlist.Email")}:</strong>{" "}
-                  {selectedCustomer.email}
-                </p>
-                <p>
-                  <strong>{t("customerlist.Phone")}:</strong>{" "}
-                  {selectedCustomer.phone}
-                </p>
-                <p>
-                  <strong>{t("customerlist.Item")}:</strong>{" "}
-                  {selectedCustomer.item}
-                </p>
-                <p>
-                  <strong>{t("customerlist.Quantity")}:</strong>{" "}
-                  {selectedCustomer.quantity}
-                </p>
-                <p>
-                  <strong>{t("customerlist.Amount")}:</strong> $
-                  {selectedCustomer.amount}
-                </p>
-
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-6 sm:p-8 relative">
+                {/* Close button (top right) */}
                 <button
-                  className="absolute top-2 right-2 text-gray-600 dark:text-gray-300 hover:text-red-500"
+                  className="absolute top-3 right-3 text-gray-500 dark:text-gray-300 hover:text-red-500 transition"
                   onClick={() => setShowModal(false)}
+                  aria-label="Close modal"
                 >
                   ✕
                 </button>
+
+                {/* Title */}
+                <h2 className="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-white">
+                  {t("customerlist.CustomerDetails")}
+                </h2>
+
+                {/* Info List */}
+                <div className="space-y-3 text-sm text-gray-700 dark:text-gray-200">
+                  <p>
+                    <span className="font-medium text-gray-600 dark:text-gray-400">
+                      {t("customerlist.Name")}:
+                    </span>{" "}
+                    {selectedCustomer.customer}
+                  </p>
+                  <p>
+                    <span className="font-medium text-gray-600 dark:text-gray-400">
+                      {t("customerlist.Email")}:
+                    </span>{" "}
+                    {selectedCustomer.email}
+                  </p>
+                  <p>
+                    <span className="font-medium text-gray-600 dark:text-gray-400">
+                      {t("customerlist.Phone")}:
+                    </span>{" "}
+                    {selectedCustomer.phone}
+                  </p>
+                  <p>
+                    <span className="font-medium text-gray-600 dark:text-gray-400">
+                      {t("customerlist.Item")}:
+                    </span>{" "}
+                    {selectedCustomer.item}
+                  </p>
+                  <p>
+                    <span className="font-medium text-gray-600 dark:text-gray-400">
+                      {t("customerlist.Quantity")}:
+                    </span>{" "}
+                    {selectedCustomer.quantity}
+                  </p>
+                  <p>
+                    <span className="font-medium text-gray-600 dark:text-gray-400">
+                      {t("customerlist.Amount")}:
+                    </span>{" "}
+                    <span className="text-green-600 dark:text-green-400 font-semibold">
+                      ${selectedCustomer.amount}
+                    </span>
+                  </p>
+                </div>
+
+                {/* Optional Bottom Close Button */}
+                <div className="mt-6 text-center sm:hidden">
+                  <button
+                    onClick={() => setShowModal(false)}
+                    className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                  >
+                    {t("Close")}
+                  </button>
+                </div>
               </div>
             </div>
           )}

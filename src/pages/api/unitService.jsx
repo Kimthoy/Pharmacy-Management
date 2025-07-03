@@ -1,66 +1,77 @@
 import axios from "axios";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api";
+
 const getAuthHeader = () => {
   const token = localStorage.getItem("token");
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
-export const createCustomer = async (customer) => {
+
+export const createUnit = async (unitData) => {
   try {
-    const response = await axios.post(`${API_URL}/customers/create`, customer, {
+    const response = await axios.post(`${API_URL}/units`, unitData, {
       headers: getAuthHeader(),
     });
     console.log("Success:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error:", error.response?.data || error.message);
-    throw error.response?.data || { message: "Failed to create medicine" };
+    throw error.response?.data || { message: "Failed to create unit" };
   }
 };
-export const getAllCustomer = async () => {
+
+export const getAllUnits = async () => {
   try {
-    const response = await axios.get(`${API_URL}/customers`, {
+    const response = await axios.get(`${API_URL}/units`, {
       headers: getAuthHeader(),
     });
-
-    // Log the whole response to see its structure
     console.log("API response:", response.data);
-
-    // If response.data contains `{ data: [...] }`
     return Array.isArray(response.data)
       ? response.data
       : response.data.data || [];
   } catch (error) {
     console.error(
-      "Error fetching medicines:",
+      "Error fetching units:",
       error.response?.data || error.message
     );
-    throw error.response?.data || { message: "Failed to fetch customer" };
+    throw error.response?.data || { message: "Failed to fetch units" };
   }
 };
-export const updateCustomer = async (id, data) => {
+
+export const updateUnit = async (id, data) => {
   try {
-    const response = await axios.put(`${API_URL}/customers/${id}`, data, {
+    const response = await axios.put(`${API_URL}/units/${id}`, data, {
       headers: getAuthHeader(),
     });
     return response.data;
   } catch (error) {
-    if (error.response?.data) {
+    if (error.response) {
       throw error.response.data;
     } else {
       throw { message: "Network error" };
     }
   }
 };
-export const deleteCustomer = async (id) => {
+
+export const deleteUnit = async (id) => {
   try {
-    const response = await axios.delete(`${API_URL}/customers/${id}`, {
-      headers: getAuthHeader(),
+    const response = await fetch(`${API_URL}/units/${id}`, {
+      method: "DELETE",
+      headers: {
+        ...getAuthHeader(),
+        "Content-Type": "application/json",
+      },
     });
 
-    return response.data;
+    if (!response.ok) {
+      const data = await response.json();
+      alert(data.message || "Failed to delete");
+      return false;
+    }
+    return true;
   } catch (error) {
     console.error("Delete error:", error);
+    alert("An error occurred");
     return false;
   }
 };

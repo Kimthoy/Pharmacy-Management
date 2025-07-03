@@ -13,7 +13,6 @@ export const createMedicine = async (medicineData) => {
     const response = await axios.post(`${API_URL}/medicines`, medicineData, {
       headers: {
         ...getAuthHeader(),
-        // Don't set 'Content-Type': axios will set the correct multipart/form-data boundary
       },
     });
     console.log("Success:", response.data);

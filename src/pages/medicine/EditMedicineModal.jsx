@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { updateMedicine } from "../api/medicineService"; // adjust path as needed
 import Swal from "sweetalert2";
+import { ToastContainer, toast } from "react-toastify";
 import Select from "react-select";
 import { getAllCategory } from "../api/categoryService";
+import { getAllUnits } from "../api/unitService";
 const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
   // const [formData, setFormData] = useState(initialData || {});
   const [category, setCategory] = useState([]);
+  const [unit, setUnit] = useState([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -21,6 +24,7 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
     barcode_number: "",
     medicine_detail: "",
     category_ids: [],
+    unit_ids: [],
     image: null,
     imageFile: null,
   });
@@ -39,6 +43,7 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
         category_ids: medicine.categories
           ? medicine.categories.map((c) => c.id)
           : [],
+        unit_ids: medicine.unit ? medicine.unit.map((u) => u.id) : [],
         image: medicine.image_url || null, // Your image URL or null
         imageFile: null,
       });
@@ -78,6 +83,35 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
   //   setMedicine({ ...medicine, category_ids: selected });
   // };
 
+  //Fetch unit
+  //Unit fetch
+  useEffect(() => {
+    const fetchUnit = async () => {
+      try {
+        const result = await getAllUnits();
+        setUnit(result);
+      } catch (e) {
+        console.error("Failed to load units");
+      }
+    };
+    fetchUnit();
+  }, []);
+  const fetchUnit = async () => {
+    setLoading(true);
+    try {
+      const data = await getAllUnits();
+      setUnit(data);
+    } catch (err) {
+      console.error("Fetch error:", err);
+      setError("Failed to fetch units.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchUnit();
+  }, []);
+
   useEffect(() => {
     setFormData(initialData || {});
   }, [initialData]);
@@ -86,8 +120,6 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
-
-    // For number inputs, convert value to number (optional)
     const val = type === "number" ? (value === "" ? "" : Number(value)) : value;
 
     setFormData((prev) => ({
@@ -131,15 +163,21 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
     label: cat.category_name,
   }));
 
-  const handleCategoryChange = (selectedOptions) => {
-    const selectedIds = selectedOptions
-      ? selectedOptions.map((opt) => opt.value)
-      : [];
-    setMedicine((prev) => ({
-      ...prev,
-      category_ids: selectedIds,
-    }));
-  };
+  const statusOptions = [
+    { value: "active", label: "Active" },
+    { value: "inactive", label: "Inactive" },
+  ];
+  //Set Unit Option
+  const unitOptions = unit.map((unt) => ({
+    value: unt.id,
+    label: unt.unit_name,
+  }));
+  // const handleUnitChange = (selectedOptions) => {
+  //   setMedicine((prev) => ({
+  //     ...prev,
+  //     unit_ids: selectedOptions.map((opt) => opt.value),
+  //   }));
+  // };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
@@ -197,21 +235,20 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
             className="w-full p-2 border focus:border-none"
           />
           <Select
-            isMulti
-            name="category_ids"
+            name="category_id"
             options={categoryOptions}
-            value={categoryOptions.filter(
-              (opt) =>
-                Array.isArray(formData.category_ids) &&
-                formData.category_ids.includes(opt.value)
-            )}
-            onChange={(selectedOptions) => {
-              const selectedIds = selectedOptions
-                ? selectedOptions.map((opt) => opt.value)
-                : [];
-              setFormData({ ...formData, category_ids: selectedIds });
+            value={
+              categoryOptions.find(
+                (opt) => opt.value === formData.category_id
+              ) || null
+            }
+            onChange={(selectedOption) => {
+              setFormData((prev) => ({
+                ...prev,
+                category_id: selectedOption ? selectedOption.value : null,
+              }));
             }}
-            className="basic-multi-select"
+            className="basic-single-select"
             classNamePrefix="select"
             styles={{
               container: (base) => ({
@@ -220,15 +257,47 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
               }),
             }}
           />
-          <select
+          <Select
+            name="unit_ids"
+            options={unitOptions}
+            value={
+              unitOptions.find(
+                (opt) => opt.value === formData.unit_ids
+              ) || null
+            }
+            onChange={(selectedOption) => {
+              setFormData((prev) => ({
+                ...prev,
+                unit_ids: selectedOption ? selectedOption.value : null,
+              }));
+            }}
+            className="basic-single-select"
+            classNamePrefix="select"
+            styles={{
+              container: (base) => ({
+                ...base,
+                maxHeight: "150px",
+              }),
+            }}
+          />
+
+          <Select
             name="status"
-            value={formData.status || ""}
-            className="border"
-            onChange={handleChange}
-          >
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
+            options={statusOptions}
+            value={
+              statusOptions.find((opt) => opt.value === formData.status) || null
+            }
+            onChange={(selectedOption) => {
+              handleChange({
+                target: {
+                  name: "status",
+                  value: selectedOption ? selectedOption.value : "",
+                },
+              });
+            }}
+            classNamePrefix="select "
+            className=" rounded-lg"
+          />
 
           <div className="md:col-span-2">
             <textarea
@@ -244,6 +313,7 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
           <input
             type="file"
             accept="image/*"
+            className="border rounded-lg h-12 p-2 cursor-pointer"
             onChange={(e) => {
               const file = e.target.files[0];
               if (file) {

@@ -1,6 +1,7 @@
 import React, { Suspense, lazy, useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import {
   BrowserRouter as Router,
   Route,
@@ -57,6 +58,7 @@ const Profile = lazy(() => import("./pages/profile/AboutUser"));
 
 const MessagePage = lazy(() => import("./pages/setting/Message"));
 const NotificationPage = lazy(() => import("./pages/setting/Notification"));
+const Unit = lazy(() => import("./pages/medicine/Unit"));
 const App = () => {
   const location = useLocation();
   const [langCode, setLangCode] = useState(
@@ -153,6 +155,7 @@ const App = () => {
                       element={<MedicineDetail />}
                     />
                     <Route path="/categoies" element={<Category />} />
+                    <Route path="/units" element={<Unit />} />
                     <Route path="/settingpage" element={<Setting />} />
                     <Route
                       path="/manufacturerreturnlist"
@@ -191,6 +194,7 @@ const App = () => {
                 </Suspense>
               </div>
               <Footer />
+              <ToastContainer position="top-right" autoClose={3000} />
             </div>
           </div>
         </LanguageProvider>

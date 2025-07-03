@@ -5,21 +5,21 @@ const getAuthHeader = () => {
   const token = localStorage.getItem("token");
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
-export const createCustomer = async (customer) => {
+export const createSupplier = async (supplier) => {
   try {
-    const response = await axios.post(`${API_URL}/customers/create`, customer, {
+    const response = await axios.post(`${API_URL}/suppliers`, supplier, {
       headers: getAuthHeader(),
     });
     console.log("Success:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error:", error.response?.data || error.message);
-    throw error.response?.data || { message: "Failed to create medicine" };
+    throw error.response?.data || { message: "Failed to create suppliers" };
   }
 };
-export const getAllCustomer = async () => {
+export const getAllSupplier = async () => {
   try {
-    const response = await axios.get(`${API_URL}/customers`, {
+    const response = await axios.get(`${API_URL}/suppliers`, {
       headers: getAuthHeader(),
     });
 
@@ -32,15 +32,15 @@ export const getAllCustomer = async () => {
       : response.data.data || [];
   } catch (error) {
     console.error(
-      "Error fetching medicines:",
+      "Error fetching suppliers:",
       error.response?.data || error.message
     );
-    throw error.response?.data || { message: "Failed to fetch customer" };
+    throw error.response?.data || { message: "Failed to fetch suppliers" };
   }
 };
-export const updateCustomer = async (id, data) => {
+export const updateSupplier = async (id, data) => {
   try {
-    const response = await axios.put(`${API_URL}/customers/${id}`, data, {
+    const response = await axios.put(`${API_URL}/suppliers/${id}`, data, {
       headers: getAuthHeader(),
     });
     return response.data;
@@ -52,9 +52,9 @@ export const updateCustomer = async (id, data) => {
     }
   }
 };
-export const deleteCustomer = async (id) => {
+export const deleteSupplier = async (id) => {
   try {
-    const response = await axios.delete(`${API_URL}/customers/${id}`, {
+    const response = await axios.delete(`${API_URL}/suppliers/${id}`, {
       headers: getAuthHeader(),
     });
 
@@ -64,3 +64,4 @@ export const deleteCustomer = async (id) => {
     return false;
   }
 };
+ 

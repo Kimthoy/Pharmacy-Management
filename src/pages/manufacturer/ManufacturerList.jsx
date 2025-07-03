@@ -2,80 +2,36 @@ import { useState, useRef, useEffect } from "react";
 import { FaEllipsisH } from "react-icons/fa";
 import { BiEdit, BiShow, BiTrash } from "react-icons/bi";
 import { useTranslation } from "../../hooks/useTranslation";
-
-const manufacturers = [
-  {
-    manufacturer_id: "#M-35",
-    company: "Healthcare",
-    email: "info@softnio.com",
-    phone: "+811 847-4958",
-    address: "Stoeng Meanchey, Phnom Penh",
-    balance: 7868.55,
-    status: "active",
-  },
-  {
-    manufacturer_id: "#M-98",
-    company: "Healthcare",
-    email: "info@softnio.com",
-    phone: "+811 847-4958",
-    address: "Stoeng Meanchey, Phnom Penh",
-    balance: 7868.55,
-    status: "active",
-  },
-  {
-    manufacturer_id: "#M-35",
-    company: "Healthcare",
-    email: "info@softnio.com",
-    phone: "+811 847-4958",
-    address: "Stoeng Meanchey, Phnom Penh",
-    balance: 7868.55,
-    status: "active",
-  },
-  {
-    manufacturer_id: "#M-98",
-    company: "Healthcare",
-    email: "info@softnio.com",
-    phone: "+811 847-4958",
-    address: "Stoeng Meanchey, Phnom Penh",
-    balance: 7868.55,
-    status: "active",
-  },
-];
-
+import SupplierFormModal from "./SupplierFormModal";
+import { toast } from "react-toastify";
+import { createSupplier, getAllSupplier } from "../api/supplierService";
 const Manufacturerlist = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const toggleForm = () => setIsModalOpen((prev) => !prev);
   const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState(null);
+  const [suppliers, setSuppliers] = useState([]);
   const menuRef = useRef(null);
-  const [formData, setFormData] = useState({
-    manufacturer_id: "",
-    company: "",
-    email: "",
-    phone: "",
-    address: "",
-    balance: "",
-    status: "active",
-  });
-  const [formErrors, setFormErrors] = useState({});
 
-  const toggleForm = () => {
-    setIsFormOpen(!isFormOpen);
-    setFormData({
-      manufacturer_id: "",
-      company: "",
-      email: "",
-      phone: "",
-      address: "",
-      balance: "",
-      status: "active",
-    });
-    setFormErrors({});
+  const [formErrors, setFormErrors] = useState({});
+  const toggleMenu = (index) => setOpenMenu(openMenu === index ? null : index);
+
+  const fetchSuppliers = async () => {
+    try {
+      const data = await getAllSupplier();
+      setSuppliers(data);
+    } catch (err) {
+      toast.error("Failed to load suppliers");
+    }
   };
 
-  const toggleMenu = (index) => setOpenMenu(openMenu === index ? null : index);
+  useEffect(() => {
+    fetchSuppliers();
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -87,65 +43,70 @@ const Manufacturerlist = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleFormChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    if (formErrors[name]) {
-      setFormErrors((prev) => ({ ...prev, [name]: "" }));
-    }
-  };
-
-  const validateForm = () => {
+  const validateForm = (data) => {
     const errors = {};
-    if (!formData.manufacturer_id.trim())
-      errors.manufacturer_id = t(
-        "manufacturerlist.ErrorManufacturerIDRequired"
-      );
-    if (!formData.company.trim())
-      errors.company = t("manufacturerlist.ErrorCompanyRequired");
-    if (!formData.email.trim())
-      errors.email = t("manufacturerlist.ErrorEmailRequired");
-    else if (!/\S+@\S+\.\S+/.test(formData.email))
-      errors.email = t("manufacturerlist.ErrorEmailInvalid");
-    if (!formData.phone.trim())
-      errors.phone = t("manufacturerlist.ErrorPhoneRequired");
-    if (!formData.address.trim())
-      errors.address = t("manufacturerlist.ErrorAddressRequired");
-    if (!formData.balance.trim())
-      errors.balance = t("manufacturerlist.ErrorBalanceRequired");
-    else if (isNaN(formData.balance) || Number(formData.balance) < 0)
-      errors.balance = t("manufacturerlist.ErrorBalanceInvalid");
+
+    if (!data.company_name?.trim())
+      errors.company_name = "Company name is required";
+    if (!data.email?.trim()) errors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(data.email))
+      errors.email = "Email is invalid";
+    if (!data.phone_number?.trim())
+      errors.phone_number = "Phone number is required";
+    if (!data.address?.trim()) errors.address = "Address is required";
     return errors;
   };
 
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-    const errors = validateForm();
+  const handleFormSubmit = async (formData) => {
+    // No e.preventDefault() here!
+
+    const errors = validateForm(formData);
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       return;
     }
-    // For demo, add to manufacturers array (replace with API call in production)
-    manufacturers.push({
-      ...formData,
-      balance: Number(formData.balance),
-    });
-    toggleForm();
+
+    try {
+      await createSupplier({
+        ...formData,
+        balance: Number(formData.balance), // if you use balance
+      });
+
+      toast.success("Supplier added successfully!");
+      setFormErrors({});
+      toggleForm(); // close modal
+
+      // Optional: refresh list or reset form
+      fetchSuppliers();
+      // setFormData(initialState);
+    } catch (err) {
+      const msg = err.message || "Failed to create supplier.";
+      toast.error(msg);
+    }
   };
 
-  const filteredManufacturers = manufacturers.filter((man) =>
-    man.manufacturer_id.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const totalPages = Math.ceil(filteredManufacturers.length / rowsPerPage) || 1;
+  const filteredSuppliers = suppliers.filter((sup) => {
+    const companyId = sup.company_id || "";
+    return companyId.toLowerCase().includes(searchTerm.toLowerCase());
+  });
+  const totalPages = Math.ceil(filteredSuppliers.length / rowsPerPage) || 1;
   const startIndex = (currentPage - 1) * rowsPerPage;
-  const selectedManufacturers = filteredManufacturers.slice(
+  const selectedSuppliers = filteredSuppliers.slice(
     startIndex,
     startIndex + rowsPerPage
   );
-
-  const getStatus = (status) => {
-    if (status === "active")
+  const handleCreateSupplier = async (formData) => {
+    try {
+      await createSupplier(formData);
+      toast.success("Supplier created!");
+      setIsModalOpen(false);
+      fetchSuppliers(); // Refresh list
+    } catch (error) {
+      toast.error(error.message || "Failed to create supplier");
+    }
+  };
+  const getStatus = (is_active) => {
+    if (is_active === true)
       return {
         text: t("manufacturerlist.StatusActive"),
         color: "text-green-400 dark:text-green-300",
@@ -176,8 +137,6 @@ const Manufacturerlist = () => {
         </button>
       </div>
 
-     
-
       <div className="flex flex-wrap gap-4 mb-4">
         <input
           type="text"
@@ -201,6 +160,9 @@ const Manufacturerlist = () => {
                 {t("manufacturerlist.Company")}
               </th>
               <th className="p-3 text-left text-gray-400 dark:text-gray-300 text-md">
+                {t("manufacturerlist.Email")}
+              </th>
+              <th className="p-3 text-left text-gray-400 dark:text-gray-300 text-md">
                 {t("manufacturerlist.Phone")}
               </th>
               <th className="sm:flex hidden p-3 text-left text-gray-400 dark:text-gray-300 text-md">
@@ -216,25 +178,30 @@ const Manufacturerlist = () => {
             </tr>
           </thead>
           <tbody className="border border-gray-200 dark:border-gray-600">
-            {selectedManufacturers.map((man, index) => {
-              const { text, color } = getStatus(man.status);
+            {selectedSuppliers.map((man, index) => {
+              const { text, color } = getStatus(man.is_active);
               return (
                 <tr
                   key={index}
                   className="border-b border-gray-200 dark:border-gray-600 text-md"
                 >
                   <td className="sm:flex hidden p-3 text-green-400 dark:text-green-300 cursor-pointer hover:underline">
-                    {man.manufacturer_id}
+                    {man.company_id}
+                  </td>
+                  <td
+                    className="p-3 text-gray-400 dark:text-gray-300  max-w-[100px] truncate"
+                    title={man.company_name}
+                  >
+                    {man.company_name}
+                  </td>
+                  <td
+                    className="p-3 text-gray-400 dark:text-gray-300  max-w-[100px] truncate"
+                    title={man.email}
+                  >
+                    {man.email}
                   </td>
                   <td className="p-3 text-gray-400 dark:text-gray-300">
-                    {man.company}
-                    <br />
-                    <span className="sm:flex hidden text-gray-500 dark:text-gray-400">
-                      {man.email}
-                    </span>
-                  </td>
-                  <td className="p-3 text-gray-400 dark:text-gray-300">
-                    {man.phone}
+                    {man.phone_number}
                   </td>
                   <td className="sm:flex hidden p-3 text-gray-400 dark:text-gray-300">
                     {man.address}
@@ -260,7 +227,7 @@ const Manufacturerlist = () => {
                           <BiEdit className="mr-2" />
                           {t("manufacturerlist.Edit")}
                         </button>
-                        <button className="sm:flex hidden items-center w-full text-left text-gray-600 dark:text-gray-200 py-2 px-3 hover:rounded-md hover:bg-green-500 hover:text-white dark:hover:bg-green-400 dark:hover:text-white">
+                        <button className="flex items-center w-full text-left text-gray-600 dark:text-gray-200 py-2 px-3 hover:rounded-md hover:bg-green-500 hover:text-white dark:hover:bg-green-400 dark:hover:text-white">
                           <BiTrash className="mr-2" />
                           {t("manufacturerlist.Remove")}
                         </button>
@@ -316,6 +283,11 @@ const Manufacturerlist = () => {
           </button>
         </div>
       </div>
+      <SupplierFormModal
+        isOpen={isModalOpen}
+        onClose={toggleForm}
+        onSubmit={handleFormSubmit} // now it expects formData, not event
+      />
     </div>
   );
 };

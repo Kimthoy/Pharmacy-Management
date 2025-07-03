@@ -22,7 +22,7 @@
     "Enable": "បើកដំណើរការ"
   },
   "medicine-view": {
-    "Quantity":"ចំនួន",
+    "Quantity": "ចំនួន",
     "Image": "រូបភាព",
     "Info": "ព័ត៌មានថ្នាំ",
     "Name": "ឈ្មោះ",
@@ -235,6 +235,7 @@
     "total-customer": "អតិថិជន សរុប"
   },
   "add-medicine": {
+    "Unit": "ឯកតា",
     "Photo": "រូបភាព",
     "ExpireDate": "ថ្ងៃខែផុតកំណត់",
     "AddMedicine": "ទម្រង់បែបបទនៃការ​​​បន្ថែម ថ្នាំ",
@@ -272,6 +273,7 @@
   },
 
   "sidebar": {
+    "units": "ឯកតា",
     "supplies": "ការផ្គត់ផ្គង់",
     "supplier": "អ្នកផ្គត់ផ្គង់",
     "supplierlist": "បញ្ជីអ្នកផ្គត់ផ្គង់",
@@ -380,6 +382,12 @@
     "ButtonAddCustomer": "បន្ថែមអតិថិជន"
   },
   "customerlist": {
+    "CustomerDetails": "ព័ត៌មានអតិថិជន",
+    "Name": "ឈ្មោះអតិថិជន",
+    "Email": "អុីមែល",
+    "Update": "ធ្វើបច្ចុប្បន្នភាព",
+    "Cancel": "បោះបង់",
+    "Address": "អាសយដ្ឋាន",
     "View": "មើលលម្អិត",
     "CustomerListTitle": "បញ្ជីអតិថិជន",
     "SearchPlaceholder": "ស្វែងរកតាមឈ្មោះ...",
@@ -894,6 +902,7 @@
   },
 
   "staff": {
+    "password": "ពាក្យសម្ងាត់",
     "StaffDashboard": "ផ្ទាំងគ្រប់គ្រងបុគ្គលិក",
     "StaffDashboardDesc": "គ្រប់គ្រងបុគ្គលិករបស់អ្នកប្រកបដោយប្រសិទ្ធភាព",
     "addStaff": "បន្ថែមបុគ្គលិក",

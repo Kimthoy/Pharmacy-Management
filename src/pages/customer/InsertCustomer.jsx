@@ -14,10 +14,28 @@ const AddCustomer = () => {
     amount: "",
   });
   const handleCustomerChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type } = e.target;
+    let newValue = value;
+
+    if (type === "number") {
+      if (name === "quantity") {
+        const parsed = parseInt(value, 10);
+        newValue = isNaN(parsed) ? "" : Math.max(parsed, 1); // quantity must be ≥ 1
+      } else if (name === "amount") {
+        const parsed = parseFloat(value);
+        newValue = isNaN(parsed) ? "" : Math.max(parsed, 0); // amount must be ≥ 0
+      }
+    }
+
     setCustomer((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: newValue,
+    }));
+  };
+  const handleAmountBlur = () => {
+    setCustomer((prev) => ({
+      ...prev,
+      amount: parseFloat(prev.amount || 0).toFixed(2),
     }));
   };
   const [error, setError] = useState("");
@@ -69,7 +87,6 @@ const AddCustomer = () => {
     },
     [customer]
   );
-
 
   return (
     <div className=" mb-20  bg-white dark:bg-gray-900 rounded-md  dark:shadow-gray-800 w-full max-w-6xl mx-auto">
@@ -195,9 +212,11 @@ const AddCustomer = () => {
             </label>
             <input
               type="number"
+              step="1.00"
               name="amount"
               value={customer.amount}
               onChange={handleCustomerChange}
+              onBlur={handleAmountBlur}
               className="border border-gray-400 dark:border-gray-600 px-2 text-md py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 focus:placeholder:text-green-400 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
             />
           </div>

@@ -1,10 +1,11 @@
 import { useState, useCallback, useEffect } from "react";
 import BarcodeScanner from "../../components/BarcodeScanner";
-// import { LiaWindowCloseSolid } from "react-icons/lia";
 import { useTranslation } from "../../hooks/useTranslation";
 import { createMedicine } from "../api/medicineService";
 import { getAllCategory } from "../api/categoryService";
+import { getAllUnits } from "../api/unitService";
 import { LuScanBarcode } from "react-icons/lu";
+
 import Select from "react-select";
 const AddMedicine = () => {
   const { t } = useTranslation();
@@ -16,12 +17,12 @@ const AddMedicine = () => {
     expire_date: "",
     status: "active",
     category: "",
+    unit_id: "",
     medicine_detail: "",
     barcode_number: "",
-    image: "",
+    image: null,
   });
   const [imagePreview, setImagePreview] = useState(null);
-
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -47,14 +48,59 @@ const AddMedicine = () => {
         [name]: values,
       }));
     } else {
+      let newValue = value;
+
+      if (type === "number") {
+        if (name === "quantity") {
+          const parsed = parseInt(value, 10);
+          newValue = isNaN(parsed) ? "" : Math.max(parsed, 1);
+        } else if (name === "price") {
+          const parsed = parseFloat(value);
+          newValue = isNaN(parsed) ? "" : Math.max(parsed, 0);
+        }
+      }
       setMedicine((prev) => ({
         ...prev,
-        [name]: value,
+        [name]: newValue,
       }));
     }
   }, []);
-
+  const handleAmountBlur = () => {
+    setMedicine((prev) => ({
+      ...prev,
+      price: parseFloat(prev.price || 0).toFixed(2),
+    }));
+  };
   const [category, setCategory] = useState([]);
+  const [unit, setUnit] = useState([]);
+  //Unit fetch
+  useEffect(() => {
+    const fetchUnit = async () => {
+      try {
+        const result = await getAllUnits();
+        setUnit(result);
+      } catch (e) {
+        console.error("Failed to load units");
+      }
+    };
+    fetchUnit();
+  }, []);
+  const fetchUnit = async () => {
+    setLoading(true);
+    try {
+      const data = await getAllUnits();
+      setUnit(data);
+    } catch (err) {
+      console.error("Fetch error:", err);
+      setError("Failed to fetch units.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchUnit();
+  }, []);
+  //Category validate and fetch
   useEffect(() => {
     const fetchCategory = async () => {
       try {
@@ -66,6 +112,7 @@ const AddMedicine = () => {
     };
     fetchCategory();
   }, []);
+
   const fetchCategory = async () => {
     setLoading(true);
     try {
@@ -78,11 +125,17 @@ const AddMedicine = () => {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchCategory();
   }, []);
-
+  //Hand Submit Medicine
+  const [toast, setToast] = useState({ message: "", type: "" });
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+    setTimeout(() => {
+      setToast({ message: "", type: "" });
+    }, 2000);
+  };
   const handleMedicineSubmit = useCallback(
     async (e) => {
       e.preventDefault();
@@ -90,25 +143,22 @@ const AddMedicine = () => {
       setSuccess("");
       setIsLoading(true);
 
-      // 🧪 Quantity validation
       if (!medicine.quantity || parseInt(medicine.quantity) < 0) {
-        setError("Please enter the quantity of product!");
+        showToast("Please enter the quantity of product!", "error");
         setIsLoading(false);
         return;
       }
 
-      // 🧪 Expire date validation
       if (
         medicine.expire_date &&
         new Date(medicine.expire_date) <= new Date()
       ) {
-        setError(t("Ops! the expire date not enter yet!"));
+        showToast(t("Ops! the expire date not enter yet!"), "error");
         setIsLoading(false);
         return;
       }
 
       try {
-        // ✅ Prepare FormData for Laravel + image
         const formData = new FormData();
         formData.append("medicine_name", medicine.medicine_name);
         formData.append("price", parseFloat(medicine.price) || 0);
@@ -118,27 +168,19 @@ const AddMedicine = () => {
         formData.append("status", medicine.status);
         formData.append("medicine_detail", medicine.medicine_detail || "");
         formData.append("barcode_number", medicine.barcode_number);
-
-        // ✅ Append category_ids[] for Laravel array
         medicine.category_ids.forEach((id) => {
           formData.append("category_ids[]", id);
         });
-
-        // ✅ Append image file only if valid
+        medicine.unit_ids.forEach((id) => {
+          formData.append("unit_ids[]", id);
+        });
         if (medicine.image instanceof File) {
           formData.append("image", medicine.image);
         }
 
-        // ✅ Debug: log FormData content
-        for (let [key, value] of formData.entries()) {
-          console.log(`${key}:`, value);
-        }
-
-        // ✅ Call API
         await createMedicine(formData);
+        showToast("Success", "success");
 
-        // ✅ Show success + reset form
-        setSuccess("Success");
         setMedicine({
           medicine_name: "",
           price: "",
@@ -150,49 +192,74 @@ const AddMedicine = () => {
           medicine_detail: "",
           barcode_number: "",
           category_ids: [],
-          image: null, // ✅ set to null (not empty string)
+          unit_ids: [],
+          image: null,
         });
       } catch (err) {
         console.error("Full error:", err);
         const errorMessage = err?.message || "Something went wrong";
-        setError(errorMessage);
+        showToast(errorMessage, "error");
       } finally {
         setIsLoading(false);
       }
     },
     [t, medicine]
   );
-
-  const handleDetected = (barcode) => {
-    if (!medicine.barcode_number) {
-      setMedicine((prev) => ({ ...prev, barcode_number: barcode }));
-      // fetchMedicineDetails(barcode); // example async fetch
-    }
-  };
   const [showScanner, setShowScanner] = useState(false);
-  const [barcode, setBarcode] = useState("");
-
   const handleScan = (scannedBarcode) => {
     setMedicine((prev) => ({ ...prev, barcode_number: scannedBarcode }));
     setShowScanner(false);
   };
 
+  //Set category option
   const categoryOptions = category.map((cat) => ({
     value: cat.id,
     label: cat.category_name,
   }));
 
   const handleCategoryChange = (selectedOptions) => {
-    const selectedIds = selectedOptions.map((opt) => opt.value);
     setMedicine((prev) => ({
       ...prev,
-      category_ids: selectedIds,
+      category_ids: selectedOptions.map((opt) => opt.value),
+    }));
+  };
+  //Set Unit Option
+  const unitOptions = unit.map((unt) => ({
+    value: unt.id,
+    label: unt.unit_name,
+  }));
+  const handleUnitChange = (selectedOptions) => {
+    setMedicine((prev) => ({
+      ...prev,
+      unit_ids: selectedOptions.map((opt) => opt.value),
     }));
   };
   return (
     <div className="p-6 mb-12 bg-white dark:bg-gray-900 rounded-lg shadow-lg dark:shadow-gray-800 w-full max-w-6xl mx-auto">
       <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center">
         <div>
+          {toast.message && (
+            <div
+              style={{
+                position: "fixed",
+                top: "20px",
+                right: "20px",
+                backgroundColor:
+                  toast.type === "success" ? "#4CAF50" : "#F44336",
+                color: "white",
+                padding: "12px 20px",
+                borderRadius: "6px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                zIndex: 9999,
+                minWidth: "250px",
+                fontWeight: "bold",
+                userSelect: "none",
+              }}
+            >
+              {toast.message}
+            </div>
+          )}
+
           <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
             {t("add-medicine.AddMedicine")}
           </h2>
@@ -201,16 +268,7 @@ const AddMedicine = () => {
           </p>
         </div>
       </div>
-      {error && (
-        <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/50 text-red-600 dark:text-red-300 text-md rounded-md border border-red-200 dark:border-red-700">
-          {error}
-        </div>
-      )}
-      {success && (
-        <div className="mb-4 p-4 bg-green-50 dark:bg-green-900/50 text-green-600 dark:text-green-300 text-md rounded-md border border-green-200 dark:border-green-700">
-          {success}
-        </div>
-      )}
+
       <form onSubmit={handleMedicineSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="flex flex-col">
@@ -241,9 +299,9 @@ const AddMedicine = () => {
               type="number"
               id="price"
               name="price"
-              defaultValue={"0"}
               placeholder={t("add-medicine.Price-PlaceHolder")}
               value={medicine.price}
+              onBlur={handleAmountBlur}
               onChange={handleMedicineChange}
               className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
             />
@@ -340,22 +398,46 @@ const AddMedicine = () => {
           <div>
             <label htmlFor=""> {t("add-medicine.Category")}</label>
             <Select
-              isMulti
               name="category_ids"
               options={categoryOptions}
-              value={categoryOptions.filter(
-                (opt) =>
-                  Array.isArray(medicine.category_ids) &&
-                  medicine.category_ids.includes(opt.value)
+              value={categoryOptions.filter((opt) =>
+                Array.isArray(medicine.category_ids)
+                  ? medicine.category_ids.includes(opt.value)
+                  : false
               )}
               onChange={handleCategoryChange}
-              className="basic-multi-select"
+              isMulti
+              className="basic-single-select"
               classNamePrefix="select"
               styles={{
                 container: (base) => ({
                   ...base,
                   maxHeight: "150px",
-                  marginBottom: "2.3rem", // or '16px', '20px', etc.
+                  marginBottom: "2.3rem",
+                  marginTop: "0.5rem",
+                }),
+              }}
+            />
+          </div>
+          <div>
+            <label htmlFor=""> {t("add-medicine.Unit")}</label>
+            <Select
+              name="unit_id"
+              options={unitOptions}
+              value={unitOptions.filter((opt) =>
+                Array.isArray(medicine.unit_ids)
+                  ? medicine.unit_ids.includes(opt.value)
+                  : false
+              )}
+              onChange={handleUnitChange}
+              isMulti
+              className="basic-single-select"
+              classNamePrefix="select"
+              styles={{
+                container: (base) => ({
+                  ...base,
+                  maxHeight: "150px",
+                  marginBottom: "2.3rem",
                   marginTop: "0.5rem",
                 }),
               }}
@@ -378,16 +460,6 @@ const AddMedicine = () => {
               onChange={handleMedicineChange}
               className="mb-2 border px-3 py-2 rounded-lg"
             />
-
-            {imagePreview && (
-              <div className="absolute right-0 top-0">
-                <img
-                  src={imagePreview}
-                  alt="Selected Preview"
-                  className="w-24 h-24 object-cover rounded shadow border border-gray-300"
-                />
-              </div>
-            )}
           </div>
 
           <div className="flex flex-col col-span-1 md:col-span-3">
