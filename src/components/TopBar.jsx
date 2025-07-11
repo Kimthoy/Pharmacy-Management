@@ -348,7 +348,7 @@ const TopBar = ({ onSearch }) => {
   return (
     <div className="bg-white dark:bg-gray-900 z-10 sm:h-20 h-16 flex flex-col sm:flex-row items-center justify-between sm:shadow-sm shadow-lg dark:shadow-gray-800 ">
       <button
-        className="sm:hidden mr-6 bg-gray-200 absolute right-0 mt-2 p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition dark:text-white "
+        className="sm:hidden mr-6 bg-gray-200 absolute right-0 mt-2 p-2 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 transition dark:text-white dark:bg-slate-700 "
         onClick={openProfileDashboard}
       >
         <MdOutlineSettingsSuggest size={24} />

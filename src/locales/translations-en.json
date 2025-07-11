@@ -25,6 +25,7 @@
     "Enable": "Enable"
   },
   "medicine-view": {
+    "BarCode": "BarCode Number",
     "Quantity": "Quantity",
     "Image": "Image",
     "Info": "Informations",
@@ -200,14 +201,12 @@
 
   "topbar": {
     "recentChats": "Recent Chats",
-
     "viewAll": "View All",
     "close": "Close",
     "messages": "Messages",
     "confirm": "Confirm",
     "cancel": "Cancel",
     "search": "Search",
-
     "notifications": "Notifications",
     "darkMode": " ",
     "lightMode": " ",
@@ -272,7 +271,10 @@
     "total-customer": "Total Customer"
   },
   "add-medicine": {
-    "Unit":"Unit",
+    "Scan": "Scan",
+    "Barcode": "Barcode Number",
+    "Barcode-Placeholder": "Barcode",
+    "Unit": "Unit",
     "Photo": "Photo",
     "ExpireDate ": "Expire Date",
     "AddMedicine": "Add Medicine",
@@ -311,6 +313,11 @@
   },
 
   "sidebar": {
+    "AddStock":"Add Stocks",
+    "supplyitems":"Supply Items",
+    "stock": "Stock",
+    "StockList": "Stock List",
+    "supplies": "Supplies",
     "units": "Unit",
     "supplies": "Supplies",
     "categoies": "Category",
@@ -326,9 +333,9 @@
     "customerLedger": "Customer Ledger",
     "staff": "Staff",
     "staffList": "List of Staff",
-    "manufacturer": "Manufactory",
-    "manufacturerList": "Manufacturer List",
-    "manufacturerLedger": "Manufacturer Ledger",
+    "manufacturer": "Manufacturer",
+    "manufacturerList": "Supplier",
+
     "returns": "Return",
     "addWastageReturn": "Add Wastage Return",
     "addManufacturerReturn": "Add Manufacturer Return",
@@ -372,7 +379,7 @@
     "MedicineDetailMedicineList": "Medicine List"
   },
   "medicinelist": {
-    "MedicineListTitle": "MedicineList",
+    "MedicineListTitle": "Supplier List",
     "MedicineListDesc": "Here is the medicine list.",
     "MedicineListSearchByName": "Search by name...",
     "MedicineListFilterStartDate": "Filter by Choose start date",
@@ -466,12 +473,12 @@
     "Next": "Next"
   },
   "manufacturerlist": {
-    "ManufacturerListTitle": "Manufacturer List",
-    "ManufacturerListDesc": "You have a total of 30 manufacturers for the pharmacy.",
-    "AddManufacturer": "Add Manufacturer",
-    "AddManufacturerTitle": "Add Manufacturer",
-    "AddManufacturerDesc": "The manufacturer must fill all fields.",
-    "ManufacturerID": "Manufacturer ID",
+    "ManufacturerListTitle": "Supplier List",
+    "ManufacturerListDesc": "You have supplier for the pharmacy.",
+    "AddManufacturer": "Add Supplier",
+    "AddManufacturerTitle": "Add Supplier",
+    "AddManufacturerDesc": "The Supplier must fill all fields.",
+    "ManufacturerID": "Supplier ID",
     "ManufacturerIDPlaceholder": "e.g., #M-123",
     "Company": "Company",
     "CompanyPlaceholder": "e.g., Healthcare",
@@ -497,7 +504,7 @@
     "Page": "Page",
     "Of": "of",
     "Next": "Next",
-    "ErrorManufacturerIDRequired": "Manufacturer ID is required",
+    "ErrorManufacturerIDRequired": "Supplier ID is required",
     "ErrorCompanyRequired": "Company name is required",
     "ErrorEmailRequired": "Email is required",
     "ErrorEmailInvalid": "Invalid email format",
@@ -506,49 +513,7 @@
     "ErrorBalanceRequired": "Balance is required",
     "ErrorBalanceInvalid": "Balance must be a valid number"
   },
-  "manufacturerledger": {
-    "ManufacturerLedgerTitle": "Manufacturer Ledger",
-    "AddLedgerEntry": "Add Ledger Entry",
-    "AddLedgerEntryTitle": "Add Ledger Entry",
-    "AddLedgerEntryDesc": "All fields must be filled to add a ledger entry.",
-    "ID": "Invoice No",
-    "IDPlaceholder": "e.g., #DP1234",
-    "Date": "Date",
-    "PayTerm": "Payment Term",
-    "PayTermOnDelivery": "On Delivery",
-    "PayTermAfterDispatch": "After Dispatch",
-    "PayTermFinalSettlement": "Final Settlement",
-    "Debit": "Debit (USD)",
-    "DebitPlaceholder": "e.g., 1000",
-    "Credit": "Credit (USD)",
-    "CreditPlaceholder": "e.g., 1000",
-    "Balance": "Balance (USD)",
-    "BalancePlaceholder": "e.g., 500",
-    "Description": "Description",
-    "DescriptionPlaceholder": "Enter description...",
-    "Cancel": "Cancel",
-    "SearchPlaceholder": "Find ID ...",
-    "FilterStartDate": "Start Date",
-    "FilterEndDate": "End Date",
-    "Actions": "Actions",
-    "ViewDetails": "View Details",
-    "Edit": "Edit",
-    "Delete": "Delete",
-    "RowsPerPage": "Rows per page",
-    "Previous": "Previous",
-    "Page": "Page",
-    "Of": "of",
-    "Next": "Next",
-    "ErrorIDRequired": "Invoice No is required",
-    "ErrorDateRequired": "Date is required",
-    "ErrorPayTermRequired": "Payment Term is required",
-    "ErrorDebitRequired": "Debit is required",
-    "ErrorDebitInvalid": "Debit must be a valid number",
-    "ErrorCreditRequired": "Credit is required",
-    "ErrorCreditInvalid": "Credit must be a valid number",
-    "ErrorBalanceRequired": "Balance is required",
-    "ErrorBalanceInvalid": "Balance must be a valid number"
-  },
+
   "sellreport": {
     "SalesReportTitle": "Sales Report",
     "SalesReportDesc": "Here is the sales report of this month. Monthly sales performance overview",

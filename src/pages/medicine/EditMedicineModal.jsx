@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { updateMedicine } from "../api/medicineService"; // adjust path as needed
 import Swal from "sweetalert2";
-import { ToastContainer, toast } from "react-toastify";
+
 import Select from "react-select";
 import { getAllCategory } from "../api/categoryService";
 import { getAllUnits } from "../api/unitService";
@@ -18,13 +18,11 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
     medicine_name: "",
     price: "",
     weight: "",
-    quantity: "",
-    expire_date: "",
     status: "",
-    barcode_number: "",
+    barcode: "",
     medicine_detail: "",
-    category_ids: [],
-    unit_ids: [],
+    category_id: null,
+    unit_id: null,
     image: null,
     imageFile: null,
   });
@@ -35,15 +33,14 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
         medicine_name: medicine.medicine_name || "",
         price: medicine.price || "",
         weight: medicine.weight || "",
-        quantity: medicine.quantity || "",
-        expire_date: medicine.expire_date || "",
+
         status: medicine.status || "",
-        barcode_number: medicine.barcode_number || "",
+        barcode: medicine.barcode || "",
         medicine_detail: medicine.medicine_detail || "",
         category_ids: medicine.categories
           ? medicine.categories.map((c) => c.id)
           : [],
-        unit_ids: medicine.unit ? medicine.unit.map((u) => u.id) : [],
+        unit_ids: null,
         image: medicine.image_url || null, // Your image URL or null
         imageFile: null,
       });
@@ -76,14 +73,6 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
   useEffect(() => {
     fetchCategory();
   }, []);
-  // const handleCategoryChange = (e) => {
-  //   const selected = Array.from(e.target.selectedOptions, (option) =>
-  //     Number(option.value)
-  //   );
-  //   setMedicine({ ...medicine, category_ids: selected });
-  // };
-
-  //Fetch unit
   //Unit fetch
   useEffect(() => {
     const fetchUnit = async () => {
@@ -113,7 +102,21 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
   }, []);
 
   useEffect(() => {
-    setFormData(initialData || {});
+    if (initialData) {
+      setFormData({
+        id: initialData.id || null,
+        medicine_name: initialData.medicine_name || "",
+        price: initialData.price || "",
+        weight: initialData.weight || "",
+        status: initialData.status || "",
+        barcode: initialData.barcode || "",
+        medicine_detail: initialData.medicine_detail || "",
+        category_ids: initialData.categories?.map((c) => c.id) || [],
+        unit_ids: initialData.unit?.map((u) => u.id) || [],
+        image: initialData.image || null,
+        imageFile: null,
+      });
+    }
   }, [initialData]);
 
   if (!isOpen) return null;
@@ -172,13 +175,6 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
     value: unt.id,
     label: unt.unit_name,
   }));
-  // const handleUnitChange = (selectedOptions) => {
-  //   setMedicine((prev) => ({
-  //     ...prev,
-  //     unit_ids: selectedOptions.map((opt) => opt.value),
-  //   }));
-  // };
-
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
       <div className="bg-white sm:mb-0 mb-16 dark:bg-slate-800 p-6 focus:border-none-xl overflow-y-auto max-h-[85vh] w-[95%] max-w-lg shadow-lg">
@@ -187,6 +183,14 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input
+            type="text"
+            name="barcode"
+            value={formData.barcode || ""}
+            onChange={handleChange}
+            placeholder="Barcode Number"
+            className="w-full p-2 border focus:border-none"
+          />
           <input
             type="text"
             name="medicine_name"
@@ -211,92 +215,55 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
             placeholder="Weight"
             className="w-full p-2 border focus:border-none"
           />
-          <input
-            type="number"
-            name="quantity"
-            value={formData.quantity || ""}
-            onChange={handleChange}
-            placeholder="Quantity"
-            className="w-full p-2 border focus:border-none"
-          />
-          <input
-            type="date"
-            name="expire_date"
-            value={formData.expire_date}
-            onChange={handleChange}
-            className="w-full p-2 border focus:border-none"
-          />
-          <input
-            type="text"
-            name="barcode_number"
-            value={formData.barcode_number || ""}
-            onChange={handleChange}
-            placeholder="Barcode Number"
-            className="w-full p-2 border focus:border-none"
-          />
+
           <Select
-            name="category_id"
+            isMulti
+            name="category_ids"
             options={categoryOptions}
-            value={
-              categoryOptions.find(
-                (opt) => opt.value === formData.category_id
-              ) || null
-            }
-            onChange={(selectedOption) => {
+            value={categoryOptions.filter((opt) =>
+              formData.category_ids?.includes(opt.value)
+            )}
+            onChange={(selected) => {
               setFormData((prev) => ({
                 ...prev,
-                category_id: selectedOption ? selectedOption.value : null,
+                category_ids: selected ? selected.map((opt) => opt.value) : [],
               }));
-            }}
-            className="basic-single-select"
-            classNamePrefix="select"
-            styles={{
-              container: (base) => ({
-                ...base,
-                maxHeight: "150px",
-              }),
-            }}
-          />
-          <Select
-            name="unit_ids"
-            options={unitOptions}
-            value={
-              unitOptions.find(
-                (opt) => opt.value === formData.unit_ids
-              ) || null
-            }
-            onChange={(selectedOption) => {
-              setFormData((prev) => ({
-                ...prev,
-                unit_ids: selectedOption ? selectedOption.value : null,
-              }));
-            }}
-            className="basic-single-select"
-            classNamePrefix="select"
-            styles={{
-              container: (base) => ({
-                ...base,
-                maxHeight: "150px",
-              }),
             }}
           />
 
           <Select
-            name="status"
-            options={statusOptions}
+            name="unit_id"
+            options={unitOptions}
             value={
-              statusOptions.find((opt) => opt.value === formData.status) || null
+              unitOptions.find((opt) => opt.value === formData.unit_id) || null
             }
-            onChange={(selectedOption) => {
-              handleChange({
-                target: {
-                  name: "status",
-                  value: selectedOption ? selectedOption.value : "",
-                },
-              });
+            onChange={(selectedOption) =>
+              setFormData((prev) => ({
+                ...prev,
+                unit_id: selectedOption ? selectedOption.value : null,
+              }))
+            }
+            classNamePrefix="select"
+            className="basic-single-select"
+          />
+
+          <Select
+            name="unit_ids"
+            isMulti
+            options={unitOptions}
+            value={unitOptions.filter((opt) =>
+              (formData.unit_ids || []).includes(opt.value)
+            )}
+            onChange={(selectedOptions) => {
+              setFormData((prev) => ({
+                ...prev,
+                unit_ids: selectedOptions
+                  ? selectedOptions.map((opt) => opt.value)
+                  : [],
+              }));
             }}
-            classNamePrefix="select "
-            className=" rounded-lg"
+            className="basic-multi-select"
+            classNamePrefix="select"
           />
 
           <div className="md:col-span-2">

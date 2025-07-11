@@ -521,6 +521,7 @@ const SupplierList = () => {
                         {t("supplierlist.SupplierListViewDetails")}
                       </button>
                       <button
+                       
                         className="flex align-middle w-full text-left text-gray-600 dark:text-gray-200 py-2 hover:rounded-md hover:bg-green-500 hover:text-white dark:hover:bg-green-400 dark:hover:text-white"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -532,6 +533,7 @@ const SupplierList = () => {
                         {t("supplierlist.SupplierListEdit")}
                       </button>
                       <button
+                      
                         className="flex align-middle w-full text-left text-gray-600 dark:text-gray-200 py-2 hover:rounded-md hover:bg-green-500 hover:text-white dark:hover:bg-green-400 dark:hover:text-white"
                         onClick={(e) => {
                           e.stopPropagation();

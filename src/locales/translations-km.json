@@ -22,6 +22,7 @@
     "Enable": "បើកដំណើរការ"
   },
   "medicine-view": {
+    "BarCode": "បារកូដ",
     "Quantity": "ចំនួន",
     "Image": "រូបភាព",
     "Info": "ព័ត៌មានថ្នាំ",
@@ -235,6 +236,9 @@
     "total-customer": "អតិថិជន សរុប"
   },
   "add-medicine": {
+    "Scan": "ស្កេន",
+    "Barcode": "លេខ​បារកូដ",
+    "Barcode-Placeholder": "បារកូដ",
     "Unit": "ឯកតា",
     "Photo": "រូបភាព",
     "ExpireDate": "ថ្ងៃខែផុតកំណត់",
@@ -273,10 +277,14 @@
   },
 
   "sidebar": {
+    "AddStock": "បញ្ជូលឃ្លាំង",
+    "supplyitems": "ផលិតផលផ្គត់ផ្គង់",
+    "stock": "ឃ្លាំង",
+    "StockList": "បញ្ជីឃ្លាំង",
     "units": "ឯកតា",
     "supplies": "ការផ្គត់ផ្គង់",
     "supplier": "អ្នកផ្គត់ផ្គង់",
-    "supplierlist": "បញ្ជីអ្នកផ្គត់ផ្គង់",
+    "supplierlist": "អ្នកផ្គត់ផ្គង់",
     "categoies": "ប្រភេទថ្នាំ",
     "appName": "ឳសថស្ថាន",
     "dashboards": "ផ្ទាំងគ្រប់គ្រង",
@@ -432,7 +440,7 @@
     "AddManufacturer": "បន្ថែមក្រុមហ៊ុន",
     "AddManufacturerTitle": "បន្ថែមក្រុមហ៊ុនផលិត",
     "AddManufacturerDesc": "ក្រុមហ៊ុនផលិតត្រូវបំពេញគ្រប់វាលទាំងអស់។",
-    "ManufacturerID": "លេខសម្គាល់ក្រុមហ៊ុនផលិត",
+    "ManufacturerID": "លេខសម្គាល់",
     "ManufacturerIDPlaceholder": "ឧ. #M-123",
     "Company": "ក្រុមហ៊ុន",
     "CompanyPlaceholder": "ឧ. Healthcare",

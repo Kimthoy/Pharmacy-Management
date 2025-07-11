@@ -8,6 +8,7 @@ import { RiPagesLine } from "react-icons/ri";
 import { FaUserDoctor } from "react-icons/fa6";
 import { MdPointOfSale } from "react-icons/md";
 import { FiLogOut } from "react-icons/fi";
+import { TbTruckDelivery } from "react-icons/tb";
 import {
   UserGroupIcon,
   UserPlusIcon,
@@ -69,11 +70,22 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
       ],
     },
     {
-      name: t("sidebar.manufacturer"),
+      name: t("sidebar.stock"),
       icon: LiaWarehouseSolid,
+      path: "/stock",
+      subItems: [
+        { name: t("sidebar.AddStock"), path: "/add-supply" },
+        { name: t("sidebar.StockList"), path: "/stocklist" },
+      ],
+    },
+    {
+      name: t("sidebar.manufacturer"),
+      icon: TbTruckDelivery,
       path: "/menufacturer",
       subItems: [
         { name: t("sidebar.manufacturerList"), path: "/manufacturerlist" },
+        { name: t("sidebar.supplies"), path: "/supplies" },
+        { name: t("sidebar.supplyitems"), path: "/supplyitems" },
       ],
     },
     {
@@ -131,6 +143,15 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
       ],
     },
     { name: t("sidebar.settings"), icon: CiSettings, path: "/settingpage" },
+    {
+      name: "Sameple",
+      icon: CiRepeat,
+      path: "/sample",
+      subItems: [
+        { name: "Sample Stock", path: "/samplestock" },
+        { name: "Add Stock", path: "/addstock" },
+      ],
+    },
   ];
 
   const handlePageSelection = (item, path) => {
@@ -200,7 +221,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                           handlePageSelection(name, path);
                         }
                       }}
-                      className={`group hover:shadow-lg flex items-center justify-between w-full px-4    py-2 mt-1 text-md rounded-lg transition-all duration-200
+                      className={`group hover:shadow-lg flex items-center justify-between w-full px-3    py-2 mt-1 text-md rounded-lg transition-all duration-200
                         ${
                           isParentActive
                             ? "bg-white text-green-700 dark:bg-green-600"
@@ -213,7 +234,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                     >
                       <div className="flex items-center">
                         <Icon
-                          className={` w-7 h-6 flex-shrink-0 transition-colors duration-200
+                          className={` w-6 h-6 flex-shrink-0 transition-colors duration-200
                             ${
                               isParentActive
                                 ? "text-green-700"
@@ -276,7 +297,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
             </ul>
             <hr className="h-3 text-white w-full" />
             <button
-              className="shadow-lg flex items-center w-full px-5 py-3 mt-2 text-md transition-all duration-300 ease-in-out 
+              className="shadow-lg flex items-center w-full px-4 py-3 mt-2 text-md transition-all duration-300 ease-in-out 
              rounded-lg bg-red-600 text-white hover:bg-red-700 hover:scale-105 hover:shadow-md overflow-hidden"
             >
               <FiLogOut className="w-6 h-6 flex-shrink-0 transition-all duration-300" />

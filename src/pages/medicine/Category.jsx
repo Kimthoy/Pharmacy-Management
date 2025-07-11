@@ -311,7 +311,7 @@ const CategoryDashboard = () => {
           </p>
         )}
       </div>
-      <div className="flex justify-center items-center mt-4 gap-2">
+      <div className="flex justify-center items-center mt-4 gap-1 flex-wrap">
         <button
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
           disabled={currentPage === 1}
@@ -320,19 +320,65 @@ const CategoryDashboard = () => {
           Prev
         </button>
 
-        {Array.from({ length: totalPages }, (_, i) => (
-          <button
-            key={i}
-            onClick={() => setCurrentPage(i + 1)}
-            className={`px-3 py-1 rounded-lg ${
-              currentPage === i + 1
-                ? "bg-blue-600 text-white shadow-lg"
-                : "bg-gray-200 text-gray-700 shadow-lg"
-            }`}
-          >
-            {i + 1}
-          </button>
-        ))}
+        {(() => {
+          const pages = [];
+          const maxPagesToShow = 5;
+          let start = Math.max(currentPage - 2, 1);
+          let end = Math.min(start + maxPagesToShow - 1, totalPages);
+
+          if (end - start < maxPagesToShow - 1) {
+            start = Math.max(end - maxPagesToShow + 1, 1);
+          }
+
+          if (start > 1) {
+            pages.push(
+              <button
+                key={1}
+                onClick={() => setCurrentPage(1)}
+                className={`px-3 py-1 rounded-lg ${
+                  currentPage === 1 ? "bg-blue-600 text-white" : "bg-gray-200"
+                }`}
+              >
+                1
+              </button>
+            );
+            if (start > 2) pages.push(<span key="start-ellipsis">...</span>);
+          }
+
+          for (let i = start; i <= end; i++) {
+            pages.push(
+              <button
+                key={i}
+                onClick={() => setCurrentPage(i)}
+                className={`px-3 py-1 rounded-lg ${
+                  currentPage === i ? "bg-blue-600 text-white" : "bg-gray-200"
+                }`}
+              >
+                {i}
+              </button>
+            );
+          }
+
+          if (end < totalPages) {
+            if (end < totalPages - 1)
+              pages.push(<span key="end-ellipsis">...</span>);
+            pages.push(
+              <button
+                key={totalPages}
+                onClick={() => setCurrentPage(totalPages)}
+                className={`px-3 py-1 rounded-lg ${
+                  currentPage === totalPages
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-200"
+                }`}
+              >
+                {totalPages}
+              </button>
+            );
+          }
+
+          return pages;
+        })()}
 
         <button
           onClick={() =>

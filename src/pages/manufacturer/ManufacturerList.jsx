@@ -1,13 +1,19 @@
 import { useState, useRef, useEffect } from "react";
-import { FaEllipsisH } from "react-icons/fa";
+
 import { BiEdit, BiShow, BiTrash } from "react-icons/bi";
 import { useTranslation } from "../../hooks/useTranslation";
 import SupplierFormModal from "./SupplierFormModal";
-import { toast } from "react-toastify";
-import { createSupplier, getAllSupplier } from "../api/supplierService";
+
+import { BiSolidDetail } from "react-icons/bi";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import {
+  createSupplier,
+  getAllSupplier,
+  updateSupplier,
+  deleteSupplier,
+} from "../api/supplierService";
 const Manufacturerlist = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const toggleForm = () => setIsModalOpen((prev) => !prev);
   const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -16,10 +22,24 @@ const Manufacturerlist = () => {
   const [openMenu, setOpenMenu] = useState(null);
   const [suppliers, setSuppliers] = useState([]);
   const menuRef = useRef(null);
-
+  const [showModal, setShowModal] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const toggleMenu = (index) => setOpenMenu(openMenu === index ? null : index);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedSupplier, setSelectedSupplier] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [supplierToDelete, setSupplierToDelete] = useState(null);
 
+  const [formData, setFormData] = useState({
+    id: null,
+    company_id: "",
+    company_name: "",
+    email: "",
+    phone_number: "",
+    address: "",
+    is_active: true,
+  });
   const fetchSuppliers = async () => {
     try {
       const data = await getAllSupplier();
@@ -28,7 +48,10 @@ const Manufacturerlist = () => {
       toast.error("Failed to load suppliers");
     }
   };
-
+  const toggleForm = () => {
+    console.log("Toggle form clicked");
+    setIsModalOpen((prev) => !prev);
+  };
   useEffect(() => {
     fetchSuppliers();
   }, []);
@@ -50,7 +73,7 @@ const Manufacturerlist = () => {
       errors.company_name = "Company name is required";
     if (!data.email?.trim()) errors.email = "Email is required";
     else if (!/\S+@\S+\.\S+/.test(data.email))
-      errors.email = "Email is invalid";
+      toast.error("Email has already exists!");
     if (!data.phone_number?.trim())
       errors.phone_number = "Phone number is required";
     if (!data.address?.trim()) errors.address = "Address is required";
@@ -58,8 +81,6 @@ const Manufacturerlist = () => {
   };
 
   const handleFormSubmit = async (formData) => {
-    // No e.preventDefault() here!
-
     const errors = validateForm(formData);
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
@@ -67,21 +88,38 @@ const Manufacturerlist = () => {
     }
 
     try {
-      await createSupplier({
-        ...formData,
-        balance: Number(formData.balance), // if you use balance
-      });
+      if (formData.id) {
+        // Update existing supplier
+        await updateSupplier(formData.id, formData);
+        toast.success("Supplier updated successfully!");
+      } else {
+        // Create new supplier
+        await createSupplier({
+          ...formData,
+          balance: Number(formData.balance || 0), // only if you use balance
+        });
+        toast.success("Supplier added successfully!");
+      }
 
-      toast.success("Supplier added successfully!");
       setFormErrors({});
       toggleForm(); // close modal
-
-      // Optional: refresh list or reset form
-      fetchSuppliers();
-      // setFormData(initialState);
+      fetchSuppliers(); // refresh supplier list
     } catch (err) {
-      const msg = err.message || "Failed to create supplier.";
-      toast.error(msg);
+      if (err.response?.status === 422) {
+        const validationErrors = err.response.data.errors || {};
+
+        setFormErrors(validationErrors); // Optional: populate field errors
+
+        // Show toast for specific field errors
+        if (validationErrors.email) {
+          toast.error(validationErrors.email[0]); // shows: "The email has already been taken."
+        } else {
+          toast.error("Validation failed. Please check your inputs.");
+        }
+      } else {
+        const msg = err.response?.data?.message || "Email already exists!";
+        toast.error(msg);
+      }
     }
   };
 
@@ -116,6 +154,19 @@ const Manufacturerlist = () => {
       color: "text-red-400 dark:text-red-300",
     };
   };
+  const handleEdit = (man) => {
+    setIsModalOpen(true);
+    setFormData({
+      id: man.id,
+      company_id: man.company_id,
+      company_name: man.company_name,
+      email: man.email,
+      phone_number: man.phone_number,
+      address: man.address,
+      
+      is_active: man.is_active,
+    });
+  };
 
   return (
     <div className="sm:p-6 mb-20 bg-white dark:bg-gray-900 sm:shadow-lg dark:shadow-gray-800 rounded-md overflow-x-auto">
@@ -149,7 +200,7 @@ const Manufacturerlist = () => {
       </div>
 
       {/* Table */}
-      <div className="sm:w-full w-[444px]">
+      <div>
         <table className="w-full sm:min-w-[600px] border-collapse bg-white dark:bg-gray-800 shadow-md dark:shadow-gray-700 sm:rounded-lg border border-gray-200 dark:border-gray-600">
           <thead className="border border-gray-200 dark:border-gray-600">
             <tr>
@@ -165,13 +216,7 @@ const Manufacturerlist = () => {
               <th className="p-3 text-left text-gray-400 dark:text-gray-300 text-md">
                 {t("manufacturerlist.Phone")}
               </th>
-              <th className="sm:flex hidden p-3 text-left text-gray-400 dark:text-gray-300 text-md">
-                {t("manufacturerlist.Address")}
-              </th>
 
-              <th className=" p-3 text-left text-gray-400 dark:text-gray-300 text-md">
-                {t("manufacturerlist.Status")}
-              </th>
               <th className="p-3 text-left text-gray-400 dark:text-gray-300 text-md">
                 {t("manufacturerlist.Actions")}
               </th>
@@ -203,36 +248,33 @@ const Manufacturerlist = () => {
                   <td className="p-3 text-gray-400 dark:text-gray-300">
                     {man.phone_number}
                   </td>
-                  <td className="sm:flex hidden p-3 text-gray-400 dark:text-gray-300">
-                    {man.address}
-                  </td>
 
-                  <td className={` p-3 ${color}`}>{text}</td>
-                  <td className="p-3 relative">
+                  <td className="p-3 flex">
                     <button
-                      ref={menuRef}
-                      className="p-2 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300"
-                      onClick={() => toggleMenu(index)}
-                      aria-label={t("manufacturerlist.Actions")}
+                      onClick={() => handleEdit(man)}
+                      className=" text-blue-600 p-3 hover:rounded-md hover:bg-slate-300  dark:hover:bg-slate-600 dark:text-blue-600"
                     >
-                      <FaEllipsisH />
+                      <BiEdit className="w-5 h-5" />
                     </button>
-                    {openMenu === index && (
-                      <div className="absolute z-10 right-24 sm:right-28 top-6 w-36 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg dark:shadow-gray-700">
-                        <button className="flex items-center w-full text-left text-gray-600 dark:text-gray-200 py-2 px-3 hover:rounded-lg hover:bg-green-500 hover:text-white dark:hover:bg-green-400 dark:hover:text-white">
-                          <BiShow className="mr-2" />
-                          {t("manufacturerlist.ViewDetails")}
-                        </button>
-                        <button className="flex items-center w-full text-left text-gray-600 dark:text-gray-200 py-2 px-3 hover:rounded-md hover:bg-green-500 hover:text-white dark:hover:bg-green-400 dark:hover:text-white">
-                          <BiEdit className="mr-2" />
-                          {t("manufacturerlist.Edit")}
-                        </button>
-                        <button className="flex items-center w-full text-left text-gray-600 dark:text-gray-200 py-2 px-3 hover:rounded-md hover:bg-green-500 hover:text-white dark:hover:bg-green-400 dark:hover:text-white">
-                          <BiTrash className="mr-2" />
-                          {t("manufacturerlist.Remove")}
-                        </button>
-                      </div>
-                    )}
+
+                    <button
+                      onClick={() => {
+                        setSelectedSupplier(man); // `man` is the supplier from map loop
+                        setShowDetailModal(true);
+                      }}
+                      className=" text-green-600 p-3 hover:rounded-md hover:bg-slate-300 dark:hover:bg-slate-600 dark:text-green-600"
+                    >
+                      <BiSolidDetail className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSupplierToDelete(man); // `man` is your supplier object
+                        setShowDeleteModal(true);
+                      }}
+                      className=" text-red-600 p-3 hover:rounded-md hover:bg-slate-300  dark:hover:bg-slate-600 dark:text-red-600"
+                    >
+                      <BiTrash className="w-5 h-5" />
+                    </button>
                   </td>
                 </tr>
               );
@@ -283,11 +325,94 @@ const Manufacturerlist = () => {
           </button>
         </div>
       </div>
-      <SupplierFormModal
-        isOpen={isModalOpen}
-        onClose={toggleForm}
-        onSubmit={handleFormSubmit} // now it expects formData, not event
-      />
+      {isModalOpen && (
+        <SupplierFormModal
+          isOpen={isModalOpen}
+          onClose={toggleForm}
+          formData={formData}
+          setFormData={setFormData}
+          onSubmit={handleFormSubmit}
+          formErrors={formErrors}
+        />
+      )}
+      {showDetailModal && selectedSupplier && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg w-full max-w-md">
+            <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
+              Supplier Details
+            </h2>
+            <div className="space-y-2 text-gray-700 dark:text-gray-200">
+              <p>
+                <strong>Company ID:</strong> {selectedSupplier.company_id}
+              </p>
+              <p>
+                <strong>Company Name:</strong> {selectedSupplier.company_name}
+              </p>
+              <p>
+                <strong>Email:</strong> {selectedSupplier.email}
+              </p>
+              <p>
+                <strong>Phone:</strong> {selectedSupplier.phone_number}
+              </p>
+              <p>
+                <strong>Address:</strong> {selectedSupplier.address}
+              </p>
+              <p>
+                <strong>Status:</strong>{" "}
+                {selectedSupplier.is_active ? "Active" : "Inactive"}
+              </p>
+            </div>
+
+            <div className="flex justify-end mt-6">
+              <button
+                onClick={() => setShowDetailModal(false)}
+                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showDeleteModal && supplierToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+          <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg w-full max-w-sm">
+            <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white">
+              Confirm Delete
+            </h2>
+            <p className="text-gray-700 dark:text-gray-300 mb-6">
+              Are you sure you want to delete{" "}
+              <strong>{supplierToDelete.company_name}</strong>?
+            </p>
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  try {
+                    await deleteSupplier(supplierToDelete.id); // Call your API method
+                    toast.success("Supplier deleted successfully");
+                    fetchSuppliers(); // Refresh data
+                  } catch (err) {
+                    toast.error("Failed to delete supplier");
+                  } finally {
+                    setShowDeleteModal(false);
+                    setSupplierToDelete(null);
+                  }
+                }}
+                className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      <ToastContainer />
     </div>
   );
 };

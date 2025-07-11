@@ -1,4 +1,3 @@
-
 import axios from "axios";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api";
@@ -13,6 +12,7 @@ export const createMedicine = async (medicineData) => {
     const response = await axios.post(`${API_URL}/medicines`, medicineData, {
       headers: {
         ...getAuthHeader(),
+        "Content-Type": "multipart/form-data",
       },
     });
     console.log("Success:", response.data);
@@ -23,20 +23,23 @@ export const createMedicine = async (medicineData) => {
   }
 };
 
-
-export const getAllMedicines = async () => {
+export const getAllMedicines = async (page = 1, perPage = 10) => {
   try {
     const response = await axios.get(`${API_URL}/medicines`, {
       headers: getAuthHeader(),
+      params: {
+        page,
+        perPage,
+      },
     });
 
-    // Log the whole response to see its structure
+    // Log the entire structure to debug if needed
     console.log("API response:", response.data);
 
-    // If response.data contains `{ data: [...] }`
-    return Array.isArray(response.data)
-      ? response.data
-      : response.data.data || [];
+    return {
+      data: response.data.data || [],
+      meta: response.data.meta || {},
+    };
   } catch (error) {
     console.error(
       "Error fetching medicines:",
@@ -64,30 +67,31 @@ export const updateMedicine = async (id, data) => {
   try {
     const formData = new FormData();
 
-    // Append each field to formData
+    // Append simple fields
     if (data.medicine_name)
       formData.append("medicine_name", data.medicine_name);
     if (data.price) formData.append("price", data.price);
     if (data.weight) formData.append("weight", data.weight);
-    if (data.quantity) formData.append("quantity", data.quantity);
-    if (data.barcode_number)
-      formData.append("barcode_number", data.barcode_number);
-    if (data.expire_date) formData.append("expire_date", data.expire_date);
+    if (data.barcode) formData.append("barcode", data.barcode);
     if (data.status) formData.append("status", data.status);
     if (data.medicine_detail)
       formData.append("medicine_detail", data.medicine_detail);
 
-    // Handle category_ids array
+    // ✅ Append category_ids[]
     if (Array.isArray(data.category_ids)) {
       data.category_ids.forEach((id) => formData.append("category_ids[]", id));
     }
 
-    // Handle image file (optional)
+    if (Array.isArray(data.unit_ids)) {
+      data.unit_ids.forEach((id) => formData.append("unit_ids[]", id));
+    }
+
+    // ✅ Append image file
     if (data.imageFile) {
       formData.append("image", data.imageFile);
     }
 
-    // Use POST with _method=PUT for Laravel
+    // Send with _method override for PUT
     const response = await axios.post(
       `${API_URL}/medicines/${id}?_method=PUT`,
       formData,
@@ -101,11 +105,8 @@ export const updateMedicine = async (id, data) => {
 
     return response.data;
   } catch (error) {
-    if (error.response) {
-      throw error.response.data;
-    } else {
-      throw { message: "Network error" };
-    }
+    console.error("Update failed:", error.response?.data || error.message);
+    throw error.response?.data || { message: "Failed to update medicine" };
   }
 };
 

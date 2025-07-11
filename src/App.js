@@ -19,6 +19,7 @@ import { AuthProvider } from "./context/AuthContext";
 const ProfileDashboard = lazy(() => import("./pages/profile/ProfileDashboard"));
 
 const ActivityPage = lazy(() => import("./pages/profile/ActivityPage"));
+const AddSupply = lazy(() => import("./pages/stock/AddSupply"));
 
 const Login = lazy(() => import("./pages/auth/Login"));
 const CustomerList = lazy(() => import("./pages/customer/ListCustomer"));
@@ -27,7 +28,9 @@ const Dashboard = lazy(() => import("./pages/dashboard/Dashboard"));
 const ManufacturerList = lazy(() =>
   import("./pages/manufacturer/ManufacturerList")
 );
-const AddManu = lazy(() => import("./pages/manufacturer/AddManufacturer"));
+const Supplies = lazy(() => import("./pages/manufacturer/Supply"));
+const SupplyItems = lazy(() => import("./pages/manufacturer/SupplyItem"));
+
 const SellReport = lazy(() => import("./pages/report/ReportSell"));
 const StockReport = lazy(() => import("./pages/report/ReportStock"));
 const PurchaseReport = lazy(() => import("./pages/report/ReportPurchase"));
@@ -55,10 +58,12 @@ const WastageReturnList = lazy(() =>
 const StaffList = lazy(() => import("./pages/staff/ManageStaff"));
 const Client = lazy(() => import("./pages/auth/Client"));
 const Profile = lazy(() => import("./pages/profile/AboutUser"));
-
+const StockList = lazy(() => import("./pages/stock/StockList"));
 const MessagePage = lazy(() => import("./pages/setting/Message"));
 const NotificationPage = lazy(() => import("./pages/setting/Notification"));
 const Unit = lazy(() => import("./pages/medicine/Unit"));
+const SampleStock = lazy(() => import("./pages/sample/InventoryDashboard"));
+const AddStock = lazy(() => import("./pages/sample/InventoryForm"));
 const App = () => {
   const location = useLocation();
   const [langCode, setLangCode] = useState(
@@ -129,7 +134,8 @@ const App = () => {
                       path="/manufacturerlist"
                       element={<ManufacturerList />}
                     />
-                    <Route path="/addmanu" element={<AddManu />} />
+                    <Route path="/supplies" element={<Supplies />} />
+                    <Route path="/supplyitems" element={<SupplyItems />} />
 
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
@@ -138,6 +144,7 @@ const App = () => {
                     <Route path="/stockreport" element={<StockReport />} />
                     <Route path="/expensepage" element={<ExpensePage />} />
                     <Route path="/incomepage" element={<IncomePage />} />
+                    <Route path="/stocklist" element={<StockList />} />
                     <Route
                       path="/invoicedetail"
                       element={<InvoiceDetailsPage />}
@@ -188,7 +195,9 @@ const App = () => {
                     />
 
                     <Route path="/saledashboard" element={<SaleDashboard />} />
-
+                    <Route path="/samplestock" element={<SampleStock />} />
+                    <Route path="/addstock" element={<AddStock />} />
+                    <Route path="/add-supply" element={<AddSupply />} />
                     <Route path="*" element={<Navigate to="/" />} />
                   </Routes>
                 </Suspense>
