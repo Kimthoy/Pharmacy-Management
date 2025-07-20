@@ -1,5 +1,8 @@
 import { Home, ClipboardList, ShoppingCart, Leaf, Flame } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { AiOutlineProduct } from "react-icons/ai";
+import { MdOutlineWarehouse } from "react-icons/md";
+
 import { useTranslation } from "../../src/hooks/useTranslation";
 const Footer = () => {
   const { t } = useTranslation();
@@ -43,7 +46,7 @@ const Footer = () => {
         className="flex flex-col items-center text-xs text-gray-600 hover:text-green-600 cursor-pointer"
         onClick={() => navigate("/herbs")}
       >
-        <Leaf size={22} />
+        <MdOutlineWarehouse size={22} />
         <span>{t("footers.search")}</span>
       </div>
 
@@ -52,7 +55,7 @@ const Footer = () => {
         className="flex flex-col items-center text-xs text-gray-600 hover:text-green-600 cursor-pointer"
         onClick={() => navigate("/popular")}
       >
-        <Flame size={22} />
+        <AiOutlineProduct size={22} />
         <span>{t("footers.popular")}</span>
       </div>
     </div>

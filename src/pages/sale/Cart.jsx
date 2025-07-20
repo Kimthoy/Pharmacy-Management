@@ -114,22 +114,16 @@ const Cart = ({
               </span>
             </div>
           </div>
-
+          <hr className="bg-slate-300 h-[2px] mb-7" />
           <div className="flex space-x-3">
             <button
               onClick={clearCart}
               aria-label="លុបកន្ត្រក"
-              className="flex-1 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition"
+              className="flex-1  text-red-500 py-2 rounded-lg  transition"
             >
               លុប
             </button>
-            <button
-              onClick={saveCart}
-              aria-label="រក្សាទុកកន្ត្រក"
-              className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
-            >
-              រក្សាទុក
-            </button>
+
             <button
               onClick={() => {
                 placeOrder(); // your existing order logic

@@ -5,7 +5,7 @@ import { createSupply } from "../api/suppliesService";
 import { getAllSupplier } from "../api/supplierService";
 import { getAllMedicines } from "../api/medicineService";
 import { toast } from "react-toastify";
-import { GrNewWindow } from "react-icons/gr";
+
 
 const AddSupply = () => {
   const navigate = useNavigate();
@@ -300,10 +300,11 @@ const AddSupply = () => {
               <div className="text-right">
                 <button
                   type="button"
+                
                   onClick={() => removeItem(index)}
                   className="text-red-500 text-sm hover:underline"
                 >
-                  លុបចេញ
+                 Delete
                 </button>
               </div>
             </div>
@@ -324,7 +325,7 @@ const AddSupply = () => {
             disabled={isLoading}
             className="bg-blue-600 shadow-lg text-white px-6 py-2 mt-4 rounded w-full sm:w-auto"
           >
-            {isLoading ? "Save..." : "Save"}
+            {isLoading ? "Saving..." : "Save"}
           </button>
         </div>
       </form>

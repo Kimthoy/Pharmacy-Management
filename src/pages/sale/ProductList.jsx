@@ -4,7 +4,7 @@ import MedicineTable from "./MedicineTable"; // Import the MedicineTable compone
 
 const ProductList = ({
   products,
-  cart,
+
   handleAddToCartClick,
   displayPrice,
   currency,
@@ -14,7 +14,9 @@ const ProductList = ({
 
   return (
     <div className="flex flex-1 flex-col justify-center ">
-      {showCompoundMedicines ? (
+      {safeProducts.length === 0 ? (
+        <p className="text-center text-gray-500">No products found.</p>
+      ) : showCompoundMedicines ? (
         <MedicineTable
           products={safeProducts}
           handleAddToCartClick={handleAddToCartClick}
@@ -23,7 +25,7 @@ const ProductList = ({
         />
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 w-full mb-24">
-          {products.map((product) => (
+          {safeProducts.map((product) => (
             <ProductCard
               key={product.id}
               product={product}

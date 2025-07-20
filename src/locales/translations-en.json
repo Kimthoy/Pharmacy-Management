@@ -11,11 +11,11 @@
     }
   },
   "footers": {
-    "home": "Home",
+    "home": "Dashboard",
     "orders": "Orders",
-    "foryou": "For You",
-    "search": "Search",
-    "popular": "Popular"
+    "foryou": "Sale",
+    "search": "Stocks",
+    "popular": "Products"
   },
   "navigation": {
     "title": "Panharith Pharmacy"
@@ -313,8 +313,8 @@
   },
 
   "sidebar": {
-    "AddStock":"Add Stocks",
-    "supplyitems":"Supply Items",
+    "AddStock": "Add Stocks",
+    "supplyitems": "Supply Items",
     "stock": "Stock",
     "StockList": "Stock List",
     "supplies": "Supplies",

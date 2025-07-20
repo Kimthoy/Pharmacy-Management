@@ -8,21 +8,16 @@ const OrderReviewModal = ({
   cardNumber,
   setCardNumber,
   confirmOrder,
-  displayPrice, // You may not need this now since price is in Riel
 }) => {
-  const exchangeRate = 4050; // Riel per 1 USD
-
-  // Helper to convert Riel price to USD
+  const exchangeRate = 4050;
   const convertRielToUSD = (riel) => riel / exchangeRate;
-
-  // Calculate total price in USD based on cart items (assuming price in Riel)
-  const totalPrice = cart.reduce(
-    (sum, item) => sum + (item.price / exchangeRate) * item.quantity,
-    0
-  );
+ const totalPrice = cart.reduce((sum, item) => {
+   const priceInUSD =
+     item.currency === "KHR" ? item.price / exchangeRate : item.price;
+   return sum + priceInUSD * item.quantity;
+ }, 0);
 
   const totalPriceInRiel = totalPrice * exchangeRate;
-
   const [dollarAmountRaw, setDollarAmountRaw] = useState("");
   const [rielAmountRaw, setRielAmountRaw] = useState("");
   const [totalDollarAmount, setTotalDollarAmount] = useState(0);
@@ -30,7 +25,6 @@ const OrderReviewModal = ({
   const [dollarError, setDollarError] = useState("");
   const [rielError, setRielError] = useState("");
   const [cardError, setCardError] = useState("");
-
   const formatNumber = (value, isDollar = false) => {
     if (!value) return "";
     const cleanValue = value.replace(/,/g, "");
@@ -42,78 +36,97 @@ const OrderReviewModal = ({
         })
       : parseInt(cleanValue).toLocaleString("en-US");
   };
+ const validateInput = (value, isDollar = false) => {
+   if (!value || value.trim() === "") return ""; // Let empty values pass temporarily
 
-  const validateInput = (value, isDollar = false) => {
-    if (!value) return "សូមបញ្ជូលលុយ";
-    const cleanValue = value.replace(/,/g, "");
-    const regex = isDollar ? /^-?\d*(\.\d{0,2})?$/ : /^-?\d*$/;
-    if (!regex.test(cleanValue)) {
-      return isDollar
-        ? "Please enter a valid dollar amount "
-        : "Please enter a valid riel amount";
-    }
-    const parsedValue = isDollar
-      ? parseFloat(cleanValue)
-      : parseInt(cleanValue);
-    if (isDollar && parsedValue < totalPrice) {
-      return "Dollar is less than total price";
-    } else if (!isDollar && parsedValue < totalPriceInRiel) {
-      return "Riel price is less than total price";
-    }
-    return "";
-  };
+   const cleanValue = value.replace(/,/g, "");
+   const regex = isDollar ? /^-?\d*(\.\d{0,2})?$/ : /^-?\d*$/;
+   if (!regex.test(cleanValue)) {
+     return isDollar
+       ? "Please enter a valid dollar amount"
+       : "Please enter a valid riel amount";
+   }
 
-  const handleDollarChange = (e) => {
-    const value = e.target.value.replace(/,/g, "");
-    setDollarAmountRaw(value);
-    const error = validateInput(value, true);
-    setDollarError(error);
-    if (!error && value) {
-      const parsedValue = parseFloat(value) || 0;
-      const paidInRiel = parsedValue * exchangeRate;
-      setRielAmountRaw(paidInRiel.toString());
-      setRielError("");
-      setTotalRielAmount(paidInRiel - totalPriceInRiel);
-      setTotalDollarAmount((paidInRiel - totalPriceInRiel) / exchangeRate);
-    } else {
-      setRielAmountRaw("");
-      setTotalRielAmount(0);
-      setTotalDollarAmount(0);
-    }
-  };
+   const parsedValue = isDollar ? parseFloat(cleanValue) : parseInt(cleanValue);
+   if (isNaN(parsedValue)) return "Invalid number";
 
-  const handleRielChange = (e) => {
-    const value = e.target.value.replace(/,/g, "");
-    setRielAmountRaw(value);
-    const error = validateInput(value, false);
-    setRielError(error);
-    if (!error && value) {
-      const parsedValue = parseInt(value) || 0;
-      setDollarAmountRaw((parsedValue / exchangeRate).toFixed(2));
-      setDollarError("");
-      setTotalRielAmount(parsedValue - totalPriceInRiel);
-      setTotalDollarAmount((parsedValue - totalPriceInRiel) / exchangeRate);
-    } else {
-      setDollarAmountRaw("");
-      setTotalRielAmount(0);
-      setTotalDollarAmount(0);
-    }
-  };
+   if (isDollar && parsedValue < totalPrice) {
+     return "Dollar is less than total price";
+   } else if (!isDollar && parsedValue < totalPriceInRiel) {
+     return "Riel price is less than total price";
+   }
 
-  const handleConfirm = () => {
-    if (paymentMethod === "cash") {
-      if (dollarError || rielError) return;
-      if (!dollarAmountRaw || !rielAmountRaw) {
-        setDollarError("Please enter an amount");
-        setRielError("Please enter an amount");
-        return;
-      }
-    } else if (cardNumber.length < 16) {
-      setCardError("Please enter a valid 16-digit card number");
-      return;
-    }
-    confirmOrder();
-  };
+   return "";
+ };
+
+ const handleDollarChange = (e) => {
+   const value = e.target.value.replace(/,/g, "");
+   setDollarAmountRaw(value);
+
+   if (!value.trim()) {
+     setRielAmountRaw("");
+     setTotalRielAmount(0);
+     setTotalDollarAmount(0);
+     setDollarError("");
+     return;
+   }
+
+   const error = validateInput(value, true);
+   setDollarError(error);
+
+   if (!error) {
+     const parsedValue = parseFloat(value) || 0;
+     const paidInRiel = parsedValue * exchangeRate;
+     setRielAmountRaw(formatNumber(paidInRiel.toFixed(0)));
+     setRielError("");
+     setTotalRielAmount(paidInRiel - totalPriceInRiel);
+     setTotalDollarAmount((paidInRiel - totalPriceInRiel) / exchangeRate);
+   }
+ };
+
+ const handleRielChange = (e) => {
+   const value = e.target.value.replace(/,/g, "");
+   setRielAmountRaw(value);
+
+   if (!value.trim()) {
+     setDollarAmountRaw("");
+     setTotalRielAmount(0);
+     setTotalDollarAmount(0);
+     setRielError("");
+     return;
+   }
+
+   const error = validateInput(value, false);
+   setRielError(error);
+
+   if (!error) {
+     const parsedValue = parseInt(value) || 0;
+     const usd = parsedValue / exchangeRate;
+     setDollarAmountRaw(formatNumber(usd.toFixed(2), true));
+     setDollarError("");
+     setTotalRielAmount(parsedValue - totalPriceInRiel);
+     setTotalDollarAmount((parsedValue - totalPriceInRiel) / exchangeRate);
+   }
+ };
+
+ const handleConfirm = () => {
+   if (paymentMethod === "cash") {
+     if (dollarError || rielError) return;
+
+     if (!dollarAmountRaw || !rielAmountRaw) {
+       setDollarError("Please enter an amount");
+       setRielError("Please enter an amount");
+       return;
+     }
+   } else {
+     if (!cardNumber || cardNumber.length < 16) {
+       setCardError("Please enter a valid 16-digit card number");
+       return;
+     }
+   }
+
+   confirmOrder(); // ✅ call passed-in function
+ };
 
   if (!isOpen) return null;
 

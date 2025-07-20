@@ -11,8 +11,9 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
   const [unit, setUnit] = useState([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+ 
   const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [medicine, setMedicine] = useState([]);
   const [formData, setFormData] = useState({
     medicine_name: "",
@@ -34,13 +35,14 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
         price: medicine.price || "",
         weight: medicine.weight || "",
 
-        status: medicine.status || "",
+      
         barcode: medicine.barcode || "",
         medicine_detail: medicine.medicine_detail || "",
         category_ids: medicine.categories
           ? medicine.categories.map((c) => c.id)
           : [],
-        unit_ids: null,
+        unit_id: null,
+       
         image: medicine.image_url || null, // Your image URL or null
         imageFile: null,
       });
@@ -108,7 +110,7 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
         medicine_name: initialData.medicine_name || "",
         price: initialData.price || "",
         weight: initialData.weight || "",
-        status: initialData.status || "",
+    
         barcode: initialData.barcode || "",
         medicine_detail: initialData.medicine_detail || "",
         category_ids: initialData.categories?.map((c) => c.id) || [],
@@ -166,10 +168,7 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
     label: cat.category_name,
   }));
 
-  const statusOptions = [
-    { value: "active", label: "Active" },
-    { value: "inactive", label: "Inactive" },
-  ];
+
   //Set Unit Option
   const unitOptions = unit.map((unt) => ({
     value: unt.id,
@@ -229,22 +228,6 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
                 category_ids: selected ? selected.map((opt) => opt.value) : [],
               }));
             }}
-          />
-
-          <Select
-            name="unit_id"
-            options={unitOptions}
-            value={
-              unitOptions.find((opt) => opt.value === formData.unit_id) || null
-            }
-            onChange={(selectedOption) =>
-              setFormData((prev) => ({
-                ...prev,
-                unit_id: selectedOption ? selectedOption.value : null,
-              }))
-            }
-            classNamePrefix="select"
-            className="basic-single-select"
           />
 
           <Select
@@ -311,10 +294,11 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
             Cancel
           </button>
           <button
+            disabled={isLoading}
             onClick={handleSubmit}
             className="bg-blue-600 shadow-lg hover:bg-opacity-40 hover:text-blue-600 px-4 py-2 focus:border-none text-white"
           >
-            Save
+            {isLoading ? "Saving..." : "Save"}
           </button>
         </div>
       </div>

@@ -17,7 +17,7 @@ const MedicineList = () => {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editMedicineData, setEditMedicineData] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-
+  const [isdeleteloading, setIsDeleteLoading] = useState(false);
   const fetchMedicines = async (page = 1) => {
     setLoading(true);
     try {
@@ -96,7 +96,7 @@ const MedicineList = () => {
                 <th className="border px-2 py-2">Weight (mg/g)</th>
                 <th className="border px-2 py-2">Unit</th>
                 <th className="border px-2 py-2">Category</th>
-                <th className="border px-2 py-2">Status</th>
+
                 <th className="border px-2 py-2">Description</th>
                 <th className="border px-2 py-2">Actions</th>
               </tr>
@@ -135,7 +135,6 @@ const MedicineList = () => {
                         : "—"}
                     </td>
 
-                    <td className="border px-2 py-1">{med.status || "—"}</td>
                     <td className="border px-2 py-1">
                       {med.medicine_detail || (
                         <span className="text-gray-400">N/A</span>
@@ -147,9 +146,20 @@ const MedicineList = () => {
                       </button>
                       <button
                         onClick={() => confirmDelete(med.id)}
-                        disabled={statusLoadingId === med.id}
+                        disabled={isdeleteloading}
+                        className={`flex items-center gap-1 ${
+                          isdeleteloading ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
                       >
-                        <TbHttpDelete className="text-red-600 w-5 h-5" />
+                        {isdeleteloading ? (
+                          <>
+                            <span className="text-gray-500 text-sm">
+                              Deleting...
+                            </span>
+                          </>
+                        ) : (
+                          <TbHttpDelete className="text-red-600 w-5 h-5" />
+                        )}
                       </button>
                     </td>
                   </tr>

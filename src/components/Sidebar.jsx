@@ -105,17 +105,17 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
         { name: t("sidebar.wastageReturnList"), path: "/wastagereturnlist" },
       ],
     },
-    {
-      name: t("sidebar.finance"),
-      icon: HiOutlineCurrencyDollar,
-      path: "/financepage",
-      subItems: [
-        { name: t("sidebar.expense"), path: "/expensepage" },
-        { name: t("sidebar.income"), path: "/incomepage" },
-        { name: t("sidebar.invoiceDetail"), path: "/invoicedetail" },
-        { name: t("sidebar.invoiceList"), path: "/invoicelist" },
-      ],
-    },
+    // {
+    //   name: t("sidebar.finance"),
+    //   icon: HiOutlineCurrencyDollar,
+    //   path: "/financepage",
+    //   subItems: [
+    //     { name: t("sidebar.expense"), path: "/expensepage" },
+    //     { name: t("sidebar.income"), path: "/incomepage" },
+    //     { name: t("sidebar.invoiceDetail"), path: "/invoicedetail" },
+    //     { name: t("sidebar.invoiceList"), path: "/invoicelist" },
+    //   ],
+    // },
     {
       name: t("sidebar.salepage"),
       icon: MdPointOfSale,
@@ -142,16 +142,16 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
         { name: t("sidebar.client"), path: "/client" },
       ],
     },
-    { name: t("sidebar.settings"), icon: CiSettings, path: "/settingpage" },
-    {
-      name: "Sameple",
-      icon: CiRepeat,
-      path: "/sample",
-      subItems: [
-        { name: "Sample Stock", path: "/samplestock" },
-        { name: "Add Stock", path: "/addstock" },
-      ],
-    },
+    // { name: t("sidebar.settings"), icon: CiSettings, path: "/settingpage" },
+    // {
+    //   name: "Sameple",
+    //   icon: CiRepeat,
+    //   path: "/sample",
+    //   subItems: [
+    //     { name: "Sample Stock", path: "/samplestock" },
+    //     { name: "Add Stock", path: "/addstock" },
+    //   ],
+    // },
   ];
 
   const handlePageSelection = (item, path) => {
@@ -189,7 +189,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
       {/* Sidebar */}
       <div
         className={`h-screen flex-shrink-0 bg-green-600 dark:bg-gray-900 dark:shadow-gray-800 transition-all duration-300 fixed z-[200] md:static
-          ${isOpen ? "w-64" : "w-0 md:w-[80px]"} md:hover:w-64 
+          ${isOpen ? "w-52" : "w-0 md:w-[80px]"} md:hover:w-64 
           ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         `}
         onMouseEnter={() => window.innerWidth >= 768 && setIsOpen(true)}
@@ -221,7 +221,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                           handlePageSelection(name, path);
                         }
                       }}
-                      className={`group hover:shadow-lg flex items-center justify-between w-full px-3    py-2 mt-1 text-md rounded-lg transition-all duration-200
+                      className={`group hover:shadow-lg flex items-center justify-between w-full px-4    py-2 mt-1 text-md rounded-lg transition-all duration-200
                         ${
                           isParentActive
                             ? "bg-white text-green-700 dark:bg-green-600"
@@ -244,7 +244,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                           `}
                         />
                         {isOpen && (
-                          <span className="ml-4 whitespace-nowrap">{name}</span>
+                          <span className="ml-2 whitespace-nowrap">{name}</span>
                         )}
                       </div>
 

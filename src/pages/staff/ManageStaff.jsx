@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
-import { FaSort, FaCog, FaSun, FaMoon } from "react-icons/fa";
+import { FaSort, FaCog } from "react-icons/fa";
 import { useTranslation } from "../../hooks/useTranslation";
 import { useTheme } from "../../context/ThemeContext";
 import { FaRegEdit } from "react-icons/fa";
 import { TbHttpDelete } from "react-icons/tb";
 import { GrView } from "react-icons/gr";
 import Select from "react-select";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import {
   getUsers,
@@ -17,8 +19,9 @@ import {
 
 const ManageStaff = () => {
   const { t } = useTranslation();
-  const { theme, toggleTheme } = useTheme();
-
+  const { theme } = useTheme();
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
   const [currentPage, setCurrentPage] = useState(1);
@@ -26,7 +29,6 @@ const ManageStaff = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState("add");
   const [editUserId, setEditUserId] = useState(null);
-  const [confirmation, setConfirmation] = useState("");
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isToggling, setIsToggling] = useState({});
@@ -40,22 +42,35 @@ const ManageStaff = () => {
   const [formError, setFormError] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteConfirmUser, setDeleteConfirmUser] = useState(null);
+  const confirmDeleteUser = (user) => {
+    setDeleteConfirmUser(user);
+  };
+
   const genderOptions = [
     { value: "", label: t("staff.selectGender") },
     { value: "male", label: t("staff.male") },
     { value: "female", label: t("staff.female") },
-    { value: "other", label: t("staff.other") },
-    { value: "prefer_not_to_say", label: t("staff.preferNotToSay") },
   ];
+
   const roleOptions = [
-    { value: "admin", label: t("staff.roleAdmin") },
-    { value: "cashier", label: t("staff.roleCashier") },
-    { value: "partner", label: t("staff.rolePartner") },
+    { value: "", label: "Admin" },
+    { value: "cashier", label: "Cashier" },
+    { value: "partner", label: "Partner" },
   ];
+
+  const filteredRoleOptions =
+    modalMode === "add"
+      ? roleOptions.filter((opt) => opt.label !== "Admin")
+      : formData.role === "Admin"
+      ? roleOptions
+      : roleOptions.filter((opt) => opt.label !== "Admin");
+
   const statusOptions = [
     { value: "Active", label: t("staff.statusActive") },
     { value: "Inactive", label: t("staff.statusInactive") },
   ];
+
   const handleViewDetail = (user) => {
     setSelectedUser(user);
     setIsModalOpen(true);
@@ -65,28 +80,33 @@ const ManageStaff = () => {
     setSearchQuery(e.target.value);
     setCurrentPage(1);
   };
-  const handleDeleteStaff = async (user) => {
-    if (
-      user.status !== "Active" ||
-      !window.confirm(`Are you sure you want to delete ${user.username}?`)
-    ) {
-      return;
-    }
+
+  const handleDeleteConfirmed = async () => {
+    if (!deleteConfirmUser) return;
+
+    setIsDeleting(true); // ✅ start loading
 
     try {
-      await deleteUser(user.id);
-      fetchUsers();
+      await deleteUser(deleteConfirmUser.id);
+      toast.success(`${deleteConfirmUser.username} deleted successfully`);
+      fetchUsers(); // refresh list
     } catch (error) {
       console.error("Delete error:", error);
-      alert("Failed to delete user");
+      toast.error("Failed to delete user");
+    } finally {
+      setIsDeleting(false); // ✅ stop loading
+      setDeleteConfirmUser(null); // close modal
     }
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteConfirmUser(null);
   };
 
   const fetchUsers = async () => {
     setIsLoading(true);
     try {
       const response = await getUsers();
-      console.log("Full response:", response);
       let transformedUsers = [];
       if (response.data && Array.isArray(response.data)) {
         transformedUsers = response.data.map((user) => ({
@@ -105,6 +125,7 @@ const ManageStaff = () => {
       setUsers(transformedUsers);
     } catch (error) {
       console.error("Failed to fetch users:", error);
+      toast.error("Failed to load users");
       setUsers([]);
     } finally {
       setIsLoading(false);
@@ -115,17 +136,20 @@ const ManageStaff = () => {
     fetchUsers();
   }, []);
 
+  // ✅ When adding a staff member
   const handleAddStaff = () => {
     setModalMode("add");
+
     setFormData({
       name: "",
       email: "",
-      role: "admin",
+      role: "cashier",
       status: "Active",
       password: "",
       phone: "",
       gender: "",
     });
+
     setFormError("");
     setShowModal(true);
   };
@@ -133,16 +157,18 @@ const ManageStaff = () => {
   const handleEditStaff = (user) => {
     setModalMode("edit");
     setEditUserId(user.id);
+
     setFormData({
       username: user.username || user.name || "",
       name: user.name || user.username || "",
       email: user.email || "",
-      role: user.role || "admin",
+      role: user.role?.toLowerCase() || "cashier",
       status: user.is_active ? "Active" : "Inactive",
       password: "",
       phone: user.phone || "",
       gender: user.gender || "",
     });
+
     setFormError("");
     setShowModal(true);
   };
@@ -178,58 +204,22 @@ const ManageStaff = () => {
       }
       if (modalMode === "add") {
         await createUser(updatedData);
-        setConfirmation(t("staff.success.staffAdded", { name: formData.name }));
+        toast.success(t("staff.success.staffAdded", { name: formData.name }));
       } else {
         await updateUser(editUserId, updatedData);
-        setConfirmation(
-          t("staff.success.staffUpdated", { name: formData.name })
-        );
+        toast.success(t("staff.success.staffUpdated", { name: formData.name }));
       }
       setShowModal(false);
       fetchUsers();
       setFormError("");
-      setTimeout(() => setConfirmation(""), 3000);
     } catch (error) {
-      console.error("Error submitting form:", {
-        message: error.message,
-        response: error.response ? error.response.data : "No response",
-        status: error.response ? error.response.status : "No status",
-      });
-      setFormError(
+      console.error("Error submitting form:", error);
+      toast.error(
         error.response?.data?.message ||
           error.response?.data?.errors?.[0] ||
           error.message ||
           t("staff.error.submitFailed")
       );
-    }
-  };
-
-  const handleToggleStatus = async (user) => {
-    setIsToggling((prev) => ({ ...prev, [user.id]: true }));
-    try {
-      const newStatus = user.status === "Active" ? "Inactive" : "Active";
-      await toggleUserStatus({ id: user.id });
-      fetchUsers();
-      setConfirmation(
-        t("staff.success.statusToggled", { name: user.name, status: newStatus })
-      );
-      setTimeout(() => setConfirmation(""), 3000);
-    } catch (err) {
-      console.error("Error toggling status:", {
-        message: err.message,
-        response: err.response ? err.response.data : "No response",
-        status: err.response ? err.response.status : "No status",
-      });
-      const errorMessage =
-        err.response?.data?.message === "Unauthenticated."
-          ? t("staff.error.unauthenticated")
-          : err.response?.data?.message ||
-            err.response?.data?.errors?.[0] ||
-            t("staff.error.statusToggleFailed", { error: "Unknown error" });
-      setConfirmation(errorMessage);
-      setTimeout(() => setConfirmation(""), 3000);
-    } finally {
-      setIsToggling((prev) => ({ ...prev, [user.id]: false }));
     }
   };
 
@@ -246,18 +236,22 @@ const ManageStaff = () => {
       )
     : [];
 
-  const filteredList = sortedList.filter((user) =>
-    user.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+ 
+const filteredList = sortedList
+  // Search filter
+  .filter((user) => user.name.toLowerCase().includes(searchQuery.toLowerCase()))
+  // ✅ Hide admins
+  .filter((user) => user.role?.toLowerCase() !== "admin");
 
-  const totalPages = Math.ceil(filteredList.length / itemsPerPage);
-  const paginatedList = filteredList.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+const totalPages = Math.ceil(filteredList.length / itemsPerPage);
+
+const paginatedList = filteredList.slice(
+  (currentPage - 1) * itemsPerPage,
+  currentPage * itemsPerPage
+);
 
   return (
-    <div className="sm:p-2  mb-14  dark:bg-gray-900 min-h-screen max-w-6xl mx-auto">
+    <div className="sm:p-2 mb-14 dark:bg-gray-900 min-h-screen max-w-6xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <div>
           <h1 className="text-xl font-bold text-gray-700 dark:text-gray-200">
@@ -278,13 +272,9 @@ const ManageStaff = () => {
         </div>
       </div>
 
-      {confirmation && (
-        <div className="mb-4 p-3 bg-emerald-100 dark:bg-emerald-800 text-emerald-700 dark:text-emerald-300 text-md rounded-lg">
-          {confirmation}
-        </div>
-      )}
-
-      <div className="bg-white dark:bg-gray-800  rounded-lg  border-gray-200 dark:border-gray-600">
+      {/* Staff Table */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg border-gray-200 dark:border-gray-600">
+        {/* Search & sort */}
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-md font-bold text-gray-700 dark:text-gray-200">
             {t("staff.staffList")}
@@ -308,7 +298,7 @@ const ManageStaff = () => {
               <FaSort />
             </button>
             <button
-              className="bg-white hidden sm:flex dark:bg-gray-700 px-4 py-2 rounded-lg shadow-lg dark:shadow-gray-600  items-center space-x-2 border border-gray-400 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600"
+              className="bg-white hidden sm:flex dark:bg-gray-700 px-4 py-2 rounded-lg shadow-lg dark:shadow-gray-600 items-center space-x-2 border border-gray-400 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600"
               aria-label="Settings"
             >
               <FaCog />
@@ -316,8 +306,9 @@ const ManageStaff = () => {
           </div>
         </div>
 
+        {/* Table */}
         <div className="sm:w-full w-[444px]">
-          <table className="w-full  dark:text-slate-100 border-collapse border border-gray-300 dark:border-gray-600">
+          <table className="w-full dark:text-slate-100 border-collapse border border-gray-300 dark:border-gray-600">
             <thead>
               <tr className="text-center ">
                 <td className="py-2 px-3">{t("staff.name")}</td>
@@ -342,7 +333,7 @@ const ManageStaff = () => {
                     <td className="p-3 border border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-300">
                       {user.name || "No name"}
                     </td>
-                    <td className="sm:flex hidden p-4  border-gray-300 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 cursor-pointer">
+                    <td className="sm:flex hidden p-4 border-gray-300 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 cursor-pointer">
                       {user.email || "No email"}
                     </td>
                     <td className="p-3 border border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-300">
@@ -358,34 +349,32 @@ const ManageStaff = () => {
                       {user.status || "No status"}
                     </td>
                     <td className="p-3 border border-gray-300 dark:border-gray-600">
-                      <div className="flex justify-center space-x-2">
-                        <button
-                          onClick={() => handleEditStaff(user)}
-                          className={`text-md border text-blue-700 border-blue-500 dark:border-blue-400 px-2 py-1 rounded-lg transition hover:bg-blue-600 hover:text-white`}
-                        >
-                          <FaRegEdit className="w-5 h-5" />
-                        </button>
-                        <button
-                          onClick={() => handleViewDetail(user)}
-                          className={`text-md border px-2 py-1 rounded-lg transition text-green-600 border-green-600 hover:text-white hover:bg-green-600 dark:text-green-400 dark:border-green-200 dark:hover:bg-green-600 dark:hover:text-white dark:hover:shadow-lg dark:hover:shadow-slate-300`}
-                        >
-                          <GrView className="w-5 h-5" />
-                        </button>
-                        <button
-                          onClick={() => {
-                            if (
-                              window.confirm(
-                                "Are you sure you want to delete this staff member?"
-                              )
-                            ) {
-                              handleDeleteStaff(user);
-                            }
-                          }}
-                          className="text-md border border-red-500 dark:border-red-400 px-2 py-1 rounded-lg transition align-middle text-red-600 hover:bg-red-600 hover:text-white"
-                        >
-                          <TbHttpDelete className="w-5 h-5" />
-                        </button>
-                      </div>
+                      {user.role === "admin" ? (
+                        <span className="text-gray-400 italic">
+                          Admin Protected
+                        </span>
+                      ) : (
+                        <div className="flex justify-center space-x-2">
+                          <button
+                            onClick={() => handleEditStaff(user)}
+                            className="text-md border text-blue-700 border-blue-500 dark:border-blue-400 px-2 py-1 rounded-lg transition hover:bg-blue-600 hover:text-white"
+                          >
+                            <FaRegEdit className="w-5 h-5" />
+                          </button>
+                          <button
+                            onClick={() => handleViewDetail(user)}
+                            className="text-md border px-2 py-1 rounded-lg transition text-green-600 border-green-600 hover:text-white hover:bg-green-600 dark:text-green-400 dark:border-green-200 dark:hover:bg-green-600 dark:hover:text-white dark:hover:shadow-lg dark:hover:shadow-slate-300"
+                          >
+                            <GrView className="w-5 h-5" />
+                          </button>
+                          <button
+                            onClick={() => confirmDeleteUser(user)}
+                            className="text-md border border-red-500 dark:border-red-400 px-2 py-1 rounded-lg transition align-middle text-red-600 hover:bg-red-600 hover:text-white"
+                          >
+                            <TbHttpDelete className="w-5 h-5" />
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))
@@ -401,10 +390,11 @@ const ManageStaff = () => {
               )}
             </tbody>
           </table>
+
+          {/* User details modal */}
           {isModalOpen && selectedUser && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 px-4">
               <div className="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 sm:p-8 overflow-hidden">
-                {/* Close Button (top-right) */}
                 <button
                   onClick={() => setIsModalOpen(false)}
                   className="absolute top-3 right-3 text-gray-500 hover:text-red-500 dark:text-gray-300 dark:hover:text-red-400 transition"
@@ -412,13 +402,9 @@ const ManageStaff = () => {
                 >
                   ✕
                 </button>
-
-                {/* Modal Heading */}
                 <h2 className="text-2xl font-semibold mb-6 text-gray-800 dark:text-white text-center">
                   👤 User Details
                 </h2>
-
-                {/* User Info List */}
                 <ul className="space-y-3 text-sm text-gray-700 dark:text-gray-200">
                   <li>
                     <span className="font-medium text-gray-600 dark:text-gray-400">
@@ -457,8 +443,6 @@ const ManageStaff = () => {
                     {selectedUser.gender}
                   </li>
                 </ul>
-
-                {/* Bottom Close Button (fallback on mobile) */}
                 <div className="mt-8 text-center">
                   <button
                     onClick={() => setIsModalOpen(false)}
@@ -470,8 +454,43 @@ const ManageStaff = () => {
               </div>
             </div>
           )}
+          {deleteConfirmUser && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 max-w-sm w-full">
+                <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200">
+                  Confirm Deletion
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 mt-2">
+                  Are you sure you want to delete{" "}
+                  <span className="font-semibold">
+                    {deleteConfirmUser.username}
+                  </span>
+                  ? This action cannot be undone.
+                </p>
+
+                <div className="flex justify-end mt-4 space-x-2">
+                  <button
+                    onClick={handleCancelDelete}
+                    className="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleDeleteConfirmed}
+                    disabled={isDeleting}
+                    className={`px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 ${
+                      isDeleting ? "opacity-70 cursor-not-allowed" : ""
+                    }`}
+                  >
+                    {isDeleting ? "Deleting..." : "Yes, Delete"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
+        {/* Pagination */}
         <div className="flex flex-col md:flex-row justify-between items-center mt-4">
           <div className="hidden items-center space-x-2 sm:flex">
             <span className="text-gray-400 dark:text-gray-300 text-md">
@@ -517,9 +536,10 @@ const ManageStaff = () => {
           </div>
         </div>
 
+        {/* Add/Edit Modal */}
         {showModal && (
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white sm:mb-12 mb-16 sm:overflow-hidden overflow-y-auto sm:max-h-[90vh] max-h-[85vh] w-[95%] dark:bg-gray-800 p-6  shadow-lg  max-w-md">
+            <div className="bg-white sm:mb-12 mb-16 sm:overflow-hidden overflow-y-auto sm:max-h-[90vh] max-h-[85vh] w-[95%] dark:bg-gray-800 p-6 shadow-lg max-w-md">
               <h3 className="text-lg font-bold text-gray-700 dark:text-gray-200">
                 {modalMode === "add"
                   ? t("staff.addStaff")
@@ -559,7 +579,7 @@ const ManageStaff = () => {
                     />
                   </div>
 
-                  <div className="flex  flex-col flex-1 min-w-[180px] mt-4 sm:mt-0">
+                  <div className="flex flex-col flex-1 min-w-[180px] mt-4 sm:mt-0">
                     <label
                       htmlFor="gender"
                       className="block text-md font-medium text-gray-700 dark:text-gray-200"
@@ -583,7 +603,7 @@ const ManageStaff = () => {
                         })
                       }
                       classNamePrefix="select"
-                      className="mt-1  w-full text-md  border-gray-400 dark:border-gray-600  rounded-lg font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
+                      className="mt-1 w-full text-md border-gray-400 dark:border-gray-600 rounded-lg font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
                     />
                   </div>
                 </div>
@@ -607,7 +627,6 @@ const ManageStaff = () => {
                   />
                 </div>
 
-                {/* Password (only for add mode) */}
                 {modalMode === "add" && (
                   <div className="flex flex-col flex-1 min-w-[180px]">
                     <label
@@ -639,9 +658,9 @@ const ManageStaff = () => {
                     </label>
                     <Select
                       name="role"
-                      options={roleOptions}
+                      options={filteredRoleOptions}
                       value={
-                        roleOptions.find(
+                        filteredRoleOptions.find(
                           (opt) => opt.value === formData.role
                         ) || null
                       }
@@ -654,8 +673,7 @@ const ManageStaff = () => {
                         })
                       }
                       classNamePrefix="select"
-                      className="mt-1 w-full text-md  border-gray-400 dark:border-gray-600  rounded-lg font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
-                      aria-required="true"
+                      className="mt-1 w-full text-md border-gray-400 dark:border-gray-600 rounded-lg font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
                     />
                   </div>
 
@@ -683,7 +701,7 @@ const ManageStaff = () => {
                         })
                       }
                       classNamePrefix="select"
-                      className="mt-1 w-full text-md   dark:border-gray-600  rounded-lg font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
+                      className="mt-1 w-full text-md dark:border-gray-600 rounded-lg font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
                       aria-required="true"
                     />
                   </div>
@@ -708,23 +726,36 @@ const ManageStaff = () => {
                 </div>
 
                 {/* Buttons */}
-                <div className="flex  justify-end space-x-2 ">
+                <div className="flex justify-end space-x-2">
                   <button
                     type="button"
                     onClick={() => setShowModal(false)}
-                    className="text-md text-gray-500 dark:text-gray-400 border border-gray-400 dark:border-gray-600 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                    disabled={isSubmitting} // ✅ disable cancel while submitting
+                    className={`text-md text-gray-500 dark:text-gray-400 border border-gray-400 dark:border-gray-600 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 ${
+                      isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                     aria-label="Cancel"
                   >
                     {t("staff.cancel")}
                   </button>
+
                   <button
                     type="submit"
-                    className="text-md text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-4 py-2 rounded-lg dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition"
+                    disabled={isSubmitting} // ✅ disable submit while loading
+                    className={`text-md text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-4 py-2 rounded-lg dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition ${
+                      isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                     aria-label={
                       modalMode === "add" ? "Add staff" : "Save changes"
                     }
                   >
-                    {modalMode === "add" ? t("staff.add") : t("staff.save")}
+                    {isSubmitting
+                      ? modalMode === "add"
+                        ? "Adding..."
+                        : "Saving..."
+                      : modalMode === "add"
+                      ? t("staff.add")
+                      : t("staff.save")}
                   </button>
                 </div>
               </form>
@@ -732,6 +763,9 @@ const ManageStaff = () => {
           </div>
         )}
       </div>
+
+      {/* Toast Notifications */}
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
     </div>
   );
 };

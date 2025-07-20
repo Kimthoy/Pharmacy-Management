@@ -52,8 +52,6 @@ const StockList = () => {
             <th className="px-4 py-2 text-left">Medicine</th>
             <th className="px-4 py-2 text-left">Qty</th>
             <th className="px-4 py-2 text-left">Price In</th>
-            <th className="px-4 py-2 text-left">Barcode</th>
-            {/* <th className="px-4 py-2 text-left">Actions</th> */}
           </tr>
         </thead>
         <tbody>
@@ -71,17 +69,6 @@ const StockList = () => {
                 </td>
                 <td className="px-4 py-2">{stock.quantity}</td>
                 <td className="px-4 py-2">${stock.price_in}</td>
-                <td className="px-4 py-2">
-                  {stock.medicine?.barcode || "N/A"}
-                </td>
-                {/* <td className="px-4 py-2 flex gap-2">
-                  <button
-                    onClick={() => handleEdit(stock)}
-                    className="text-blue-600 hover:text-white hover:bg-blue-600 border border-blue-600 px-2 py-1 rounded"
-                  >
-                    <BiEdit className="w-5 h-5" />
-                  </button>
-                </td> */}
               </tr>
             ))
           ) : (

@@ -33,11 +33,18 @@ export const getAllMedicines = async (page = 1, perPage = 10) => {
       },
     });
 
-    // Log the entire structure to debug if needed
-    console.log("API response:", response.data);
+    const rawData = response.data.data || [];
+
+
+    const formatted = rawData.map((item) => ({
+      ...item,
+      name: item.medicine_name,
+      price: parseFloat(item.price), // ensure it's a number
+      image: item.image || "", // fallback if missing
+    }));
 
     return {
-      data: response.data.data || [],
+      data: formatted,
       meta: response.data.meta || {},
     };
   } catch (error) {
@@ -49,7 +56,7 @@ export const getAllMedicines = async (page = 1, perPage = 10) => {
   }
 };
 
-// Toggle medicine active status
+
 export const toggleProductStatus = async (medicineId) => {
   try {
     const response = await axios.put(
@@ -67,17 +74,15 @@ export const updateMedicine = async (id, data) => {
   try {
     const formData = new FormData();
 
-    // Append simple fields
+
     if (data.medicine_name)
       formData.append("medicine_name", data.medicine_name);
     if (data.price) formData.append("price", data.price);
     if (data.weight) formData.append("weight", data.weight);
     if (data.barcode) formData.append("barcode", data.barcode);
-    if (data.status) formData.append("status", data.status);
+
     if (data.medicine_detail)
       formData.append("medicine_detail", data.medicine_detail);
-
-    // ✅ Append category_ids[]
     if (Array.isArray(data.category_ids)) {
       data.category_ids.forEach((id) => formData.append("category_ids[]", id));
     }
@@ -85,8 +90,6 @@ export const updateMedicine = async (id, data) => {
     if (Array.isArray(data.unit_ids)) {
       data.unit_ids.forEach((id) => formData.append("unit_ids[]", id));
     }
-
-    // ✅ Append image file
     if (data.imageFile) {
       formData.append("image", data.imageFile);
     }
@@ -109,7 +112,6 @@ export const updateMedicine = async (id, data) => {
     throw error.response?.data || { message: "Failed to update medicine" };
   }
 };
-
 
 export const deleteMedicine = async (id) => {
   try {

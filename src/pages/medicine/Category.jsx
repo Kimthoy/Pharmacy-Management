@@ -18,6 +18,7 @@ const CategoryDashboard = () => {
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [saveloading, setSaveLoading] = useState(false);
   // const [deleteLoadingId, setDeleteLoadingId] = useState(null);
 
   const [category, setCategory] = useState({
@@ -295,10 +296,11 @@ const CategoryDashboard = () => {
                   Cancel
                 </button>
                 <button
+                  disabled={saveloading}
                   onClick={handleUpdateCategory}
                   className="px-4 py-2 bg-blue-600 text-white  rounded-lg hover:bg-opacity-50 hover:text-blue-700  shadow-lg"
                 >
-                  Save
+                  {saveloading?"Saving...":"Save"}
                 </button>
               </div>
             </div>

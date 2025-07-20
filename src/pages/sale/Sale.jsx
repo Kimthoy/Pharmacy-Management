@@ -8,7 +8,8 @@ import RetailSaleModal from "./RetailSaleModal";
 import ToastNotification from "./ToastNotification";
 import compoundMedicines from "./compoundMedicines";
 import { HiMiniShoppingCart } from "react-icons/hi2";
-
+import { getAllMedicines } from "../api/medicineService";
+import { createSale } from "../api/saleService";
 import "./sell.css";
 
 const Sale = () => {
@@ -25,123 +26,39 @@ const Sale = () => {
   const [toast, setToast] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [cardNumber, setCardNumber] = useState("");
-  const [currentProducts, setCurrentProducts] = useState([]);
+  // const [currentProducts, setCurrentProducts] = useState([]);
   const [isCompoundMode, setIsCompoundMode] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [currentProducts, setCurrentProducts] = useState([]);
 
-  const regularProducts = [
-    {
-      id: 1,
-      supply_id: 1,
-      name: "ថ្នាំក្អក",
-      price: 1.25,
-      image:
-        "https://th.bing.com/th/id/OIP.ljUSqIK7CFM9CZGAAb0cGgHaFy?w=278&h=217&c=7&r=0&o=5&dpr=1.3&pid=1.7",
-      hasBottle: true,
-      typeofmedicine: "ប្រអប់",
-    },
-    {
-      id: 2,
-      supply_id: 1,
-      name: "វីតាមីន C",
-      price: 2.5,
-      image:
-        "https://th.bing.com/th/id/R.c068130b57bc509fd0f85bd9ce1b5aca?rik=APU1%2bXfEr8SQBQ&pid=ImgRaw&r=0",
-      hasBottle: false,
-      typeofmedicine: "បន្ទះ",
-    },
-    {
-      id: 3,
-      supply_id: 2,
-      name: "អាស្ពីរីន",
-      price: 0.8,
-      image:
-        "https://th.bing.com/th/id/OIP.m7dTJT4Mo3Y8Wr0TKwt8sgHaHa?w=800&h=800&rs=1&pid=ImgDetMain",
-      hasBottle: true,
-      typeofmedicine: "ដប",
-    },
-    {
-      id: 4,
-      supply_id: 2,
-      name: "ថ្នាំបំបាត់ការឈឺចាប់",
-      price: 1.2,
-      image:
-        "https://edrug-online.com/wp-content/uploads/2020/06/Paracetamol-Dosage.jpg",
-      hasBottle: false,
-      typeofmedicine: "ប្រអប់",
-    },
-    {
-      id: 5,
-      supply_id: 2,
-      name: "វីតាមីន D",
-      price: 5.0,
-      image:
-        "https://th.bing.com/th/id/R.0f5d3bb4626be26530d545a525af630c?rik=77RaYpK340tQZQ&pid=ImgRaw&r=0&sres=1&sresct=1",
-      hasBottle: true,
-      typeofmedicine: "ថ្នាំធម្មតា",
-    },
-    {
-      id: 6,
-      supply_id: 1,
-      name: "ថ្នាំប្រឆាំងនឹងអាឡែស៊ី",
-      price: 0.9,
-      image:
-        "https://th.bing.com/th/id/OIP.F1gIKLr0bGqvir5qjXrjuQHaHa?w=172&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
-      hasBottle: false,
-      typeofmedicine: "ថ្នាំធម្មតា",
-    },
-    {
-      id: 7,
-      supply_id: 1,
-      name: "ថ្នាំប្រឆាំងនឹងអាឡែស៊ី",
-      price: 0.9,
-      image:
-        "https://th.bing.com/th/id/OIP.F1gIKLr0bGqvir5qjXrjuQHaHa?w=172&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
-      hasBottle: false,
-      typeofmedicine: "ថ្នាំធម្មតា",
-    },
-    {
-      id: 8,
-      supply_id: 1,
-      name: "ថ្នាំប្រឆាំងនឹងអាឡែស៊ី",
-      price: 0.9,
-      image:
-        "https://th.bing.com/th/id/OIP.F1gIKLr0bGqvir5qjXrjuQHaHa?w=172&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
-      hasBottle: false,
-      typeofmedicine: "ថ្នាំធម្មតា",
-    },
-    {
-      id: 9,
-      supply_id: 1,
-      name: "ថ្នាំប្រឆាំងនឹងអាឡែស៊ី",
-      price: 0.9,
-      image:
-        "https://th.bing.com/th/id/OIP.F1gIKLr0bGqvir5qjXrjuQHaHa?w=172&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
-      hasBottle: false,
-      typeofmedicine: "ថ្នាំធម្មតា",
-    },
-    {
-      id: 10,
-      supply_id: 1,
-      name: "ថ្នាំប្រឆាំងនឹងអាឡែស៊ី",
-      price: 0.9,
-      image:
-        "https://th.bing.com/th/id/OIP.F1gIKLr0bGqvir5qjXrjuQHaHa?w=172&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
-      hasBottle: false,
-      typeofmedicine: "ថ្នាំធម្មតា",
-    },
-  ];
+  // const [meta, setMeta] = useState({});
+
+  useEffect(() => {
+    const fetchMedicines = async () => {
+      const { data } = await getAllMedicines();
+      console.log("Fetched medicines:", data); // 👈 Add this
+      setProducts(data); // This goes into state
+    };
+
+    fetchMedicines();
+  }, []);
+
   const updatedCompoundMedicines = compoundMedicines.map((medicine) => ({
     ...medicine,
     typeofmedicine: "ថ្នាំផ្សំ",
   }));
   const randomizeProducts = () => {
     const randomChoice = Math.random() < 0.5;
-    const selectedProducts = randomChoice
-      ? regularProducts
-      : updatedCompoundMedicines;
+    const selectedProducts = randomChoice ? products : updatedCompoundMedicines;
     setCurrentProducts(selectedProducts);
     setIsCompoundMode(!randomChoice);
   };
+
+  useEffect(() => {
+    setCurrentProducts(products);
+    setIsCompoundMode(false);
+  }, [products]);
+
   const handleAddToCartClick = (product) => {
     addToCart(product);
   };
@@ -178,14 +95,13 @@ const Sale = () => {
     if (typeof price !== "number") return 0;
     return price;
   };
-
-  const filteredProducts = useMemo(
-    () =>
-      currentProducts.filter((product) =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase())
-      ),
-    [currentProducts, searchQuery]
-  );
+  const filteredProducts = useMemo(() => {
+    const safeList = Array.isArray(currentProducts) ? currentProducts : [];
+    return safeList.filter((product) => {
+      const name = product?.name?.toLowerCase?.() || "";
+      return name.includes(searchQuery.toLowerCase());
+    });
+  }, [currentProducts, searchQuery]);
 
   const totalPrice = cart.reduce(
     (sum, item) => sum + displayPrice(item.price) * (item.quantity || 1),
@@ -223,7 +139,7 @@ const Sale = () => {
     setIsOrderReviewModalOpen(true);
   };
 
-  const confirmOrder = () => {
+  const confirmOrder = async () => {
     if (
       (paymentMethod === "aba" || paymentMethod === "wing") &&
       (!cardNumber || cardNumber.length < 16)
@@ -234,11 +150,34 @@ const Sale = () => {
       });
       return;
     }
-    setCart([]);
-    setCardNumber("");
-    setIsCheckoutOpen(false);
-    setIsOrderReviewModalOpen(false);
-    setToast({ message: "ការបញ្ជាទិញបានជោគជ័យ!", type: "success" });
+
+    const saleData = {
+      sale_date: new Date().toISOString().slice(0, 10), // or format as needed
+      payment_method: paymentMethod,
+      total_amount: totalPrice,
+      card_number: cardNumber || null,
+      items: cart.map((item) => ({
+        medicine_id: item.medicine_id || item.id,
+        quantity: item.quantity,
+        unit_price: item.price,
+      })),
+    };
+
+    try {
+      await createSale(saleData); // call backend
+      setCart([]);
+      setCardNumber("");
+      setIsCheckoutOpen(false);
+      setIsOrderReviewModalOpen(false);
+      setToast({ message: "ការបញ្ជាទិញបានជោគជ័យ!", type: "success" });
+    } catch (error) {
+      console.error("Sale failed:", error);
+      setToast({
+        message:
+          "បរាជ័យក្នុងការបញ្ជាទិញ: " + (error.message || "Unknown error"),
+        type: "error",
+      });
+    }
   };
 
   useEffect(() => {
@@ -254,15 +193,11 @@ const Sale = () => {
   useEffect(() => {
     randomizeProducts();
   }, []);
-  useEffect(() => {
-    setCurrentProducts(regularProducts);
-    setIsCompoundMode(false);
-  }, []);
-  // const [isCartOpen, setCartOpen] = useState(false);
+
   return (
     <div className="flex mb-14 h-screen bg-white dark:bg-gray-900 font-khmer relative">
       <div className="flex-1 flex flex-col md:flex-row">
-        <div className="flex-1 sm:p-6 p-2 overflow-auto">
+        <div className="flex-1 sm:p-6 p-2 ">
           <Header
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
@@ -270,8 +205,9 @@ const Sale = () => {
             setCompoundModeType={(type) => {
               const isCompound = type === "compound";
               setCurrentProducts(
-                isCompound ? updatedCompoundMedicines : regularProducts
+                isCompound ? updatedCompoundMedicines : products
               );
+
               setIsCompoundMode(isCompound);
             }}
             openRetailSaleModal={() => setIsRetailSaleOpen(true)}

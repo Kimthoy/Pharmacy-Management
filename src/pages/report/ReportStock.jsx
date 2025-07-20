@@ -1,6 +1,4 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
-import { FaEllipsisH } from "react-icons/fa";
-import { BiEdit, BiShow, BiTrash } from "react-icons/bi";
 import {
   BarChart,
   Bar,
@@ -13,438 +11,336 @@ import {
 import { useTranslation } from "../../hooks/useTranslation";
 import { useTheme } from "../../context/ThemeContext";
 
-const STOCK_DATA = [
-  {
-    id: 1,
-    medicine_name: "Paracetamol",
-    category: "Tablets",
-    quantity: 150,
-    reorder_level: 50,
-    stock_value: 2250,
-    last_updated: "2024-03-15",
-  },
-  {
-    id: 2,
-    medicine_name: "Amoxicillin",
-    category: "Capsules",
-    quantity: 80,
-    reorder_level: 30,
-    stock_value: 1600,
-    last_updated: "2024-03-16",
-  },
-  {
-    id: 3,
-    medicine_name: "Cough Syrup",
-    category: "Syrups",
-    quantity: 40,
-    reorder_level: 20,
-    stock_value: 1200,
-    last_updated: "2024-03-17",
-  },
-  {
-    id: 4,
-    medicine_name: "Ibuprofen",
-    category: "Tablets",
-    quantity: 200,
-    reorder_level: 60,
-    stock_value: 3000,
-    last_updated: "2024-03-18",
-  },
-  {
-    id: 5,
-    medicine_name: "Cefixime",
-    category: "Capsules",
-    quantity: 25,
-    reorder_level: 40,
-    stock_value: 750,
-    last_updated: "2024-03-19",
-  },
-  {
-    id: 6,
-    medicine_name: "Antacid Syrup",
-    category: "Syrups",
-    quantity: 60,
-    reorder_level: 25,
-    stock_value: 1800,
-    last_updated: "2024-03-20",
-  },
-  {
-    id: 7,
-    medicine_name: "Aspirin",
-    category: "Tablets",
-    quantity: 90,
-    reorder_level: 30,
-    stock_value: 1350,
-    last_updated: "2024-03-21",
-  },
-  {
-    id: 8,
-    medicine_name: "Azithromycin",
-    category: "Capsules",
-    quantity: 110,
-    reorder_level: 40,
-    stock_value: 2200,
-    last_updated: "2024-03-22",
-  },
-];
+// ✅ Import API service
+import { getAllStocks } from "../api/stockService";
 
 const StockReport = () => {
   const { t } = useTranslation();
   const { theme } = useTheme();
+
+  const [stockData, setStockData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  // ✅ Sorting states
+  const [sortField, setSortField] = useState("medicine_name");
+  const [sortOrder, setSortOrder] = useState("asc");
+
   const [filters, setFilters] = useState({
     searchTerm: "",
     startDate: "",
     endDate: "",
-    category: "",
   });
+
   const [pagination, setPagination] = useState({
     currentPage: 1,
-    rowsPerPage: 5,
+    rowsPerPage: 10,
   });
-  const [openMenu, setOpenMenu] = useState(null);
-  const menuRef = useRef(null);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setOpenMenu(null);
+    const fetchStock = async () => {
+      try {
+        const response = await getAllStocks();
+        const stocks = Array.isArray(response.data) ? response.data : [];
+        console.log("✅ Stock API:", stocks);
+        setStockData(stocks);
+      } catch (err) {
+        console.error("❌ Fetch Stock Error:", err);
+        setError("Failed to load stock report");
+      } finally {
+        setLoading(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+
+    fetchStock();
   }, []);
 
-  // Memoized filtered data
+  // ✅ Filter stock data
   const filteredData = useMemo(() => {
-    return STOCK_DATA.filter((item) => {
-      const matchesSearch = item.medicine_name
-        .toLowerCase()
-        .includes(filters.searchTerm.toLowerCase());
+    return stockData.filter((item) => {
+      const searchMatch =
+        !filters.searchTerm ||
+        String(item.medicine_id)
+          .toLowerCase()
+          .includes(filters.searchTerm.toLowerCase()) ||
+        (item.notes?.toLowerCase() || "").includes(
+          filters.searchTerm.toLowerCase()
+        );
+
       const dateMatch =
         (!filters.startDate ||
-          new Date(item.last_updated) >= new Date(filters.startDate)) &&
+          new Date(item.received_date) >= new Date(filters.startDate)) &&
         (!filters.endDate ||
-          new Date(item.last_updated) <= new Date(filters.endDate));
-      const categoryMatch =
-        !filters.category || item.category === filters.category;
-      return matchesSearch && dateMatch && categoryMatch;
-    });
-  }, [filters]);
+          new Date(item.received_date) <= new Date(filters.endDate));
 
-  // Compute summary metrics
+      return searchMatch && dateMatch;
+    });
+  }, [stockData, filters]);
+
+  // ✅ Sorting logic
+  const sortedData = [...filteredData].sort((a, b) => {
+    let valA, valB;
+
+    if (sortField === "medicine_name") {
+      valA = a.medicine?.medicine_name?.toLowerCase() || "";
+      valB = b.medicine?.medicine_name?.toLowerCase() || "";
+    } else if (sortField === "quantity") {
+      valA = a.quantity;
+      valB = b.quantity;
+    } else if (sortField === "price_in") {
+      valA = parseFloat(a.price_in || 0);
+      valB = parseFloat(b.price_in || 0);
+    } else if (sortField === "received_date") {
+      valA = new Date(a.received_date);
+      valB = new Date(b.received_date);
+    } else {
+      valA = a.id;
+      valB = b.id;
+    }
+
+    if (valA < valB) return sortOrder === "asc" ? -1 : 1;
+    if (valA > valB) return sortOrder === "asc" ? 1 : -1;
+    return 0;
+  });
+
+  // ✅ Total stock value = sum(quantity * price)
   const totalStockValue = filteredData.reduce(
-    (sum, item) => sum + item.stock_value,
+    (sum, item) => sum + item.quantity * parseFloat(item.price_in || 0),
     0
   );
+
+  // ✅ Low stock items (< 50)
   const lowStockItems = filteredData.filter(
-    (item) => item.quantity <= item.reorder_level
+    (item) => item.quantity < 50
   ).length;
 
-  // Chart data by category
+  // ✅ Chart data for bar chart
   const chartData = useMemo(() => {
-    const categories = ["Tablets", "Capsules", "Syrups"];
-    return categories.map((category) => ({
-      category,
-      quantity: filteredData
-        .filter((item) => item.category === category)
-        .reduce((sum, item) => sum + item.quantity, 0),
+    return filteredData.map((item) => ({
+      name: `Med-${item.medicine?.medicine_name}`,
+      quantity: item.quantity,
     }));
   }, [filteredData]);
 
-  // Pagination logic
-  const totalPages =
-    Math.ceil(filteredData.length / pagination.rowsPerPage) || 1;
-  const paginatedData = filteredData.slice(
+  // ✅ Pagination
+  const totalPages = Math.ceil(sortedData.length / pagination.rowsPerPage) || 1;
+  const paginatedData = sortedData.slice(
     (pagination.currentPage - 1) * pagination.rowsPerPage,
     pagination.currentPage * pagination.rowsPerPage
   );
 
+  // ✅ Print filtered & sorted report
+  const handlePrint = () => {
+    const printContent = document.getElementById("stock-table").outerHTML;
+    const win = window.open("", "_blank");
+    win.document.write(`
+      <html>
+        <head>
+          <title>Stock Report</title>
+          <style>
+            body { font-family: Arial; padding: 20px; }
+            h2 { text-align: center; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+            th { background: #f4f4f4; }
+          </style>
+        </head>
+        <body>
+          <h2>Stock Report</h2>
+          <p><b>Total Stock Value:</b> $${totalStockValue.toFixed(2)}</p>
+          <p><b>Low Stock Items:</b> ${lowStockItems} Medicines</p>
+          ${printContent}
+        </body>
+      </html>
+    `);
+    win.document.close();
+    win.focus();
+    win.print();
+    win.close();
+  };
+
+  if (loading)
+    return <p className="p-6 text-center">Loading Stock Report...</p>;
+  if (error) return <p className="p-6 text-center text-red-500">{error}</p>;
+
   return (
     <div className="sm:p-6 mb-24 bg-white dark:bg-gray-900 min-h-screen">
-      {/* Stock Report Section */}
-      <section className="mb-8">
-        <h2 className="sm:text-lg text-md font-bold text-gray-500 dark:text-gray-200">
-          {t("stockreport.StockReportTitle")}
+      {/* ✅ Header */}
+      <div className="flex justify-between mb-4">
+        <h2 className="text-lg font-bold text-gray-700 dark:text-gray-200">
+          Stock Report
         </h2>
-        <p className="text-gray-500 text-md dark:text-gray-300">
-          {t("stockreport.StockReportDesc")}
-        </p>
-      </section>
+      </div>
 
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* Stock Summary Card */}
-        <div className="bg-white dark:bg-gray-800 sm:p-6 sm:shadow-md dark:shadow-gray-700 sm:rounded-lg">
-          <h3 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-4">
-            {t("stockreport.StockSummary")}
-          </h3>
-          <div className="mb-4">
-            <p className="text-gray-600 dark:text-gray-200">
-              {t("stockreport.TotalStockValue")}
-            </p>
-            <p className="text-md font-bold text-emerald-600 dark:text-emerald-400">
-              ${totalStockValue.toFixed(2)}
-            </p>
-          </div>
-          <div className="mb-4">
-            <p className="text-gray-600 dark:text-gray-200">
-              {t("stockreport.LowStockItems")}
-            </p>
-            <p className="text-md font-bold text-red-500 dark:text-red-400">
-              {lowStockItems}
-            </p>
-          </div>
-          <button className="text-emerald-600 dark:text-emerald-400 hover:underline">
-            {t("stockreport.ViewDetailedReport")}
-          </button>
+      {/* ✅ Summary section */}
+      <div className="grid md:grid-cols-2 gap-2 mb-6">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+          <p className="text-gray-500 dark:text-gray-300 mb-5">
+            Total Stock Value
+          </p>
+          <p className="text-xl font-bold text-emerald-600 mb-5">
+            ${totalStockValue.toFixed(2)}
+          </p>
+          <p className="text-gray-500 dark:text-gray-300 mt-2">
+            Low Stock Items:{" "}
+            <span className="font-bold text-red-500 text-lg p-4">
+              {lowStockItems} Medicines
+            </span>
+          </p>
         </div>
 
-        {/* Stock by Category Chart */}
-        <div className="bg-white dark:bg-gray-800 sm:p-6 sm:shadow-lg dark:shadow-gray-700 sm:rounded-lg">
-          <h3 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-4">
-            {t("stockreport.StockByCategory")}
-          </h3>
+        {/* ✅ Stock Bar Chart */}
+        <div className="bg-white dark:bg-gray-800 p-2 rounded-md shadow">
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={chartData}>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke={theme === "dark" ? "#4b5563" : "#e5e7eb"}
-              />
-              <XAxis
-                dataKey="category"
-                stroke={theme === "dark" ? "#9ca3af" : "#6b7280"}
-              />
-              <YAxis stroke={theme === "dark" ? "#9ca3af" : "#6b7280"} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: theme === "dark" ? "#1f2937" : "#ffffff",
-                  borderColor: theme === "dark" ? "#4b5563" : "#e5e7eb",
-                  color: theme === "dark" ? "#e5e7eb" : "#374151",
-                }}
-              />
-              <Bar
-                dataKey="quantity"
-                fill={theme === "dark" ? "#a78bfa" : "#8884d8"}
-              />
+              <CartesianGrid strokeDasharray="1 1" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="quantity" fill="#059669" />
             </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
 
-      {/* Stock Inventory Section */}
-      <div className="bg-white dark:bg-gray-800 sm:p-6 sm:shadow-lg dark:shadow-gray-700 sm:rounded-lg mt-6">
-        <h3 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-6">
-          {t("stockreport.StockInventory")}
-        </h3>
+      {/* ✅ Filters + Sort + Print */}
+      <div className="flex flex-wrap gap-4 mb-4 items-center">
+        <input
+          type="text"
+          placeholder="Search medicine or notes"
+          className="border p-2 rounded w-1/3"
+          value={filters.searchTerm}
+          onChange={(e) =>
+            setFilters((prev) => ({ ...prev, searchTerm: e.target.value }))
+          }
+        />
 
-        {/* Filter controls */}
-        <div className="sm:flex flex-wrap gap-4 mb-6">
-          <div>
-            <label
-              htmlFor="search"
-              className="block  text-gray-400 dark:text-gray-300 mb-1 text-md"
-            >
-              {t("stockreport.Search")}
-            </label>
-            <input
-              type="text"
-              id="search"
-              placeholder={t("stockreport.SearchPlaceholder")}
-              className="border w-full border-gray-300 dark:border-gray-600 p-2 rounded-md focus:outline-emerald-500 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
-              value={filters.searchTerm}
-              onChange={(e) =>
-                setFilters((prev) => ({ ...prev, searchTerm: e.target.value }))
-              }
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="startDate"
-              className="block text-gray-400 dark:text-gray-300 mb-1 text-md"
-            >
-              {t("stockreport.StartDate")}
-            </label>
-            <input
-              type="date"
-              id="startDate"
-              className="border w-full border-gray-300 dark:border-gray-600 p-2 rounded-md focus:outline-emerald-500 dark:bg-gray-700 dark:text-gray-200"
-              value={filters.startDate}
-              onChange={(e) =>
-                setFilters((prev) => ({ ...prev, startDate: e.target.value }))
-              }
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="endDate"
-              className="block text-gray-400 dark:text-gray-300 mb-1 text-md"
-            >
-              {t("stockreport.EndDate")}
-            </label>
-            <input
-              type="date"
-              id="endDate"
-              className="border w-full border-gray-300 dark:border-gray-600 p-2 rounded-md focus:outline-emerald-500 dark:bg-gray-700 dark:text-gray-200"
-              value={filters.endDate}
-              onChange={(e) =>
-                setFilters((prev) => ({ ...prev, endDate: e.target.value }))
-              }
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="category"
-              className="block text-gray-400 dark:text-gray-300 mb-1 text-md"
-            >
-              {t("stockreport.Category")}
-            </label>
-            <select
-              id="category"
-              className="border w-full border-gray-300 dark:border-gray-600 p-2 rounded-md focus:outline-emerald-500 dark:bg-gray-700 dark:text-gray-200"
-              value={filters.category}
-              onChange={(e) =>
-                setFilters((prev) => ({ ...prev, category: e.target.value }))
-              }
-              aria-label={t("stockreport.Category")}
-            >
-              <option value="">{t("stockreport.AllCategories")}</option>
-              <option value="Tablets">{t("stockreport.Tablets")}</option>
-              <option value="Capsules">{t("stockreport.Capsules")}</option>
-              <option value="Syrups">{t("stockreport.Syrups")}</option>
-            </select>
-          </div>
-        </div>
+        {/* Date Filters */}
+        <label className="py-2">Start Date</label>
+        <input
+          type="date"
+          value={filters.startDate}
+          onChange={(e) =>
+            setFilters((prev) => ({ ...prev, startDate: e.target.value }))
+          }
+          className="border p-2 rounded"
+        />
+        <label className="py-2">End Date</label>
+        <input
+          type="date"
+          value={filters.endDate}
+          onChange={(e) =>
+            setFilters((prev) => ({ ...prev, endDate: e.target.value }))
+          }
+          className="border p-2 rounded"
+        />
 
-        {/* Stock table */}
-        <table className="sm:w-full w-[420px] bg-white dark:bg-gray-800 sm:shadow-lg dark:shadow-gray-700 sm:rounded-lg border border-gray-300 dark:border-gray-600">
-          <thead>
-            <tr className="border-b border-gray-200 dark:border-gray-600">
-              <th className="px-5 py-3 text-left text-gray-400 dark:text-gray-300 text-md">
-                {t("stockreport.MedicineName")}
-              </th>
-              <th className="px-5 py-3 text-left text-gray-400 dark:text-gray-300 text-md">
-                {t("stockreport.Category")}
-              </th>
-              <th className="px-5 py-3 text-left text-gray-400 dark:text-gray-300 text-md">
-                {t("stockreport.Quantity")}
-              </th>
+        {/* Sort Dropdown */}
+        <label className="text-gray-500 dark:text-gray-300">Sort By:</label>
+        <select
+          value={sortField}
+          onChange={(e) => setSortField(e.target.value)}
+          className="border p-2 rounded"
+        >
+          <option value="medicine_name">Medicine Name</option>
+          <option value="quantity">Quantity</option>
+          <option value="price_in">Price</option>
+          <option value="received_date">Received Date</option>
+        </select>
 
-              <th className="px-5 py-3 text-left text-gray-400 dark:text-gray-300 text-md">
-                {t("stockreport.Actions")}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedData.map((item) => (
-              <tr
-                key={item.id}
-                className="border-b border-gray-200 dark:border-gray-600"
-              >
-                <td className="px-5 py-3 text-gray-800 dark:text-gray-200 font-medium">
-                  {item.medicine_name}
-                </td>
-                <td className="px-5 py-3 text-gray-500 dark:text-gray-300">
-                  {item.category}
-                </td>
+        {/* Toggle Asc/Desc */}
+        <button
+          onClick={() =>
+            setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"))
+          }
+          className="px-4 py-2 bg-emerald-500 text-white rounded"
+        >
+          {sortOrder === "asc" ? "⬆ Ascending" : "⬇ Descending"}
+        </button>
+
+        {/* ✅ Print Button */}
+        <button
+          onClick={handlePrint}
+          className="px-4 py-2 text-emerald-600 underline"
+        >
+          🖨 Report Stock
+        </button>
+      </div>
+
+      {/* ✅ Stock Table */}
+      <table
+        id="stock-table"
+        className="w-full border-collapse border border-gray-300 dark:border-gray-700"
+      >
+        <thead>
+          <tr className="bg-gray-100 dark:bg-gray-700">
+            <th className="sm:flex hidden p-2 border">ID</th>
+            <th className="p-2 border">Medicine Name</th>
+            <th className="p-2 border">Quantity</th>
+            <th className="p-2 border">Price In</th>
+            <th className="p-2 border">Received Date</th>
+            <th className="p-2 border">Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          {paginatedData.length > 0 ? (
+            paginatedData.map((stock) => (
+              <tr key={stock.id} className="border">
+                <td className="p-2 border sm:flex hidden">{stock.id}</td>
+                <td className="p-2 border">{stock.medicine?.medicine_name}</td>
                 <td
-                  className={`px-5 py-3 font-semibold ${
-                    item.quantity <= item.reorder_level
-                      ? "text-red-500 dark:text-red-400"
-                      : "text-gray-500 dark:text-gray-300"
+                  className={`p-2 border ${
+                    stock.quantity < 50 ? "text-red-500" : ""
                   }`}
                 >
-                  {item.quantity}
+                  {stock.quantity}
                 </td>
-
-                <td className="px-5 py-3 relative">
-                  <button
-                    ref={menuRef}
-                    className="p-2 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300"
-                    onClick={() =>
-                      setOpenMenu(openMenu === item.id ? null : item.id)
-                    }
-                    aria-label={t("stockreport.Actions")}
-                  >
-                    <FaEllipsisH />
-                  </button>
-                  {openMenu === item.id && (
-                    <div className="absolute z-10 sm:right-[230px] right-[87px] sm:top-4 top-5 sm:w-44 w-40 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md shadow-md dark:shadow-gray-700">
-                      <button className="flex items-center w-full text-left text-gray-600 dark:text-gray-200 py-2 px-3 hover:rounded-md hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-400 dark:hover:text-white">
-                        <BiShow className="mr-2" />
-                        {t("stockreport.ViewDetails")}
-                      </button>
-                      <button className="flex items-center w-full text-left text-gray-600 dark:text-gray-200 py-2 px-3 hover:rounded-md hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-400 dark:hover:text-white">
-                        <BiEdit className="mr-2" />
-                        {t("stockreport.Edit")}
-                      </button>
-                      <button className="flex items-center w-full text-left text-gray-600 dark:text-gray-200 py-2 px-3 hover:rounded-md hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-400 dark:hover:text-white">
-                        <BiTrash className="mr-2" />
-                        {t("stockreport.Delete")}
-                      </button>
-                    </div>
-                  )}
+                <td className="p-2 border">${stock.price_in}</td>
+                <td className="p-2 border">
+                  {new Date(stock.received_date).toLocaleDateString()}
                 </td>
+                <td className="p-2 border">{stock.notes || "N/A"}</td>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="6" className="p-4 text-center text-gray-500">
+                No Stock Found
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
 
-        {/* Pagination controls */}
-        <div className="flex justify-between items-center mt-4">
-          <div className="sm:flex hidden items-center gap-2">
-            <label
-              htmlFor="rowsPerPage"
-              className="text-gray-400 dark:text-gray-300 text-md"
-            >
-              {t("stockreport.RowsPerPage")}
-            </label>
-            <select
-              id="rowsPerPage"
-              className="border border-gray-300 dark:border-gray-600 p-2 rounded-md focus:outline-emerald-500 dark:bg-gray-700 dark:text-gray-200"
-              value={pagination.rowsPerPage}
-              onChange={(e) =>
-                setPagination({
-                  currentPage: 1,
-                  rowsPerPage: parseInt(e.target.value),
-                })
-              }
-              aria-label={t("stockreport.RowsPerPage")}
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={15}>15</option>
-            </select>
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-gray-400 dark:text-gray-300 text-md hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
-              onClick={() =>
-                setPagination((prev) => ({
-                  ...prev,
-                  currentPage: Math.max(1, prev.currentPage - 1),
-                }))
-              }
-              disabled={pagination.currentPage === 1}
-            >
-              {t("stockreport.Previous")}
-            </button>
-            <span className="text-gray-400 dark:text-gray-300 text-md">
-              {t("stockreport.Page")} {pagination.currentPage}{" "}
-              {t("stockreport.Of")} {totalPages}
-            </span>
-            <button
-              className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-gray-400 dark:text-gray-300 text-md hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
-              onClick={() =>
-                setPagination((prev) => ({
-                  ...prev,
-                  currentPage: Math.min(prev.currentPage + 1, totalPages),
-                }))
-              }
-              disabled={pagination.currentPage === totalPages}
-            >
-              {t("stockreport.Next")}
-            </button>
-          </div>
-        </div>
+      {/* ✅ Pagination */}
+      <div className="flex justify-between mt-4">
+        <button
+          disabled={pagination.currentPage === 1}
+          onClick={() =>
+            setPagination((prev) => ({
+              ...prev,
+              currentPage: prev.currentPage - 1,
+            }))
+          }
+          className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+        >
+          Prev
+        </button>
+        <span>
+          Page {pagination.currentPage} of {totalPages}
+        </span>
+        <button
+          disabled={pagination.currentPage === totalPages}
+          onClick={() =>
+            setPagination((prev) => ({
+              ...prev,
+              currentPage: prev.currentPage + 1,
+            }))
+          }
+          className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+        >
+          Next
+        </button>
       </div>
     </div>
   );

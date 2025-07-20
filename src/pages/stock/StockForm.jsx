@@ -3,7 +3,7 @@ import { getAllMedicines } from "../api/medicineService";
 import { updateStock, createStock } from "../api/stockService";
 
 //toast for notification
-import { ToastContainer, toast } from "react-toastify";
+import {  toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 
