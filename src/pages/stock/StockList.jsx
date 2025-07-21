@@ -4,8 +4,9 @@ import { TbHttpDelete } from "react-icons/tb";
 import { BiEdit } from "react-icons/bi";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import { useNavigate } from "react-router-dom";
 const StockList = () => {
+  const navigate = useNavigate();
   const [stocksData, setStocksData] = useState([]);
   // const [editingStock, setEditingStock] = useState(null);
   // const [showForm, setShowForm] = useState(false);
@@ -42,13 +43,18 @@ const StockList = () => {
   const totalPages = Math.ceil(stocksData.length / itemsPerPage);
 
   return (
-    <div className="p-4">
+    <div className="p-4 sm:mb-4 mb-20">
       <h2 className="text-xl font-bold mb-4">Stock List</h2>
-
+      <div
+        className="sm:hidden flex  flex-col float-end  underline  text-md mb-4 text-green-600  cursor-pointer"
+        onClick={() => navigate("/add-supply")}
+      >
+        <span>Supply</span>
+      </div>
       <table className="w-full border border-gray-300 rounded overflow-hidden">
         <thead className="bg-gray-100">
           <tr className="bg-green-600 text-white">
-            <th className="px-4 py-2 text-left">ID</th>
+            <th className="px-4 py-3 text-left">ID</th>
             <th className="px-4 py-2 text-left">Medicine</th>
             <th className="px-4 py-2 text-left">Qty</th>
             <th className="px-4 py-2 text-left">Price In</th>
@@ -59,7 +65,7 @@ const StockList = () => {
             currentItems.map((stock) => (
               <tr
                 key={stock.id}
-                className="hover:bg-gray-50 dark:hover:bg-slate-800 border-b border-gray-200"
+                className="hover:bg-gray-50 even:bg-slate-200  dark:hover:bg-slate-800 border-b border-gray-200"
               >
                 <td className="px-4 py-2">{stock.id}</td>
                 <td className="px-4 py-2">
@@ -67,7 +73,7 @@ const StockList = () => {
                     stock.medicine?.name ||
                     "N/A"}
                 </td>
-                <td className="px-4 py-2">{stock.quantity}</td>
+                <td className="px-4 py-3">{stock.quantity}</td>
                 <td className="px-4 py-2">${stock.price_in}</td>
               </tr>
             ))

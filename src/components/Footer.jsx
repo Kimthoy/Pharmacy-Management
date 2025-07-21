@@ -13,7 +13,7 @@ const Footer = () => {
       {/* Home */}
       <div
         className="flex flex-col  items-center text-xs text-gray-600 hover:text-green-600 cursor-pointer"
-        onClick={() => navigate("/home")}
+        onClick={() => navigate("/")}
       >
         <Home size={22} />
         <span>{t("footers.home")}</span>
@@ -31,7 +31,7 @@ const Footer = () => {
       {/* Shopping Cart - center highlight */}
       <div
         className="flex flex-col items-center -mt-6"
-        onClick={() => navigate("/cart")}
+        onClick={() => navigate("/saledashboard")}
       >
         <div className="bg-green-600 text-white p-3 rounded-full shadow-lg">
           <ShoppingCart size={24} />
@@ -44,7 +44,7 @@ const Footer = () => {
       {/* Leaf */}
       <div
         className="flex flex-col items-center text-xs text-gray-600 hover:text-green-600 cursor-pointer"
-        onClick={() => navigate("/herbs")}
+        onClick={() => navigate("/stocklist")}
       >
         <MdOutlineWarehouse size={22} />
         <span>{t("footers.search")}</span>
@@ -53,7 +53,7 @@ const Footer = () => {
       {/* Flame */}
       <div
         className="flex flex-col items-center text-xs text-gray-600 hover:text-green-600 cursor-pointer"
-        onClick={() => navigate("/popular")}
+        onClick={() => navigate("/listofmedicine")}
       >
         <AiOutlineProduct size={22} />
         <span>{t("footers.popular")}</span>

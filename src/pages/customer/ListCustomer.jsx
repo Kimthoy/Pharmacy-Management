@@ -111,7 +111,7 @@ const CustomerList = () => {
   };
 
   return (
-    <div className="p-3 bg-white dark:bg-gray-900 shadow-md dark:shadow-gray-800 rounded-md">
+    <div className="p-3 bg-white mb-20 dark:bg-gray-900 shadow-md dark:shadow-gray-800 rounded-md">
       <div className="flex flex-col md:flex-row md:justify-between gap-3 mb-6">
         <h2 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-200">
           {t("customerlist.CustomerListTitle")}

@@ -28,7 +28,7 @@ const UnitDashboard = () => {
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 8;
 
   const filtered = units.filter((u) =>
     u.unit_name?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -143,7 +143,7 @@ const UnitDashboard = () => {
   );
 
   return (
-    <div className="sm:p-6">
+    <div className="sm:p-6 mb-20">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Unit Dashboard</h1>
         <button
@@ -224,7 +224,7 @@ const UnitDashboard = () => {
             {currentItems.map((u, index) => (
               <tr
                 key={index}
-                className="border-t border-gray-200 dark:border-gray-700"
+                className="border-t even:bg-slate-100 border-gray-200 dark:border-gray-700"
               >
                 <td
                   className="px-4 py-3 max-w-[150px] truncate"

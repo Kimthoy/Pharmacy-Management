@@ -35,7 +35,6 @@ export const getAllMedicines = async (page = 1, perPage = 10) => {
 
     const rawData = response.data.data || [];
 
-
     const formatted = rawData.map((item) => ({
       ...item,
       name: item.medicine_name,
@@ -56,7 +55,6 @@ export const getAllMedicines = async (page = 1, perPage = 10) => {
   }
 };
 
-
 export const toggleProductStatus = async (medicineId) => {
   try {
     const response = await axios.put(
@@ -74,27 +72,27 @@ export const updateMedicine = async (id, data) => {
   try {
     const formData = new FormData();
 
+    console.log("Updating medicine:", data); // ✅ Debug payload
 
-    if (data.medicine_name)
-      formData.append("medicine_name", data.medicine_name);
-    if (data.price) formData.append("price", data.price);
-    if (data.weight) formData.append("weight", data.weight);
-    if (data.barcode) formData.append("barcode", data.barcode);
+    // Always send fields, even empty
+    formData.append("medicine_name", data.medicine_name ?? "");
+    formData.append("price", data.price ?? "");
+    formData.append("weight", data.weight ?? "");
+    formData.append("barcode", data.barcode ?? "");
+    formData.append("medicine_detail", data.medicine_detail ?? "");
 
-    if (data.medicine_detail)
-      formData.append("medicine_detail", data.medicine_detail);
-    if (Array.isArray(data.category_ids)) {
-      data.category_ids.forEach((id) => formData.append("category_ids[]", id));
-    }
+    // Always send arrays
+    (data.category_ids ?? []).forEach((catId) =>
+      formData.append("category_ids[]", catId)
+    );
+    (data.unit_ids ?? []).forEach((unitId) =>
+      formData.append("unit_ids[]", unitId)
+    );
 
-    if (Array.isArray(data.unit_ids)) {
-      data.unit_ids.forEach((id) => formData.append("unit_ids[]", id));
-    }
     if (data.imageFile) {
       formData.append("image", data.imageFile);
     }
 
-    // Send with _method override for PUT
     const response = await axios.post(
       `${API_URL}/medicines/${id}?_method=PUT`,
       formData,

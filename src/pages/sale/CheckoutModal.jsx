@@ -1,19 +1,34 @@
 import React, { useRef } from "react";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
-const CheckoutModal = ({
+export default function CheckoutModal({
   isOpen,
   setIsOpen,
   totalPrice,
   totalQuantity,
-  currency,
+  products = [],
   confirmOrder,
-}) => {
-  // ✅ Always call hooks first
+  currency = "USD",
+  storeName = "ហាងរបស់អ្នក",
+  logoUrl = null,
+}) {
   const invoiceRef = useRef();
 
-  const safeTotalPrice = totalPrice || 0;
+  // ✅ Debug logs
+  console.log("🛒 Products passed to CheckoutModal:", products);
+  console.log("💰 Total Price:", totalPrice);
+  console.log("📦 Total Quantity:", totalQuantity);
 
-  // ✅ Khmer localized date/time
+  // ✅ If no products, use fake sample for testing
+  const displayProducts =
+    products && products.length > 0
+      ? products
+      : [
+          { name: "Sample Product A", quantity: 2, price: 5 },
+          { name: "Sample Product B", quantity: 1, price: 8 },
+        ];
+
   const now = new Date().toLocaleString("km-KH", {
     weekday: "long",
     year: "numeric",
@@ -24,143 +39,166 @@ const CheckoutModal = ({
     hour12: true,
   });
 
-  // ✅ Print Invoice
-  const handlePrintInvoice = () => {
-    const invoiceContent = invoiceRef.current.innerHTML;
-    const printWindow = window.open("", "_blank");
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>វិក្កយបត្រ (Invoice)</title>
-          <style>
-            body { 
-              font-family: 'Khmer UI', Arial, sans-serif; 
-              padding: 20px; 
-              text-align: center; 
-            }
-            h2 { margin-bottom: 10px; }
-            .summary { 
-              margin-top: 15px; 
-              font-size: 16px; 
-            }
-            .line {
-              border-top: 1px dashed #999;
-              margin: 10px 0;
-            }
-            .thanks {
-              margin-top: 20px;
-              font-size: 14px;
-              font-style: italic;
-            }
-          </style>
-        </head>
-        <body>
-          ${invoiceContent}
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
-    printWindow.close();
+  const handleDownloadPDF = async () => {
+    const el = invoiceRef.current;
+    if (!el) {
+      alert("Invoice not found!");
+      return;
+    }
+
+    await new Promise((r) => setTimeout(r, 300)); // wait for DOM
+
+    const canvas = await html2canvas(el, { scale: 2, backgroundColor: "#fff" });
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF("p", "mm", "a4");
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+    pdf.save(`invoice-${Date.now()}.pdf`);
   };
 
-  // ✅ Confirm Order → Close Modal → Print Invoice
   const handleConfirm = () => {
-    if (confirmOrder) confirmOrder(); // trigger parent logic if needed
+    if (confirmOrder) confirmOrder();
     setIsOpen(false);
-    setTimeout(() => handlePrintInvoice(), 300);
+    setTimeout(() => handleDownloadPDF(), 300);
   };
 
-  // ✅ Early return AFTER hooks are called
-  if (!isOpen)
-    return (
-      <div style={{ display: "none" }}>
-        {/* Hidden invoice for printing */}
-        <div ref={invoiceRef}>
-          <h2>🏪 វិក្កយបត្រ</h2>
-          <p>🕒 {now}</p>
-          <div className="line"></div>
-          <div className="summary">
-            <p>
-              ចំនួនផលិតផល: <strong>{totalQuantity || 0}</strong>
-            </p>
-            <p>
-              សរុបទាំងអស់:{" "}
-              <strong>
-                {safeTotalPrice.toFixed(2)} {currency === "USD" ? "$" : "៛"}
-              </strong>
-            </p>
-          </div>
-          <div className="line"></div>
-          <p className="thanks">🙏 អរគុណសម្រាប់ការទិញទំនិញ!</p>
+  /** ✅ Visible invoice for debug */
+  const InvoiceTemplate = () => (
+    <div
+      ref={invoiceRef}
+      style={{
+        width: "210mm",
+        minHeight: "297mm",
+        background: "#fff",
+        padding: "20px",
+        fontFamily: "Khmer UI, Arial, sans-serif",
+        border: "2px solid #ddd",
+        marginTop: "20px",
+      }}
+    >
+      {logoUrl && (
+        <div style={{ textAlign: "center", marginBottom: "10px" }}>
+          <img src={logoUrl} alt="Logo" style={{ width: "80px" }} />
         </div>
+      )}
+      <h2 style={{ textAlign: "center" }}>🏪 {storeName}</h2>
+      <p style={{ textAlign: "center" }}>🕒 {now}</p>
+
+      <hr style={{ border: "1px dashed #999", margin: "10px 0" }} />
+
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <thead>
+          <tr>
+            <th style={{ borderBottom: "1px solid #ccc", padding: "6px" }}>
+              ផលិតផល
+            </th>
+            <th style={{ borderBottom: "1px solid #ccc", padding: "6px" }}>
+              ចំនួន
+            </th>
+            <th style={{ borderBottom: "1px solid #ccc", padding: "6px" }}>
+              តម្លៃ
+            </th>
+            <th style={{ borderBottom: "1px solid #ccc", padding: "6px" }}>
+              សរុប
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {displayProducts.map((item, i) => (
+            <tr key={i}>
+              <td style={{ borderBottom: "1px solid #eee", padding: "6px" }}>
+                {item.name}
+              </td>
+              <td style={{ borderBottom: "1px solid #eee", padding: "6px" }}>
+                {item.quantity}
+              </td>
+              <td style={{ borderBottom: "1px solid #eee", padding: "6px" }}>
+                {item.price.toFixed(2)} {currency === "USD" ? "$" : "៛"}
+              </td>
+              <td style={{ borderBottom: "1px solid #eee", padding: "6px" }}>
+                {(item.price * item.quantity).toFixed(2)}{" "}
+                {currency === "USD" ? "$" : "៛"}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <hr style={{ border: "1px dashed #999", margin: "10px 0" }} />
+
+      <div style={{ textAlign: "right", fontSize: "16px" }}>
+        <p>
+          <strong>ចំនួនទំនិញ:</strong> {totalQuantity || displayProducts.length}
+        </p>
+        <p>
+          <strong>សរុបទាំងអស់:</strong>{" "}
+          {totalPrice > 0
+            ? totalPrice.toFixed(2)
+            : displayProducts
+                .reduce((sum, p) => sum + p.price * p.quantity, 0)
+                .toFixed(2)}{" "}
+          {currency === "USD" ? "$" : "៛"}
+        </p>
       </div>
-    );
+
+      <hr style={{ border: "1px dashed #999", margin: "10px 0" }} />
+
+      <p style={{ textAlign: "center", fontStyle: "italic" }}>
+        🙏 អរគុណសម្រាប់ការទិញទំនិញ!
+      </p>
+    </div>
+  );
 
   return (
     <>
-      {/* ✅ Modal UI */}
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white p-6 rounded-lg max-w-md w-full shadow-lg">
-          <h2 className="text-xl font-bold mb-4 text-center">
-            បញ្ជាក់ការបញ្ជាទិញ
-          </h2>
+      {isOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg max-w-md w-full shadow-lg">
+            <h2 className="text-xl font-bold mb-4 text-center">
+              បញ្ជាក់ការបញ្ជាទិញ
+            </h2>
 
-          <div className="text-center">
-            <p className="mb-2 text-lg font-semibold">
-              សរុប:{" "}
-              <span className="text-emerald-600">
-                {safeTotalPrice.toFixed(2)} {currency === "USD" ? "$" : "៛"}
-              </span>
-            </p>
-            <p className="mb-2">
-              ចំនួនទំនិញ: <strong>{totalQuantity || 0}</strong>
-            </p>
-            <p className="text-sm text-gray-600">ពេលវេលា: {now}</p>
+            <div className="text-center">
+              <p className="mb-2 text-lg font-semibold">
+                សរុប:{" "}
+                <span className="text-emerald-600">
+                  {totalPrice > 0 ? totalPrice.toFixed(2) : "??"}{" "}
+                  {currency === "USD" ? "$" : "៛"}
+                </span>
+              </p>
+              <p className="mb-2">
+                ចំនួនទំនិញ: <strong>{totalQuantity || "??"}</strong>
+              </p>
+              <p className="text-sm text-gray-600">ពេលវេលា: {now}</p>
+            </div>
+
+            <div className="flex flex-col space-y-3 mt-6">
+              <button
+                onClick={() => setIsOpen(false)}
+                className="w-full bg-gray-300 text-gray-800 py-2 rounded-lg hover:bg-gray-400"
+              >
+                បោះបង់
+              </button>
+              <button
+                onClick={handleConfirm}
+                className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+              >
+                ✅ បញ្ជាក់ & ទាញយកវិក្កយបត្រ
+              </button>
+              <button
+                onClick={handleDownloadPDF}
+                className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700"
+              >
+                ⬇️ ទាញយកវិក្កយបត្រ
+              </button>
+            </div>
           </div>
 
-          {/* ✅ Buttons */}
-          <div className="flex space-x-3 mt-6">
-            <button
-              onClick={() => setIsOpen(false)}
-              className="flex-1 bg-gray-300 text-gray-800 py-2 rounded-lg hover:bg-gray-400 transition duration-200"
-            >
-              បោះបង់
-            </button>
-            <button
-              onClick={handleConfirm}
-              className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200"
-            >
-              បញ្ជាក់
-            </button>
-          </div>
+          {/* ✅ DEBUG: Visible invoice directly below modal */}
+          <InvoiceTemplate />
         </div>
-      </div>
-
-      {/* ✅ Hidden Invoice Template (needed for print) */}
-      <div style={{ display: "none" }}>
-        <div ref={invoiceRef}>
-          <h2>🏪 វិក្កយបត្រ</h2>
-          <p>🕒 {now}</p>
-          <div className="line"></div>
-          <div className="summary">
-            <p>
-              ចំនួនផលិតផល: <strong>{totalQuantity || 0}</strong>
-            </p>
-            <p>
-              សរុបទាំងអស់:{" "}
-              <strong>
-                {safeTotalPrice.toFixed(2)} {currency === "USD" ? "$" : "៛"}
-              </strong>
-            </p>
-          </div>
-          <div className="line"></div>
-          <p className="thanks">🙏 អរគុណសម្រាប់ការទិញទំនិញ!</p>
-        </div>
-      </div>
+      )}
     </>
   );
-};
-
-export default CheckoutModal;
+}

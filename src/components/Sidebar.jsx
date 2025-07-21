@@ -60,14 +60,14 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
     {
       name: t("sidebar.staff"),
       icon: FaUserDoctor,
-      path: "/staff",
-      subItems: [
-        {
-          name: t("sidebar.staffList"),
-          icon: UserPlusIcon,
-          path: "/listofstaff",
-        },
-      ],
+      path: "/listofstaff",
+      // subItems: [
+      //   {
+      //     name: t("sidebar.staffList"),
+      //     icon: UserPlusIcon,
+      //     path: "/listofstaff",
+      //   },
+      // ],
     },
     {
       name: t("sidebar.stock"),
@@ -119,8 +119,8 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
     {
       name: t("sidebar.salepage"),
       icon: MdPointOfSale,
-      path: "/salepage",
-      subItems: [{ name: t("sidebar.saledashboard"), path: "/saledashboard" }],
+      path: "/saledashboard",
+      // subItems: [{ name: t("sidebar.saledashboard"), path: "/saledashboard" }],
     },
     {
       name: t("sidebar.reports"),
@@ -132,16 +132,16 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
         { name: t("sidebar.purchaseReport"), path: "/purchasreport" },
       ],
     },
-    {
-      name: t("sidebar.pages"),
-      icon: RiPagesLine,
-      path: "/login",
-      subItems: [
-        { name: t("sidebar.login"), path: "/login" },
-        { name: t("sidebar.register"), path: "/register" },
-        { name: t("sidebar.client"), path: "/client" },
-      ],
-    },
+    // {
+    //   name: t("sidebar.pages"),
+    //   icon: RiPagesLine,
+    //   path: "/login",
+    //   subItems: [
+    //     { name: t("sidebar.login"), path: "/login" },
+    //     { name: t("sidebar.register"), path: "/register" },
+    //     { name: t("sidebar.client"), path: "/client" },
+    //   ],
+    // },
     // { name: t("sidebar.settings"), icon: CiSettings, path: "/settingpage" },
     // {
     //   name: "Sameple",

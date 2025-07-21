@@ -19,7 +19,7 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
     medicine_name: "",
     price: "",
     weight: "",
-    status: "",
+   
     barcode: "",
     medicine_detail: "",
     category_id: null,

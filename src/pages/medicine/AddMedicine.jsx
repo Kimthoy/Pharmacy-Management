@@ -1,14 +1,16 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useTranslation } from "../../hooks/useTranslation";
 import { createMedicine } from "../api/medicineService";
 import { getAllCategory } from "../api/categoryService";
 import { getAllUnits } from "../api/unitService";
-import { Html5QrcodeScanner } from "html5-qrcode"; // <-- fixed import
+import { Html5QrcodeScanner } from "html5-qrcode";
 import BarcodeScanner from "../../components/BarcodeScanner";
 import Select from "react-select";
 import { LuScanBarcode } from "react-icons/lu";
+
 const AddMedicine = () => {
   const { t } = useTranslation();
+
   const [medicine, setMedicine] = useState({
     medicine_name: "",
     barcode: "",
@@ -22,9 +24,9 @@ const AddMedicine = () => {
     unit_ids: [],
     image: null,
   });
+
   const [toast, setToast] = useState({ message: "", type: "" });
   const [isScanning, setIsScanning] = useState(false);
-  // const [isScanning, setIsScanning] = useState(false);
   const [scannerInstance, setScannerInstance] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [error, setError] = useState("");
@@ -33,8 +35,30 @@ const AddMedicine = () => {
   const [category, setCategory] = useState([]);
   const [unit, setUnit] = useState([]);
 
+  // ✅ Ref for barcode input
+  const barcodeRef = useRef(null);
+
+  // ✅ Auto-focus barcode on mount
+  useEffect(() => {
+    if (barcodeRef.current) {
+      barcodeRef.current.focus();
+    }
+  }, []);
+
+  // ✅ Focus barcode after each scan or form reset
+  const focusBarcodeField = () => {
+    setTimeout(() => {
+      if (barcodeRef.current) {
+        barcodeRef.current.focus();
+      }
+    }, 200);
+  };
+
   const openScanner = () => setIsScanning(true);
-  const closeScanner = () => setIsScanning(false);
+  const closeScanner = () => {
+    setIsScanning(false);
+    focusBarcodeField(); // ✅ refocus after closing scanner
+  };
 
   const handleScanSuccess = (decodedText) => {
     setMedicine((prev) => ({
@@ -42,7 +66,9 @@ const AddMedicine = () => {
       barcode: decodedText,
     }));
     setIsScanning(false);
+    focusBarcodeField(); // ✅ keep focus for next scan
   };
+
   // Fetch units once
   useEffect(() => {
     const fetchUnit = async () => {
@@ -55,12 +81,14 @@ const AddMedicine = () => {
     };
     fetchUnit();
   }, []);
+
   const handleAmountBlur = () => {
     setMedicine((prev) => ({
       ...prev,
       price: parseFloat(prev.price || 0).toFixed(2),
     }));
   };
+
   // Fetch categories once
   useEffect(() => {
     const fetchCategory = async () => {
@@ -113,6 +141,7 @@ const AddMedicine = () => {
         setMedicine((prev) => ({ ...prev, barcode: decodedText }));
         scanner.clear();
         setIsScanning(false);
+        focusBarcodeField();
       },
       (error) => {
         console.warn("Scan error:", error);
@@ -128,7 +157,7 @@ const AddMedicine = () => {
 
   const startScanner = () => setIsScanning(true);
 
-  // Submit handler (simplified here)
+  // Submit handler
   const handleMedicineSubmit = useCallback(
     async (e) => {
       e.preventDefault();
@@ -151,6 +180,8 @@ const AddMedicine = () => {
 
         await createMedicine(formData);
         setSuccess("Created successfully!");
+        setToast({ message: "Medicine added successfully!", type: "success" });
+
         // Reset form if needed
         setMedicine({
           medicine_name: "",
@@ -166,8 +197,11 @@ const AddMedicine = () => {
           image: null,
         });
         setImagePreview(null);
+
+        focusBarcodeField(); // ✅ After submit, focus barcode again
       } catch (err) {
         setError(err.message || "Failed to create medicine");
+        setToast({ message: "Failed to add medicine", type: "error" });
       } finally {
         setIsLoading(false);
       }
@@ -175,12 +209,11 @@ const AddMedicine = () => {
     [medicine]
   );
 
-  // Category options for react-select
+  // Category options
   const categoryOptions = category.map((cat) => ({
     value: cat.id,
     label: cat.category_name,
   }));
-
   const handleCategoryChange = (selectedOptions) => {
     setMedicine((prev) => ({
       ...prev,
@@ -193,7 +226,6 @@ const AddMedicine = () => {
     value: unt.id,
     label: unt.unit_name,
   }));
-
   const handleUnitChange = (selectedOptions) => {
     setMedicine((prev) => ({
       ...prev,
@@ -238,6 +270,7 @@ const AddMedicine = () => {
 
       <form onSubmit={handleMedicineSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* ✅ Barcode Input with auto-focus */}
           <div className="flex flex-col">
             <label
               htmlFor="barcode"
@@ -247,6 +280,7 @@ const AddMedicine = () => {
             </label>
             <div className="relative w-full">
               <input
+                ref={barcodeRef} // ✅ auto-focus ref
                 type="text"
                 id="barcode"
                 name="barcode"
@@ -258,14 +292,14 @@ const AddMedicine = () => {
               <button
                 type="button"
                 onClick={startScanner}
-                className="absolute right-1 top-1/2 -translate-y-1/2  px-3 py-1 rounded-md text-sm"
+                className="absolute right-1 top-1/2 -translate-y-1/2 px-3 py-1 rounded-md text-sm"
               >
                 <LuScanBarcode className="w-5 h-5 text-green-600" />
               </button>
             </div>
           </div>
 
-          {/* Render scanner modal */}
+          {/* ✅ Scanner Modal */}
           {isScanning && (
             <BarcodeScanner
               onScanSuccess={handleScanSuccess}
@@ -273,6 +307,7 @@ const AddMedicine = () => {
             />
           )}
 
+          {/* Other fields */}
           <div className="flex flex-col">
             <label
               htmlFor="medicine_name"
@@ -290,6 +325,7 @@ const AddMedicine = () => {
               className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
             />
           </div>
+
           <div className="flex flex-col">
             <label
               htmlFor="price"
@@ -308,6 +344,7 @@ const AddMedicine = () => {
               className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
             />
           </div>
+
           <div className="flex flex-col">
             <label
               htmlFor="weight"
@@ -327,7 +364,7 @@ const AddMedicine = () => {
           </div>
 
           <div>
-            <label htmlFor=""> {t("add-medicine.Category")}</label>
+            <label>{t("add-medicine.Category")}</label>
             <Select
               name="category_ids"
               options={categoryOptions}
@@ -338,20 +375,12 @@ const AddMedicine = () => {
               )}
               onChange={handleCategoryChange}
               isMulti
-              className="basic-single-select"
               classNamePrefix="select"
-              styles={{
-                container: (base) => ({
-                  ...base,
-                  maxHeight: "150px",
-                  marginBottom: "2.3rem",
-                  marginTop: "0.5rem",
-                }),
-              }}
             />
           </div>
+
           <div>
-            <label htmlFor=""> {t("add-medicine.Unit")}</label>
+            <label>{t("add-medicine.Unit")}</label>
             <Select
               name="unit_id"
               options={unitOptions}
@@ -362,19 +391,11 @@ const AddMedicine = () => {
               )}
               onChange={handleUnitChange}
               isMulti
-              className="basic-single-select"
               classNamePrefix="select"
-              styles={{
-                container: (base) => ({
-                  ...base,
-                  maxHeight: "150px",
-                  marginBottom: "2.3rem",
-                  marginTop: "0.5rem",
-                }),
-              }}
             />
           </div>
 
+          {/* Image Upload */}
           <div className="flex flex-col w-full max-w-lg relative">
             <label
               htmlFor="medicine-image"
@@ -393,6 +414,7 @@ const AddMedicine = () => {
             />
           </div>
 
+          {/* Medicine Detail */}
           <div className="flex flex-col col-span-1 md:col-span-3">
             <label
               htmlFor="medicine_detail"
@@ -410,6 +432,7 @@ const AddMedicine = () => {
             ></textarea>
           </div>
         </div>
+
         <div className="mt-6">
           <button
             type="submit"

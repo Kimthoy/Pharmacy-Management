@@ -6,7 +6,6 @@ import { getAllSupplier } from "../api/supplierService";
 import { getAllMedicines } from "../api/medicineService";
 import { toast } from "react-toastify";
 
-
 const AddSupply = () => {
   const navigate = useNavigate();
   const [supply, setSupply] = useState({
@@ -24,20 +23,36 @@ const AddSupply = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const suppliers = await getAllSupplier();
-      const medicines = await getAllMedicines();
+      try {
+        const suppliers = await getAllSupplier();
+        const medicinesResponse = await getAllMedicines();
 
-      setSupplierOptions(
-        suppliers.map((s) => ({ value: s.id, label: s.company_name }))
-      );
+        // ✅ Extract array from API response
+        const medicines = medicinesResponse.data;
 
-      setMedicineOptions(
-        medicines.map((m) => ({
-          value: m.id,
-          label: m.medicine_name,
-          barcode: m.barcode,
-        }))
-      );
+        if (Array.isArray(suppliers)) {
+          setSupplierOptions(
+            suppliers.map((s) => ({
+              value: s.id,
+              label: s.company_name,
+            }))
+          );
+        }
+
+        if (Array.isArray(medicines)) {
+          setMedicineOptions(
+            medicines.map((m) => ({
+              value: m.id,
+              label: m.medicine_name,
+              barcode: m.barcode,
+            }))
+          );
+        } else {
+          console.error("Medicines is not an array:", medicines);
+        }
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      }
     };
 
     fetchData();
@@ -300,11 +315,10 @@ const AddSupply = () => {
               <div className="text-right">
                 <button
                   type="button"
-                
                   onClick={() => removeItem(index)}
                   className="text-red-500 text-sm hover:underline"
                 >
-                 Delete
+                  Delete
                 </button>
               </div>
             </div>

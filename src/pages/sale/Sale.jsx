@@ -19,27 +19,22 @@ const Sale = () => {
     const savedCart = localStorage.getItem("cart");
     return savedCart ? JSON.parse(savedCart) : [];
   });
+
   const [isOrderReviewModalOpen, setIsOrderReviewModalOpen] = useState(false);
-  // const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isRetailSaleOpen, setIsRetailSaleOpen] = useState(false);
   const [toast, setToast] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [cardNumber, setCardNumber] = useState("");
-  // const [currentProducts, setCurrentProducts] = useState([]);
   const [isCompoundMode, setIsCompoundMode] = useState(false);
   const [products, setProducts] = useState([]);
   const [currentProducts, setCurrentProducts] = useState([]);
 
-  // const [meta, setMeta] = useState({});
-
   useEffect(() => {
     const fetchMedicines = async () => {
       const { data } = await getAllMedicines();
-      console.log("Fetched medicines:", data); // 👈 Add this
-      setProducts(data); // This goes into state
+      setProducts(data);
     };
-
     fetchMedicines();
   }, []);
 
@@ -47,6 +42,7 @@ const Sale = () => {
     ...medicine,
     typeofmedicine: "ថ្នាំផ្សំ",
   }));
+
   const randomizeProducts = () => {
     const randomChoice = Math.random() < 0.5;
     const selectedProducts = randomChoice ? products : updatedCompoundMedicines;
@@ -59,9 +55,6 @@ const Sale = () => {
     setIsCompoundMode(false);
   }, [products]);
 
-  const handleAddToCartClick = (product) => {
-    addToCart(product);
-  };
   const addToCart = (product) => {
     setCart((prev) => {
       const existingItem = prev.find(
@@ -85,16 +78,24 @@ const Sale = () => {
         },
       ];
     });
+
     setToast({
-      message: `${product.name} ត្រូវបានបន្ថែមទៅកន្ត្រក`,
+      message: `${
+        product.medicine_name || product.name
+      } ត្រូវបានបន្ថែមទៅកន្ត្រក`,
       type: "success",
     });
+  };
+
+  const handleAddToCartClick = (product) => {
+    addToCart(product);
   };
 
   const displayPrice = (price) => {
     if (typeof price !== "number") return 0;
     return price;
   };
+
   const filteredProducts = useMemo(() => {
     const safeList = Array.isArray(currentProducts) ? currentProducts : [];
     return safeList.filter((product) => {
@@ -112,6 +113,7 @@ const Sale = () => {
     0
   );
 
+  // ✅ CLEAR CART
   const clearCart = () => {
     if (window.confirm("តើអ្នកប្រាកដជាចង់លុបកន្ត្រកទេ?")) {
       setCart([]);
@@ -140,19 +142,8 @@ const Sale = () => {
   };
 
   const confirmOrder = async () => {
-    if (
-      (paymentMethod === "aba" || paymentMethod === "wing") &&
-      (!cardNumber || cardNumber.length < 16)
-    ) {
-      setToast({
-        message: "សូមបញ្ចូលលេខកាតត្រឹមត្រូវ!",
-        type: "error",
-      });
-      return;
-    }
-
     const saleData = {
-      sale_date: new Date().toISOString().slice(0, 10), // or format as needed
+      sale_date: new Date().toISOString().slice(0, 10),
       payment_method: paymentMethod,
       total_amount: totalPrice,
       card_number: cardNumber || null,
@@ -164,7 +155,7 @@ const Sale = () => {
     };
 
     try {
-      await createSale(saleData); // call backend
+      await createSale(saleData);
       setCart([]);
       setCardNumber("");
       setIsCheckoutOpen(false);
@@ -190,9 +181,46 @@ const Sale = () => {
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
+
   useEffect(() => {
     randomizeProducts();
   }, []);
+
+  /* ✅ BARCODE SCANNER LISTENER */
+  useEffect(() => {
+    let barcodeBuffer = "";
+
+    const handleKeydown = (e) => {
+      if (e.key === "Enter") {
+        if (barcodeBuffer.length > 0) {
+          console.log("📸 Barcode scanned:", barcodeBuffer);
+
+          // ✅ Find product by barcode
+          const matched = products.find(
+            (p) => String(p.barcode || p.medicine_code) === barcodeBuffer
+          );
+
+          if (matched) {
+            addToCart(matched);
+          } else {
+            setToast({
+              message: `រកមិនឃើញផលិតផលសម្រាប់ Barcode: ${barcodeBuffer}`,
+              type: "error",
+            });
+          }
+        }
+        barcodeBuffer = ""; // reset after enter
+      } else {
+        // ✅ Append key if it's a number/letter
+        if (e.key.length === 1) {
+          barcodeBuffer += e.key;
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeydown);
+    return () => window.removeEventListener("keydown", handleKeydown);
+  }, [products]); // reattach if products update
 
   return (
     <div className="flex mb-14 h-screen bg-white dark:bg-gray-900 font-khmer relative">
@@ -224,7 +252,6 @@ const Sale = () => {
         <Cart
           cart={cart}
           isCartOpen={isCartOpen}
-          // setIsCartOpen={setIsCartOpen}
           totalPrice={totalPrice}
           totalQuantity={totalQuantity}
           clearCart={clearCart}
@@ -258,11 +285,10 @@ const Sale = () => {
         setIsOpen={setIsCheckoutOpen}
         totalPrice={totalPrice}
         totalQuantity={totalQuantity}
-        paymentMethod={paymentMethod}
-        setPaymentMethod={setPaymentMethod}
-        cardNumber={cardNumber}
-        setCardNumber={setCardNumber}
+        products={cart}
         confirmOrder={confirmOrder}
+        storeName="ហាងម៉ូតទំនិញ"
+        currency="USD"
       />
       <RetailSaleModal
         isOpen={isRetailSaleOpen}

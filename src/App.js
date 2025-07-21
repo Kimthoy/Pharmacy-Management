@@ -2,6 +2,7 @@ import React, { Suspense, lazy, useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
 import {
   BrowserRouter as Router,
   Route,
@@ -30,6 +31,7 @@ const ManufacturerList = lazy(() =>
 );
 const Supplies = lazy(() => import("./pages/manufacturer/Supply"));
 const SupplyItems = lazy(() => import("./pages/manufacturer/SupplyItem"));
+const SalesReport = lazy(() => import("./pages/sale/SalesReport"));
 
 const SellReport = lazy(() => import("./pages/report/ReportSell"));
 const StockReport = lazy(() => import("./pages/report/ReportStock"));
@@ -136,7 +138,7 @@ const App = () => {
                     />
                     <Route path="/supplies" element={<Supplies />} />
                     <Route path="/supplyitems" element={<SupplyItems />} />
-
+                    <Route path="/reports" element={<SalesReport />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/salereport" element={<SellReport />} />

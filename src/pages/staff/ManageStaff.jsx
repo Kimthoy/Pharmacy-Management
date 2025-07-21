@@ -236,19 +236,20 @@ const ManageStaff = () => {
       )
     : [];
 
- 
-const filteredList = sortedList
-  // Search filter
-  .filter((user) => user.name.toLowerCase().includes(searchQuery.toLowerCase()))
-  // ✅ Hide admins
-  .filter((user) => user.role?.toLowerCase() !== "admin");
+  const filteredList = sortedList
+    // Search filter
+    .filter((user) =>
+      user.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    // ✅ Hide admins
+    .filter((user) => user.role?.toLowerCase() !== "admin");
 
-const totalPages = Math.ceil(filteredList.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredList.length / itemsPerPage);
 
-const paginatedList = filteredList.slice(
-  (currentPage - 1) * itemsPerPage,
-  currentPage * itemsPerPage
-);
+  const paginatedList = filteredList.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <div className="sm:p-2 mb-14 dark:bg-gray-900 min-h-screen max-w-6xl mx-auto">
@@ -307,13 +308,18 @@ const paginatedList = filteredList.slice(
         </div>
 
         {/* Table */}
-        <div className="sm:w-full w-[444px]">
+        <div className="w-full ">
           <table className="w-full dark:text-slate-100 border-collapse border border-gray-300 dark:border-gray-600">
             <thead>
-              <tr className="text-center ">
+              <tr className="text-center">
                 <td className="py-2 px-3">{t("staff.name")}</td>
-                <td className="py-2 px-3 sm:flex hidden">{t("staff.email")}</td>
-                <td className="py-2 px-3">{t("staff.role")}</td>
+
+                {/* ✅ Email hidden on small screens */}
+                <td className="py-2 px-3 ">{t("staff.email")}</td>
+
+                {/* ✅ Role hidden on small screens */}
+                <td className="py-2 px-3 ">{t("staff.role")}</td>
+
                 <td className="py-2 px-3">{t("staff.status")}</td>
                 <td className="py-2 px-3">{t("staff.actions")}</td>
               </tr>
@@ -323,22 +329,32 @@ const paginatedList = filteredList.slice(
                 paginatedList.map((user) => (
                   <tr
                     key={user.id}
-                    className={`border text-center transition-all border-gray-300 dark:border-gray-600 
-                      ${
-                        user.status === "Active"
-                          ? "hover:bg-slate-200 dark:hover:bg-slate-700 hover:cursor-pointer hover:shadow-lg"
-                          : "bg-gray-100 text-gray-400 dark:bg-slate-800 dark:text-gray-500 cursor-not-allowed"
-                      }`}
+                    className={`border text-center even:bg-slate-100 transition-all border-gray-300 dark:border-gray-600 
+            ${
+              user.status === "Active"
+                ? "hover:bg-slate-200 dark:hover:bg-slate-700 hover:cursor-pointer hover:shadow-lg"
+                : "bg-gray-100 text-gray-400 dark:bg-slate-800 dark:text-gray-500 cursor-not-allowed"
+            }`}
                   >
-                    <td className="p-3 border border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-300">
+                    {/* Always visible */}
+                    <td className="p-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300">
                       {user.name || "No name"}
                     </td>
-                    <td className="sm:flex hidden p-4 border-gray-300 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 cursor-pointer">
+
+                    {/* ✅ Email hidden on mobile */}
+                    <td
+                      title={user.email}
+                      className="truncate max-w-20 p-4 border-gray-300 dark:border-gray-600 text-emerald-500 dark:text-emerald-400"
+                    >
                       {user.email || "No email"}
                     </td>
-                    <td className="p-3 border border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-300">
+
+                    {/* ✅ Role hidden on mobile */}
+                    <td className="truncate max-w-44 p-3 border border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-300">
                       {user.role || "No role"}
                     </td>
+
+                    {/* Always visible */}
                     <td
                       className={`p-3 border border-gray-300 dark:border-gray-600 ${
                         user.status === "Active"
@@ -348,6 +364,8 @@ const paginatedList = filteredList.slice(
                     >
                       {user.status || "No status"}
                     </td>
+
+                    {/* Always visible actions */}
                     <td className="p-3 border border-gray-300 dark:border-gray-600">
                       {user.role === "admin" ? (
                         <span className="text-gray-400 italic">
@@ -363,13 +381,13 @@ const paginatedList = filteredList.slice(
                           </button>
                           <button
                             onClick={() => handleViewDetail(user)}
-                            className="text-md border px-2 py-1 rounded-lg transition text-green-600 border-green-600 hover:text-white hover:bg-green-600 dark:text-green-400 dark:border-green-200 dark:hover:bg-green-600 dark:hover:text-white dark:hover:shadow-lg dark:hover:shadow-slate-300"
+                            className="text-md border px-2 py-1 rounded-lg transition text-green-600 border-green-600 hover:text-white hover:bg-green-600 dark:text-green-400 dark:border-green-200 dark:hover:bg-green-600 dark:hover:text-white"
                           >
                             <GrView className="w-5 h-5" />
                           </button>
                           <button
                             onClick={() => confirmDeleteUser(user)}
-                            className="text-md border border-red-500 dark:border-red-400 px-2 py-1 rounded-lg transition align-middle text-red-600 hover:bg-red-600 hover:text-white"
+                            className="text-md border border-red-500 dark:border-red-400 px-2 py-1 rounded-lg transition text-red-600 hover:bg-red-600 hover:text-white"
                           >
                             <TbHttpDelete className="w-5 h-5" />
                           </button>

@@ -11,8 +11,9 @@ const SupplyItem = () => {
     const fetchSupplyItems = async () => {
       try {
         const res = await getAllSupplyItems();
-        setItems(res); // ✅ already returns array
+        setItems(res);
       } catch (err) {
+        console.error("Fetch failed:", err);
         setError("Failed to fetch supply items.");
       } finally {
         setLoading(false);
@@ -27,13 +28,17 @@ const SupplyItem = () => {
 
   return (
     <div className="p-6">
-      <Link
-        to="/supplies"
-        className="float-right text-green-500 hover:underline"
-      >
-        <a href="">Go Supply</a>
-      </Link>
-      <h1 className="text-xl font-bold mb-4">Supply Item List</h1>
+      {/* ✅ Go back to Supplies page */}
+      <div className="flex justify-between mb-4">
+        <h1 className="text-xl font-bold">Supply Item List</h1>
+        <Link
+          to="/supplies"
+          className="text-green-500 hover:underline font-medium"
+        >
+          Go to Supplies →
+        </Link>
+      </div>
+
       <table className="min-w-full table-auto border border-gray-300 rounded-md shadow-sm">
         <thead className="bg-gray-100 text-left text-sm font-semibold text-gray-700">
           <tr>
@@ -46,24 +51,62 @@ const SupplyItem = () => {
           </tr>
         </thead>
         <tbody>
-          {items.map((item, idx) => (
-            <tr key={item.id} className="hover:bg-gray-50">
-              <td className="border px-4 py-2">{idx + 1}</td>
-              <td className="border px-4 py-2 text-blue-600">
-                {item.supply?.supply_id || "N/A"}
-              </td>
-              <td className="border px-4 py-2">
-                {item.medicine?.barcode || item.medicine_id}
-              </td>
-              <td className="border px-4 py-2">{item.supply_quantity}</td>
-              <td className="border px-4 py-2">${item.unit_price}</td>
-              <td className="border px-4 py-2">
-                {item.expire_date
-                  ? new Date(item.expire_date).toLocaleDateString()
-                  : "N/A"}
+          {items.length > 0 ? (
+            items.map((item, idx) => (
+              <tr key={item.id} className="hover:bg-gray-50 even:bg-slate-200">
+                {/* ✅ Index */}
+                <td className="border px-4 py-2">{idx + 1}</td>
+
+                <td className="border px-4 py-2">
+                  <Link
+                    to="/supplies"
+                    state={{ highlightedSupplyId: item.supply?.supply_id }}
+                    className="text-blue-500 hover:underline"
+                  >
+                    {item.supply?.supply_id || "N/A"}
+                  </Link>
+                </td>
+
+                <td className="border px-4 py-2">
+                  <Link
+                    to="/listofmedicine"
+                    state={{ highlightedBarcode: item.medicine?.barcode }}
+                    className="text-blue-500 hover:underline"
+                  >
+                    {item.medicine?.barcode ||
+                      item.medicine?.medicine_name ||
+                      "N/A"}
+                  </Link>
+                </td>
+
+                {/* ✅ Quantity */}
+                <td className="border px-4 py-2">
+                  {item.supply_quantity ?? "N/A"}
+                </td>
+
+                {/* ✅ Unit Price */}
+                <td className="border px-4 py-2">
+                  {item.unit_price ? `$${item.unit_price}` : "N/A"}
+                </td>
+
+                {/* ✅ Expire Date */}
+                <td className="border px-4 py-2">
+                  {item.expire_date
+                    ? new Date(item.expire_date).toLocaleDateString()
+                    : "N/A"}
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td
+                colSpan="6"
+                className="border px-4 py-4 text-center text-gray-500"
+              >
+                No supply items found.
               </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
     </div>

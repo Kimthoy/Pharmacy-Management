@@ -5,6 +5,7 @@ import { getAllMedicines, deleteMedicine } from "../api/medicineService";
 import { TbHttpDelete } from "react-icons/tb";
 import EditMedicineModal from "./EditMedicineModal";
 import { useTranslation } from "../../hooks/useTranslation";
+import { useLocation } from "react-router-dom";
 
 const MedicineList = () => {
   const { t } = useTranslation();
@@ -18,6 +19,10 @@ const MedicineList = () => {
   const [editMedicineData, setEditMedicineData] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isdeleteloading, setIsDeleteLoading] = useState(false);
+
+  const location = useLocation();
+  const highlightedBarcode = location.state?.highlightedBarcode || null;
+
   const fetchMedicines = async (page = 1) => {
     setLoading(true);
     try {
@@ -35,6 +40,18 @@ const MedicineList = () => {
   useEffect(() => {
     fetchMedicines(currentPage);
   }, [currentPage]);
+
+  // ✅ Auto-scroll to highlighted medicine after loading
+  useEffect(() => {
+    if (!loading && highlightedBarcode) {
+      const el = document.querySelector(
+        `[data-barcode="${highlightedBarcode}"]`
+      );
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
+  }, [loading, highlightedBarcode]);
 
   const handleEditClick = (medicine) => {
     setEditMedicineData(medicine);
@@ -72,8 +89,94 @@ const MedicineList = () => {
     }
   };
 
+  const filteredMedicines = (medicines ?? []).filter((med) =>
+    med.medicine_name?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const renderTableRows = () => {
+    if (loading) {
+      return (
+        <tr>
+          <td colSpan="7" className="text-center py-4">
+            Loading...
+          </td>
+        </tr>
+      );
+    }
+
+    if (!loading && filteredMedicines.length === 0) {
+      return (
+        <tr>
+          <td colSpan="7" className="text-center py-4 text-gray-500">
+            No medicines found.
+          </td>
+        </tr>
+      );
+    }
+
+    return filteredMedicines.map((med) => {
+      const isHighlighted = highlightedBarcode === med.barcode;
+
+      return (
+        <tr
+          key={med.id}
+          data-barcode={med.barcode}
+          className={`hover:bg-gray-50 ${isHighlighted ? "bg-yellow-100" : ""}`}
+        >
+          <td className="border px-2 py-1">{med.medicine_name}</td>
+          <td className="border px-2 py-1">${med.price}</td>
+          <td className="hidden sm:table-cell border px-2 py-1">
+            {med.weight}
+          </td>
+          <td className="hidden sm:table-cell border px-2 py-1">
+            {Array.isArray(med.units) && med.units.length > 0
+              ? med.units.map((unt) => (
+                  <span key={unt.id} className="inline-block mr-1">
+                    {unt.unit_name}
+                  </span>
+                ))
+              : "—"}
+          </td>
+          <td className="hidden sm:table-cell border px-2 py-1">
+            {Array.isArray(med.categories) && med.categories.length > 0
+              ? med.categories.map((cat) => (
+                  <span key={cat.id} className="inline-block mr-1">
+                    {cat.category_name}
+                  </span>
+                ))
+              : "—"}
+          </td>
+          <td
+            className="border px-2 py-1 truncate max-w-8"
+            title={med.medicine_detail}
+          >
+            {med.medicine_detail || <span className="text-gray-400">N/A</span>}
+          </td>
+          <td className="border px-2 py-5 flex gap-2">
+            <button onClick={() => handleEditClick(med)}>
+              <BiEdit className="text-blue-600 w-5 h-5" />
+            </button>
+            <button
+              onClick={() => confirmDelete(med.id)}
+              disabled={isdeleteloading}
+              className={`flex items-center gap-1 ${
+                isdeleteloading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            >
+              {isdeleteloading ? (
+                <span className="text-gray-500 text-sm">Deleting...</span>
+              ) : (
+                <TbHttpDelete className="text-red-600 w-5 h-5" />
+              )}
+            </button>
+          </td>
+        </tr>
+      );
+    });
+  };
+
   return (
-    <div className="p-4">
+    <div className="p-4 sm:mb-3 mb-12">
       <h2 className="text-xl font-bold mb-4 dark:text-white">Medicine List</h2>
 
       <input
@@ -84,126 +187,60 @@ const MedicineList = () => {
         className="border p-2 rounded mb-4 w-full max-w-sm"
       />
 
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <>
-          <table className="w-full border-gray-300">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="border px-2 py-2">Name</th>
-                <th className="border px-2 py-2">Price</th>
-                <th className="border px-2 py-2">Weight (mg/g)</th>
-                <th className="border px-2 py-2">Unit</th>
-                <th className="border px-2 py-2">Category</th>
+      <table className="w-full border-gray-300">
+        <thead className="bg-gray-100">
+          <tr>
+            <th className="border px-2 py-2">Name</th>
+            <th className="border px-2 py-2">Price</th>
+            <th className="hidden sm:table-cell border px-2 py-2">
+              Weight (mg/g)
+            </th>
+            <th className="hidden sm:table-cell border px-2 py-2">Unit</th>
+            <th className="hidden sm:table-cell border px-2 py-2">Category</th>
+            <th className="border px-2 py-2">Description</th>
+            <th className="border px-2 py-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody>{renderTableRows()}</tbody>
+      </table>
 
-                <th className="border px-2 py-2">Description</th>
-                <th className="border px-2 py-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(medicines ?? [])
-                .filter((med) =>
-                  med.medicine_name
-                    ?.toLowerCase()
-                    .includes(searchTerm.toLowerCase())
-                )
-                .map((med) => (
-                  <tr key={med.id}>
-                    <td className="border px-2 py-1">{med.medicine_name}</td>
-                    <td className="border px-2 py-1">${med.price}</td>
-                    <td className="border px-2 py-1">{med.weight}</td>
+      {!loading && meta?.last_page > 1 && (
+        <div className="mt-4 flex justify-center gap-2">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage <= 1}
+            className="px-3 py-1 border rounded disabled:opacity-50"
+          >
+            Prev
+          </button>
 
-                    <td className="border px-2 py-1">
-                      {Array.isArray(med.units) && med.units.length > 0
-                        ? med.units.map((unt) => (
-                            <span key={unt.id} className="inline-block mr-1">
-                              {unt.unit_name}
-                            </span>
-                          ))
-                        : "—"}
-                    </td>
+          {meta?.last_page &&
+            Array.from({ length: meta.last_page }, (_, i) => i + 1).map(
+              (pageNum) => (
+                <button
+                  key={pageNum}
+                  onClick={() => setCurrentPage(pageNum)}
+                  className={`px-3 py-1 border rounded ${
+                    currentPage === pageNum ? "bg-blue-600 text-white" : ""
+                  }`}
+                >
+                  {pageNum}
+                </button>
+              )
+            )}
 
-                    <td className="border px-2 py-1">
-                      {Array.isArray(med.categories) &&
-                      med.categories.length > 0
-                        ? med.categories.map((cat) => (
-                            <span key={cat.id} className="inline-block mr-1">
-                              {cat.category_name}
-                            </span>
-                          ))
-                        : "—"}
-                    </td>
-
-                    <td className="border px-2 py-1">
-                      {med.medicine_detail || (
-                        <span className="text-gray-400">N/A</span>
-                      )}
-                    </td>
-                    <td className="border px-2 py-5 flex gap-2">
-                      <button onClick={() => handleEditClick(med)}>
-                        <BiEdit className="text-blue-600 w-5 h-5" />
-                      </button>
-                      <button
-                        onClick={() => confirmDelete(med.id)}
-                        disabled={isdeleteloading}
-                        className={`flex items-center gap-1 ${
-                          isdeleteloading ? "opacity-50 cursor-not-allowed" : ""
-                        }`}
-                      >
-                        {isdeleteloading ? (
-                          <>
-                            <span className="text-gray-500 text-sm">
-                              Deleting...
-                            </span>
-                          </>
-                        ) : (
-                          <TbHttpDelete className="text-red-600 w-5 h-5" />
-                        )}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-
-          <div className="mt-4 flex justify-center gap-2">
-            <button
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage <= 1}
-              className="px-3 py-1 border rounded disabled:opacity-50"
-            >
-              Prev
-            </button>
-
-            {meta?.last_page &&
-              Array.from({ length: meta.last_page }, (_, i) => i + 1).map(
-                (pageNum) => (
-                  <button
-                    key={pageNum}
-                    onClick={() => setCurrentPage(pageNum)}
-                    className={`px-3 py-1 border rounded ${
-                      currentPage === pageNum ? "bg-blue-600 text-white" : ""
-                    }`}
-                  >
-                    {pageNum}
-                  </button>
-                )
-              )}
-
-            <button
-              onClick={() =>
-                setCurrentPage((prev) =>
-                  Math.min(prev + 1, meta.last_page || prev)
-                )
-              }
-              disabled={currentPage >= meta.last_page}
-              className="px-3 py-1 border rounded disabled:opacity-50"
-            >
-              Next
-            </button>
-          </div>
-        </>
+          <button
+            onClick={() =>
+              setCurrentPage((prev) =>
+                Math.min(prev + 1, meta.last_page || prev)
+              )
+            }
+            disabled={currentPage >= meta.last_page}
+            className="px-3 py-1 border rounded disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
       )}
 
       {editModalOpen && (

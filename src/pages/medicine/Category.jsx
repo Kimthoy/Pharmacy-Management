@@ -31,7 +31,7 @@ const CategoryDashboard = () => {
   //pagination
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 8;
 
   const filtered = categories.filter((cat) =>
     cat.category_name?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -145,7 +145,7 @@ const CategoryDashboard = () => {
   );
 
   return (
-    <div className="sm:p-6">
+    <div className="sm:p-6 mb-20">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Category Dashboard</h1>
         <button
@@ -224,7 +224,7 @@ const CategoryDashboard = () => {
             {currentItems.map((cat, index) => (
               <tr
                 key={index}
-                className="border-t border-gray-200 dark:border-gray-700"
+                className="border-t even:bg-slate-100 border-gray-200 dark:border-gray-700"
               >
                 <td
                   className="px-4 py-3 max-w-[150px] truncate"
@@ -300,7 +300,7 @@ const CategoryDashboard = () => {
                   onClick={handleUpdateCategory}
                   className="px-4 py-2 bg-blue-600 text-white  rounded-lg hover:bg-opacity-50 hover:text-blue-700  shadow-lg"
                 >
-                  {saveloading?"Saving...":"Save"}
+                  {saveloading ? "Saving..." : "Save"}
                 </button>
               </div>
             </div>
