@@ -5,7 +5,7 @@ import { createSupply } from "../api/suppliesService";
 import { getAllSupplier } from "../api/supplierService";
 import { getAllMedicines } from "../api/medicineService";
 import { toast } from "react-toastify";
-
+import { useTranslation } from "../../hooks/useTranslation";
 const AddSupply = () => {
   const navigate = useNavigate();
   const [supply, setSupply] = useState({
@@ -13,7 +13,7 @@ const AddSupply = () => {
     invoice_date: "",
     invoice_id: "",
   });
-
+  const { t } = useTranslation();
   const [supplierOptions, setSupplierOptions] = useState([]);
   const [medicineOptions, setMedicineOptions] = useState([]);
   const [supplyItems, setSupplyItems] = useState([
@@ -173,16 +173,16 @@ const AddSupply = () => {
   return (
     <div className="shadow-lg bg-[#FBFBFB] dark:bg-slate-900 mb-14 max-w-5xl mx-auto px-4 py-6">
       <h2 className="text-lg font-bold  dark:text-teal-50">
-        បន្ថែមការផ្គត់ផ្គង់ថ្នី!
+        {t("add-supply.title")}
       </h2>
-      <p>សម្រាប់ការបញ្ជូលស្តុក អ្នកអាចបញ្ជូលតាមរយះការស្កេនបាកូដជំនួសបាន។</p>
-      <p className="mb-6">
-        សូមស្កេន "បាកូដ" នៅលើផលិតផល​ និងបំពេញនូវអ្នកផ្គត់ផ្គង់។
-      </p>
+      <p className="mb-4 text-gray-400">{t("add-supply.description")}</p>
+
       <form onSubmit={handleSubmit} className="space-y-6 w-full">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block mb-1 dark:text-teal-50">Invoice Date</label>
+            <label className="block mb-1 dark:text-teal-50">
+              {t("add-supply.InvoiceDate")}
+            </label>
             <input
               type="date"
               required
@@ -194,7 +194,9 @@ const AddSupply = () => {
             />
           </div>
           <div>
-            <label className="block mb-1 dark:text-teal-50">Invoice ID</label>
+            <label className="block mb-1 dark:text-teal-50">
+              {t("add-supply.InvoiceID")}
+            </label>
             <input
               required
               type="text"
@@ -207,7 +209,9 @@ const AddSupply = () => {
           </div>
         </div>
         <div className="w-full sm:w-1/2 mt-4">
-          <label className="block mb-1 dark:text-teal-50">Supplier</label>
+          <label className="block mb-1 dark:text-teal-50">
+            {t("add-supply.Supplier")}
+          </label>
           <Select
             options={supplierOptions}
             required
@@ -219,7 +223,9 @@ const AddSupply = () => {
             isClearable
           />
         </div>
-        <h3 className="font-semibold mt-6 dark:text-teal-50">Supply Items</h3>
+        <h3 className="font-semibold mt-6 dark:text-teal-50">
+          {t("add-supply.SupplyItem")}
+        </h3>
         <div className="w-full  ">
           {supplyItems.map((item, index) => (
             <div
@@ -227,11 +233,11 @@ const AddSupply = () => {
               className="border border-gray-300 rounded-md p-4 shadow-sm bg-white dark:bg-slate-800"
             >
               <div className="mb-3">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                  Medicine
+                <label className="block text-md font-medium text-gray-700 dark:text-gray-200">
+                  {t("add-supply.Medicine")}
                 </label>
                 <Select
-                  className="mt-1 text-sm"
+                  className="mt-1 text-md"
                   required
                   classNamePrefix="react-select"
                   value={
@@ -266,8 +272,8 @@ const AddSupply = () => {
               </div>
 
               <div className="mb-3">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                  Quantity
+                <label className="block text-md font-medium text-gray-700 dark:text-gray-200">
+                  {t("add-supply.Quantity")}
                 </label>
                 <input
                   type="number"
@@ -282,8 +288,8 @@ const AddSupply = () => {
               </div>
 
               <div className="mb-3">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                  Unit Price
+                <label className="block text-md font-medium text-gray-700 dark:text-gray-200">
+                  {t("add-supply.UnitPrice")}
                 </label>
                 <input
                   type="number"
@@ -298,8 +304,8 @@ const AddSupply = () => {
               </div>
 
               <div className="mb-3">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                  Expire Date
+                <label className="block text-md font-medium text-gray-700 dark:text-gray-200">
+                  {t("add-supply.ExpireDate")}
                 </label>
                 <input
                   type="date"
@@ -316,9 +322,9 @@ const AddSupply = () => {
                 <button
                   type="button"
                   onClick={() => removeItem(index)}
-                  className="text-red-500 text-sm hover:underline"
+                  className="text-red-500 text-md hover:underline"
                 >
-                  Delete
+                  {t("add-supply.Delete")}
                 </button>
               </div>
             </div>
@@ -327,19 +333,18 @@ const AddSupply = () => {
         <button
           type="button"
           onClick={addItem}
-          className="mt-3  text-green-600 hover:underline  rounded flex items-center gap-2 w-full sm:w-auto"
+          className="mt-3 text-md text-green-600 hover:underline  rounded flex items-center gap-2 w-full sm:w-auto"
         >
-          បន្ថែមផលិតផល
-          {/* <GrNewWindow className="w-5 h-5" />​bg-green-600 px-4 py-2*/}
+          {t("add-supply.AddNew")}
         </button>
 
         <div>
           <button
             type="submit"
             disabled={isLoading}
-            className="bg-blue-600 shadow-lg text-white px-6 py-2 mt-4 rounded w-full sm:w-auto"
+            className="bg-blue-600 shadow-lg text-md text-white px-6 py-2 mt-4 rounded w-full sm:w-auto"
           >
-            {isLoading ? "Saving..." : "Save"}
+            {isLoading ? t("add-supply.Saving") : t("add-supply.Save")}
           </button>
         </div>
       </form>

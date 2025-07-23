@@ -126,7 +126,7 @@ const CustomerList = () => {
       </div>
 
       <div className="w-full h-96 overflow-x-auto">
-        <table className="min-w-[420px] w-full bg-white dark:bg-gray-800 shadow-md rounded-lg border border-gray-200 dark:border-gray-600">
+        <table className="min-w-[420px] w-full bg-white dark:bg-gray-800  rounded-lg border border-gray-200 dark:border-gray-600">
           <thead className="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 text-md">
             <tr>
               <th className="px-4 py-2 text-left whitespace-nowrap">
@@ -149,82 +149,99 @@ const CustomerList = () => {
             </tr>
           </thead>
           <tbody className="text-md text-gray-700 dark:text-gray-200">
-            {filteredCustomers.map((cus, index) => {
-              const { text, color } = getStatus(cus.status);
-              return (
-                <tr
-                  key={index}
-                  className="border-t border-gray-200 dark:border-gray-700"
-                >
-                  <td className="px-4 py-3">
-                    {cus.name}
-                    <br />
-                    <span className="text-xs text-gray-400">{cus.email}</span>
-                  </td>
+            {filteredCustomers.length > 0 ? (
+              filteredCustomers.map((cus, index) => {
+                const { text, color } = getStatus(cus.status);
 
-                  <td className="px-4 py-3">{cus.phone}</td>
+                return (
+                  <tr
+                    key={index}
+                    className="border-t border-gray-200 dark:border-gray-700"
+                  >
+                    <td className="px-4 py-3">
+                      {cus.name}
+                      <br />
+                      <span className="text-xs text-gray-400">{cus.email}</span>
+                    </td>
 
-                  {/* Desktop only cells */}
-                  <td className="hidden md:table-cell px-4 py-3">
-                    {cus.item} <br />
-                    {cus.quantity}
-                  </td>
-                  <td className="hidden md:table-cell px-4 py-3 font-semibold">
-                    ${cus.amount}
-                  </td>
-                  <td className={`hidden md:table-cell px-4 py-3 ${color}`}>
-                    {text}
-                  </td>
+                    <td className="px-4 py-3">{cus.phone}</td>
 
-                  <td className="px-4 py-3 relative">
-                    <button
-                      onClick={() => toggleMenu(index)}
-                      className="text-xl text-gray-400 hover:text-green-500"
-                    >
-                      <FaEllipsisH />
-                    </button>
-                    {openMenu === index && (
-                      <div
-                        ref={menuRef}
-                        className="absolute sm:right-24 right-16  top-5 mt-2 z-50 w-36 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded shadow-md"
+                    {/* Desktop only cells */}
+                    <td className="hidden md:table-cell px-4 py-3">
+                      {cus.item} <br />
+                      {cus.quantity}
+                    </td>
+
+                    <td className="hidden md:table-cell px-4 py-3 font-semibold">
+                      ${cus.amount}
+                    </td>
+
+                    <td className={`hidden md:table-cell px-4 py-3 ${color}`}>
+                      {text}
+                    </td>
+
+                    <td className="px-4 py-3 relative">
+                      <button
+                        onClick={() => toggleMenu(index)}
+                        className="text-xl text-gray-400 hover:text-green-500"
                       >
-                        <button
-                          onClick={() => {
-                            setSelectedCustomer(cus);
-                            setShowModal(true);
-                            setOpenMenu(null);
-                          }}
-                          className="flex items-center w-full px-4 py-2 text-md hover:bg-green-100 dark:hover:bg-green-600"
-                        >
-                          <RiTableView className="mr-2" />{" "}
-                          {t("customerlist.View")}
-                        </button>
-                        <button
-                          onClick={() => {
-                            setEditingCustomer(cus);
-                            setShowEditModal(true);
-                            setOpenMenu(null);
-                          }}
-                          className="flex items-center w-full px-4 py-2 text-md hover:bg-green-100 dark:hover:bg-green-600"
-                        >
-                          <BiEdit className="mr-2" /> {t("customerlist.Edit")}
-                        </button>
+                        <FaEllipsisH />
+                      </button>
 
-                        <button
-                          key={cus.id}
-                          onClick={() => handleDeleteClick(cus.id)}
-                          className="flex items-center w-full px-4 py-2 text-md hover:bg-red-100 dark:hover:bg-red-600"
+                      {openMenu === index && (
+                        <div
+                          ref={menuRef}
+                          className="absolute sm:right-24 right-16 top-5 mt-2 z-50 w-36 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded shadow-md"
                         >
-                          <BiTrash className="mr-2" />
-                          {t("customerlist.Remove")}
-                        </button>
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
+                          <button
+                            onClick={() => {
+                              setSelectedCustomer(cus);
+                              setShowModal(true);
+                              setOpenMenu(null);
+                            }}
+                            className="flex items-center w-full px-4 py-2 text-md hover:bg-green-100 dark:hover:bg-green-600"
+                          >
+                            <RiTableView className="mr-2" />{" "}
+                            {t("customerlist.View")}
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              setEditingCustomer(cus);
+                              setShowEditModal(true);
+                              setOpenMenu(null);
+                            }}
+                            className="flex items-center w-full px-4 py-2 text-md hover:bg-green-100 dark:hover:bg-green-600"
+                          >
+                            <BiEdit className="mr-2" /> {t("customerlist.Edit")}
+                          </button>
+
+                          <button
+                            key={cus.id}
+                            onClick={() => handleDeleteClick(cus.id)}
+                            className="flex items-center w-full px-4 py-2 text-md hover:bg-red-100 dark:hover:bg-red-600"
+                          >
+                            <BiTrash className="mr-2" />{" "}
+                            {t("customerlist.Remove")}
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td
+                  colSpan="6"
+                  className="text-center py-6 text-gray-500 dark:text-gray-400"
+                >
+                  {t("customerlist.NotFound")}
+                </td>
+              </tr>
+            )}
           </tbody>
+
           {showModal && selectedCustomer && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
               <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-6 sm:p-8 relative">

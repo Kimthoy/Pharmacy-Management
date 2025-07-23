@@ -65,13 +65,14 @@ const MedicineList = () => {
 
   const confirmDelete = (id) => {
     Swal.fire({
-      title: "Are you sure?",
-      text: "This action cannot be undone!",
+      title: t("medicine-list.Confirmation"),
+      text: t("medicine-list.Noted"),
       icon: "warning",
       showCancelButton: true,
+      cancelButtonText: t("medicine-list.Cancel"),
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, delete it!",
+      confirmButtonText: t("medicine-list.Yes"),
     }).then((result) => {
       if (result.isConfirmed) handleDeleteMedicine(id);
     });
@@ -98,7 +99,7 @@ const MedicineList = () => {
       return (
         <tr>
           <td colSpan="7" className="text-center py-4">
-            Loading...
+            {t("medicine-list.Loading")}
           </td>
         </tr>
       );
@@ -108,7 +109,7 @@ const MedicineList = () => {
       return (
         <tr>
           <td colSpan="7" className="text-center py-4 text-gray-500">
-            No medicines found.
+            {t("medicine-list.NotFound")}
           </td>
         </tr>
       );
@@ -177,11 +178,13 @@ const MedicineList = () => {
 
   return (
     <div className="p-4 sm:mb-3 mb-12">
-      <h2 className="text-xl font-bold mb-4 dark:text-white">Medicine List</h2>
+      <h2 className="text-xl font-bold mb-4 dark:text-white">
+        {t("medicine-list.TitleMedicine")}
+      </h2>
 
       <input
         type="text"
-        placeholder="Search by name..."
+        placeholder={t("medicine-list.SearchMedicine")}
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         className="border p-2 rounded mb-4 w-full max-w-sm"
@@ -190,15 +193,21 @@ const MedicineList = () => {
       <table className="w-full border-gray-300">
         <thead className="bg-gray-100">
           <tr>
-            <th className="border px-2 py-2">Name</th>
-            <th className="border px-2 py-2">Price</th>
+            <th className="border px-2 py-2">{t("medicine-list.Name")}</th>
+            <th className="border px-2 py-2">{t("medicine-list.Price")}</th>
             <th className="hidden sm:table-cell border px-2 py-2">
-              Weight (mg/g)
+              {t("medicine-list.Weight")}
             </th>
-            <th className="hidden sm:table-cell border px-2 py-2">Unit</th>
-            <th className="hidden sm:table-cell border px-2 py-2">Category</th>
-            <th className="border px-2 py-2">Description</th>
-            <th className="border px-2 py-2">Actions</th>
+            <th className="hidden sm:table-cell border px-2 py-2">
+              {t("medicine-list.Unit")}
+            </th>
+            <th className="hidden sm:table-cell border px-2 py-2">
+              {t("medicine-list.Category")}
+            </th>
+            <th className="border px-2 py-2">
+              {t("medicine-list.Description")}
+            </th>
+            <th className="border px-2 py-2">{t("medicine-list.Actions")}</th>
           </tr>
         </thead>
         <tbody>{renderTableRows()}</tbody>
@@ -211,7 +220,7 @@ const MedicineList = () => {
             disabled={currentPage <= 1}
             className="px-3 py-1 border rounded disabled:opacity-50"
           >
-            Prev
+            {t("medicine-list.Prev")}
           </button>
 
           {meta?.last_page &&
@@ -238,7 +247,7 @@ const MedicineList = () => {
             disabled={currentPage >= meta.last_page}
             className="px-3 py-1 border rounded disabled:opacity-50"
           >
-            Next
+            {t("medicine-list.Next")}
           </button>
         </div>
       )}

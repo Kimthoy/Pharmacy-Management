@@ -1,63 +1,47 @@
-import React, { useEffect, useState } from "react";
-import { deleteStock, getAllStocks } from "../api/stockService";
-import { TbHttpDelete } from "react-icons/tb";
-import { BiEdit } from "react-icons/bi";
+import { useEffect, useState } from "react";
+import { getAllStocks } from "../api/stockService";
+import { useTranslation } from "../../hooks/useTranslation";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 const StockList = () => {
   const navigate = useNavigate();
   const [stocksData, setStocksData] = useState([]);
-  // const [editingStock, setEditingStock] = useState(null);
-  // const [showForm, setShowForm] = useState(false);
-
-  // const [isDeleting, setIsDeleting] = useState(false);
-
-  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 7;
-
-  const fetchStocks = async () => {
-    try {
-      const res = await getAllStocks();
-      setStocksData(res.data); // Assuming res.data is an array
-    } catch (error) {
-      console.error("Failed to fetch stocks", error);
-      toast.error("Failed to load stocks");
-    }
-  };
-
-  useEffect(() => {
-    fetchStocks();
-  }, []);
-
-  // const handleEdit = (stock) => {
-  //   setEditingStock(stock);
-  //   setShowForm(true);
-  // };
-
-  // Pagination logic
+  const { t } = useTranslation();
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = stocksData.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(stocksData.length / itemsPerPage);
-
+  const fetchStocks = async () => {
+    try {
+      const res = await getAllStocks();
+      setStocksData(res.data); 
+    } catch (error) {
+      console.error("Failed to fetch stocks", error);
+     
+    }
+  };
+  useEffect(() => {
+    fetchStocks();
+  }, []);
   return (
     <div className="p-4 sm:mb-4 mb-20">
-      <h2 className="text-xl font-bold mb-4">Stock List</h2>
+      <h2 className="text-xl font-bold mb-4">{t("stock-list.title")}</h2>
       <div
         className="sm:hidden flex  flex-col float-end  underline  text-md mb-4 text-green-600  cursor-pointer"
         onClick={() => navigate("/add-supply")}
       >
-        <span>Supply</span>
+        <span>{t("stock-list.btnGotoSupply")}</span>
       </div>
       <table className="w-full border border-gray-300 rounded overflow-hidden">
         <thead className="bg-gray-100">
           <tr className="bg-green-600 text-white">
-            <th className="px-4 py-3 text-left">ID</th>
-            <th className="px-4 py-2 text-left">Medicine</th>
-            <th className="px-4 py-2 text-left">Qty</th>
-            <th className="px-4 py-2 text-left">Price In</th>
+            <th className="px-4 py-3 text-left">{t("stock-list.ID")}</th>
+            <th className="px-4 py-2 text-left">{t("stock-list.Medicine")}</th>
+            <th className="px-4 py-2 text-left">{t("stock-list.Qty")}</th>
+            <th className="px-4 py-2 text-left">{t("stock-list.PriceIn")}</th>
           </tr>
         </thead>
         <tbody>
@@ -80,7 +64,7 @@ const StockList = () => {
           ) : (
             <tr>
               <td colSpan="6" className="text-center py-20 text-gray-500">
-                No stocks found.
+                  { t("stock-list.NotFound")}
               </td>
             </tr>
           )}
@@ -95,7 +79,7 @@ const StockList = () => {
             disabled={currentPage === 1}
             className="px-3 py-1 bg-gray-300 rounded-lg disabled:opacity-50"
           >
-            Prev
+            {t("stock-list.btnPrev")}
           </button>
 
           {Array.from({ length: totalPages }, (_, i) => (
@@ -119,7 +103,7 @@ const StockList = () => {
             disabled={currentPage === totalPages}
             className="px-3 py-1 bg-gray-300 rounded-lg disabled:opacity-50"
           >
-            Next
+            {t("stock-list.btnNext")}
           </button>
         </div>
       )}

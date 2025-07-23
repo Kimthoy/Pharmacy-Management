@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { useTranslation } from "../../hooks/useTranslation";
+
 import {
   getAllCategory,
   createCategory,
@@ -147,28 +148,28 @@ const CategoryDashboard = () => {
   return (
     <div className="sm:p-6 mb-20">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Category Dashboard</h1>
+        <h1 className="text-2xl font-bold">{t("category.Title")}</h1>
         <button
           onClick={() => setShowModal(true)}
           className="bg-blue-600 text-white px-4 py-2 shadow-lg active:shadow-none rounded-lg hover:bg-blue-700"
         >
-          New
+          {t("category.New")}
         </button>
       </div>
 
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
           <div className="bg-white sm:p-6 p-3 rounded-lg shadow-md w-full max-w-md">
-            <h2 className="text-lg font-bold mb-2">Create Category</h2>
-            <p className="text-sm text-gray-600 mb-4">
-              Add a new category using the form below.
-            </p>
+            <h2 className="text-lg font-bold mb-2">
+              {t("category.CreateCategory")}
+            </h2>
+            <p className="text-sm text-gray-600 mb-4">{t("category.Desc")}</p>
             <form onSubmit={handleSubmit} className="space-y-4">
               {success && <p className="text-green-600 text-sm">{success}</p>}
               {error && <p className="text-red-600 text-sm">{error}</p>}
               <div>
                 <label className="block mb-1 text-sm font-medium">
-                  Category Name
+                  {t("category.Name")}
                 </label>
                 <input
                   type="text"
@@ -181,7 +182,7 @@ const CategoryDashboard = () => {
               </div>
               <div>
                 <label className="block mb-1 text-sm font-medium">
-                  Description
+                  {t("category.Description")}
                 </label>
                 <textarea
                   name="description"
@@ -196,14 +197,14 @@ const CategoryDashboard = () => {
                   onClick={() => setShowModal(false)}
                   className="px-4 py-2 border rounded-lg shadow-lg active:shadow-none text-red-700"
                 >
-                  Cancel
+                  {t("category.BtnCancel")}
                 </button>
                 <button
                   type="submit"
                   disabled={isLoading}
                   className="bg-green-600 shadow-lg active:shadow-none text-white px-4 py-2 rounded-lg hover:bg-green-700"
                 >
-                  {isLoading ? "Saving..." : "Save"}
+                  {isLoading ? t("category.BtnSaving") : t("category.BtnSave")}
                 </button>
               </div>
             </form>
@@ -215,55 +216,77 @@ const CategoryDashboard = () => {
         <table className="min-w-full table-auto border-collapse border border-gray-300">
           <thead>
             <tr className="bg-gray-100">
-              <th className="border px-4 py-2 text-left">Category</th>
-              <th className="border px-4 py-2 text-left">Description</th>
-              <th className="border px-4 py-2 text-left">Actions</th>
+              <th className="border px-4 py-2 text-left">
+                {t("category.CateName")}
+              </th>
+              <th className="border px-4 py-2 text-left">
+                {t("category.CateDescription")}
+              </th>
+              <th className="border px-4 py-2 text-left">
+                {t("category.Actions")}
+              </th>
             </tr>
           </thead>
           <tbody className="text-md text-gray-700 dark:text-gray-200">
-            {currentItems.map((cat, index) => (
-              <tr
-                key={index}
-                className="border-t even:bg-slate-100 border-gray-200 dark:border-gray-700"
-              >
-                <td
-                  className="px-4 py-3 max-w-[150px] truncate"
-                  title={cat.category_name}
+            {currentItems.length > 0 ? (
+              currentItems.map((cat, index) => (
+                <tr
+                  key={index}
+                  className="border-t even:bg-slate-100 border-gray-200 dark:border-gray-700"
                 >
-                  {cat.category_name}
-                </td>
+                  <td
+                    className="px-4 py-3 max-w-[150px] truncate"
+                    title={cat.category_name}
+                  >
+                    {cat.category_name}
+                  </td>
 
+                  <td
+                    className="px-4 py-3 max-w-[200px] truncate"
+                    title={cat.description}
+                  >
+                    {cat.description}
+                  </td>
+
+                  <td className="px-4 py-3 flex gap-2">
+                    <button
+                      onClick={() => handleEditCategory(cat)}
+                      className="text-blue-600 sm:hover:bg-slate-700 sm:hover:rounded-lg sm:p-4 sm:hover:bg-opacity-20"
+                    >
+                      <FaEdit className="sm:w-5 w-4 sm:h-5 h-4" />
+                    </button>
+
+                    <button
+                      onClick={() => confirmDelete(cat.id)}
+                      className="text-red-600 ml-5 sm:hover:bg-slate-700 sm:hover:rounded-lg sm:p-4 sm:hover:bg-opacity-20"
+                    >
+                      <FaTrash className="sm:w-5 w-4 sm:h-5 h-4" />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
                 <td
-                  className="px-4 py-3 max-w-[200px] truncate"
-                  title={cat.description}
+                  colSpan="3"
+                  className="text-center py-6 text-gray-500 dark:text-gray-400"
                 >
-                  {cat.description}
-                </td>
-                <td className="px-4 py-3 flex gap-2">
-                  <button
-                    onClick={() => handleEditCategory(cat)}
-                    className="text-blue-600  sm:hover:bg-slate-700 sm:hover:rounded-lg sm:p-4 sm:hover:bg-opacity-20"
-                  >
-                    <FaEdit className="sm:w-5 w-4 sm:h-5 h-4" />
-                  </button>
-
-                  <button
-                    onClick={() => confirmDelete(cat.id)}
-                    className="text-red-600 ml-5  sm:hover:bg-slate-700 sm:hover:rounded-lg sm:p-4 sm:hover:bg-opacity-20"
-                  >
-                    <FaTrash className="sm:w-5 w-4 sm:h-5 h-4" />
-                  </button>
+                  {t("category.NotFound")}
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
         {showEditModal && selectedCategory && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
             <div className="bg-white p-6 rounded-lg-lg shadow-lg w-full max-w-md dark:bg-slate-800">
-              <h2 className="text-xl font-semibold mb-4">Edit Category</h2>
+              <h2 className="text-xl font-semibold mb-4">
+                {t("category.CateEdit")}
+              </h2>
 
-              <label className="block mb-2 text-sm">Category Name</label>
+              <label className="block mb-2 text-sm">
+                {t("category.ColName")}
+              </label>
               <input
                 type="text"
                 value={selectedCategory.category_name}
@@ -276,7 +299,9 @@ const CategoryDashboard = () => {
                 className="w-full border px-3 py-2 rounded-lg mb-4"
               />
 
-              <label className="block mb-2 text-sm">Description</label>
+              <label className="block mb-2 text-sm">
+                {t("category.ColDesc")}
+              </label>
               <textarea
                 value={selectedCategory.description}
                 onChange={(e) =>
@@ -293,14 +318,16 @@ const CategoryDashboard = () => {
                   onClick={() => setShowEditModal(false)}
                   className="px-4 py-2 bg-gray-400 text-white transition-all rounded-lg shadow-lg hover:bg-opacity-65 hover:text-red-700"
                 >
-                  Cancel
+                  {t("category.BtnCancel")}
                 </button>
                 <button
                   disabled={saveloading}
                   onClick={handleUpdateCategory}
                   className="px-4 py-2 bg-blue-600 text-white  rounded-lg hover:bg-opacity-50 hover:text-blue-700  shadow-lg"
                 >
-                  {saveloading ? "Saving..." : "Save"}
+                  {saveloading
+                    ? t("category.BtnSaving")
+                    : t("category.BtnSave")}
                 </button>
               </div>
             </div>
@@ -308,9 +335,7 @@ const CategoryDashboard = () => {
         )}
 
         {loading && (
-          <p className="text-center p-16 text-xl text-gray-500 dark:text-gray-400 mt-4">
-            {t("Loading ...")}
-          </p>
+          <p className="text-center p-16 text-xl text-gray-500 dark:text-gray-400 mt-4"></p>
         )}
       </div>
       <div className="flex justify-center items-center mt-4 gap-1 flex-wrap">
@@ -319,7 +344,7 @@ const CategoryDashboard = () => {
           disabled={currentPage === 1}
           className="px-3 py-1 bg-gray-300 rounded-lg disabled:opacity-50"
         >
-          Prev
+          {t("category.Prev")}
         </button>
 
         {(() => {
@@ -389,7 +414,7 @@ const CategoryDashboard = () => {
           disabled={currentPage === totalPages}
           className="px-3 py-1 bg-gray-300 rounded-lg disabled:opacity-50"
         >
-          Next
+          {t("category.Next")}
         </button>
       </div>
     </div>

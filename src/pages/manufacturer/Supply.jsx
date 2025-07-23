@@ -135,7 +135,7 @@ const Supply = () => {
                   <td className="border px-4 py-2 text-green-500 hidden sm:table-cell">
                     {item.invoice_id || "N/A"}
                   </td>
-                  <td className="border px-2 py-2 flex space-x-2 hidden sm:table-cell">
+                  <td className="border px-2 py-2  space-x-2 hidden sm:table-cell">
                     <button
                       onClick={() => navigate(`/edit-supply/${item.id}`)}
                       className="text-blue-500 hover:bg-slate-200 dark:hover:bg-slate-600 p-2 rounded-lg transition"

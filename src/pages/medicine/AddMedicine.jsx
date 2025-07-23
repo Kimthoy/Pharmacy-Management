@@ -443,7 +443,7 @@ const AddMedicine = () => {
                 : "bg-green-500 dark:bg-green-600 hover:bg-green-600 dark:hover:bg-green-500"
             } w-full md:w-auto shadow-md`}
           >
-            {isLoading ? "Creating..." : "Create"}
+            {isLoading ? t("add-medicine.Creating") : t("add-medicine.Create")}
           </button>
         </div>
       </form>

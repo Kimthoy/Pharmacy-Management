@@ -1,4 +1,63 @@
 {
+  "stock-list": {
+    "title": "Stock Dashboard",
+    "btnGotoSupply": "Go Supply",
+    "ID": "ID",
+    "Medicine": "Medicine Name",
+    "Qty": "Quantity",
+    "PriceIn": "Price In",
+    "btnPrev": "Previous",
+    "BtnNext": "Next",
+    "NotFound": "No stock found !"
+  },
+  "add-supply": {
+    "title": "Add new Supplies!",
+    "description": "To insert you can can barcode from medicine instead .",
+    "InvoiceDate": "Invoice Date",
+    "InvoiceID": "Invoice ID",
+    "ExpireDate": "Expire Date",
+    "Delete": "Delete",
+    "Saving": "Saving...",
+    "Save": "Save",
+    "Supplier": "Supplier",
+    "SupplyItem": "Supply Items",
+    "Medicine": "Medicine",
+    "Quantity": "Quantity",
+    "UnitPrice": "Unit Price",
+    "AddNew": "Add New"
+  },
+  "unit": {
+    "NotFound": "No unit found !",
+    "Confirmation": "Are you sure delete this record?",
+    "title": "Unit Dashboard",
+    "ColName": "Unit Name",
+    "ColDesc": "Description",
+    "ColActions": "Actions",
+    "BtnNew": "New",
+    "BtnCancel": "Cancel",
+    "BtnSaving": "Saving...",
+    "BtnSave": "Save",
+    "BtnPrev": "Previous",
+    "BtnNext": "Next",
+    "TitleNew": "Create new unit !",
+    "formdesc": "Please fill all this column to create.",
+    "name": "Unit Name",
+    "desc": "Description"
+  },
+  "edit-medicine": {
+    "EditTitle": "Edit Medicine",
+    "Barcode": "Barcode Number",
+    "Name": "Name",
+    "Price": "Price",
+    "Weight": "Weight",
+    "Unit": "Unit",
+    "Category": "Category",
+    "Detail": "Medicine Details",
+    "Image": "Image",
+    "BtnCancel": "Cancel",
+    "BtnSave": "Save",
+    "BtnSaving": "Saving..."
+  },
   "profile": {
     "menu": {
       "profile": "Profile",
@@ -21,8 +80,25 @@
     "title": "Panharith Pharmacy"
   },
   "medicine-list": {
+    "Confirmation": "Are you sure delete this record?",
+    "Noted": "The deleting do not undo !",
+    "Yes": "Yes",
+    "Cancel": "Cancel",
+    "Loading": "Loading...",
+    "NotFound": "No Medicine Found !",
+    "TitleMedicine": "Medicine Lists",
+    "SearchMedicine": "Search for medicine name...",
+    "Unit": "Unit",
+    "Category": "Category",
+    "Description": "Description",
+    "Actions": "Actions",
+    "Name": "Name",
+    "Price": "Price",
+    "Weight": "Weight",
     "Disable": "Disable",
-    "Enable": "Enable"
+    "Enable": "Enable",
+    "Prev": "Previous",
+    "Next": "Next"
   },
   "medicine-view": {
     "BarCode": "BarCode Number",
@@ -271,6 +347,8 @@
     "total-customer": "Total Customer"
   },
   "add-medicine": {
+    "Creating": "Creating..",
+    "Create": "Create",
     "Scan": "Scan",
     "Barcode": "Barcode Number",
     "Barcode-Placeholder": "Barcode",
@@ -428,6 +506,7 @@
     "ButtonAddCustomer": "Add Customer"
   },
   "customerlist": {
+    "NotFound": "No customer found !",
     "CustomerDetails": "Customer Details",
     "Name": "Name",
     "Email": "Email",
@@ -1237,34 +1316,25 @@
   },
 
   "category": {
-    "categoryDashboard": "Category Dashboard",
-    "categoryDashboardDesc": "Manage medicine categories in the pharmacy.",
-    "categoryList": "Category List",
+    "NotFound": "No category found !",
+    "Title": "Category Dashboard",
+    "New": "New",
+    "CreateCategory": "Create a category !",
     "searchPlaceholder": "Search categories...",
-    "name": "Name",
-    "description": "Description",
-    "actions": "Actions",
+    "Desc": "Please fill this column to create a category !",
+    "Name": "Category Name",
+    "Description": "Description",
     "noRecords": "No categories found.",
-    "addCategory": "Add Category",
-    "editCategory": "Edit Category",
-    "confirmDelete": "Are you sure you want to delete this category?",
-    "show": "Show",
-    "entries": "entries",
-    "page": "Page",
-    "of": "of",
-    "previous": "Previous",
-    "next": "Next",
-    "cancel": "Cancel",
-    "create": "Create",
-    "update": "Update",
-    "settings": "Settings",
-    "itemsPerPage": "Items per Page",
-    "defaultSortOrder": "Default Sort Order",
-    "ascending": "Ascending",
-    "descending": "Descending",
-    "showDescription": "Show Description Column",
-    "reset": "Reset to Default",
-    "save": "Save"
+    "CateName": "Category Name",
+    "CateDescription": "Category Description",
+
+    "Actions": "Actions",
+
+    "Prev": "Previous",
+    "Next": "Next",
+    "BtnCancel": "Cancel",
+    "BtnSave": "Save",
+    "BtnSaving": "Saving..."
   },
   "Sale": {
     "HomePage": "Home",

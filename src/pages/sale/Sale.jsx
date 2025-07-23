@@ -32,8 +32,18 @@ const Sale = () => {
 
   useEffect(() => {
     const fetchMedicines = async () => {
-      const { data } = await getAllMedicines();
-      setProducts(data);
+      try {
+        const response = await getAllMedicines();
+        const data = Array.isArray(response) ? response : response?.data ?? [];
+        setProducts(data);
+      } catch (err) {
+        console.warn("Failed to fetch medicines:", err?.message || err);
+        setProducts([]);
+        setToast({
+          message: "បរាជ័យក្នុងការទាញទិន្នន័យថ្នាំ",
+          type: "error",
+        });
+      }
     };
     fetchMedicines();
   }, []);
@@ -92,8 +102,7 @@ const Sale = () => {
   };
 
   const displayPrice = (price) => {
-    if (typeof price !== "number") return 0;
-    return price;
+    return typeof price === "number" ? price : 0;
   };
 
   const filteredProducts = useMemo(() => {
@@ -113,7 +122,6 @@ const Sale = () => {
     0
   );
 
-  // ✅ CLEAR CART
   const clearCart = () => {
     if (window.confirm("តើអ្នកប្រាកដជាចង់លុបកន្ត្រកទេ?")) {
       setCart([]);
@@ -186,20 +194,14 @@ const Sale = () => {
     randomizeProducts();
   }, []);
 
-  /* ✅ BARCODE SCANNER LISTENER */
   useEffect(() => {
     let barcodeBuffer = "";
-
     const handleKeydown = (e) => {
       if (e.key === "Enter") {
         if (barcodeBuffer.length > 0) {
-          console.log("📸 Barcode scanned:", barcodeBuffer);
-
-          // ✅ Find product by barcode
           const matched = products.find(
             (p) => String(p.barcode || p.medicine_code) === barcodeBuffer
           );
-
           if (matched) {
             addToCart(matched);
           } else {
@@ -209,23 +211,21 @@ const Sale = () => {
             });
           }
         }
-        barcodeBuffer = ""; // reset after enter
+        barcodeBuffer = "";
       } else {
-        // ✅ Append key if it's a number/letter
         if (e.key.length === 1) {
           barcodeBuffer += e.key;
         }
       }
     };
-
     window.addEventListener("keydown", handleKeydown);
     return () => window.removeEventListener("keydown", handleKeydown);
-  }, [products]); // reattach if products update
+  }, [products]);
 
   return (
     <div className="flex mb-14 h-screen bg-white dark:bg-gray-900 font-khmer relative">
       <div className="flex-1 flex flex-col md:flex-row">
-        <div className="flex-1 sm:p-6 p-2 ">
+        <div className="flex-1 sm:p-6 p-2">
           <Header
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
@@ -235,7 +235,6 @@ const Sale = () => {
               setCurrentProducts(
                 isCompound ? updatedCompoundMedicines : products
               );
-
               setIsCompoundMode(isCompound);
             }}
             openRetailSaleModal={() => setIsRetailSaleOpen(true)}
@@ -261,13 +260,14 @@ const Sale = () => {
           onClose={() => setCartOpen(false)}
         />
         <button
-          className="md:hidden fixed bottom-4 mb-14 flex right-0 focus:shadow-none bg-green-600 text-white p-3 rounded-md  shadow-lg"
+          className="md:hidden fixed bottom-4 mb-14 flex right-0 focus:shadow-none bg-green-600 text-white p-3 rounded-md shadow-lg"
           onClick={() => setCartOpen(true)}
           aria-label="បើកកន្ត្រក"
         >
           <HiMiniShoppingCart className="w-6 h-6" /> ({totalQuantity})
         </button>
       </div>
+
       <OrderReviewModal
         isOpen={isOrderReviewModalOpen}
         setIsOpen={setIsOrderReviewModalOpen}
@@ -280,6 +280,7 @@ const Sale = () => {
         confirmOrder={confirmOrder}
         displayPrice={displayPrice}
       />
+
       <CheckoutModal
         isOpen={isCheckoutOpen}
         setIsOpen={setIsCheckoutOpen}
@@ -290,12 +291,14 @@ const Sale = () => {
         storeName="ហាងម៉ូតទំនិញ"
         currency="USD"
       />
+
       <RetailSaleModal
         isOpen={isRetailSaleOpen}
         setIsOpen={setIsRetailSaleOpen}
         products={currentProducts}
         addToCart={addToCart}
       />
+
       <ToastNotification toast={toast} />
     </div>
   );

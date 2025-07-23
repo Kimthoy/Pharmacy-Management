@@ -1,4 +1,64 @@
 {
+  "stock-list": {
+    "title": "ផ្ទាំងគ្រប់គ្រង​ ស្តុក",
+    "btnGotoSupply": "ទៅកាន់ការផ្គត់ផ្គង់",
+    "ID": "លេខសម្គាល់",
+    "Medicine": "ឈ្មោះថ្នាំ",
+    "Qty": "ចំនួន​នាំចូល",
+    "PriceIn": "តម្លៃនាំចូល",
+    "btnPrev": "ពីមុន",
+    "BtnNext": "បន្ទាប់",
+    "NotFound":"រកមិនឃើញ បញ្ជីស្តុកទេ !"
+
+  },
+  "add-supply": {
+    "title": "បន្ថែមការផ្គត់ផ្គង់ថ្មី​!",
+    "description": "ដើម្បីបញ្ជូល អ្នកអាចស្កេនបាកូដពីប្រអប់ថ្នាំជំនួសបាន​។",
+    "InvoiceDate": "ថ្ងៃខែផុតចូលស្តុក",
+    "InvoiceID": "លេខវិក័យបត្រ",
+    "ExpireDate": "ថ្ងៃខែផុតកំណត់",
+    "Delete": "លុប",
+    "Saving": "កំពុងរក្សាទុក...",
+    "Save": "រក្សាទុក",
+    "Supplier": "អ្នកផ្គត់ផ្គង់",
+    "SupplyItem": "ថ្នាំដែលបានផ្គត់ផ្គង់",
+    "Medicine": "ថ្នាំ",
+    "Quantity": "ចំនួនដែលផ្គត់ផ្គង់",
+    "UnitPrice": "តម្លៃ",
+    "AddNew": "បន្ថែមថ្នាំថ្មី"
+  },
+  "unit": {
+    "NotFound": "រកមិនឃើញ បញ្ជីឯកតាទេ !",
+    "Confirmation": "តើអ្នកប្រាកដថាចង់លុបមែនឬទេ?",
+    "title": "ផ្ទាំងគ្រប់គ្រង ឯកតា",
+    "ColName": "ឈ្មោះឯកតា",
+    "ColDesc": "ការពិពណ៌នា",
+    "ColActions": "សកម្មភាព",
+    "BtnNew": "ថ្មី",
+    "BtnCancel": "បោះបង់",
+    "BtnSaving": "កំពុងរក្សាទុក...",
+    "BtnSave": "រក្សាទុក",
+    "BtnPrev": "ពីមុន",
+    "BtnNext": "បន្ទាប់",
+    "TitleNew": "បង្កើតឯកតាថ្មី !",
+    "formdesc": "សូមបំពេញព័ត៍មានទាំងនេះដើម្បីបង្កើត",
+    "name": "ឈ្មោះឯកតា",
+    "desc": "ការពិពណ៌នា"
+  },
+  "edit-medicine": {
+    "EditTitle": "ការកែសម្រួល ថ្នាំ",
+    "Barcode": "បារកូដ",
+    "Name": "ឈ្មោះថ្នាំ",
+    "Price": "តម្លៃ",
+    "Weight": "ទម្ងន់ថ្នាំ (mg)",
+    "Unit": "ឯកតា",
+    "Category": "ប្រភេទ",
+    "Detail": "ព័ត៌មានថ្នាំ",
+    "Image": "រូបភាព",
+    "BtnCancel": "បោះបង់",
+    "BtnSave": "រក្សាទុក",
+    "BtnSaving": "កំពុងរក្សាទុក..."
+  },
   "profile": {
     "menu": {
       "profile": "គណនី",
@@ -18,8 +78,25 @@
     "popular": "ពេញនិយម"
   },
   "medicine-list": {
-    "Disable": "បិទដំណើរការ",
-    "Enable": "បើកដំណើរការ"
+    "Confirmation": "តើអ្នកប្រាកដថាចង់លុបមែនឬទេ?",
+    "Noted": "ការលុបនេះនឹងមិនអាចធ្វើឡើងវិញបានទេ !",
+    "Yes": "បាទ/ចាស",
+    "Cancel": "បោះបង់",
+    "Loading": "កំពុងទាញយក...",
+    "NotFound": "រកមិនឃើញ បញ្ជីថ្នាំទេ !",
+    "TitleMedicine": "បញ្ជីថ្នាំ",
+    "SearchMedicine": "ស្វែងរកតាមឈ្មោះថ្នាំ...",
+    "Unit": "ឯកតា",
+    "Category": "ប្រភេទ",
+    "Description": "ការពិពណ៌នា",
+    "Actions": "សកម្មភាព",
+    "Name": "ឈ្មោះថ្នាំ",
+    "Price": "តម្លៃ",
+    "Weight": "ទម្ងន់",
+    "Disable": "បិទ",
+    "Enable": "បើក",
+    "Prev": "ពីមុន",
+    "Next": "បន្ទាប់"
   },
   "medicine-view": {
     "BarCode": "បារកូដ",
@@ -236,6 +313,8 @@
     "total-customer": "អតិថិជន សរុប"
   },
   "add-medicine": {
+    "Creating": "កំពុងបង្កើត..",
+    "Create": "បង្កើត",
     "Scan": "ស្កេន",
     "Barcode": "លេខ​បារកូដ",
     "Barcode-Placeholder": "បារកូដ",
@@ -390,6 +469,7 @@
     "ButtonAddCustomer": "បន្ថែមអតិថិជន"
   },
   "customerlist": {
+    "NotFound": "រកមិនឃើញ បញ្ជីអតិថិជនទេ !",
     "CustomerDetails": "ព័ត៌មានអតិថិជន",
     "Name": "ឈ្មោះអតិថិជន",
     "Email": "អុីមែល",
@@ -1227,35 +1307,25 @@
   },
 
   "category": {
-    "categoryDashboard": "ផ្ទាំងបញ្ជីប្រភេទថ្នាំ",
-    "categoryDashboardDesc": "គ្រប់គ្រងប្រភេទថ្នាំរបស់ឱសថនៅក្នុងឱសថស្ថាន។",
-    "categoryList": "បញ្ជីប្រភេទ",
-    "searchPlaceholder": "ស្វែងរកប្រភេទ...",
-    "name": "ឈ្មោះ",
-    "description": "សេចក្តីពិពណ៌នា",
-    "actions": "សកម្មភាព",
-    "noRecords": "រកមិនឃើញប្រភេទណាមួយទេ។",
-    "addCategory": "បន្ថែម",
-    "editCategory": "កែប្រែ",
-    "confirmDelete": "តើអ្នកប្រាកដថាចង់លុបមែនឬទេ?",
-    "show": "បង្ហាញ",
-    "entries": "ធាតុ",
-    "page": "ទំព័រ",
-    "of": "នៃ",
-    "previous": "មុន",
-    "next": "បន្ទាប់",
-    "cancel": "បោះបង់",
-    "create": "បង្កើត",
-    "update": "ធ្វើបច្ចុប្បន្នភាព",
+    "NotFound": "រកមិនឃើញ បញ្ជីប្រភេទទេ !",
+    "Title": "ផ្ទាំងគ្រប់គ្រង​ ប្រភេទថ្នាំ",
+    "New": "ថ្មី",
+    "CreateCategory": "បង្កើតថ្នាំថ្មី!",
+    "searchPlaceholder": "ស្វែងរកតាមប្រភេទ",
+    "Desc": "សូមបំពេញព័ត៍មានទាំងនេះដើម្បីបង្កើត !",
+    "Name": "ឈ្មោះថ្នាំ",
+    "Description": "ការពិពណ៌នា",
+    "noRecords": "រកមិនឃើញកំណត់ត្រា",
+    "CateName": "ឈ្មោះ",
+    "CateDescription": "ការពិពណ៌នា",
 
-    "settings": "ការកំណត់",
-    "itemsPerPage": "ចំនួនក្នុងមួយទំព័រ",
-    "defaultSortOrder": "លំដាប់តម្រៀបលំនាំដើម",
-    "ascending": "កើនឡើង",
-    "descending": "ថយចុះ",
-    "showDescription": "បង្ហាញសេចក្តីពិពណ៌នា",
-    "reset": "កំណត់ទៅលំនាំដើម",
-    "save": "រក្សាទុក"
+    "Actions": "សកម្មភាព",
+
+    "Prev": "ពីមុន",
+    "Next": "បន្ទាប់",
+    "BtnCancel": "បោះបង់",
+    "BtnSave": "រក្សាទុក",
+    "BtnSaving": "កំពុងរក្សាទុក..."
   },
 
   "login": {

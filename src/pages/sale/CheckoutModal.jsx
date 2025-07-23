@@ -15,18 +15,12 @@ export default function CheckoutModal({
 }) {
   const invoiceRef = useRef();
 
-  // ✅ Debug logs
-  console.log("🛒 Products passed to CheckoutModal:", products);
-  console.log("💰 Total Price:", totalPrice);
-  console.log("📦 Total Quantity:", totalQuantity);
-
-  // ✅ If no products, use fake sample for testing
   const displayProducts =
     products && products.length > 0
       ? products
       : [
-          { name: "Sample Product A", quantity: 2, price: 5 },
-          { name: "Sample Product B", quantity: 1, price: 8 },
+          { name: "Sample Product A", quantity: 2, price: 5.0 },
+          { name: "Sample Product B", quantity: 1, price: 8.0 },
         ];
 
   const now = new Date().toLocaleString("km-KH", {
@@ -42,11 +36,11 @@ export default function CheckoutModal({
   const handleDownloadPDF = async () => {
     const el = invoiceRef.current;
     if (!el) {
-      alert("Invoice not found!");
+      alert("Invoice not ready!");
       return;
     }
 
-    await new Promise((r) => setTimeout(r, 300)); // wait for DOM
+    await new Promise((r) => setTimeout(r, 200));
 
     const canvas = await html2canvas(el, { scale: 2, backgroundColor: "#fff" });
     const imgData = canvas.toDataURL("image/png");
@@ -57,13 +51,12 @@ export default function CheckoutModal({
     pdf.save(`invoice-${Date.now()}.pdf`);
   };
 
-  const handleConfirm = () => {
-    if (confirmOrder) confirmOrder();
+  const handleConfirm = async () => {
+    if (confirmOrder) await confirmOrder();
+    await handleDownloadPDF();
     setIsOpen(false);
-    setTimeout(() => handleDownloadPDF(), 300);
   };
 
-  /** ✅ Visible invoice for debug */
   const InvoiceTemplate = () => (
     <div
       ref={invoiceRef}
@@ -108,16 +101,17 @@ export default function CheckoutModal({
           {displayProducts.map((item, i) => (
             <tr key={i}>
               <td style={{ borderBottom: "1px solid #eee", padding: "6px" }}>
-                {item.name}
+                {item.name || "Unknown Product"}
               </td>
               <td style={{ borderBottom: "1px solid #eee", padding: "6px" }}>
-                {item.quantity}
+                {item.quantity || 0}
               </td>
               <td style={{ borderBottom: "1px solid #eee", padding: "6px" }}>
-                {item.price.toFixed(2)} {currency === "USD" ? "$" : "៛"}
+                {Number(item.price || 0).toFixed(2)}{" "}
+                {currency === "USD" ? "$" : "៛"}
               </td>
               <td style={{ borderBottom: "1px solid #eee", padding: "6px" }}>
-                {(item.price * item.quantity).toFixed(2)}{" "}
+                {Number(item.price * item.quantity || 0).toFixed(2)}{" "}
                 {currency === "USD" ? "$" : "៛"}
               </td>
             </tr>
@@ -134,9 +128,13 @@ export default function CheckoutModal({
         <p>
           <strong>សរុបទាំងអស់:</strong>{" "}
           {totalPrice > 0
-            ? totalPrice.toFixed(2)
+            ? Number(totalPrice).toFixed(2)
             : displayProducts
-                .reduce((sum, p) => sum + p.price * p.quantity, 0)
+                .reduce(
+                  (sum, p) =>
+                    sum + Number(p.price || 0) * Number(p.quantity || 0),
+                  0
+                )
                 .toFixed(2)}{" "}
           {currency === "USD" ? "$" : "៛"}
         </p>
@@ -163,12 +161,22 @@ export default function CheckoutModal({
               <p className="mb-2 text-lg font-semibold">
                 សរុប:{" "}
                 <span className="text-emerald-600">
-                  {totalPrice > 0 ? totalPrice.toFixed(2) : "??"}{" "}
+                  {totalPrice > 0
+                    ? Number(totalPrice).toFixed(2)
+                    : displayProducts
+                        .reduce(
+                          (sum, p) =>
+                            sum +
+                            Number(p.price || 0) * Number(p.quantity || 0),
+                          0
+                        )
+                        .toFixed(2)}{" "}
                   {currency === "USD" ? "$" : "៛"}
                 </span>
               </p>
               <p className="mb-2">
-                ចំនួនទំនិញ: <strong>{totalQuantity || "??"}</strong>
+                ចំនួនទំនិញ:{" "}
+                <strong>{totalQuantity || displayProducts.length}</strong>
               </p>
               <p className="text-sm text-gray-600">ពេលវេលា: {now}</p>
             </div>
@@ -195,7 +203,6 @@ export default function CheckoutModal({
             </div>
           </div>
 
-          {/* ✅ DEBUG: Visible invoice directly below modal */}
           <InvoiceTemplate />
         </div>
       )}

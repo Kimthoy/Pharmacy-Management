@@ -7,7 +7,7 @@ import {
   createUnit,
   updateUnit,
   deleteUnit,
-} from "../api/unitService"; // Adjust path to your API service
+} from "../api/unitService";
 
 const UnitDashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -17,7 +17,7 @@ const UnitDashboard = () => {
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
+  const { t } = useTranslation();
   const [unit, setUnit] = useState({
     unit_name: "",
     desc: "",
@@ -41,13 +41,14 @@ const UnitDashboard = () => {
 
   const confirmDelete = (id) => {
     Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      title: t("unit.Confirmation"),
+      text: t("unit.DescWarning"),
       icon: "warning",
       showCancelButton: true,
+      cancelButtonText: t("unit.CancelButton"),
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, delete it!",
+      confirmButtonText: t("unit.YesButton"),
     }).then((result) => {
       if (result.isConfirmed) {
         handleDeleteUnit(id);
@@ -130,7 +131,7 @@ const UnitDashboard = () => {
         setSuccess("Unit created successfully!");
         setUnit({ unit_name: "", desc: "" });
         setShowModal(false);
-        fetchUnits(); // Refresh list after create
+        fetchUnits();
       } catch (err) {
         console.error("Full error:", err);
         const errorMessage = err?.message || "Failed to create unit.";
@@ -145,12 +146,12 @@ const UnitDashboard = () => {
   return (
     <div className="sm:p-6 mb-20">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Unit Dashboard</h1>
+        <h1 className="text-2xl font-bold">{t("unit.title")}</h1>
         <button
           onClick={() => setShowModal(true)}
           className="bg-blue-600 text-white px-4 py-2 shadow-lg active:shadow-none rounded-lg hover:bg-blue-700"
         >
-          New
+          {t("unit.BtnNew")}
         </button>
       </div>
 
@@ -158,16 +159,14 @@ const UnitDashboard = () => {
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
           <div className="bg-white sm:p-6 p-3 rounded-lg shadow-md w-full max-w-md">
-            <h2 className="text-lg font-bold mb-2">Create Unit</h2>
-            <p className="text-sm text-gray-600 mb-4">
-              Add a new unit using the form below.
-            </p>
+            <h2 className="text-lg font-bold mb-2">{t("unit.TitleNew")}</h2>
+            <p className="text-sm text-gray-600 mb-4">{t("unit.formdesc")}</p>
             <form onSubmit={handleSubmit} className="space-y-4">
               {success && <p className="text-green-600 text-sm">{success}</p>}
               {error && <p className="text-red-600 text-sm">{error}</p>}
               <div>
                 <label className="block mb-1 text-sm font-medium">
-                  Unit Name
+                  {t("unit.name")}
                 </label>
                 <input
                   type="text"
@@ -180,7 +179,7 @@ const UnitDashboard = () => {
               </div>
               <div>
                 <label className="block mb-1 text-sm font-medium">
-                  Description
+                  {t("unit.desc")}
                 </label>
                 <textarea
                   name="desc"
@@ -195,14 +194,14 @@ const UnitDashboard = () => {
                   onClick={() => setShowModal(false)}
                   className="px-4 py-2 border rounded-lg shadow-lg active:shadow-none text-red-700"
                 >
-                  Cancel
+                  {t("unit.BtnCancel")}
                 </button>
                 <button
                   type="submit"
                   disabled={isLoading}
                   className="bg-green-600 shadow-lg active:shadow-none text-white px-4 py-2 rounded-lg hover:bg-green-700"
                 >
-                  {isLoading ? "Saving..." : "Save"}
+                  {isLoading ? t("unit.BtnSaving") : t("unit.BtnSave")}
                 </button>
               </div>
             </form>
@@ -215,44 +214,64 @@ const UnitDashboard = () => {
         <table className="min-w-full table-auto border-collapse border border-gray-300">
           <thead>
             <tr className="bg-gray-100">
-              <th className="border px-4 py-2 text-left">Unit Name</th>
-              <th className="border px-4 py-2 text-left">Description</th>
-              <th className="border px-4 py-2 text-left">Actions</th>
+              <th className="border px-4 py-2 text-left">
+                {t("unit.ColName")}
+              </th>
+              <th className="border px-4 py-2 text-left">
+                {t("unit.ColDesc")}
+              </th>
+              <th className="border px-4 py-2 text-left">
+                {t("unit.ColActions")}
+              </th>
             </tr>
           </thead>
           <tbody className="text-md text-gray-700 dark:text-gray-200">
-            {currentItems.map((u, index) => (
-              <tr
-                key={index}
-                className="border-t even:bg-slate-100 border-gray-200 dark:border-gray-700"
-              >
-                <td
-                  className="px-4 py-3 max-w-[150px] truncate"
-                  title={u.unit_name}
+          {currentItems.length > 0 ? (
+              currentItems.map((u, index) => (
+                <tr
+                  key={index}
+                  className="border-t even:bg-slate-100 border-gray-200 dark:border-gray-700"
                 >
-                  {u.unit_name}
-                </td>
-
-                <td className="px-4 py-3 max-w-[200px] truncate" title={u.desc}>
-                  {u.desc}
-                </td>
-                <td className="px-4 py-3 flex gap-2">
-                  <button
-                    onClick={() => handleEditUnit(u)}
-                    className="text-blue-600  sm:hover:bg-slate-700 sm:hover:rounded-lg sm:p-4 sm:hover:bg-opacity-20"
+                  <td
+                    className="px-4 py-3 max-w-[150px] truncate"
+                    title={u.unit_name}
                   >
-                    <FaEdit className="sm:w-5 w-4 sm:h-5 h-4" />
-                  </button>
+                    {u.unit_name}
+                  </td>
 
-                  <button
-                    onClick={() => confirmDelete(u.id)}
-                    className="text-red-600 ml-5  sm:hover:bg-slate-700 sm:hover:rounded-lg sm:p-4 sm:hover:bg-opacity-20"
+                  <td
+                    className="px-4 py-3 max-w-[200px] truncate"
+                    title={u.desc}
                   >
-                    <FaTrash className="sm:w-5 w-4 sm:h-5 h-4" />
-                  </button>
+                    {u.desc}
+                  </td>
+                  <td className="px-4 py-3 flex gap-2">
+                    <button
+                      onClick={() => handleEditUnit(u)}
+                      className="text-blue-600  sm:hover:bg-slate-700 sm:hover:rounded-lg sm:p-4 sm:hover:bg-opacity-20"
+                    >
+                      <FaEdit className="sm:w-5 w-4 sm:h-5 h-4" />
+                    </button>
+
+                    <button
+                      onClick={() => confirmDelete(u.id)}
+                      className="text-red-600 ml-5  sm:hover:bg-slate-700 sm:hover:rounded-lg sm:p-4 sm:hover:bg-opacity-20"
+                    >
+                      <FaTrash className="sm:w-5 w-4 sm:h-5 h-4" />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan="3"
+                  className="text-center py-6 text-gray-500 dark:text-gray-400"
+                >
+                    {t("unit.NotFound") }
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
 
@@ -260,9 +279,11 @@ const UnitDashboard = () => {
         {showEditModal && selectedUnit && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
             <div className="bg-white p-6 rounded-lg-lg shadow-lg w-full max-w-md dark:bg-slate-800">
-              <h2 className="text-xl font-semibold mb-4">Edit Unit</h2>
+              <h2 className="text-xl font-semibold mb-4">
+                {t("unit.FormEdit")}
+              </h2>
 
-              <label className="block mb-2 text-sm">Unit Name</label>
+              <label className="block mb-2 text-sm">{t("unit.name")}</label>
               <input
                 type="text"
                 value={selectedUnit.unit_name}
@@ -275,7 +296,7 @@ const UnitDashboard = () => {
                 className="w-full border px-3 py-2 rounded-lg mb-4"
               />
 
-              <label className="block mb-2 text-sm">Description</label>
+              <label className="block mb-2 text-sm">{t("unit.desc")}</label>
               <textarea
                 value={selectedUnit.desc}
                 onChange={(e) =>
@@ -292,13 +313,13 @@ const UnitDashboard = () => {
                   onClick={() => setShowEditModal(false)}
                   className="px-4 py-2 bg-gray-400 text-white transition-all rounded-lg shadow-lg hover:bg-opacity-65 hover:text-red-700"
                 >
-                  Cancel
+                  {t("unit.BtnCancel")}
                 </button>
                 <button
                   onClick={handleUpdateUnit}
                   className="px-4 py-2 bg-blue-600 text-white  rounded-lg hover:bg-opacity-50 hover:text-blue-700  shadow-lg"
                 >
-                  Save
+                  {isLoading ? t("unit.BtnSaving") : t("unit.BtnSave")}
                 </button>
               </div>
             </div>
@@ -307,7 +328,7 @@ const UnitDashboard = () => {
 
         {loading && (
           <p className="text-center p-16 text-xl text-gray-500 dark:text-gray-400 mt-4">
-            Loading ...
+            {t("unit.Loading")}
           </p>
         )}
       </div>
@@ -319,7 +340,7 @@ const UnitDashboard = () => {
           disabled={currentPage === 1}
           className="px-3 py-1 bg-gray-300 rounded-lg disabled:opacity-50"
         >
-          Prev
+          {t("unit.BtnPrev")}
         </button>
 
         {Array.from({ length: totalPages }, (_, i) => (
@@ -343,7 +364,7 @@ const UnitDashboard = () => {
           disabled={currentPage === totalPages}
           className="px-3 py-1 bg-gray-300 rounded-lg disabled:opacity-50"
         >
-          Next
+          {t("unit.BtnNext")}
         </button>
       </div>
     </div>
