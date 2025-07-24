@@ -15,7 +15,7 @@ import SystemMonitor from "./SystemMonitor";
 import QuickActions from "./QuickActions";
 import StatsCard from "./StatsCard";
 import InfoCard from "./InfoCard";
-
+import DashboardStatus from "./DashboardStatus";
 const Dashboard = () => {
   const { t } = useTranslation();
 
@@ -66,7 +66,7 @@ const Dashboard = () => {
           {t("dashboard.subtitle")}
         </p>
       </header>
-
+      <DashboardStatus />
       <SystemMonitor activities={dashboardData.recentActivities} />
 
       {/* <QuickActions onAction={handleQuickAction} /> */}
@@ -80,6 +80,7 @@ const Dashboard = () => {
           textColor="text-white dark:text-white"
           borderColor="border-green-300 dark:border-green-700"
         />
+
         <StatsCard
           icon={CurrencyRupeeIcon}
           title={t("dashboard.stats.revenue")}
