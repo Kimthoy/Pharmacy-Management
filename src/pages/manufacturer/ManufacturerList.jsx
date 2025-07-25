@@ -15,6 +15,9 @@ import {
 } from "../api/supplierService";
 const Manufacturerlist = () => {
   const { t } = useTranslation();
+  const [totalSupplier, setTotalSupplier] = useState(0);
+  const [error, setError] = useState([]);
+  const [loading, setLoading] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
@@ -40,18 +43,32 @@ const Manufacturerlist = () => {
     address: "",
     is_active: true,
   });
-  const fetchSuppliers = async () => {
-    try {
-      const data = await getAllSupplier();
-      setSuppliers(data);
-    } catch (err) {
-      toast.error("Failed to load suppliers");
-    }
-  };
+
   const toggleForm = () => {
     console.log("Toggle form clicked");
     setIsModalOpen((prev) => !prev);
   };
+
+  const fetchSuppliers = async () => {
+    try {
+      const response = await getAllSupplier();
+
+      const suppliers = Array.isArray(response.data) ? response.data : [];
+
+      setSuppliers(suppliers);
+
+      const totalSupplier = suppliers.length;
+      console.log("Total suppliers:", totalSupplier);
+
+      setTotalSupplier(totalSupplier);
+    } catch (err) {
+      console.error("Failed to fetch suppliers", err);
+      setError("Failed to fetch supplier");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchSuppliers();
   }, []);
@@ -102,17 +119,17 @@ const Manufacturerlist = () => {
       }
 
       setFormErrors({});
-      toggleForm(); // close modal
-      fetchSuppliers(); // refresh supplier list
+      toggleForm();
+      fetchSuppliers(); 
     } catch (err) {
       if (err.response?.status === 422) {
         const validationErrors = err.response.data.errors || {};
 
-        setFormErrors(validationErrors); // Optional: populate field errors
+        setFormErrors(validationErrors); 
 
-        // Show toast for specific field errors
+        
         if (validationErrors.email) {
-          toast.error(validationErrors.email[0]); // shows: "The email has already been taken."
+          toast.error(validationErrors.email[0]);
         } else {
           toast.error("Validation failed. Please check your inputs.");
         }
@@ -163,7 +180,7 @@ const Manufacturerlist = () => {
       email: man.email,
       phone_number: man.phone_number,
       address: man.address,
-      
+
       is_active: man.is_active,
     });
   };
@@ -178,6 +195,7 @@ const Manufacturerlist = () => {
           <p className="text-gray-400 dark:text-gray-300 text-md">
             {t("manufacturerlist.ManufacturerListDesc")}
           </p>
+          <p>Total Suppliers: {totalSupplier}</p>
         </div>
         <button
           type="button"

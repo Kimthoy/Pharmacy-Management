@@ -1,11 +1,6 @@
-const Cart = ({
-  cart,
-  isCartOpen,
-  clearCart,
-  saveCart,
-  placeOrder,
-  onClose,
-}) => {
+import React, { useState } from "react";
+
+const Cart = ({ cart, clearCart, placeOrder, onClose, onCheckout }) => {
   const exchangeRate = 4000;
 
   const calculateTotalPriceUSD = () => {
@@ -15,10 +10,11 @@ const Cart = ({
       return total + priceInUSD * item.quantity;
     }, 0);
   };
+  const [isCartOpen, setCartOpen] = useState(false);
+  const [isCheckoutOpen, setCheckoutOpen] = useState(false);
 
   const totalPrice = calculateTotalPriceUSD();
   const totalPriceInRiel = totalPrice * exchangeRate;
-
   const totalQuantity = cart.reduce((total, item) => total + item.quantity, 0);
 
   const displayPrice = (price, currency = "USD") => {
@@ -27,12 +23,17 @@ const Cart = ({
       : price.toFixed(2);
   };
 
+  const handleCheckout = () => {
+    if (placeOrder) placeOrder();
+    if (onCheckout) onCheckout();
+  };
+
   return (
     <div
       className={`bg-slate-200 shadow-sm p-4 z-10 transition-transform duration-300
-    fixed bottom-0 left-0 sm:w-80 w-full h-[80vh] md:h-full md:static
-    rounded-t-2xl flex flex-col
-    ${isCartOpen ? "translate-y-0" : "translate-y-full md:translate-y-0"}`}
+        fixed bottom-0 left-0 sm:w-80 w-full h-[80vh] md:h-full md:static
+        rounded-t-2xl flex flex-col
+        ${isCartOpen ? "translate-y-0" : "translate-y-full md:translate-y-0"}`}
       style={{ zIndex: 1000 }}
     >
       <div className="flex justify-between items-center sm:mb-0 mb-4 bg-slate-200 z-10 pb-2 border-b">
@@ -40,15 +41,15 @@ const Cart = ({
         <button
           onClick={onClose}
           aria-label="Close cart"
-          className="sm:hidden flex bg-red-600 text-white px-3 rounded-lg py-1  shadow-lg"
+          className="sm:hidden flex bg-red-600 text-white px-3 rounded-lg py-1 shadow-lg"
         >
           បិទ
         </button>
       </div>
 
       {cart.length === 0 ? (
-        <div className=" flex-1 flex flex-col items-center justify-center text-gray-600">
-          <img src="empty_cart1.png" alt="" />
+        <div className="flex-1 flex flex-col items-center justify-center text-gray-600">
+          <img src="empty_cart1.png" alt="empty cart" />
         </div>
       ) : (
         <div className="flex-1 overflow-auto mb-2">
@@ -64,24 +65,22 @@ const Cart = ({
                   alt={item.name}
                   className="w-10 h-10 object-cover rounded flex-shrink-0"
                 />
-                <div className="flex-1">
-                  <div className="text-xs">
-                    {item.packaging
-                      ? `${item.name} (${item.packaging})`
-                      : item.name}
-                    <br />
-                    <div>
-                      សរុប :{" "}
-                      {(
-                        displayPrice(item.price, item.currency) * item.quantity
-                      ).toFixed(2)}{" "}
-                      $ (
-                      <span className="text-emerald-600">{item.quantity}</span>)
-                    </div>
-                    <span className="text-gray-500">
-                      {item.typeofmedicine || "មិនបានកំណត់"}
-                    </span>
+                <div className="flex-1 text-xs">
+                  {item.packaging
+                    ? `${item.name} (${item.packaging})`
+                    : item.name}
+                  <br />
+                  <div>
+                    សរុប :{" "}
+                    {(
+                      displayPrice(item.price, item.currency) * item.quantity
+                    ).toFixed(2)}{" "}
+                    $ (<span className="text-emerald-600">{item.quantity}</span>
+                    )
                   </div>
+                  <span className="text-gray-500">
+                    {item.typeofmedicine || "មិនបានកំណត់"}
+                  </span>
                 </div>
               </li>
             ))}
@@ -90,7 +89,7 @@ const Cart = ({
       )}
 
       {cart.length > 0 && (
-        <div className="sticky bottom-0  z-10 pt-2 border-t">
+        <div className="sticky bottom-0 z-10 pt-2 border-t">
           <div className="flex flex-col space-y-2 mb-4">
             <div className="flex justify-between items-center font-semibold">
               <span>សរុប</span>
@@ -119,15 +118,15 @@ const Cart = ({
             <button
               onClick={clearCart}
               aria-label="លុបកន្ត្រក"
-              className="flex-1  text-red-500 py-2 rounded-lg  transition"
+              className="flex-1 text-red-500 py-2 rounded-lg transition"
             >
               លុប
             </button>
 
             <button
               onClick={() => {
-                placeOrder(); // your existing order logic
-                onClose(); // close the cart automatically
+                placeOrder(); // ✅ do the order
+                onCheckout(); // ✅ tell parent to hide cart + open checkout
               }}
               aria-label="បញ្ជាទិញ"
               className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"

@@ -1,7 +1,7 @@
 import { ShieldCheckIcon } from "@heroicons/react/24/outline";
 
 const SystemMonitor = ({ activities }) => (
-  <div className=" sm:shadow-md shadow-lg dark:bg-gray-800  bg-slate-300 rounded-lg p-4 mb-6">
+  <div className=" sm:shadow-lg shadow-lg dark:bg-gray-800  bg-slate-300 rounded-lg p-4 mb-6">
     <div className="flex items-center">
       <ShieldCheckIcon className="h-5 w-5 text-indigo-500 dark:text-indigo-300 mr-2" />
       <h3 className="text-sm font-semibold text-indigo-600 dark:text-indigo-200">

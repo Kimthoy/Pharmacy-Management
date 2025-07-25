@@ -3,8 +3,9 @@ import { FaEllipsisV, FaPlus } from "react-icons/fa";
 import { BiEdit, BiShow, BiTrash } from "react-icons/bi";
 import { useTranslation } from "../../hooks/useTranslation";
 import { useNavigate } from "react-router-dom";
-import { suppliers } from "../../data/suppliers";
-
+// import { suppliers } from "../../data/suppliers";
+import { getAllSupplier } from "../api/supplierService";
+import { sync } from "framer-motion";
 const SupplierList = () => {
   const { t } = useTranslation();
   const [openMenu, setOpenMenu] = useState(null);
@@ -24,6 +25,7 @@ const SupplierList = () => {
   });
   const [formErrors, setFormErrors] = useState({});
   const [suppliersList, setSuppliersList] = useState(suppliers);
+  const [suppliers, setSupplier] = useState([]);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const navigate = useNavigate();
 
@@ -52,7 +54,23 @@ const SupplierList = () => {
     startIndex,
     startIndex + rowsPerPage
   );
-
+  const fetchSuppliers = async () => {
+    try {
+      const data = await getAllSupplier();
+      setSupplier(data);
+    } catch (err) {
+      console.error("Failed to fetch suppliers", err);
+      setError("Failed to fetch supplier");
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchSuppliers();
+  }, []);
+  const totalSupplier = suppliers.reduce(
+    (sum, suppliers) => sum + suppliers.id || "N/A"
+  );
   const validateForm = () => {
     const errors = {};
     if (!formData.name.trim())
@@ -521,7 +539,6 @@ const SupplierList = () => {
                         {t("supplierlist.SupplierListViewDetails")}
                       </button>
                       <button
-                       
                         className="flex align-middle w-full text-left text-gray-600 dark:text-gray-200 py-2 hover:rounded-md hover:bg-green-500 hover:text-white dark:hover:bg-green-400 dark:hover:text-white"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -533,7 +550,6 @@ const SupplierList = () => {
                         {t("supplierlist.SupplierListEdit")}
                       </button>
                       <button
-                      
                         className="flex align-middle w-full text-left text-gray-600 dark:text-gray-200 py-2 hover:rounded-md hover:bg-green-500 hover:text-white dark:hover:bg-green-400 dark:hover:text-white"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -551,6 +567,7 @@ const SupplierList = () => {
             ))}
           </tbody>
         </table>
+     
       </div>
 
       <div className="flex flex-wrap items-center justify-between mt-4">

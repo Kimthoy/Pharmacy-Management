@@ -12,7 +12,6 @@ import {
 import { useTranslation } from "../../hooks/useTranslation";
 import { useTheme } from "../../context/ThemeContext";
 
-// ✅ PDF + Excel libs
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import * as XLSX from "xlsx";
@@ -20,7 +19,7 @@ import * as XLSX from "xlsx";
 const SellReport = () => {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  const reportRef = useRef(); // ✅ wrap the full report
+  const reportRef = useRef(); 
 
   const [salesData, setSalesData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -38,7 +37,6 @@ const SellReport = () => {
     rowsPerPage: 5,
   });
 
-  // ✅ Fetch sales once
   useEffect(() => {
     const fetchSales = async () => {
       try {
@@ -46,10 +44,10 @@ const SellReport = () => {
         const salesArray = Array.isArray(response)
           ? response
           : response?.data || [];
-        console.log("✅ API Sales Array:", salesArray);
+        console.log(" API Sales Array:", salesArray);
         setSalesData(salesArray);
       } catch (err) {
-        console.error("❌ Fetch Sales Error:", err);
+        console.error(" Fetch Sales Error:", err);
         setError(err.message || "Failed to fetch sales");
       } finally {
         setLoading(false);
@@ -58,7 +56,6 @@ const SellReport = () => {
     fetchSales();
   }, []);
 
-  // ✅ Filter data by search, date, month
   const filteredData = useMemo(() => {
     return salesData.filter((sale) => {
       const search = filters.searchTerm.toLowerCase();
@@ -89,7 +86,6 @@ const SellReport = () => {
     });
   }, [salesData, filters]);
 
-  // ✅ Chart Data (sorted by date)
   const chartData = useMemo(() => {
     return [...filteredData]
       .sort((a, b) => new Date(a.sale_date) - new Date(b.sale_date))
@@ -99,7 +95,6 @@ const SellReport = () => {
       }));
   }, [filteredData]);
 
-  // ✅ Total sales for filtered data
   const totalSales = useMemo(
     () =>
       filteredData.reduce(
@@ -109,7 +104,6 @@ const SellReport = () => {
     [filteredData]
   );
 
-  // ✅ Pagination
   const totalPages = Math.max(
     1,
     Math.ceil(filteredData.length / pagination.rowsPerPage)
@@ -119,7 +113,6 @@ const SellReport = () => {
     return filteredData.slice(start, start + pagination.rowsPerPage);
   }, [filteredData, pagination]);
 
-  // ✅ Print Table
   const handlePrintTable = () => {
     const tableContent =
       document.getElementById("sales-report-table").outerHTML;
@@ -169,7 +162,6 @@ const SellReport = () => {
     printWindow.close();
   };
 
-  // ✅ Download PDF
   const handleDownloadPDF = async () => {
     if (!reportRef.current) {
       alert("Report section not found!");
@@ -189,7 +181,6 @@ const SellReport = () => {
     pdf.save(`sales-report-${Date.now()}.pdf`);
   };
 
-  // ✅ Download Excel
   const handleDownloadExcel = () => {
     const excelRows = filteredData.flatMap((sale) => {
       const baseInfo = {
@@ -244,16 +235,12 @@ const SellReport = () => {
 
   return (
     <div className="sm:p-6 mb-32 bg-white dark:bg-gray-900 min-h-screen">
-      {/* ✅ Header */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="sm:text-lg text-md font-bold text-gray-500 dark:text-gray-200">
           {t("sellreport.SalesReportTitle")}
         </h2>
       </div>
-
-      {/* ✅ This is the report section captured for PDF */}
       <div ref={reportRef}>
-        {/* ✅ Summary Section */}
         <section className="mb-8">
           <p className="text-gray-500 dark:text-gray-300 text-xs">
             {t("sellreport.SalesReportDesc")}
@@ -262,8 +249,6 @@ const SellReport = () => {
             Total Sales (Filtered): ${totalSales.toFixed(2)}
           </p>
         </section>
-
-        {/* ✅ Chart Section */}
         <div className="grid md:grid-cols-2 gap-6">
           <div className="bg-white dark:bg-gray-800 sm:p-6 sm:shadow-md dark:shadow-gray-700 sm:rounded-lg">
             <h3 className="sm:text-lg underline text-md mb-4 font-semibold text-gray-800 dark:text-gray-200">
@@ -285,8 +270,6 @@ const SellReport = () => {
             </ResponsiveContainer>
           </div>
         </div>
-
-        {/* ✅ Filters */}
         <div className="flex gap-4 mt-6">
           <div>
             <label className="block text-gray-400 dark:text-gray-300 mb-1 text-md">
@@ -326,7 +309,6 @@ const SellReport = () => {
           </div>
         </div>
 
-        {/* ✅ Sales Table */}
         <div className="bg-white dark:bg-gray-800 sm:p-6 sm:shadow-md dark:shadow-gray-700 rounded-lg mt-6">
           <h3 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-6">
             {t("sellreport.SalesRecords")}
@@ -428,7 +410,6 @@ const SellReport = () => {
         </div>
       </div>
 
-      {/* ✅ Pagination Controls */}
       <div className="flex justify-between items-center mt-4">
         <div className="hidden sm:flex items-center gap-2">
           <label

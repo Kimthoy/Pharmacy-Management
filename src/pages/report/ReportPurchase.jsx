@@ -108,7 +108,10 @@ const PurchaseReport = () => {
     0
   );
   const totalPurchases = filteredData.length;
-
+  const totalPurchaseValue = filteredData.reduce(
+    (sum, item) => sum + item.quantity,
+    0
+  );
   // ✅ Pagination
   const totalPages =
     Math.ceil(filteredData.length / pagination.rowsPerPage) || 1;
@@ -214,12 +217,9 @@ const PurchaseReport = () => {
             View all purchases by supplier, medicine, and cost.
           </p>
         </div>
-        {/* PRINT BUTTON */}
       </section>
 
-      {/* Summary */}
       <div className="grid md:grid-cols-2 gap-6">
-        {/* Summary Card */}
         <div className="bg-white dark:bg-gray-800 sm:p-6 sm:shadow-md rounded-lg">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
             Purchase Summary
@@ -230,6 +230,14 @@ const PurchaseReport = () => {
             </p>
             <p className="sm:text-2xl text-lg font-bold text-emerald-600 dark:text-emerald-400">
               ${totalPurchaseAmount.toFixed(2)}
+            </p>
+          </div>
+          <div className="mb-4">
+            <p className="text-gray-600 dark:text-gray-200">
+              Total Purchase quantity:
+            </p>
+            <p className="sm:text-2xl text-lg font-bold text-emerald-600 dark:text-emerald-400">
+              {totalPurchaseValue}
             </p>
           </div>
           <div className="mb-4">

@@ -24,20 +24,19 @@ const AddSupply = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const suppliers = await getAllSupplier();
+        const suppliers = await getAllSupplier(); 
         const medicinesResponse = await getAllMedicines();
 
-        // ✅ Extract array from API response
-        const medicines = medicinesResponse.data;
+        const medicines = Array.isArray(medicinesResponse)
+          ? medicinesResponse
+          : medicinesResponse.data || [];
 
-        if (Array.isArray(suppliers)) {
-          setSupplierOptions(
-            suppliers.map((s) => ({
-              value: s.id,
-              label: s.company_name,
-            }))
-          );
-        }
+        setSupplierOptions(
+          suppliers.map((s) => ({
+            value: s.id,
+            label: s.company_name,
+          }))
+        );
 
         if (Array.isArray(medicines)) {
           setMedicineOptions(
@@ -57,6 +56,7 @@ const AddSupply = () => {
 
     fetchData();
   }, []);
+
 
   const handleSupplierChange = (selected) => {
     setSupply((prev) => ({ ...prev, supplier_id: selected?.value || null }));

@@ -35,7 +35,6 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
       subItems: [
         { name: t("sidebar.addMedicine"), path: "/addmedicinepage" },
         { name: t("sidebar.medicineList"), path: "/listofmedicine" },
-        // { name: t("sidebar.medicineDetail"), path: "/medicinedetail" },
         { name: t("sidebar.categoies"), path: "/categoies" },
         { name: t("sidebar.units"), path: "/units" },
       ],
@@ -61,13 +60,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
       name: t("sidebar.staff"),
       icon: FaUserDoctor,
       path: "/listofstaff",
-      // subItems: [
-      //   {
-      //     name: t("sidebar.staffList"),
-      //     icon: UserPlusIcon,
-      //     path: "/listofstaff",
-      //   },
-      // ],
+    
     },
     {
       name: t("sidebar.stock"),
@@ -105,22 +98,12 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
         { name: t("sidebar.wastageReturnList"), path: "/wastagereturnlist" },
       ],
     },
-    // {
-    //   name: t("sidebar.finance"),
-    //   icon: HiOutlineCurrencyDollar,
-    //   path: "/financepage",
-    //   subItems: [
-    //     { name: t("sidebar.expense"), path: "/expensepage" },
-    //     { name: t("sidebar.income"), path: "/incomepage" },
-    //     { name: t("sidebar.invoiceDetail"), path: "/invoicedetail" },
-    //     { name: t("sidebar.invoiceList"), path: "/invoicelist" },
-    //   ],
-    // },
+  
     {
       name: t("sidebar.salepage"),
       icon: MdPointOfSale,
       path: "/saledashboard",
-      // subItems: [{ name: t("sidebar.saledashboard"), path: "/saledashboard" }],
+     
     },
     {
       name: t("sidebar.reports"),
@@ -132,26 +115,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
         { name: t("sidebar.purchaseReport"), path: "/purchasreport" },
       ],
     },
-    // {
-    //   name: t("sidebar.pages"),
-    //   icon: RiPagesLine,
-    //   path: "/login",
-    //   subItems: [
-    //     { name: t("sidebar.login"), path: "/login" },
-    //     { name: t("sidebar.register"), path: "/register" },
-    //     { name: t("sidebar.client"), path: "/client" },
-    //   ],
-    // },
-    // { name: t("sidebar.settings"), icon: CiSettings, path: "/settingpage" },
-    // {
-    //   name: "Sameple",
-    //   icon: CiRepeat,
-    //   path: "/sample",
-    //   subItems: [
-    //     { name: "Sample Stock", path: "/samplestock" },
-    //     { name: "Add Stock", path: "/addstock" },
-    //   ],
-    // },
+   
   ];
 
   const handlePageSelection = (item, path) => {

@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import {
+  Cell,
   BarChart,
   Bar,
   XAxis,
@@ -10,52 +11,39 @@ import {
 } from "recharts";
 import { useTranslation } from "../../hooks/useTranslation";
 import { useTheme } from "../../context/ThemeContext";
-
-// ✅ Import API service
 import { getAllStocks } from "../api/stockService";
-
 const StockReport = () => {
   const { t } = useTranslation();
-  const { theme } = useTheme();
-
   const [stockData, setStockData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  // ✅ Sorting states
   const [sortField, setSortField] = useState("medicine_name");
   const [sortOrder, setSortOrder] = useState("asc");
-
   const [filters, setFilters] = useState({
     searchTerm: "",
     startDate: "",
     endDate: "",
   });
-
   const [pagination, setPagination] = useState({
     currentPage: 1,
     rowsPerPage: 10,
   });
-
   useEffect(() => {
     const fetchStock = async () => {
       try {
         const response = await getAllStocks();
         const stocks = Array.isArray(response.data) ? response.data : [];
-        console.log("✅ Stock API:", stocks);
+        console.log("Stock API:", stocks);
         setStockData(stocks);
       } catch (err) {
-        console.error("❌ Fetch Stock Error:", err);
+        console.error("Fetch Stock Error:", err);
         setError("Failed to load stock report");
       } finally {
         setLoading(false);
       }
     };
-
     fetchStock();
   }, []);
-
-  // ✅ Filter stock data
   const filteredData = useMemo(() => {
     return stockData.filter((item) => {
       const searchMatch =
@@ -76,11 +64,8 @@ const StockReport = () => {
       return searchMatch && dateMatch;
     });
   }, [stockData, filters]);
-
-  // ✅ Sorting logic
   const sortedData = [...filteredData].sort((a, b) => {
     let valA, valB;
-
     if (sortField === "medicine_name") {
       valA = a.medicine?.medicine_name?.toLowerCase() || "";
       valB = b.medicine?.medicine_name?.toLowerCase() || "";
@@ -102,34 +87,24 @@ const StockReport = () => {
     if (valA > valB) return sortOrder === "asc" ? 1 : -1;
     return 0;
   });
-
-  // ✅ Total stock value = sum(quantity * price)
   const totalStockValue = filteredData.reduce(
     (sum, item) => sum + item.quantity * parseFloat(item.price_in || 0),
     0
   );
-
-  // ✅ Low stock items (< 50)
   const lowStockItems = filteredData.filter(
     (item) => item.quantity < 50
   ).length;
-
-  // ✅ Chart data for bar chart
   const chartData = useMemo(() => {
     return filteredData.map((item) => ({
       name: `Med-${item.medicine?.medicine_name}`,
       quantity: item.quantity,
     }));
   }, [filteredData]);
-
-  // ✅ Pagination
   const totalPages = Math.ceil(sortedData.length / pagination.rowsPerPage) || 1;
   const paginatedData = sortedData.slice(
     (pagination.currentPage - 1) * pagination.rowsPerPage,
     pagination.currentPage * pagination.rowsPerPage
   );
-
-  // ✅ Print filtered & sorted report
   const handlePrint = () => {
     const printContent = document.getElementById("stock-table").outerHTML;
     const win = window.open("", "_blank");
@@ -159,20 +134,24 @@ const StockReport = () => {
     win.close();
   };
 
-  if (loading)
-    return <p className="p-6 text-center">Loading Stock Report...</p>;
-  if (error) return <p className="p-6 text-center text-red-500">{error}</p>;
+  const COLORS = [
+    "#34d399",
+    "#60a5fa",
+    "#f87171",
+    "#fbbf24", 
+    "#a78bfa", 
+    "#f472b6", 
+    "#38bdf8", 
+    "#fb923c", 
+  ];
 
   return (
     <div className="sm:p-6 mb-24 bg-white dark:bg-gray-900 min-h-screen">
-      {/* ✅ Header */}
       <div className="flex justify-between mb-4">
         <h2 className="text-lg font-bold text-gray-700 dark:text-gray-200">
           Stock Report
         </h2>
       </div>
-
-      {/* ✅ Summary section */}
       <div className="grid md:grid-cols-2 gap-2 mb-6">
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
           <p className="text-gray-500 dark:text-gray-300 mb-5">
@@ -188,8 +167,6 @@ const StockReport = () => {
             </span>
           </p>
         </div>
-
-        {/* ✅ Stock Bar Chart */}
         <div className="bg-white dark:bg-gray-800 p-2 rounded-md shadow">
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={chartData}>
@@ -197,13 +174,19 @@ const StockReport = () => {
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="quantity" fill="#059669" />
+              <Bar dataKey="quantity">
+                {chartData.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
+                ))}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
 
-      {/* ✅ Filters + Sort + Print */}
       <div className="flex flex-wrap gap-4 mb-4 items-center">
         <input
           type="text"
@@ -215,7 +198,6 @@ const StockReport = () => {
           }
         />
 
-        {/* Date Filters */}
         <label className="py-2">Start Date</label>
         <input
           type="date"
@@ -235,7 +217,6 @@ const StockReport = () => {
           className="border p-2 rounded"
         />
 
-        {/* Sort Dropdown */}
         <label className="text-gray-500 dark:text-gray-300">Sort By:</label>
         <select
           value={sortField}
@@ -248,7 +229,6 @@ const StockReport = () => {
           <option value="received_date">Received Date</option>
         </select>
 
-        {/* Toggle Asc/Desc */}
         <button
           onClick={() =>
             setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"))
@@ -258,7 +238,6 @@ const StockReport = () => {
           {sortOrder === "asc" ? "⬆ Ascending" : "⬇ Descending"}
         </button>
 
-        {/* ✅ Print Button */}
         <button
           onClick={handlePrint}
           className="px-4 py-2 text-emerald-600 underline"
@@ -267,7 +246,6 @@ const StockReport = () => {
         </button>
       </div>
 
-      {/* ✅ Stock Table */}
       <table
         id="stock-table"
         className="w-full border-collapse border border-gray-300 dark:border-gray-700"
@@ -312,7 +290,6 @@ const StockReport = () => {
         </tbody>
       </table>
 
-      {/* ✅ Pagination */}
       <div className="flex justify-between mt-4">
         <button
           disabled={pagination.currentPage === 1}

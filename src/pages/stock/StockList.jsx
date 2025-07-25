@@ -17,15 +17,18 @@ const StockList = () => {
   const fetchStocks = async () => {
     try {
       const res = await getAllStocks();
-      setStocksData(res.data); 
+      setStocksData(res.data);
     } catch (error) {
       console.error("Failed to fetch stocks", error);
-     
     }
   };
   useEffect(() => {
     fetchStocks();
   }, []);
+  const totalStock = stocksData.reduce(
+    (sum, stock) => sum + (stock.quantity || 0),
+    0
+  );
   return (
     <div className="p-4 sm:mb-4 mb-20">
       <h2 className="text-xl font-bold mb-4">{t("stock-list.title")}</h2>
@@ -35,6 +38,7 @@ const StockList = () => {
       >
         <span>{t("stock-list.btnGotoSupply")}</span>
       </div>
+      <div>Total of Stocks quantity : {totalStock}</div>
       <table className="w-full border border-gray-300 rounded overflow-hidden">
         <thead className="bg-gray-100">
           <tr className="bg-green-600 text-white">
@@ -64,7 +68,7 @@ const StockList = () => {
           ) : (
             <tr>
               <td colSpan="6" className="text-center py-20 text-gray-500">
-                  { t("stock-list.NotFound")}
+                {t("stock-list.NotFound")}
               </td>
             </tr>
           )}

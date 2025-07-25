@@ -62,7 +62,10 @@ const MedicineList = () => {
     setEditModalOpen(false);
     fetchMedicines(currentPage);
   };
-
+const totalMedicines = medicines.reduce(
+  (sum, medicine) => sum + (medicine.id || "N/A"),
+  0
+);
   const confirmDelete = (id) => {
     Swal.fire({
       title: t("medicine-list.Confirmation"),
@@ -89,7 +92,7 @@ const MedicineList = () => {
       setStatusLoadingId(null);
     }
   };
-
+  
   const filteredMedicines = (medicines ?? []).filter((med) =>
     med.medicine_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -189,7 +192,9 @@ const MedicineList = () => {
         onChange={(e) => setSearchTerm(e.target.value)}
         className="border p-2 rounded mb-4 w-full max-w-sm"
       />
-
+      <div>
+        Total Medicines : {totalMedicines}
+        </div>
       <table className="w-full border-gray-300">
         <thead className="bg-gray-100">
           <tr>

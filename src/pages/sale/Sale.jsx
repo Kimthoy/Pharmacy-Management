@@ -19,9 +19,9 @@ const Sale = () => {
     const savedCart = localStorage.getItem("cart");
     return savedCart ? JSON.parse(savedCart) : [];
   });
-
+  const [isCheckoutOpen, setCheckoutOpen] = useState(false);
   const [isOrderReviewModalOpen, setIsOrderReviewModalOpen] = useState(false);
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [setIsCheckoutOpen] = useState(false);
   const [isRetailSaleOpen, setIsRetailSaleOpen] = useState(false);
   const [toast, setToast] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState("cash");
@@ -248,17 +248,24 @@ const Sale = () => {
             showCompoundMedicines={isCompoundMode}
           />
         </div>
-        <Cart
-          cart={cart}
-          isCartOpen={isCartOpen}
-          totalPrice={totalPrice}
-          totalQuantity={totalQuantity}
-          clearCart={clearCart}
-          saveCart={saveCart}
-          placeOrder={placeOrder}
-          displayPrice={displayPrice}
-          onClose={() => setCartOpen(false)}
-        />
+        {isCartOpen && (
+          <Cart
+            cart={cart}
+            isCartOpen={isCartOpen}
+            clearCart={clearCart}
+            placeOrder={placeOrder}
+            onClose={() => setCartOpen(false)}
+            onCheckout={() => {
+              setCartOpen(false);
+              setCheckoutOpen(true);
+            }}
+          />
+        )}
+
+        {isCheckoutOpen && (
+          <CheckoutModal cart={cart} onClose={() => setCheckoutOpen(false)} />
+        )}
+
         <button
           className="md:hidden fixed bottom-4 mb-14 flex right-0 focus:shadow-none bg-green-600 text-white p-3 rounded-md shadow-lg"
           onClick={() => setCartOpen(true)}
@@ -281,15 +288,16 @@ const Sale = () => {
         displayPrice={displayPrice}
       />
 
-      <CheckoutModal
-        isOpen={isCheckoutOpen}
-        setIsOpen={setIsCheckoutOpen}
-        totalPrice={totalPrice}
-        totalQuantity={totalQuantity}
-        products={cart}
-        confirmOrder={confirmOrder}
-        storeName="ហាងម៉ូតទំនិញ"
-        currency="USD"
+      <Cart
+        cart={cart}
+        isCartOpen={isCartOpen}
+        clearCart={clearCart}
+        placeOrder={placeOrder}
+        onClose={() => setCartOpen(false)}
+        onCheckout={() => {
+          setCartOpen(false);
+          setCheckoutOpen(true);
+        }}
       />
 
       <RetailSaleModal

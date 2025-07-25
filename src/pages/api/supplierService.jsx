@@ -23,13 +23,16 @@ export const getAllSupplier = async () => {
       headers: getAuthHeader(),
     });
 
-    // Log the whole response to see its structure
-    console.log("API response:", response.data);
+    const result = response.data;
 
-    // If response.data contains `{ data: [...] }`
-    return Array.isArray(response.data)
-      ? response.data
-      : response.data.data || [];
+    
+    if (Array.isArray(result)) return result;
+
+    
+    if (Array.isArray(result.data)) return result.data;
+
+    console.warn("⚠ Unexpected supplier API response:", result);
+    return [];
   } catch (error) {
     console.error(
       "Error fetching suppliers:",
@@ -38,6 +41,7 @@ export const getAllSupplier = async () => {
     throw error.response?.data || { message: "Failed to fetch suppliers" };
   }
 };
+
 export const updateSupplier = async (id, data) => {
   try {
     const response = await axios.put(`${API_URL}/suppliers/${id}`, data, {
