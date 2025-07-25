@@ -107,6 +107,7 @@ const CategoryDashboard = () => {
   useEffect(() => {
     fetchCategory();
   }, []);
+  const totalCategory = categories.length;
 
   const handleCategoryChange = (e) => {
     const { name, value } = e.target;
@@ -211,7 +212,7 @@ const CategoryDashboard = () => {
           </div>
         </div>
       )}
-
+      <div className="m-4">Total of cateogry : {totalCategory} categories</div>
       <div className="overflow-x-auto">
         <table className="min-w-full table-auto border-collapse border border-gray-300">
           <thead>
