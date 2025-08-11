@@ -91,7 +91,7 @@ const ManageStaff = () => {
       toast.success(`${deleteConfirmUser.username} deleted successfully`);
       fetchUsers(); // refresh list
     } catch (error) {
-      console.error("Delete error:", error);
+      
       toast.error("Failed to delete user");
     } finally {
       setIsDeleting(false); // ✅ stop loading
@@ -120,11 +120,11 @@ const ManageStaff = () => {
           gender: user.gender || "",
         }));
       } else {
-        console.warn("Unexpected response data format:", response.data);
+        
       }
       setUsers(transformedUsers);
     } catch (error) {
-      console.error("Failed to fetch users:", error);
+      
       toast.error("Failed to load users");
       setUsers([]);
     } finally {
@@ -213,7 +213,7 @@ const ManageStaff = () => {
       fetchUsers();
       setFormError("");
     } catch (error) {
-      console.error("Error submitting form:", error);
+      
       toast.error(
         error.response?.data?.message ||
           error.response?.data?.errors?.[0] ||
@@ -252,7 +252,7 @@ const ManageStaff = () => {
   );
 
   return (
-    <div className="sm:p-2 mb-14 dark:bg-gray-900 min-h-screen max-w-6xl mx-auto">
+    <div className="sm:p-2 mb-14 dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen max-w-6xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <div>
           <h1 className="text-xl font-bold text-gray-700 dark:text-gray-200">
@@ -273,9 +273,7 @@ const ManageStaff = () => {
         </div>
       </div>
 
-      {/* Staff Table */}
       <div className="bg-white dark:bg-gray-800 rounded-lg border-gray-200 dark:border-gray-600">
-        {/* Search & sort */}
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-md font-bold text-gray-700 dark:text-gray-200">
             {t("staff.staffList")}
@@ -307,19 +305,13 @@ const ManageStaff = () => {
           </div>
         </div>
 
-        {/* Table */}
-        <div className="w-full ">
+        <div className="w-full">
           <table className="w-full dark:text-slate-100 border-collapse border border-gray-300 dark:border-gray-600">
             <thead>
               <tr className="text-center">
                 <td className="py-2 px-3">{t("staff.name")}</td>
-
-                {/* ✅ Email hidden on small screens */}
-                <td className="py-2 px-3 ">{t("staff.email")}</td>
-
-                {/* ✅ Role hidden on small screens */}
-                <td className="py-2 px-3 ">{t("staff.role")}</td>
-
+                <td className="py-2 px-3">{t("staff.email")}</td>
+                <td className="py-2 px-3">{t("staff.role")}</td>
                 <td className="py-2 px-3">{t("staff.status")}</td>
                 <td className="py-2 px-3">{t("staff.actions")}</td>
               </tr>
@@ -329,32 +321,24 @@ const ManageStaff = () => {
                 paginatedList.map((user) => (
                   <tr
                     key={user.id}
-                    className={`border text-center even:bg-slate-100 transition-all border-gray-300 dark:border-gray-600 
-            ${
-              user.status === "Active"
-                ? "hover:bg-slate-200 dark:hover:bg-slate-700 hover:cursor-pointer hover:shadow-lg"
-                : "bg-gray-100 text-gray-400 dark:bg-slate-800 dark:text-gray-500 cursor-not-allowed"
-            }`}
+                    className={`border text-center dark:even:bg-slate-700 even:bg-slate-100 transition-all border-gray-300 dark:border-gray-600 ${
+                      user.status === "Active"
+                        ? "hover:bg-slate-200 dark:hover:bg-slate-700 hover:cursor-pointer hover:shadow-lg"
+                        : "bg-gray-100 text-gray-400 dark:bg-slate-800 dark:text-gray-500 cursor-not-allowed"
+                    }`}
                   >
-                    {/* Always visible */}
                     <td className="p-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300">
                       {user.name || "No name"}
                     </td>
-
-                    {/* ✅ Email hidden on mobile */}
                     <td
                       title={user.email}
                       className="truncate max-w-20 p-4 border-gray-300 dark:border-gray-600 text-emerald-500 dark:text-emerald-400"
                     >
                       {user.email || "No email"}
                     </td>
-
-                    {/* ✅ Role hidden on mobile */}
                     <td className="truncate max-w-44 p-3 border border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-300">
                       {user.role || "No role"}
                     </td>
-
-                    {/* Always visible */}
                     <td
                       className={`p-3 border border-gray-300 dark:border-gray-600 ${
                         user.status === "Active"
@@ -364,8 +348,6 @@ const ManageStaff = () => {
                     >
                       {user.status || "No status"}
                     </td>
-
-                    {/* Always visible actions */}
                     <td className="p-3 border border-gray-300 dark:border-gray-600">
                       {user.role === "admin" ? (
                         <span className="text-gray-400 italic">
@@ -409,7 +391,6 @@ const ManageStaff = () => {
             </tbody>
           </table>
 
-          {/* User details modal */}
           {isModalOpen && selectedUser && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 px-4">
               <div className="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 sm:p-8 overflow-hidden">
@@ -472,6 +453,7 @@ const ManageStaff = () => {
               </div>
             </div>
           )}
+
           {deleteConfirmUser && (
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 max-w-sm w-full">
@@ -485,7 +467,6 @@ const ManageStaff = () => {
                   </span>
                   ? This action cannot be undone.
                 </p>
-
                 <div className="flex justify-end mt-4 space-x-2">
                   <button
                     onClick={handleCancelDelete}
@@ -507,282 +488,53 @@ const ManageStaff = () => {
             </div>
           )}
         </div>
-
-        {/* Pagination */}
-        <div className="flex flex-col md:flex-row justify-between items-center mt-4">
-          <div className="hidden items-center space-x-2 sm:flex">
-            <span className="text-gray-400 dark:text-gray-300 text-md">
-              {t("staff.show")}
-            </span>
-            <select
-              className="text-md border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-lg font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
-              value={itemsPerPage}
-              onChange={(e) => {
-                setItemsPerPage(Number(e.target.value));
-                setCurrentPage(1);
-              }}
-              aria-label={t("staff.entriesPerPage")}
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={15}>15</option>
-            </select>
-            <span className="text-gray-400 dark:text-gray-300 text-md">
-              {t("staff.entries")}
-            </span>
-          </div>
-          <div className="flex items-center space-x-2 mt-4 md:mt-0">
-            <button
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage(currentPage - 1)}
-              className="text-md text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-lg dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition disabled:opacity-50"
-              aria-label="Previous page"
-            >
-              {t("staff.previous")}
-            </button>
-            <span className="text-gray-700 dark:text-gray-200 text-md">
-              {t("staff.page")} {currentPage} {t("staff.of")} {totalPages}
-            </span>
-            <button
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage(currentPage + 1)}
-              className="text-md text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-lg dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition disabled:opacity-50"
-              aria-label="Next page"
-            >
-              {t("staff.next")}
-            </button>
-          </div>
-        </div>
-
-        {/* Add/Edit Modal */}
-        {showModal && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white sm:mb-12 mb-16 sm:overflow-hidden overflow-y-auto sm:max-h-[90vh] max-h-[85vh] w-[95%] dark:bg-gray-800 p-6 shadow-lg max-w-md">
-              <h3 className="text-lg font-bold text-gray-700 dark:text-gray-200">
-                {modalMode === "add"
-                  ? t("staff.addStaff")
-                  : t("staff.editStaff")}
-              </h3>
-              <button
-                onClick={() => setShowModal(false)}
-                className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                aria-label="Close modal"
-              >
-                ×
-              </button>
-              <form onSubmit={handleFormSubmit} className="mt-4 space-y-4 ">
-                {formError && (
-                  <p className="text-red-500 dark:text-red-400 text-md">
-                    {formError}
-                  </p>
-                )}
-
-                {/* Name & Gender */}
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="flex flex-col flex-1 min-w-[180px]">
-                    <label
-                      htmlFor="name"
-                      className="block text-md font-medium text-gray-700 dark:text-gray-200"
-                    >
-                      {t("staff.name")}
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleFormChange}
-                      className="mt-1 w-full text-md border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-lg font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
-                      aria-required="true"
-                    />
-                  </div>
-
-                  <div className="flex flex-col flex-1 min-w-[180px] mt-4 sm:mt-0">
-                    <label
-                      htmlFor="gender"
-                      className="block text-md font-medium text-gray-700 dark:text-gray-200"
-                    >
-                      {t("staff.gender")}
-                    </label>
-                    <Select
-                      name="gender"
-                      options={genderOptions}
-                      value={
-                        genderOptions.find(
-                          (opt) => opt.value === formData.gender
-                        ) || null
-                      }
-                      onChange={(selectedOption) =>
-                        handleFormChange({
-                          target: {
-                            name: "gender",
-                            value: selectedOption ? selectedOption.value : "",
-                          },
-                        })
-                      }
-                      classNamePrefix="select"
-                      className="mt-1 w-full text-md border-gray-400 dark:border-gray-600 rounded-lg font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
-                    />
-                  </div>
-                </div>
-
-                {/* Email */}
-                <div className="flex flex-col flex-1 min-w-[180px]">
-                  <label
-                    htmlFor="email"
-                    className="block text-md font-medium text-gray-700 dark:text-gray-200"
-                  >
-                    {t("staff.email")}
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleFormChange}
-                    className="mt-1 w-full text-md border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-lg font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
-                    aria-required="true"
-                  />
-                </div>
-
-                {modalMode === "add" && (
-                  <div className="flex flex-col flex-1 min-w-[180px]">
-                    <label
-                      htmlFor="password"
-                      className="block text-md font-medium text-gray-700 dark:text-gray-200"
-                    >
-                      {t("staff.password")}
-                    </label>
-                    <input
-                      type="password"
-                      id="password"
-                      name="password"
-                      value={formData.password}
-                      onChange={handleFormChange}
-                      className="mt-1 w-full text-md border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-lg font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
-                      aria-required="true"
-                    />
-                  </div>
-                )}
-
-                {/* Role & Status */}
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="flex flex-col flex-1 min-w-[180px]">
-                    <label
-                      htmlFor="role"
-                      className="block text-md font-medium text-gray-700 dark:text-gray-200"
-                    >
-                      {t("staff.role")}
-                    </label>
-                    <Select
-                      name="role"
-                      options={filteredRoleOptions}
-                      value={
-                        filteredRoleOptions.find(
-                          (opt) => opt.value === formData.role
-                        ) || null
-                      }
-                      onChange={(selectedOption) =>
-                        handleFormChange({
-                          target: {
-                            name: "role",
-                            value: selectedOption ? selectedOption.value : "",
-                          },
-                        })
-                      }
-                      classNamePrefix="select"
-                      className="mt-1 w-full text-md border-gray-400 dark:border-gray-600 rounded-lg font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
-                    />
-                  </div>
-
-                  <div className="flex flex-col flex-1 min-w-[180px] mt-4 sm:mt-0">
-                    <label
-                      htmlFor="status"
-                      className="block text-md font-medium text-gray-700 dark:text-gray-200"
-                    >
-                      {t("staff.status")}
-                    </label>
-                    <Select
-                      name="status"
-                      options={statusOptions}
-                      value={
-                        statusOptions.find(
-                          (opt) => opt.value === formData.status
-                        ) || null
-                      }
-                      onChange={(selectedOption) =>
-                        handleFormChange({
-                          target: {
-                            name: "status",
-                            value: selectedOption ? selectedOption.value : "",
-                          },
-                        })
-                      }
-                      classNamePrefix="select"
-                      className="mt-1 w-full text-md dark:border-gray-600 rounded-lg font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
-                      aria-required="true"
-                    />
-                  </div>
-                </div>
-
-                {/* Phone */}
-                <div className="flex flex-col flex-1 min-w-[180px]">
-                  <label
-                    htmlFor="phone"
-                    className="block text-md font-medium text-gray-700 dark:text-gray-200"
-                  >
-                    {t("staff.phone")}
-                  </label>
-                  <input
-                    type="text"
-                    id="phone"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleFormChange}
-                    className="mt-1 w-full text-md border border-gray-400 dark:border-gray-600 px-3 py-2 rounded-lg font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
-                  />
-                </div>
-
-                {/* Buttons */}
-                <div className="flex justify-end space-x-2">
-                  <button
-                    type="button"
-                    onClick={() => setShowModal(false)}
-                    disabled={isSubmitting} // ✅ disable cancel while submitting
-                    className={`text-md text-gray-500 dark:text-gray-400 border border-gray-400 dark:border-gray-600 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 ${
-                      isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
-                    aria-label="Cancel"
-                  >
-                    {t("staff.cancel")}
-                  </button>
-
-                  <button
-                    type="submit"
-                    disabled={isSubmitting} // ✅ disable submit while loading
-                    className={`text-md text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-4 py-2 rounded-lg dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition ${
-                      isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
-                    aria-label={
-                      modalMode === "add" ? "Add staff" : "Save changes"
-                    }
-                  >
-                    {isSubmitting
-                      ? modalMode === "add"
-                        ? "Adding..."
-                        : "Saving..."
-                      : modalMode === "add"
-                      ? t("staff.add")
-                      : t("staff.save")}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* Toast Notifications */}
+      <div className="flex flex-col md:flex-row justify-between items-center mt-4">
+        <div className="hidden sm:flex items-center space-x-2">
+          <span className="text-gray-400 dark:text-gray-300 text-md">
+            {t("staff.show")}
+          </span>
+          <select
+            className="text-md border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-lg font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
+            value={itemsPerPage}
+            onChange={(e) => {
+              setItemsPerPage(Number(e.target.value));
+              setCurrentPage(1);
+            }}
+            aria-label={t("staff.entriesPerPage")}
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={15}>15</option>
+          </select>
+          <span className="text-gray-400 dark:text-gray-300 text-md">
+            {t("staff.entries")}
+          </span>
+        </div>
+        <div className="flex items-center space-x-2 mt-4 md:mt-0">
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(currentPage - 1)}
+            className="text-md text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-lg dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition disabled:opacity-50"
+            aria-label="Previous page"
+          >
+            {t("staff.previous")}
+          </button>
+          <span className="text-gray-700 dark:text-gray-200 text-md">
+            {t("staff.page")} {currentPage} {t("staff.of")} {totalPages}
+          </span>
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage(currentPage + 1)}
+            className="text-md text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-lg dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition disabled:opacity-50"
+            aria-label="Next page"
+          >
+            {t("staff.next")}
+          </button>
+        </div>
+      </div>
+
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
     </div>
   );

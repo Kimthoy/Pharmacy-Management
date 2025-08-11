@@ -42,7 +42,7 @@ const CustomerList = () => {
 
       setTotalCustomers(customersArray.length);
     } catch (err) {
-      console.error("Fetch error:", err);
+      
       setError(t("customerlist.FetchError"));
     } finally {
       setLoading(false);
@@ -83,7 +83,7 @@ const CustomerList = () => {
       await fetchCustomer();
       setShowEditModal(false);
     } catch (error) {
-      console.error("Update failed:", error);
+      
     }
   };
 

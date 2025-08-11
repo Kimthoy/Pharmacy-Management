@@ -24,7 +24,7 @@ const AddSupply = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const suppliers = await getAllSupplier(); 
+        const suppliers = await getAllSupplier();
         const medicinesResponse = await getAllMedicines();
 
         const medicines = Array.isArray(medicinesResponse)
@@ -47,16 +47,15 @@ const AddSupply = () => {
             }))
           );
         } else {
-          console.error("Medicines is not an array:", medicines);
+          
         }
       } catch (err) {
-        console.error("Error fetching data:", err);
+        
       }
     };
 
     fetchData();
   }, []);
-
 
   const handleSupplierChange = (selected) => {
     setSupply((prev) => ({ ...prev, supplier_id: selected?.value || null }));
@@ -94,7 +93,7 @@ const AddSupply = () => {
           }))
         );
       } catch (err) {
-        console.error("Failed to load medicines", err);
+        
       }
     };
 
@@ -172,7 +171,7 @@ const AddSupply = () => {
 
   return (
     <div className="shadow-lg bg-[#FBFBFB] dark:bg-slate-900 mb-14 max-w-5xl mx-auto px-4 py-6">
-      <h2 className="text-lg font-bold  dark:text-teal-50">
+      <h2 className="text-lg font-bold dark:text-teal-50">
         {t("add-supply.title")}
       </h2>
       <p className="mb-4 text-gray-400">{t("add-supply.description")}</p>
@@ -208,6 +207,7 @@ const AddSupply = () => {
             />
           </div>
         </div>
+
         <div className="w-full sm:w-1/2 mt-4">
           <label className="block mb-1 dark:text-teal-50">
             {t("add-supply.Supplier")}
@@ -223,21 +223,23 @@ const AddSupply = () => {
             isClearable
           />
         </div>
+
         <h3 className="font-semibold mt-6 dark:text-teal-50">
           {t("add-supply.SupplyItem")}
         </h3>
-        <div className="w-full  ">
+
+        {/* Mobile Layout */}
+        <div className="sm:hidden space-y-4">
           {supplyItems.map((item, index) => (
             <div
               key={index}
-              className="border border-gray-300 rounded-md p-4 shadow-sm bg-white dark:bg-slate-800"
+              className="border border-gray-300 rounded-md p-4 bg-white dark:bg-slate-800"
             >
               <div className="mb-3">
-                <label className="block text-md font-medium text-gray-700 dark:text-gray-200">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   {t("add-supply.Medicine")}
                 </label>
                 <Select
-                  className="mt-1 text-md"
                   required
                   classNamePrefix="react-select"
                   value={
@@ -255,74 +257,57 @@ const AddSupply = () => {
                   options={medicineOptions}
                   placeholder="Select medicine"
                   isClearable
-                  styles={{
-                    control: (base) => ({
-                      ...base,
-                      backgroundColor: "white",
-                      borderColor: "#ccc",
-                      minHeight: "38px",
-                      fontSize: "0.875rem",
-                    }),
-                    menu: (base) => ({
-                      ...base,
-                      zIndex: 9999,
-                    }),
-                  }}
                 />
               </div>
-
               <div className="mb-3">
-                <label className="block text-md font-medium text-gray-700 dark:text-gray-200">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   {t("add-supply.Quantity")}
                 </label>
                 <input
                   type="number"
                   required
                   min={0}
-                  className="w-full px-3 py-2 mt-1 border rounded dark:text-white dark:bg-transparent bg-white"
+                  className="w-full px-3 py-2 border rounded dark:text-white dark:bg-transparent bg-white"
                   value={item.supply_quantity}
                   onChange={(e) =>
                     handleItemChange(index, "supply_quantity", e.target.value)
                   }
                 />
               </div>
-
               <div className="mb-3">
-                <label className="block text-md font-medium text-gray-700 dark:text-gray-200">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   {t("add-supply.UnitPrice")}
                 </label>
                 <input
                   type="number"
                   required
                   min={0}
-                  className="w-full px-3 py-2 mt-1 border rounded dark:text-white dark:bg-transparent bg-white"
+                  className="w-full px-3 py-2 border rounded dark:text-white dark:bg-transparent bg-white"
                   value={item.unit_price}
                   onChange={(e) =>
                     handleItemChange(index, "unit_price", e.target.value)
                   }
                 />
               </div>
-
               <div className="mb-3">
-                <label className="block text-md font-medium text-gray-700 dark:text-gray-200">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   {t("add-supply.ExpireDate")}
                 </label>
                 <input
                   type="date"
                   required
-                  className="w-full px-3 py-2 mt-1 border rounded dark:text-white dark:bg-transparent bg-white"
+                  className="w-full px-3 py-2 border rounded dark:text-white dark:bg-transparent bg-white"
                   value={item.expire_date}
                   onChange={(e) =>
                     handleItemChange(index, "expire_date", e.target.value)
                   }
                 />
               </div>
-
               <div className="text-right">
                 <button
                   type="button"
                   onClick={() => removeItem(index)}
-                  className="text-red-500 text-md hover:underline"
+                  className="text-red-500 text-sm hover:underline"
                 >
                   {t("add-supply.Delete")}
                 </button>
@@ -330,10 +315,103 @@ const AddSupply = () => {
             </div>
           ))}
         </div>
+
+        {/* Table Layout for larger screens */}
+        <div className="hidden sm:block overflow-x-auto">
+          <table className="min-w-full text-sm border dark:border-gray-700 bg-white dark:bg-slate-800">
+            <thead>
+              <tr className="bg-gray-100 dark:bg-slate-700 text-left">
+                <th className="p-2 border">{t("add-supply.Medicine")}</th>
+                <th className="p-2 border">{t("add-supply.Quantity")}</th>
+                <th className="p-2 border">{t("add-supply.UnitPrice")}</th>
+                <th className="p-2 border">{t("add-supply.ExpireDate")}</th>
+                <th className="p-2 border text-center">
+                  {t("add-supply.Delete")}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {supplyItems.map((item, index) => (
+                <tr key={index} className="border-b dark:border-gray-700">
+                  <td className="p-2 border">
+                    <Select
+                      required
+                      classNamePrefix="react-select"
+                      value={
+                        medicineOptions.find(
+                          (opt) => opt.value === item.medicine_id
+                        ) || null
+                      }
+                      onChange={(selected) =>
+                        handleItemChange(
+                          index,
+                          "medicine_id",
+                          selected?.value || ""
+                        )
+                      }
+                      options={medicineOptions}
+                      placeholder="Select medicine"
+                      isClearable
+                    />
+                  </td>
+                  <td className="p-2 border">
+                    <input
+                      type="number"
+                      required
+                      min={0}
+                      className="w-full px-2 py-1 border rounded dark:text-white dark:bg-transparent bg-white"
+                      value={item.supply_quantity}
+                      onChange={(e) =>
+                        handleItemChange(
+                          index,
+                          "supply_quantity",
+                          e.target.value
+                        )
+                      }
+                    />
+                  </td>
+                  <td className="p-2 border">
+                    <input
+                      type="number"
+                      required
+                      min={0}
+                      className="w-full px-2 py-1 border rounded dark:text-white dark:bg-transparent bg-white"
+                      value={item.unit_price}
+                      onChange={(e) =>
+                        handleItemChange(index, "unit_price", e.target.value)
+                      }
+                    />
+                  </td>
+                  <td className="p-2 border">
+                    <input
+                      type="date"
+                      required
+                      className="w-full px-2 py-1 border rounded dark:text-white dark:bg-transparent bg-white"
+                      value={item.expire_date}
+                      onChange={(e) =>
+                        handleItemChange(index, "expire_date", e.target.value)
+                      }
+                    />
+                  </td>
+                  <td className="p-2 border text-center">
+                    <button
+                      type="button"
+                      onClick={() => removeItem(index)}
+                      className="text-red-500 hover:underline"
+                    >
+                      {t("add-supply.Delete")}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
         <button
           type="button"
           onClick={addItem}
-          className="mt-3 text-md text-green-600 hover:underline  rounded flex items-center gap-2 w-full sm:w-auto"
+          className="mt-3 text-md text-green-600 hover:underline rounded flex items-center gap-2 w-full sm:w-auto"
         >
           {t("add-supply.AddNew")}
         </button>

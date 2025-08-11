@@ -3,7 +3,6 @@ import Header from "./Header";
 import ProductList from "./ProductList";
 import Cart from "./Cart";
 import OrderReviewModal from "./OrderReviewModal";
-import CheckoutModal from "./CheckoutModal";
 import RetailSaleModal from "./RetailSaleModal";
 import ToastNotification from "./ToastNotification";
 import compoundMedicines from "./compoundMedicines";
@@ -19,9 +18,8 @@ const Sale = () => {
     const savedCart = localStorage.getItem("cart");
     return savedCart ? JSON.parse(savedCart) : [];
   });
-  const [isCheckoutOpen, setCheckoutOpen] = useState(false);
+
   const [isOrderReviewModalOpen, setIsOrderReviewModalOpen] = useState(false);
-  const [setIsCheckoutOpen] = useState(false);
   const [isRetailSaleOpen, setIsRetailSaleOpen] = useState(false);
   const [toast, setToast] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState("cash");
@@ -37,7 +35,7 @@ const Sale = () => {
         const data = Array.isArray(response) ? response : response?.data ?? [];
         setProducts(data);
       } catch (err) {
-        console.warn("Failed to fetch medicines:", err?.message || err);
+        
         setProducts([]);
         setToast({
           message: "បរាជ័យក្នុងការទាញទិន្នន័យថ្នាំ",
@@ -52,13 +50,6 @@ const Sale = () => {
     ...medicine,
     typeofmedicine: "ថ្នាំផ្សំ",
   }));
-
-  const randomizeProducts = () => {
-    const randomChoice = Math.random() < 0.5;
-    const selectedProducts = randomChoice ? products : updatedCompoundMedicines;
-    setCurrentProducts(selectedProducts);
-    setIsCompoundMode(!randomChoice);
-  };
 
   useEffect(() => {
     setCurrentProducts(products);
@@ -101,9 +92,7 @@ const Sale = () => {
     addToCart(product);
   };
 
-  const displayPrice = (price) => {
-    return typeof price === "number" ? price : 0;
-  };
+  const displayPrice = (price) => (typeof price === "number" ? price : 0);
 
   const filteredProducts = useMemo(() => {
     const safeList = Array.isArray(currentProducts) ? currentProducts : [];
@@ -117,6 +106,7 @@ const Sale = () => {
     (sum, item) => sum + displayPrice(item.price) * (item.quantity || 1),
     0
   );
+
   const totalQuantity = cart.reduce(
     (sum, item) => sum + (item.quantity || 0),
     0
@@ -126,18 +116,6 @@ const Sale = () => {
     if (window.confirm("តើអ្នកប្រាកដជាចង់លុបកន្ត្រកទេ?")) {
       setCart([]);
       setToast({ message: "កន្ត្រកត្រូវបានលុប", type: "info" });
-    }
-  };
-
-  const saveCart = () => {
-    try {
-      localStorage.setItem("cart", JSON.stringify(cart));
-      setToast({ message: "កន្ត្រកត្រូវបានរក្សាទុក", type: "success" });
-    } catch (error) {
-      setToast({
-        message: "បរាជ័យក្នុងការរក្សាទុកកន្ត្រក: " + error.message,
-        type: "error",
-      });
     }
   };
 
@@ -166,11 +144,10 @@ const Sale = () => {
       await createSale(saleData);
       setCart([]);
       setCardNumber("");
-      setIsCheckoutOpen(false);
       setIsOrderReviewModalOpen(false);
       setToast({ message: "ការបញ្ជាទិញបានជោគជ័យ!", type: "success" });
     } catch (error) {
-      console.error("Sale failed:", error);
+      
       setToast({
         message:
           "បរាជ័យក្នុងការបញ្ជាទិញ: " + (error.message || "Unknown error"),
@@ -191,10 +168,6 @@ const Sale = () => {
   }, [cart]);
 
   useEffect(() => {
-    randomizeProducts();
-  }, []);
-
-  useEffect(() => {
     let barcodeBuffer = "";
     const handleKeydown = (e) => {
       if (e.key === "Enter") {
@@ -212,10 +185,8 @@ const Sale = () => {
           }
         }
         barcodeBuffer = "";
-      } else {
-        if (e.key.length === 1) {
-          barcodeBuffer += e.key;
-        }
+      } else if (e.key.length === 1) {
+        barcodeBuffer += e.key;
       }
     };
     window.addEventListener("keydown", handleKeydown);
@@ -248,7 +219,9 @@ const Sale = () => {
             showCompoundMedicines={isCompoundMode}
           />
         </div>
-        {isCartOpen && (
+
+        
+        {!isOrderReviewModalOpen && !isRetailSaleOpen && (
           <Cart
             cart={cart}
             isCartOpen={isCartOpen}
@@ -257,15 +230,12 @@ const Sale = () => {
             onClose={() => setCartOpen(false)}
             onCheckout={() => {
               setCartOpen(false);
-              setCheckoutOpen(true);
+              
             }}
           />
         )}
 
-        {isCheckoutOpen && (
-          <CheckoutModal cart={cart} onClose={() => setCheckoutOpen(false)} />
-        )}
-
+        
         <button
           className="md:hidden fixed bottom-4 mb-14 flex right-0 focus:shadow-none bg-green-600 text-white p-3 rounded-md shadow-lg"
           onClick={() => setCartOpen(true)}
@@ -275,6 +245,7 @@ const Sale = () => {
         </button>
       </div>
 
+      
       <OrderReviewModal
         isOpen={isOrderReviewModalOpen}
         setIsOpen={setIsOrderReviewModalOpen}
@@ -288,18 +259,7 @@ const Sale = () => {
         displayPrice={displayPrice}
       />
 
-      <Cart
-        cart={cart}
-        isCartOpen={isCartOpen}
-        clearCart={clearCart}
-        placeOrder={placeOrder}
-        onClose={() => setCartOpen(false)}
-        onCheckout={() => {
-          setCartOpen(false);
-          setCheckoutOpen(true);
-        }}
-      />
-
+      
       <RetailSaleModal
         isOpen={isRetailSaleOpen}
         setIsOpen={setIsRetailSaleOpen}

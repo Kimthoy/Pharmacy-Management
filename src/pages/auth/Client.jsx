@@ -28,9 +28,9 @@ const Client = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleSearch = (e) => {
-    console.log("Searching for:", e.target.value);
-  };
+  // const handleSearch = (e) => {
+  //   console.log("Searching for:", e.target.value);
+  // };
 
   return (
     <section

@@ -33,23 +33,17 @@ const PurchaseReport = () => {
     rowsPerPage: 10,
   });
 
-  // ✅ Fetch supplies & flatten supply_items
   useEffect(() => {
     const fetchSupplies = async () => {
       try {
-        console.log("🔄 Fetching supplies...");
         const supplies = await getAllSupply();
-        console.log("✅ API Supplies Response:", supplies);
-
         if (!Array.isArray(supplies)) {
-          console.warn("⚠ API did NOT return an array, got:", supplies);
           setPurchaseData([]);
           return;
         }
 
         const flattened = supplies.flatMap((supply) => {
           if (!supply.supply_items || supply.supply_items.length === 0) {
-            console.warn(`⚠ Supply ${supply.id} has NO supply_items`);
             return [];
           }
 
@@ -65,21 +59,16 @@ const PurchaseReport = () => {
               (item.supply_quantity || 0) * parseFloat(item.unit_price || 0),
           }));
         });
-
-        console.log("✅ Flattened purchase data:", flattened);
         setPurchaseData(flattened);
       } catch (err) {
-        console.error("❌ Fetch Supplies Error:", err);
+     
         setError("Failed to load purchase report");
       } finally {
         setLoading(false);
       }
     };
-
     fetchSupplies();
   }, []);
-
-  // ✅ Filtered Data
   const filteredData = useMemo(() => {
     return purchaseData.filter((row) => {
       const search = filters.searchTerm.toLowerCase();
@@ -206,11 +195,11 @@ const PurchaseReport = () => {
   if (error) return <p className="p-6 text-center text-red-500">❌ {error}</p>;
 
   return (
-    <div className="sm:p-6 mb-16 bg-white dark:bg-gray-900 min-h-screen">
-      {/* Header with Print Button */}
+    <div className="sm:p-6 mb-16 bg-white dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen">
+      {/* Header Section */}
       <section className="mb-4 flex justify-between items-center">
         <div>
-          <h2 className="sm:text-2xl text-lg font-bold text-gray-500 dark:text-gray-200">
+          <h2 className="sm:text-2xl text-lg font-bold text-gray-700 dark:text-gray-200">
             Purchase Report
           </h2>
           <p className="text-md text-gray-500 dark:text-gray-300">
@@ -219,13 +208,14 @@ const PurchaseReport = () => {
         </div>
       </section>
 
+      {/* Summary & Chart Section */}
       <div className="grid md:grid-cols-2 gap-6">
         <div className="bg-white dark:bg-gray-800 sm:p-6 sm:shadow-md rounded-lg">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
             Purchase Summary
           </h3>
           <div className="mb-4">
-            <p className="text-gray-600 dark:text-gray-200">
+            <p className="text-gray-600 dark:text-gray-300">
               Total Purchase Amount
             </p>
             <p className="sm:text-2xl text-lg font-bold text-emerald-600 dark:text-emerald-400">
@@ -233,7 +223,7 @@ const PurchaseReport = () => {
             </p>
           </div>
           <div className="mb-4">
-            <p className="text-gray-600 dark:text-gray-200">
+            <p className="text-gray-600 dark:text-gray-300">
               Total Purchase quantity:
             </p>
             <p className="sm:text-2xl text-lg font-bold text-emerald-600 dark:text-emerald-400">
@@ -241,8 +231,8 @@ const PurchaseReport = () => {
             </p>
           </div>
           <div className="mb-4">
-            <p className="text-gray-600 dark:text-gray-200">Total Purchases</p>
-            <p className="sm:text-2xl text-lg font-bold text-gray-500 dark:text-gray-300">
+            <p className="text-gray-600 dark:text-gray-300">Total Purchases</p>
+            <p className="sm:text-2xl text-lg font-bold text-gray-700 dark:text-gray-200">
               {totalPurchases}
             </p>
           </div>
@@ -283,9 +273,8 @@ const PurchaseReport = () => {
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
-          {/* Search */}
           <div>
-            <label className="block text-gray-500 dark:text-gray-300 mb-1 text-sm font-medium">
+            <label className="block text-gray-600 dark:text-gray-300 mb-1 text-sm font-medium">
               Search
             </label>
             <input
@@ -299,9 +288,8 @@ const PurchaseReport = () => {
             />
           </div>
 
-          {/* Supplier */}
           <div>
-            <label className="block text-gray-500 dark:text-gray-300 mb-1 text-sm font-medium">
+            <label className="block text-gray-600 dark:text-gray-300 mb-1 text-sm font-medium">
               Supplier
             </label>
             <input
@@ -315,9 +303,8 @@ const PurchaseReport = () => {
             />
           </div>
 
-          {/* Start Date */}
           <div>
-            <label className="block text-gray-500 dark:text-gray-300 mb-1 text-sm font-medium">
+            <label className="block text-gray-600 dark:text-gray-300 mb-1 text-sm font-medium">
               Start Date
             </label>
             <input
@@ -330,9 +317,8 @@ const PurchaseReport = () => {
             />
           </div>
 
-          {/* End Date */}
           <div>
-            <label className="block text-gray-500 dark:text-gray-300 mb-1 text-sm font-medium">
+            <label className="block text-gray-600 dark:text-gray-300 mb-1 text-sm font-medium">
               End Date
             </label>
             <input
@@ -345,11 +331,10 @@ const PurchaseReport = () => {
             />
           </div>
 
-          {/* Print Button */}
           <div className="flex md:justify-end">
             <button
               onClick={handlePrint}
-              className="w-full md:w-auto px-4 py-2 text-emerald-600  underline transition-all"
+              className="w-full md:w-auto px-4 py-2 text-emerald-600 underline transition-all"
             >
               🖨 Print Report
             </button>
@@ -360,7 +345,7 @@ const PurchaseReport = () => {
       {/* Purchase Table */}
       <table className="w-full border-collapse border border-gray-300 dark:border-gray-700">
         <thead>
-          <tr className="bg-gray-100 dark:bg-gray-700">
+          <tr className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
             <th className="p-2 border">Invoice ID</th>
             <th className="p-2 border">Supplier</th>
             <th className="p-2 border">Medicine</th>
@@ -373,25 +358,39 @@ const PurchaseReport = () => {
         <tbody>
           {paginatedData.length > 0 ? (
             paginatedData.map((row) => (
-              <tr key={row.id} className="border">
-                <td className="p-2 border text-emerald-600">
+              <tr
+                key={row.id}
+                className="border hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
+                <td className="p-2 border text-emerald-600 dark:text-emerald-400">
                   {row.invoice_id}
                 </td>
-                <td className="p-2 border">{row.supplier}</td>
-                <td className="p-2 border">{row.medicine_name}</td>
-                <td className="p-2 border">{row.quantity}</td>
-                <td className="p-2 border">${row.unit_price.toFixed(2)}</td>
-                <td className="p-2 border font-semibold text-gray-700">
+                <td className="p-2 border text-gray-800 dark:text-gray-200">
+                  {row.supplier}
+                </td>
+                <td className="p-2 border text-gray-800 dark:text-gray-200">
+                  {row.medicine_name}
+                </td>
+                <td className="p-2 border text-gray-800 dark:text-gray-200">
+                  {row.quantity}
+                </td>
+                <td className="p-2 border text-gray-800 dark:text-gray-200">
+                  ${row.unit_price.toFixed(2)}
+                </td>
+                <td className="p-2 border font-semibold text-gray-700 dark:text-gray-300">
                   ${row.total_cost.toFixed(2)}
                 </td>
-                <td className="p-2 border">
+                <td className="p-2 border text-gray-800 dark:text-gray-200">
                   {new Date(row.purchase_date).toLocaleDateString()}
                 </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="7" className="p-4 text-center text-gray-500">
+              <td
+                colSpan="7"
+                className="p-4 text-center text-gray-500 dark:text-gray-400"
+              >
                 No Purchases Found
               </td>
             </tr>
@@ -409,7 +408,7 @@ const PurchaseReport = () => {
               currentPage: prev.currentPage - 1,
             }))
           }
-          className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+          className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded disabled:opacity-50"
         >
           Prev
         </button>
@@ -424,7 +423,7 @@ const PurchaseReport = () => {
               currentPage: prev.currentPage + 1,
             }))
           }
-          className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+          className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded disabled:opacity-50"
         >
           Next
         </button>

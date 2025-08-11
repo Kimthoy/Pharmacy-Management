@@ -45,24 +45,16 @@ const Manufacturerlist = () => {
   });
 
   const toggleForm = () => {
-    console.log("Toggle form clicked");
     setIsModalOpen((prev) => !prev);
   };
 
   const fetchSuppliers = async () => {
     try {
-      const response = await getAllSupplier();
-
-      const suppliers = Array.isArray(response.data) ? response.data : [];
-
+      const suppliers = await getAllSupplier(); // Already an array
       setSuppliers(suppliers);
-
       const totalSupplier = suppliers.length;
-      console.log("Total suppliers:", totalSupplier);
-
       setTotalSupplier(totalSupplier);
     } catch (err) {
-      console.error("Failed to fetch suppliers", err);
       setError("Failed to fetch supplier");
     } finally {
       setLoading(false);
@@ -120,14 +112,13 @@ const Manufacturerlist = () => {
 
       setFormErrors({});
       toggleForm();
-      fetchSuppliers(); 
+      fetchSuppliers();
     } catch (err) {
       if (err.response?.status === 422) {
         const validationErrors = err.response.data.errors || {};
 
-        setFormErrors(validationErrors); 
+        setFormErrors(validationErrors);
 
-        
         if (validationErrors.email) {
           toast.error(validationErrors.email[0]);
         } else {
@@ -150,16 +141,7 @@ const Manufacturerlist = () => {
     startIndex,
     startIndex + rowsPerPage
   );
-  const handleCreateSupplier = async (formData) => {
-    try {
-      await createSupplier(formData);
-      toast.success("Supplier created!");
-      setIsModalOpen(false);
-      fetchSuppliers(); // Refresh list
-    } catch (error) {
-      toast.error(error.message || "Failed to create supplier");
-    }
-  };
+
   const getStatus = (is_active) => {
     if (is_active === true)
       return {
@@ -189,13 +171,15 @@ const Manufacturerlist = () => {
     <div className="sm:p-6 mb-20 bg-white dark:bg-gray-900 sm:shadow-lg dark:shadow-gray-800 rounded-md overflow-x-auto">
       <div className="flex justify-between items-center mb-4">
         <div>
-          <h2 className="text-xl font-bold text-gray-500 dark:text-gray-200">
+          <h2 className="text-xl dark:text-slate-300 font-bold text-gray-500 ">
             {t("manufacturerlist.ManufacturerListTitle")}
           </h2>
           <p className="text-gray-400 dark:text-gray-300 text-md">
             {t("manufacturerlist.ManufacturerListDesc")}
           </p>
-          <p>Total Suppliers: {totalSupplier}</p>
+          <p className="dark:text-slate-300">
+            Total Suppliers: {totalSupplier}
+          </p>
         </div>
         <button
           type="button"

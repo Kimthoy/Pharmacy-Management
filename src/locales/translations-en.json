@@ -1,5 +1,35 @@
 {
+  "retail-stock": {
+    "RetailStockManager": "Retail Stock Manager",
+    "Medicine": "Medicine",
+    "Category": "Category",
+    "Units": "Units",
+    "Transferredbox": "Transferred/box",
+    "Tabletbox": "Tablet/box",
+    "Capsuletablet": "Capsule/tablet",
+    "Capsulebox": "Capsule/box",
+    "Pricebox": "Price/box",
+    "TransferDate": "Transfer Date",
+    "NotFound": "Not Found",
+    "Prev": "Prev",
+    "Page": "Page",
+    "Next": "Next"
+  },
+  "loading": {
+    "Loading": "Loading..."
+  },
   "stock-list": {
+    "TotalofStocksquantity": "Total of Stocks",
+    "totalofquantity": "medicines",
+    "Typestock": "Type stock",
+    "typeoftotal": "types",
+    "btnConfirmTransfer": "Confirm",
+    "btnCancel": "Cancel",
+    "RetailPrice": "Retail Price",
+    "Quantity": "Transfer Quantity",
+    "btnNext": "Next",
+    "Action": "Actions",
+    "btnMoveToRetail": "Move to Retail",
     "title": "Stock Dashboard",
     "btnGotoSupply": "Go Supply",
     "ID": "ID",
@@ -45,6 +75,8 @@
     "desc": "Description"
   },
   "edit-medicine": {
+    "TabletPerBox": "TabletPerBox",
+    "CapsulePerBox": "CapsulePerBox",
     "EditTitle": "Edit Medicine",
     "Barcode": "Barcode Number",
     "Name": "Name",
@@ -56,7 +88,15 @@
     "Image": "Image",
     "BtnCancel": "Cancel",
     "BtnSave": "Save",
-    "BtnSaving": "Saving..."
+    "BtnSaving": "Saving...",
+    "Manufacturer": "Manufacturer",
+    "Origin": "Country of Origin",
+    "MedicineStatus": "Medicine Status",
+    "SelectStatus": "Select Status",
+    "Prescription": "Prescription",
+    "NonPrescription": "Non-Prescription",
+    "OTC": "Over The Counter",
+    "Purchase": "Purchase Info / Cost"
   },
   "profile": {
     "menu": {
@@ -81,6 +121,7 @@
   },
   "medicine-list": {
     "Confirmation": "Are you sure delete this record?",
+    "TotalMedicines": "Total of Medicines",
     "Noted": "The deleting do not undo !",
     "Yes": "Yes",
     "Cancel": "Cancel",
@@ -347,7 +388,10 @@
     "total-customer": "Total Customer"
   },
   "add-medicine": {
+    
     "Creating": "Creating..",
+    "StripsperBox": "Tablet/box",
+    "TabletsperBox": "Capsule/box",
     "Create": "Create",
     "Scan": "Scan",
     "Barcode": "Barcode Number",
@@ -387,10 +431,24 @@
     "Address": "Address",
     "InvoiceID": "Invoice ID",
     "Save": "Save",
-    "Cancel": "Cancel"
+    "Cancel": "Cancel",
+
+    "Manufacturer": "Manufacturer",
+    "Manufacturer-Placeholder": "Enter Manufacturer Name",
+    "Origin": "Country of Origin",
+    "Origin-Placeholder": "Enter Country of Origin",
+    "MedicineStatus": "Medicine Status",
+    "SelectStatus": "Select Status",
+    "Prescription": "Prescription",
+    "NonPrescription": "Non-Prescription",
+    "OTC": "Over The Counter",
+    "Purchase": "Purchase Info / Cost",
+    "Purchase-Placeholder": "Enter Purchase Price or Source"
   },
 
   "sidebar": {
+    "RetailStock": "Retail Stock",
+    "setting": "Settings",
     "AddStock": "Add Stocks",
     "supplyitems": "Supply Items",
     "stock": "Stock",
@@ -438,12 +496,20 @@
   },
 
   "medicinedetail": {
+    "Barcode": "Barcode",
+    "Loading": "Loading...",
+    "MedicineNotFound": "Medicine NotFound",
+    "MedicineDetailName": "MedicineDetailName",
+    "Price": "Price",
+    "MedicineDetail": "MedicineDetail",
+    "Manufacturer": "Manufacturer",
+    "Origin": "Origin",
+    "Purchase": "Purchase",
     "MedicineDetails": "Medicine Details",
     "MedicineInformation": "Medicine Information",
     "MedicineDetailName": "Name",
     "MedicineDetailWeight": "Weight",
     "MedicineDetailCategory": "Category",
-    "MedicineDetailManufacturer": "Manufacturer",
     "MedicineDetailExpireDate": "Expire Date",
     "MedicineDetailPopularity": "Popularity",
     "MedicineDetailStock": "Stock",
@@ -1316,6 +1382,8 @@
   },
 
   "category": {
+    "Totalofcateogry":"Total of cateogry",
+    "categories":"categories",
     "NotFound": "No category found !",
     "Title": "Category Dashboard",
     "New": "New",

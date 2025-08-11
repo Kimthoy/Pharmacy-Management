@@ -2,6 +2,8 @@ import { useState, useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { useTranslation } from "../../hooks/useTranslation";
 import { useNavigate, Link } from "react-router-dom";
+import { toast } from "react-toastify";
+
 import axios from "axios";
 import {
   FaFacebookF,
@@ -19,7 +21,19 @@ const Login = () => {
   const [error, setError] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
+  const currentTime = new Date().toLocaleString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "Asia/Phnom_Penh",
+  });
 
+  const currentDate = new Date().toLocaleDateString("km-KH", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
@@ -37,23 +51,20 @@ const Login = () => {
       const userData = {
         name: response.data.user.username || "User",
         email: response.data.user.email || email,
-        profile_picture: "", // No profile_picture from backend, set empty string or default
+        profile_picture: "",
         role: response.data.user.role || "Pharmacist",
-        contact: response.data.user.phone || "", // Backend uses phone instead of contact
+        contact: response.data.user.phone || "",
         join_date: response.data.user.created_at
           ? response.data.user.created_at.split(" ")[0]
           : new Date().toISOString().split("T")[0],
       };
 
-      // Store token in localStorage and set in axios headers
       const token = response.data.access_token;
-      localStorage.setItem("token", token); // Persist token
+      localStorage.setItem("token", token);
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-      // Save user data and token via AuthContext
       login(userData, token);
 
-      // Redirect based on role
       const role = userData.role.toLowerCase();
       if (role === "admin") {
         navigate("/dashboard");
@@ -61,38 +72,23 @@ const Login = () => {
         navigate("/saledashboard");
       } else {
         setError(t("login.invalidRole"));
+        toast.error(t("login.invalidRole"));
         return;
       }
 
-      alert(t("login.success"));
+      toast.success(t("login.success"));
     } catch (error) {
-      console.error(
-        "Login failed:",
-        error.response?.data?.message || error.message
-      );
-      setError(
+      const errorMsg =
         error.response?.data?.message === "Unauthenticated"
           ? t("login.invalidCredentials")
           : error.response?.data?.message ||
-              error.message ||
-              t("login.genericError")
-      );
+            error.message ||
+            t("login.genericError");
+
+      setError(errorMsg);
+      toast.error(errorMsg);
     }
   };
-
-  // Dynamic time display
-  const currentTime = new Date().toLocaleString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-    timeZone: "Asia/Phnom_Penh",
-  });
-  const currentDate = new Date().toLocaleDateString("km-KH", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
 
   return (
     <div className="min-h-screen mb-14 bg-gray-100 flex flex-col items-center justify-center font-khmer">

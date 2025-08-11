@@ -14,10 +14,6 @@ export default function SalesReport() {
       try {
         setLoading(true);
         const data = await getAllSale();
-
-        console.log("✅ Raw sales API response:", data);
-
-        // ✅ Detect array format
         if (Array.isArray(data)) {
           setSales(data);
         } else if (Array.isArray(data.sales)) {
@@ -25,11 +21,11 @@ export default function SalesReport() {
         } else if (Array.isArray(data.data)) {
           setSales(data.data);
         } else {
-          console.warn("⚠ Unknown API format, using []");
+         
           setSales([]);
         }
       } catch (err) {
-        console.error("Error fetching sales:", err);
+       
         setError(err.message || "Failed to fetch sales");
       } finally {
         setLoading(false);

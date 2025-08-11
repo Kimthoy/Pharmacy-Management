@@ -65,7 +65,7 @@ const AddCustomer = () => {
           amount: parseFloat(customer.amount) || 0,
         };
 
-        console.log("Sending payload:", payload);
+        
         await createCustomer(payload);
         setSuccess("Customer is create successfully !");
         setCustomer({
@@ -78,7 +78,7 @@ const AddCustomer = () => {
           amount: "",
         });
       } catch (err) {
-        console.error("Full error:", err);
+        
         const errorMessage = err?.message;
         setError(errorMessage);
       } finally {

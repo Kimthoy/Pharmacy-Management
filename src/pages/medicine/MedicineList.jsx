@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { BiEdit } from "react-icons/bi";
 import Swal from "sweetalert2";
 import { getAllMedicines, deleteMedicine } from "../api/medicineService";
@@ -6,9 +7,10 @@ import { TbHttpDelete } from "react-icons/tb";
 import EditMedicineModal from "./EditMedicineModal";
 import { useTranslation } from "../../hooks/useTranslation";
 import { useLocation } from "react-router-dom";
-
+import { TbListDetails } from "react-icons/tb";
 const MedicineList = () => {
   const { t } = useTranslation();
+  const [highlightedRow, setHighlightedRow] = useState(null);
   const [statusLoadingId, setStatusLoadingId] = useState(null);
   const [medicines, setMedicines] = useState([]);
   const [meta, setMeta] = useState({});
@@ -19,10 +21,8 @@ const MedicineList = () => {
   const [editMedicineData, setEditMedicineData] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isdeleteloading, setIsDeleteLoading] = useState(false);
-
   const location = useLocation();
   const highlightedBarcode = location.state?.highlightedBarcode || null;
-
   const fetchMedicines = async (page = 1) => {
     setLoading(true);
     try {
@@ -30,7 +30,6 @@ const MedicineList = () => {
       setMedicines(data);
       setMeta(meta);
     } catch (err) {
-      console.error("Failed to fetch medicines", err);
       setError("Failed to fetch medicines");
     } finally {
       setLoading(false);
@@ -41,7 +40,6 @@ const MedicineList = () => {
     fetchMedicines(currentPage);
   }, [currentPage]);
 
-  // ✅ Auto-scroll to highlighted medicine after loading
   useEffect(() => {
     if (!loading && highlightedBarcode) {
       const el = document.querySelector(
@@ -49,6 +47,14 @@ const MedicineList = () => {
       );
       if (el) {
         el.scrollIntoView({ behavior: "smooth", block: "center" });
+
+        setHighlightedRow(highlightedBarcode);
+
+        const timer = setTimeout(() => {
+          setHighlightedRow(null);
+        }, 2000);
+
+        return () => clearTimeout(timer);
       }
     }
   }, [loading, highlightedBarcode]);
@@ -62,10 +68,7 @@ const MedicineList = () => {
     setEditModalOpen(false);
     fetchMedicines(currentPage);
   };
-const totalMedicines = medicines.reduce(
-  (sum, medicine) => sum + (medicine.id || "N/A"),
-  0
-);
+  const totalMedicines = medicines.length;
   const confirmDelete = (id) => {
     Swal.fire({
       title: t("medicine-list.Confirmation"),
@@ -87,21 +90,24 @@ const totalMedicines = medicines.reduce(
       await deleteMedicine(id);
       fetchMedicines(currentPage);
     } catch (err) {
-      console.error("Delete failed:", err);
     } finally {
       setStatusLoadingId(null);
     }
   };
-  
+
   const filteredMedicines = (medicines ?? []).filter((med) =>
     med.medicine_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  const navigate = useNavigate();
 
+  const handleDetailClick = (id) => {
+    navigate(`/medicinedetail/${id}`);
+  };
   const renderTableRows = () => {
     if (loading) {
       return (
         <tr>
-          <td colSpan="7" className="text-center py-4">
+          <td colSpan="7" className="text-center py-4 dark:text-slate-300">
             {t("medicine-list.Loading")}
           </td>
         </tr>
@@ -125,7 +131,9 @@ const totalMedicines = medicines.reduce(
         <tr
           key={med.id}
           data-barcode={med.barcode}
-          className={`hover:bg-gray-50 ${isHighlighted ? "bg-yellow-100" : ""}`}
+          className={`border hover:bg-slate-100 transition duration-300 ${
+            highlightedRow === med.barcode ? "bg-yellow-100 text-black" : ""
+          }`}
         >
           <td className="border px-2 py-1">{med.medicine_name}</td>
           <td className="border px-2 py-1">${med.price}</td>
@@ -157,6 +165,10 @@ const totalMedicines = medicines.reduce(
             {med.medicine_detail || <span className="text-gray-400">N/A</span>}
           </td>
           <td className="border px-2 py-5 flex gap-2">
+            <button onClick={() => handleDetailClick(med.id)}>
+              <TbListDetails className="text-green-600 w-5 h-5" />
+            </button>
+
             <button onClick={() => handleEditClick(med)}>
               <BiEdit className="text-blue-600 w-5 h-5" />
             </button>
@@ -190,13 +202,13 @@ const totalMedicines = medicines.reduce(
         placeholder={t("medicine-list.SearchMedicine")}
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="border p-2 rounded mb-4 w-full max-w-sm"
+        className="border p-2 rounded mb-4 w-full max-w-sm dark:bg-slate-700 dark:text-slate-700"
       />
-      <div>
-        Total Medicines : {totalMedicines}
-        </div>
-      <table className="w-full border-gray-300">
-        <thead className="bg-gray-100">
+      <div className="bg-green-300 text-gray-600 w-full px-4 py-2 rounded-lg">
+        {t("medicine-list.TotalMedicines")} : {totalMedicines}
+      </div>
+      <table className="w-full border-gray-300 dark:bg-slate-800 dark:text-slate-300">
+        <thead className="bg-gray-100 dark:bg-slate-500 text-md">
           <tr>
             <th className="border px-2 py-2">{t("medicine-list.Name")}</th>
             <th className="border px-2 py-2">{t("medicine-list.Price")}</th>

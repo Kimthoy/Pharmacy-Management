@@ -14,7 +14,7 @@ export const getUsers = async () => {
     });
     return response.data;
   } catch (error) {
-    throw error;
+    throw error.response?.data || { message: "Failed to fetch users" };
   }
 };
 
@@ -25,7 +25,7 @@ export const createUser = async (userData) => {
     });
     return response.data;
   } catch (error) {
-    throw error;
+    throw error.response?.data || { message: "Failed to create user" };
   }
 };
 
@@ -36,7 +36,7 @@ export const updateUser = async (id, userData) => {
     });
     return response.data;
   } catch (error) {
-    throw error;
+    throw error.response?.data || { message: "Failed to update user" };
   }
 };
 
@@ -51,9 +51,10 @@ export const toggleUserStatus = async (userData) => {
     );
     return response.data;
   } catch (error) {
-    throw error;
+    throw error.response?.data || { message: "Failed to toggle user status" };
   }
 };
+
 export const deleteUser = async (userId) => {
   try {
     const response = await axios.delete(`${API_URL}/users/${userId}`, {
@@ -61,7 +62,6 @@ export const deleteUser = async (userId) => {
     });
     return response.data;
   } catch (error) {
-    throw error;
+    throw error.response?.data || { message: "Failed to delete user" };
   }
 };
-

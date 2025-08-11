@@ -76,7 +76,7 @@ const AddSupplyForm = () => {
       await axios.post("/api/supplies", formData);
       navigate("/supplierlist");
     } catch (error) {
-      console.error("Error submitting form:", error);
+      
       setFormErrors({ general: t("supplyform.errorSubmit") });
     }
   };

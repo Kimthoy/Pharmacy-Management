@@ -1,5 +1,32 @@
 {
+  "retail-stock": {
+    "RetailStockManager": "ការគ្រប់គ្រងស្តុកលក់រាយ",
+    "Medicine": "ថ្នាំ",
+    "Category": "ប្រភេទ",
+    "Units": "ឯកតា",
+    "Transferredbox": "ចំនួនដែលផ្ទេរ/ប្រអប់",
+    "Tabletbox": "ចំនួនបន្ទះ/ប្រអប់",
+    "Capsuletablet": "ចំនួនគ្រាប់/បន្ទះ",
+    "Capsulebox": "ចំនួនគ្រាប់/ប្រអប់",
+    "Pricebox": "តម្លែលក់រាយ/ប្រអប់",
+    "TransferDate": "ថ្ងៃខែផុតចូលស្តុក",
+    "NotFound": "រកមិនឃើញ បញ្ជីថ្នាំទេ !",
+    "Prev": "ពីមុន",
+    "Page": "ទំព័រ",
+    "Next": "បន្ទាប់"
+  },
   "stock-list": {
+    "TotalofStocksquantity": "ចំនួនថ្នាំសរុប",
+    "totalofquantity": "ថ្នាំ",
+    "Typestock": "សរុបប្រភេទថ្នាំ",
+    "typeoftotal": "ប្រភេទ",
+    "RetailPrice": "តម្លែលក់រាយ",
+    "Quantity": "ចំនួនដែលផ្គត់ផ្គង់",
+    "btnConfirmTransfer": "យល់ព្រម",
+    "btnCancel": "បោះបង់",
+    "btnNext": "បន្ទាប់",
+    "Action": "សកម្មភាព",
+    "btnMoveToRetail": "ផ្លាស់ទៅកាន់ស្តុករាយ",
     "title": "ផ្ទាំងគ្រប់គ្រង​ ស្តុក",
     "btnGotoSupply": "ទៅកាន់ការផ្គត់ផ្គង់",
     "ID": "លេខសម្គាល់",
@@ -8,8 +35,7 @@
     "PriceIn": "តម្លៃនាំចូល",
     "btnPrev": "ពីមុន",
     "BtnNext": "បន្ទាប់",
-    "NotFound":"រកមិនឃើញ បញ្ជីស្តុកទេ !"
-
+    "NotFound": "រកមិនឃើញ បញ្ជីស្តុកទេ !"
   },
   "add-supply": {
     "title": "បន្ថែមការផ្គត់ផ្គង់ថ្មី​!",
@@ -46,6 +72,8 @@
     "desc": "ការពិពណ៌នា"
   },
   "edit-medicine": {
+    "TabletPerBox": "ចំនួនបន្ទះ/ប្រអប់",
+    "CapsulePerBox": "ចំនួនគ្រាប់/ប្រអប់",
     "EditTitle": "ការកែសម្រួល ថ្នាំ",
     "Barcode": "បារកូដ",
     "Name": "ឈ្មោះថ្នាំ",
@@ -57,7 +85,15 @@
     "Image": "រូបភាព",
     "BtnCancel": "បោះបង់",
     "BtnSave": "រក្សាទុក",
-    "BtnSaving": "កំពុងរក្សាទុក..."
+    "BtnSaving": "កំពុងរក្សាទុក...",
+    "Manufacturer": "ក្រុមហ៊ុនផលិត",
+    "Origin": "ប្រទេសដើម",
+    "MedicineStatus": "ប្រភេទឱសថ",
+    "SelectStatus": "ជ្រើសរើសប្រភេទ",
+    "Prescription": "តម្រូវឱ្យមានវេជ្ជបញ្ជា",
+    "NonPrescription": "មិនចាំបាច់មានវេជ្ជបញ្ជា",
+    "OTC": "លក់ដោយសេរី",
+    "Purchase": "តម្លៃទិញ / ប្រភពទិញ"
   },
   "profile": {
     "menu": {
@@ -78,6 +114,8 @@
     "popular": "ពេញនិយម"
   },
   "medicine-list": {
+    "TotalMedicines": "ចំនួនថ្នាំសរុប",
+    
     "Confirmation": "តើអ្នកប្រាកដថាចង់លុបមែនឬទេ?",
     "Noted": "ការលុបនេះនឹងមិនអាចធ្វើឡើងវិញបានទេ !",
     "Yes": "បាទ/ចាស",
@@ -313,6 +351,8 @@
     "total-customer": "អតិថិជន សរុប"
   },
   "add-medicine": {
+    "StripsperBox": "ចំនួនបន្ទះ/ប្រអប់",
+    "TabletsperBox": "ចំនួនគ្រាប់/ប្រអប់",
     "Creating": "កំពុងបង្កើត..",
     "Create": "បង្កើត",
     "Scan": "ស្កេន",
@@ -352,10 +392,23 @@
     "Address": "អាសយដ្ឋាន",
     "InvoiceID": "លេខវិក័យបត្រ",
     "Save": "រក្សាទុក",
-    "Cancel": "បោះបង់"
+    "Cancel": "បោះបង់",
+    "Manufacturer": "ក្រុមហ៊ុនផលិត",
+    "Manufacturer-Placeholder": "បញ្ចូលឈ្មោះក្រុមហ៊ុនផលិត",
+    "Origin": "ប្រទេសដើម",
+    "Origin-Placeholder": "បញ្ចូលប្រទេសដើម",
+    "MedicineStatus": "ប្រភេទឱសថ",
+    "SelectStatus": "ជ្រើសរើសប្រភេទ",
+    "Prescription": "តម្រូវឱ្យមានវេជ្ជបញ្ជា",
+    "NonPrescription": "មិនចាំបាច់មានវេជ្ជបញ្ជា",
+    "OTC": "លក់ដោយសេរី",
+    "Purchase": "តម្លៃទិញ / ប្រភពទិញ",
+    "Purchase-Placeholder": "បញ្ចូលតម្លៃទិញ ឬ ប្រភព"
   },
 
   "sidebar": {
+    "RetailStock": "ស្តុកលក់រាយ",
+    "setting": "ការកំណត់",
     "AddStock": "បញ្ជូលឃ្លាំង",
     "supplyitems": "ផលិតផលផ្គត់ផ្គង់",
     "stock": "ឃ្លាំង",
@@ -402,6 +455,14 @@
   },
 
   "medicinedetail": {
+    "Loading": "កំពុងទាញយក...",
+    "MedicineNotFound": "រកមិនឃើញថ្នាំទេ!",
+    "Barcode": "បារកូដ",
+    "Price": "តម្លៃលក់ចេញ",
+    "MedicineDetail": "ព័ត៌មានលម្អិតថ្នាំ",
+    "Manufacturer": "រោងចក្រផលិត",
+    "Origin": "ប្រទេសផលិត",
+    "Purchase": "ការទិញ",
     "MedicineDetails": "ព័ត៌មានលម្អិតអំពីថ្នាំ",
     "MedicineInformation": "ព័ត៍មានថ្នាំ",
     "MedicineDetailName": "ឈ្មោះថ្នាំ",
@@ -1093,6 +1154,7 @@
     "print": "បោះពុម្ព"
   },
   "settings": {
+    "setting": "ការកំណត់",
     "title": "ការគ្រប់គ្រងការកំណត់",
     "description": "គ្រប់គ្រងការកំណត់ទាំងអស់ដើម្បីគ្រប់គ្រងទំព័ររបស់អ្នក។",
     "switchToDark": "ប្តូរទៅរបៀបងងឹត",
@@ -1307,6 +1369,8 @@
   },
 
   "category": {
+    "Totalofcateogry": "ចំនួនសរុបនៃប្រភេទ",
+    "categories": "ប្រភេទ",
     "NotFound": "រកមិនឃើញ បញ្ជីប្រភេទទេ !",
     "Title": "ផ្ទាំងគ្រប់គ្រង​ ប្រភេទថ្នាំ",
     "New": "ថ្មី",

@@ -52,7 +52,7 @@ const StockForm = ({ onClose, stock = null, onSaved }) => {
     const fetchMedicines = async () => {
       try {
         const medicines = await getAllMedicines();
-        console.log(medicines);
+        
         setMedicines(medicines);
       } catch (error) {
          toast.error("Stock detected and there are some erorr please check the console!");

@@ -24,7 +24,7 @@ import { getAllSale } from "../api/saleService";
 import { getAllSupplyItems } from "../api/supplyItemService";
 import { getExpiringSoonItems } from "../api/supplyItemService";
 import ExpiringSoonList from "./ExpiringSoonList";
-
+import ExpiredList from "./ExpiredList";
 const Dashboard = () => {
   const EXCHANGE_RATE = 4000;
   //medicine filters
@@ -32,11 +32,12 @@ const Dashboard = () => {
 
   const [medicines, setMedicines] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
+  const [expiredList, setExpiredList] = useState([]);
   const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
   const [meta, setMeta] = useState({});
   const [error, setError] = useState(null);
-  const [totalSupplier, setTotalSupplier] = useState(0);
+  // const [totalSupplier, setTotalSupplier] = useState(0);
   //customer
   const [customers, setCustomers] = useState([]);
   const [totalCustomers, setTotalCustomers] = useState(0);
@@ -93,7 +94,7 @@ const Dashboard = () => {
       setMedicines(data);
       setMeta(meta);
     } catch (err) {
-      console.error("Failed to fetch medicines", err);
+      
       setError("Failed to fetch medicines");
     } finally {
       setLoading(false);
@@ -109,11 +110,9 @@ const Dashboard = () => {
       setSuppliers(suppliers);
 
       const totalSupplier = suppliers.length;
-      console.log("Total suppliers:", totalSupplier);
-
-      setTotalSupplier(totalSupplier);
+      
     } catch (err) {
-      console.error("Failed to fetch suppliers", err);
+      
       setError("Failed to fetch supplier");
     } finally {
       setLoading(false);
@@ -123,6 +122,7 @@ const Dashboard = () => {
   useEffect(() => {
     fetchSuppliers();
   }, []);
+  const totalSupplier = suppliers.reduce((sum,suppliers)=>sum+(suppliers.id),0);
   useEffect(() => {
     fetchMedicines();
   }, []);
@@ -149,7 +149,7 @@ const Dashboard = () => {
 
       setTotalCustomers(customersArray.length);
     } catch (err) {
-      console.error("Fetch error:", err);
+      
       setError(t("customerlist.FetchError"));
     } finally {
       setLoading(false);
@@ -160,7 +160,6 @@ const Dashboard = () => {
     fetchCustomer();
   }, []);
 
-  //get stock filter low of stock
   const fetchStocks = async () => {
     try {
       const res = await getAllStocks();
@@ -173,13 +172,12 @@ const Dashboard = () => {
 
       setLowStockCount(lowStock.length);
     } catch (error) {
-      console.error("Failed to fetch stocks", error);
+      
     }
   };
   useEffect(() => {
     fetchStocks();
   }, []);
-  //get amount of sale
 
   useEffect(() => {
     const fetchSales = async () => {
@@ -195,7 +193,7 @@ const Dashboard = () => {
         );
         setTotalSalesAmount(total);
       } catch (err) {
-        console.error("❌ Fetch Sales Error:", err);
+        
         setError(err.message || "Failed to fetch sales");
       } finally {
         setLoading(false);
@@ -204,8 +202,27 @@ const Dashboard = () => {
 
     fetchSales();
   }, []);
+  const fetchExpiredMedicines = async () => {
+    try {
+      const response = await getAllSupplyItems();
+      const today = new Date();
 
-  //track expire medicine
+      const expiredItems = (
+        Array.isArray(response) ? response : response?.data || []
+      ).filter((item) => {
+        if (!item.expire_date) return false;
+        return new Date(item.expire_date) < today;
+      });
+
+      setExpiredList(expiredItems);
+    } catch (err) {
+      
+      setExpiredList([]);
+    }
+  };
+  useEffect(() => {
+    fetchExpiredMedicines();
+  }, []);
   useEffect(() => {
     const fetchExpiringSoon = async () => {
       try {
@@ -215,16 +232,15 @@ const Dashboard = () => {
         const next120Days = new Date();
         next120Days.setDate(today.getDate() + 120);
 
-        // Filter only items expiring in next 120 days
         const expiringSoonItems = items.filter((item) => {
           if (!item.expire_date) return false;
           const expDate = new Date(item.expire_date);
           return expDate >= today && expDate <= next120Days;
         });
 
-        setExpiringSoon(expiringSoonItems.length); // Count of expiring soon
+        setExpiringSoon(expiringSoonItems.length);
       } catch (err) {
-        console.error("Failed to fetch expiring soon items", err);
+        
       }
     };
 
@@ -234,16 +250,15 @@ const Dashboard = () => {
     const fetchExpiringSoon = async () => {
       try {
         const response = await getExpiringSoonItems();
-        console.log("Expiring Soon API Response:", response);
+        
 
-        // response.data might contain { data: [] }
         const expiringItems = Array.isArray(response)
           ? response
           : response.data || [];
 
         setExpiringSoon(expiringItems.length);
       } catch (error) {
-        console.error("Error fetching expiring soon items:", error);
+        
       }
     };
 
@@ -298,10 +313,9 @@ const Dashboard = () => {
         />
       </div>
       <DashboardStatus />
-      <ExpiringSoonList />
-      <SystemMonitor activities={dashboardData.recentActivities} />
 
-      {/* <QuickActions onAction={handleQuickAction} /> */}
+      <ExpiredList expiredList={expiredList} />
+      <SystemMonitor activities={dashboardData.recentActivities} />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <InfoCard

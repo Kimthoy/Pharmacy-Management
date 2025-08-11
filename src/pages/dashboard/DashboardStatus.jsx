@@ -29,9 +29,6 @@ const DashboardStatus = () => {
       try {
         const response = await getAllStocks();
         const stocks = Array.isArray(response.data) ? response.data : [];
-
-        console.log("Stock API:", stocks);
-
         const mapped = stocks.map((item, idx) => ({
           name: item.medicine?.medicine_name,
           value: item.quantity || item.available_stock || 0,
@@ -40,7 +37,6 @@ const DashboardStatus = () => {
 
         setStockData(mapped);
       } catch (err) {
-        console.error(" Fetch Stock Error:", err);
         setError("Failed to load stock report");
       } finally {
         setLoading(false);
@@ -57,8 +53,6 @@ const DashboardStatus = () => {
         const salesArray = Array.isArray(response)
           ? response
           : response?.data || [];
-
-        console.log("API Sales:", salesArray);
         const flattenedSales = salesArray.flatMap(
           (sale) =>
             sale.sale_items?.map((item) => ({
@@ -93,7 +87,6 @@ const DashboardStatus = () => {
 
         setSalesData(mappedSales);
       } catch (err) {
-        console.error("Fetch Sales Error:", err);
         setError(err.message || "Failed to fetch sales");
       } finally {
         setLoading(false);
@@ -120,17 +113,13 @@ const DashboardStatus = () => {
     const fetchSupplies = async () => {
       try {
         const supplies = await getAllSupply();
-        console.log("API Supplies Response:", supplies);
-
         if (!Array.isArray(supplies)) {
-          console.warn("API did NOT return an array, got:", supplies);
           setPurchaseData([]);
           return;
         }
 
         const flattened = supplies.flatMap((supply) => {
           if (!supply.supply_items || supply.supply_items.length === 0) {
-            console.warn(`Supply ${supply.id} has NO supply_items`);
             return [];
           }
 
@@ -146,10 +135,7 @@ const DashboardStatus = () => {
               (item.supply_quantity || 0) * parseFloat(item.unit_price || 0),
           }));
         });
-
-        console.log("Flattened purchase data:", flattened);
         setPurchaseData(flattened);
-
         const aggregated = Object.values(
           flattened.reduce((acc, curr) => {
             const key = curr.medicine_name;
@@ -178,7 +164,6 @@ const DashboardStatus = () => {
 
         setPurchaseChartData(coloredData);
       } catch (err) {
-        console.error("Fetch Supplies Error:", err);
         setError("Failed to load purchase report");
       } finally {
         setLoading(false);
@@ -230,7 +215,7 @@ const DashboardStatus = () => {
 
         setPopularSales(sorted.slice(0, 5));
       } catch (error) {
-        console.error("Failed to fetch popular products:", error);
+        
       }
     };
 
@@ -263,12 +248,13 @@ const DashboardStatus = () => {
 
   return (
     <div className="p-1 sm:p-0 mb-5 bg-white dark:bg-gray-900 min-h-screen sm:w-full w-[400px]">
+      {/* Dashboard Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6">
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 shadow-lg">
+        {/* Stock */}
+        <div className="z-0 bg-gray-50 dark:bg-gray-800 rounded-lg p-4 shadow-lg">
           <h3 className="text-center text-base sm:text-lg font-semibold text-gray-700 dark:text-gray-200">
             Stock Status
           </h3>
-
           {renderDonut(stockData, totalStock)}
           <div className="mt-3 text-sm sm:text-md space-y-1">
             {stockData.map((d, idx) => (
@@ -296,7 +282,9 @@ const DashboardStatus = () => {
             </Link>
           </div>
         </div>
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 shadow-lg">
+
+        {/* Sales */}
+        <div className="z-0 bg-gray-50 dark:bg-gray-800 rounded-lg p-4 shadow-lg">
           <h3 className="text-center text-base sm:text-lg font-semibold text-gray-700 dark:text-gray-200">
             Sales Status
           </h3>
@@ -328,14 +316,12 @@ const DashboardStatus = () => {
           </div>
         </div>
 
-        {/* ✅ Purchase Status */}
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 shadow-lg">
+        {/* Purchase */}
+        <div className="z-0 bg-gray-50 dark:bg-gray-800 rounded-lg p-4 shadow-lg">
           <h3 className="text-center text-base sm:text-lg font-semibold text-gray-700 dark:text-gray-200">
             Purchase Status
           </h3>
-
           {renderDonut(purchaseChartData, totalPurchase)}
-
           <div className="mt-3 text-sm sm:text-md space-y-1">
             {purchaseChartData.map((d, idx) => (
               <div
@@ -364,8 +350,9 @@ const DashboardStatus = () => {
         </div>
       </div>
 
-      <div className="bg-green-50 dark:bg-gray-800 rounded-lg shadow-lg-lg">
-        <h3 className="px-4 py-3 text-base sm:text-lg font-semibold text-green-600 dark:text-gray-200 border-b">
+      {/* Popular Products Table */}
+      <div className="bg-green-50 dark:bg-gray-800 rounded-lg shadow-lg">
+        <h3 className="px-4 py-3 text-base sm:text-lg font-semibold text-green-600 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700">
           Popular Products
         </h3>
         <div className="overflow-x-auto">
@@ -383,8 +370,12 @@ const DashboardStatus = () => {
                   key={idx}
                   className="border-b border-gray-300 dark:border-gray-700"
                 >
-                  <td className="p-3">{row.name}</td>
-                  <td className="p-3">{row.quantity}</td>
+                  <td className="p-3 text-gray-700 dark:text-gray-300">
+                    {row.name}
+                  </td>
+                  <td className="p-3 text-gray-700 dark:text-gray-300">
+                    {row.quantity}
+                  </td>
                   <td className="p-3 text-green-500">
                     ${row.totalAmount.toFixed(2)}
                   </td>

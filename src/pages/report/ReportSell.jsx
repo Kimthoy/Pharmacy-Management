@@ -19,7 +19,7 @@ import * as XLSX from "xlsx";
 const SellReport = () => {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  const reportRef = useRef(); 
+  const reportRef = useRef();
 
   const [salesData, setSalesData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -44,10 +44,8 @@ const SellReport = () => {
         const salesArray = Array.isArray(response)
           ? response
           : response?.data || [];
-        console.log(" API Sales Array:", salesArray);
         setSalesData(salesArray);
       } catch (err) {
-        console.error(" Fetch Sales Error:", err);
         setError(err.message || "Failed to fetch sales");
       } finally {
         setLoading(false);
@@ -131,13 +129,17 @@ const SellReport = () => {
 
     const totalText = totalSales.toFixed(2);
 
-    const printWindow = window.open("", "_blank", "width=900,height=600");
+    const printWindow = window.open("", "_blank", "width=500,height=400");
     printWindow.document.write(`
       <html>
         <head>
           <title>Sales Report - ${selectedMonthText}</title>
           <style>
-            body { font-family: Arial, sans-serif; padding: 20px; }
+        
+            body { 
+           
+          margin: 0;
+           font-family: Arial, sans-serif; padding: 20px; }
             h2 { text-align: center; }
             p { text-align: center; }
             table { width: 100%; border-collapse: collapse; margin-top: 20px; }
@@ -286,26 +288,25 @@ const SellReport = () => {
                 }))
               }
             />
-           
-              <button
-                onClick={handlePrintTable}
-                className="px-4 py-2 text-green-600 underline"
-              >
-                🖨 Print Report
-              </button>
-              <button
-                onClick={handleDownloadPDF}
-                className="px-4 py-2 text-blue-600 underline"
-              >
-                ⬇ PDF
-              </button>
-              <button
-                onClick={handleDownloadExcel}
-                className="px-4 py-2 text-emerald-600 underline"
-              >
-                ⬇ Excel
-              </button>
-          
+
+            <button
+              onClick={handlePrintTable}
+              className="px-4 py-2 text-green-600 underline"
+            >
+              🖨 Print Report
+            </button>
+            <button
+              onClick={handleDownloadPDF}
+              className="px-4 py-2 text-blue-600 underline"
+            >
+              ⬇ PDF
+            </button>
+            <button
+              onClick={handleDownloadExcel}
+              className="px-4 py-2 text-emerald-600 underline"
+            >
+              ⬇ Excel
+            </button>
           </div>
         </div>
 

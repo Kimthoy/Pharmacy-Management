@@ -30,7 +30,7 @@ const SupplierList = () => {
   const navigate = useNavigate();
 
   const toggleMenu = (index) => {
-    console.log("Toggling menu for index:", index);
+    
     setOpenMenu(openMenu === index ? null : index);
   };
 
@@ -59,7 +59,7 @@ const SupplierList = () => {
       const data = await getAllSupplier();
       setSupplier(data);
     } catch (err) {
-      console.error("Failed to fetch suppliers", err);
+      
       setError("Failed to fetch supplier");
     } finally {
       setLoading(false);
@@ -120,7 +120,7 @@ const SupplierList = () => {
   const handleEditFormSubmit = (e) => {
     e.preventDefault();
     if (!selectedSupplier) {
-      console.error("No supplier selected for edit");
+      
       setFormErrors({
         general: t("supplierlist.SupplierListFormErrorGeneral"),
       });
@@ -133,7 +133,7 @@ const SupplierList = () => {
       return;
     }
 
-    console.log("Updating supplier:", selectedSupplier.supplier_id, formData);
+    
     setSuppliersList((prev) =>
       prev.map((supplier) =>
         supplier.supplier_id === selectedSupplier.supplier_id
@@ -154,7 +154,7 @@ const SupplierList = () => {
   };
 
   const handleModalClose = () => {
-    console.log("Closing modal");
+    
     setIsAddModalOpen(false);
     setIsEditModalOpen(false);
     setFormData({
@@ -169,7 +169,7 @@ const SupplierList = () => {
   };
 
   const handleEditClick = (supplier) => {
-    console.log("Edit clicked for supplier:", supplier);
+    
     setSelectedSupplier(supplier);
     setFormData({
       name: supplier.name,
@@ -183,7 +183,7 @@ const SupplierList = () => {
   };
 
   const handleDeleteClick = (supplier) => {
-    console.log("Delete clicked for supplier:", supplier);
+    
     setSelectedSupplier(supplier);
     setIsDeleteConfirmOpen(true);
     setOpenMenu(null);
@@ -191,15 +191,15 @@ const SupplierList = () => {
 
   const handleDeleteConfirm = () => {
     if (!selectedSupplier) {
-      console.error("No supplier selected for deletion");
+      
       return;
     }
-    console.log("Deleting supplier:", selectedSupplier.supplier_id);
+    
     setSuppliersList((prev) => {
       const updatedList = prev.filter(
         (supplier) => supplier.supplier_id !== selectedSupplier.supplier_id
       );
-      console.log("Updated suppliers list:", updatedList);
+      
       return updatedList;
     });
     setIsDeleteConfirmOpen(false);
@@ -207,7 +207,7 @@ const SupplierList = () => {
   };
 
   const handleDeleteCancel = () => {
-    console.log("Canceling delete");
+    
     setIsDeleteConfirmOpen(false);
     setSelectedSupplier(null);
   };
@@ -542,7 +542,7 @@ const SupplierList = () => {
                         className="flex align-middle w-full text-left text-gray-600 dark:text-gray-200 py-2 hover:rounded-md hover:bg-green-500 hover:text-white dark:hover:bg-green-400 dark:hover:text-white"
                         onClick={(e) => {
                           e.stopPropagation();
-                          console.log("Edit button clicked for:", supplier);
+                          
                           handleEditClick(supplier);
                         }}
                       >
@@ -553,7 +553,7 @@ const SupplierList = () => {
                         className="flex align-middle w-full text-left text-gray-600 dark:text-gray-200 py-2 hover:rounded-md hover:bg-green-500 hover:text-white dark:hover:bg-green-400 dark:hover:text-white"
                         onClick={(e) => {
                           e.stopPropagation();
-                          console.log("Delete button clicked for:", supplier);
+                          
                           handleDeleteClick(supplier);
                         }}
                       >

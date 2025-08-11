@@ -4,7 +4,6 @@ import { AuthContext } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
 import MessageModal from "../components/MessageModal";
-// import { FiMenu } from "react-icons/fi";
 import { MdOutlineSettingsSuggest } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import {
@@ -40,6 +39,27 @@ const LanguageSelector = ({
   };
 
   const currentLang = languageOptions.find((lang) => lang.value === langCode);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const timeString = currentTime.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  });
+  const dateString = currentTime.toLocaleDateString("en-GB", {
+    weekday: "short",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 
   return (
     <div className="relative inline-block" ref={selectorRef}>
@@ -76,7 +96,7 @@ const LanguageSelector = ({
         </svg>
       </button>
       {open && (
-        <ul className="absolute z-50 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg animate-fade-in">
+        <ul className="absolute z-50  mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg animate-fade-in">
           {languageOptions.map((lang) => (
             <li
               key={lang.value}
@@ -227,7 +247,6 @@ const TopBar = ({ onSearch }) => {
   }, []);
 
   useEffect(() => {
-    console.log("Auth State:", { isAuthenticated, user });
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false);
@@ -251,11 +270,6 @@ const TopBar = ({ onSearch }) => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   });
-
-  // const handleSearch = (term) => {
-  //   console.log("Searching for:", term);
-  // };
-
   const handleLogout = () => {
     setIsModalOpen(true);
   };
@@ -303,7 +317,6 @@ const TopBar = ({ onSearch }) => {
     },
   ];
 
-  // Mock data for notifications
   const notifications = [
     {
       id: 1,
@@ -345,6 +358,27 @@ const TopBar = ({ onSearch }) => {
   const openProfileDashboard = () => {
     navigate("/profiledashboard");
   };
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const timeString = currentTime.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  });
+  const dateString = currentTime.toLocaleDateString("en-GB", {
+    weekday: "short",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
   return (
     <div className="bg-white dark:bg-gray-900 z-10 sm:h-20 h-16 flex flex-col sm:flex-row items-center justify-between sm:shadow-sm shadow-lg dark:shadow-gray-800 ">
       <button
@@ -399,7 +433,10 @@ const TopBar = ({ onSearch }) => {
           />
         </div>
       </div>
-
+      <div className="w-40 mr-5 text-right text-sm font-medium text-gray-700 dark:text-gray-200 leading-tight hidden sm:block">
+        <div>{timeString}</div>
+        <div className="text-xs">{dateString}</div>
+      </div>
       <div className="flex items-center space-x-3 mt-4 sm:mt-0">
         <div className="relative" ref={messageDropdownRef}>
           <button

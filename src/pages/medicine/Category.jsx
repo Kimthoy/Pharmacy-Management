@@ -20,7 +20,7 @@ const CategoryDashboard = () => {
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [saveloading, setSaveLoading] = useState(false);
-  // const [deleteLoadingId, setDeleteLoadingId] = useState(null);
+  
 
   const [category, setCategory] = useState({
     category_name: "",
@@ -59,7 +59,7 @@ const CategoryDashboard = () => {
   };
   const handleDeleteCategory = async (id) => {
     try {
-      // setDeleteLoadingId(id);
+      
       const success = await deleteCategory(id);
       if (success) {
         setSuccess("Category deleted successfully.");
@@ -68,7 +68,7 @@ const CategoryDashboard = () => {
         setError("Failed to delete category.");
       }
     } catch (err) {
-      console.error(err);
+     
       setError("An unexpected error occurred.");
     }
   };
@@ -80,9 +80,9 @@ const CategoryDashboard = () => {
         description: selectedCategory.description,
       });
       setShowEditModal(false);
-      fetchCategory(); // Refresh the list
+      fetchCategory(); 
     } catch (error) {
-      console.error("Error updating category:", error);
+     
     }
   };
 
@@ -97,7 +97,7 @@ const CategoryDashboard = () => {
       const data = await getAllCategory();
       setCategories(data);
     } catch (err) {
-      console.error("Fetch error:", err);
+    
       setError("Failed to fetch categories.");
     } finally {
       setLoading(false);
@@ -129,14 +129,14 @@ const CategoryDashboard = () => {
           description: category.description,
         };
 
-        console.log("Sending payload:", payload);
+       
         await createCategory(payload);
         setSuccess("category is create successfully !");
         setCategory({ category_name: "", description: "" });
         setShowModal(false);
-        fetchCategory(); // Refresh list after create
+        fetchCategory(); 
       } catch (err) {
-        console.error("Full error:", err);
+       
         const errorMessage = err?.message || "Failed to create category.";
         setError(errorMessage);
       } finally {
@@ -149,7 +149,9 @@ const CategoryDashboard = () => {
   return (
     <div className="sm:p-6 mb-20">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">{t("category.Title")}</h1>
+        <h1 className="text-2xl font-bold dark:text-slate-300">
+          {t("category.Title")}
+        </h1>
         <button
           onClick={() => setShowModal(true)}
           className="bg-blue-600 text-white px-4 py-2 shadow-lg active:shadow-none rounded-lg hover:bg-blue-700"
@@ -159,17 +161,19 @@ const CategoryDashboard = () => {
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
-          <div className="bg-white sm:p-6 p-3 rounded-lg shadow-md w-full max-w-md">
-            <h2 className="text-lg font-bold mb-2">
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50">
+          <div className="bg-white dark:bg-slate-800 sm:p-6 p-3 rounded-lg shadow-md w-full max-w-md">
+            <h2 className="text-lg dark:text-slate-300 font-bold mb-2">
               {t("category.CreateCategory")}
             </h2>
-            <p className="text-sm text-gray-600 mb-4">{t("category.Desc")}</p>
+            <p className="text-sm dark:text-slate-300 text-gray-600 mb-4">
+              {t("category.Desc")}
+            </p>
             <form onSubmit={handleSubmit} className="space-y-4">
               {success && <p className="text-green-600 text-sm">{success}</p>}
               {error && <p className="text-red-600 text-sm">{error}</p>}
               <div>
-                <label className="block mb-1 text-sm font-medium">
+                <label className="block dark:text-slate-300 mb-1 text-sm font-medium">
                   {t("category.Name")}
                 </label>
                 <input
@@ -182,7 +186,7 @@ const CategoryDashboard = () => {
                 />
               </div>
               <div>
-                <label className="block mb-1 text-sm font-medium">
+                <label className="block dark:text-slate-300 mb-1 text-sm font-medium">
                   {t("category.Description")}
                 </label>
                 <textarea
@@ -196,7 +200,7 @@ const CategoryDashboard = () => {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 border rounded-lg shadow-lg active:shadow-none text-red-700"
+                  className="px-4 dark:bg-slate-100 py-2 border rounded-lg shadow-lg active:shadow-none text-red-700"
                 >
                   {t("category.BtnCancel")}
                 </button>
@@ -212,20 +216,23 @@ const CategoryDashboard = () => {
           </div>
         </div>
       )}
-      <div className="m-4">Total of cateogry : {totalCategory} categories</div>
+      <div className="bg-green-300 text-gray-600 w-full px-4 py-2 rounded-lg">
+        {t("category.Totalofcateogry")} : {totalCategory}{" "}
+        {t("category.categories")}
+      </div>
       <div className="overflow-x-auto">
         <table className="min-w-full table-auto border-collapse border border-gray-300">
           <thead>
-            <tr className="bg-gray-100">
-              <th className="border px-4 py-2 text-left">
+            <tr className="bg-gray-100 dark:bg-slate-500 dark:text-slate-200 ">
+              <td className="border px-4 py-2 text-left">
                 {t("category.CateName")}
-              </th>
-              <th className="border px-4 py-2 text-left">
+              </td>
+              <td className="border px-4 py-2 text-left">
                 {t("category.CateDescription")}
-              </th>
-              <th className="border px-4 py-2 text-left">
+              </td>
+              <td className="border px-4 py-2 text-left">
                 {t("category.Actions")}
-              </th>
+              </td>
             </tr>
           </thead>
           <tbody className="text-md text-gray-700 dark:text-gray-200">
@@ -233,7 +240,7 @@ const CategoryDashboard = () => {
               currentItems.map((cat, index) => (
                 <tr
                   key={index}
-                  className="border-t even:bg-slate-100 border-gray-200 dark:border-gray-700"
+                  className="border-t  even:bg-slate-100 dark:even:bg-slate-600 dark: border-gray-200 dark:border-gray-700"
                 >
                   <td
                     className="px-4 py-3 max-w-[150px] truncate"

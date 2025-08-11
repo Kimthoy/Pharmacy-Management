@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useTranslation } from "../../hooks/useTranslation";
 import { useTheme } from "../../context/ThemeContext";
-
+import { toast } from "react-toastify";
 const Register = () => {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -52,12 +52,14 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSuccessMessage("");
+
     if (!validateForm()) {
+      toast.error(t("register.errors.general")); // optional
       return;
     }
 
     try {
-      const response = await axios.post("http://localhost:8000/api/register", {
+      await axios.post("http://localhost:8000/api/register", {
         name: formData.name,
         email: formData.email,
         password: formData.password,
@@ -67,6 +69,8 @@ const Register = () => {
       });
 
       setSuccessMessage(t("register.success"));
+      toast.success(t("register.success"));
+
       setFormData({
         name: "",
         email: "",
@@ -75,15 +79,10 @@ const Register = () => {
         phone: "",
         is_active: false,
       });
-      console.log("Response:", response.data);
     } catch (error) {
-      console.error(
-        "Registration failed:",
-        error.response?.data || error.message
-      );
-      setErrors({
-        general: error.response?.data?.message || t("register.errors.general"),
-      });
+      const msg = error.response?.data?.message || t("register.errors.general");
+      setErrors({ general: msg });
+      toast.error(msg);
     }
   };
 

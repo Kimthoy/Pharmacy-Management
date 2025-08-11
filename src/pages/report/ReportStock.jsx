@@ -33,10 +33,9 @@ const StockReport = () => {
       try {
         const response = await getAllStocks();
         const stocks = Array.isArray(response.data) ? response.data : [];
-        console.log("Stock API:", stocks);
+
         setStockData(stocks);
       } catch (err) {
-        console.error("Fetch Stock Error:", err);
         setError("Failed to load stock report");
       } finally {
         setLoading(false);
@@ -138,26 +137,29 @@ const StockReport = () => {
     "#34d399",
     "#60a5fa",
     "#f87171",
-    "#fbbf24", 
-    "#a78bfa", 
-    "#f472b6", 
-    "#38bdf8", 
-    "#fb923c", 
+    "#fbbf24",
+    "#a78bfa",
+    "#f472b6",
+    "#38bdf8",
+    "#fb923c",
   ];
 
   return (
-    <div className="sm:p-6 mb-24 bg-white dark:bg-gray-900 min-h-screen">
+    <div className="sm:p-6 mb-24 bg-white dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen">
+      {/* Header */}
       <div className="flex justify-between mb-4">
         <h2 className="text-lg font-bold text-gray-700 dark:text-gray-200">
           Stock Report
         </h2>
       </div>
+
+      {/* Summary & Chart */}
       <div className="grid md:grid-cols-2 gap-2 mb-6">
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
           <p className="text-gray-500 dark:text-gray-300 mb-5">
             Total Stock Value
           </p>
-          <p className="text-xl font-bold text-emerald-600 mb-5">
+          <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mb-5">
             ${totalStockValue.toFixed(2)}
           </p>
           <p className="text-gray-500 dark:text-gray-300 mt-2">
@@ -167,12 +169,13 @@ const StockReport = () => {
             </span>
           </p>
         </div>
+
         <div className="bg-white dark:bg-gray-800 p-2 rounded-md shadow">
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="1 1" />
-              <XAxis dataKey="name" />
-              <YAxis />
+              <CartesianGrid strokeDasharray="1 1" stroke="#ccc" />
+              <XAxis dataKey="name" stroke="#888" />
+              <YAxis stroke="#888" />
               <Tooltip />
               <Bar dataKey="quantity">
                 {chartData.map((entry, index) => (
@@ -187,41 +190,47 @@ const StockReport = () => {
         </div>
       </div>
 
+      {/* Filters */}
       <div className="flex flex-wrap gap-4 mb-4 items-center">
         <input
           type="text"
           placeholder="Search medicine or notes"
-          className="border p-2 rounded w-1/3"
+          className="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 p-2 rounded w-1/3"
           value={filters.searchTerm}
           onChange={(e) =>
             setFilters((prev) => ({ ...prev, searchTerm: e.target.value }))
           }
         />
 
-        <label className="py-2">Start Date</label>
+        <label className="py-2 text-gray-600 dark:text-gray-300">
+          Start Date
+        </label>
         <input
           type="date"
           value={filters.startDate}
           onChange={(e) =>
             setFilters((prev) => ({ ...prev, startDate: e.target.value }))
           }
-          className="border p-2 rounded"
+          className="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 p-2 rounded"
         />
-        <label className="py-2">End Date</label>
+
+        <label className="py-2 text-gray-600 dark:text-gray-300">
+          End Date
+        </label>
         <input
           type="date"
           value={filters.endDate}
           onChange={(e) =>
             setFilters((prev) => ({ ...prev, endDate: e.target.value }))
           }
-          className="border p-2 rounded"
+          className="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 p-2 rounded"
         />
 
         <label className="text-gray-500 dark:text-gray-300">Sort By:</label>
         <select
           value={sortField}
           onChange={(e) => setSortField(e.target.value)}
-          className="border p-2 rounded"
+          className="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 p-2 rounded"
         >
           <option value="medicine_name">Medicine Name</option>
           <option value="quantity">Quantity</option>
@@ -246,12 +255,13 @@ const StockReport = () => {
         </button>
       </div>
 
+      {/* Table */}
       <table
         id="stock-table"
         className="w-full border-collapse border border-gray-300 dark:border-gray-700"
       >
         <thead>
-          <tr className="bg-gray-100 dark:bg-gray-700">
+          <tr className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
             <th className="sm:flex hidden p-2 border">ID</th>
             <th className="p-2 border">Medicine Name</th>
             <th className="p-2 border">Quantity</th>
@@ -263,26 +273,42 @@ const StockReport = () => {
         <tbody>
           {paginatedData.length > 0 ? (
             paginatedData.map((stock) => (
-              <tr key={stock.id} className="border">
-                <td className="p-2 border sm:flex hidden">{stock.id}</td>
-                <td className="p-2 border">{stock.medicine?.medicine_name}</td>
+              <tr
+                key={stock.id}
+                className="border hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
+                <td className="p-2 border sm:flex hidden text-gray-800 dark:text-gray-200">
+                  {stock.id}
+                </td>
+                <td className="p-2 border text-gray-800 dark:text-gray-200">
+                  {stock.medicine?.medicine_name}
+                </td>
                 <td
                   className={`p-2 border ${
-                    stock.quantity < 50 ? "text-red-500" : ""
+                    stock.quantity < 50
+                      ? "text-red-500"
+                      : "text-gray-800 dark:text-gray-200"
                   }`}
                 >
                   {stock.quantity}
                 </td>
-                <td className="p-2 border">${stock.price_in}</td>
-                <td className="p-2 border">
+                <td className="p-2 border text-gray-800 dark:text-gray-200">
+                  ${stock.price_in}
+                </td>
+                <td className="p-2 border text-gray-800 dark:text-gray-200">
                   {new Date(stock.received_date).toLocaleDateString()}
                 </td>
-                <td className="p-2 border">{stock.notes || "N/A"}</td>
+                <td className="p-2 border text-gray-800 dark:text-gray-200">
+                  {stock.notes || "N/A"}
+                </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="6" className="p-4 text-center text-gray-500">
+              <td
+                colSpan="6"
+                className="p-4 text-center text-gray-500 dark:text-gray-400"
+              >
                 No Stock Found
               </td>
             </tr>
@@ -290,6 +316,7 @@ const StockReport = () => {
         </tbody>
       </table>
 
+      {/* Pagination */}
       <div className="flex justify-between mt-4">
         <button
           disabled={pagination.currentPage === 1}
@@ -299,11 +326,11 @@ const StockReport = () => {
               currentPage: prev.currentPage - 1,
             }))
           }
-          className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+          className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded disabled:opacity-50"
         >
           Prev
         </button>
-        <span>
+        <span className="text-gray-700 dark:text-gray-200">
           Page {pagination.currentPage} of {totalPages}
         </span>
         <button
@@ -314,7 +341,7 @@ const StockReport = () => {
               currentPage: prev.currentPage + 1,
             }))
           }
-          className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+          className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded disabled:opacity-50"
         >
           Next
         </button>

@@ -18,21 +18,17 @@ import Register from "./pages/auth/Register";
 import { LanguageProvider } from "./context/LanguageContext";
 import { AuthProvider } from "./context/AuthContext";
 const ProfileDashboard = lazy(() => import("./pages/profile/ProfileDashboard"));
-
+const Setting = lazy(() => import("./pages/setting/Setting"));
+const ExpireSoon = lazy(() => import("./pages/dashboard/ExpiringSoonList"));
 const ActivityPage = lazy(() => import("./pages/profile/ActivityPage"));
 const AddSupply = lazy(() => import("./pages/stock/AddSupply"));
-
 const Login = lazy(() => import("./pages/auth/Login"));
 const CustomerList = lazy(() => import("./pages/customer/ListCustomer"));
 const InsertCustomer = lazy(() => import("./pages/customer/InsertCustomer"));
 const Dashboard = lazy(() => import("./pages/dashboard/Dashboard"));
-const ManufacturerList = lazy(() =>
-  import("./pages/manufacturer/ManufacturerList")
-);
 const Supplies = lazy(() => import("./pages/manufacturer/Supply"));
 const SupplyItems = lazy(() => import("./pages/manufacturer/SupplyItem"));
 const SalesReport = lazy(() => import("./pages/sale/SalesReport"));
-
 const SellReport = lazy(() => import("./pages/report/ReportSell"));
 const StockReport = lazy(() => import("./pages/report/ReportStock"));
 const PurchaseReport = lazy(() => import("./pages/report/ReportPurchase"));
@@ -45,11 +41,14 @@ const AddMedicine = lazy(() => import("./pages/medicine/AddMedicine"));
 const MedicineList = lazy(() => import("./pages/medicine/MedicineList"));
 const Category = lazy(() => import("./pages/medicine/Category"));
 const MedicineDetail = lazy(() => import("./pages/medicine/MedicineDetail"));
-const Setting = lazy(() => import("./pages/setting/Setting"));
 const AddWastageReturn = lazy(() => import("./pages/return/AddWastageReturn"));
 const SaleDashboard = lazy(() => import("./pages/sale/Sale"));
+const RetailStock = lazy(() => import("./pages/stock/RetailStock"));
 const AddManufacturerReturn = lazy(() =>
   import("./pages/return/AddManufacturerReturn")
+);
+const ManufacturerList = lazy(() =>
+  import("./pages/manufacturer/ManufacturerList")
 );
 const ManufacturerReturnList = lazy(() =>
   import("./pages/return/ManufacturerReturnList")
@@ -58,7 +57,7 @@ const WastageReturnList = lazy(() =>
   import("./pages/return/WastageReturnList")
 );
 const StaffList = lazy(() => import("./pages/staff/ManageStaff"));
-const Client = lazy(() => import("./pages/auth/Client"));
+
 const Profile = lazy(() => import("./pages/profile/AboutUser"));
 const StockList = lazy(() => import("./pages/stock/StockList"));
 const MessagePage = lazy(() => import("./pages/setting/Message"));
@@ -66,6 +65,7 @@ const NotificationPage = lazy(() => import("./pages/setting/Notification"));
 const Unit = lazy(() => import("./pages/medicine/Unit"));
 const SampleStock = lazy(() => import("./pages/sample/InventoryDashboard"));
 const AddStock = lazy(() => import("./pages/sample/InventoryForm"));
+const SessionGet = lazy(() => import("./pages/setting/Session"));
 const App = () => {
   const location = useLocation();
   const [langCode, setLangCode] = useState(
@@ -159,13 +159,15 @@ const App = () => {
                     />
 
                     <Route path="/listofmedicine" element={<MedicineList />} />
+
                     <Route
-                      path="/medicinedetail"
+                      path="/medicinedetail/:id"
                       element={<MedicineDetail />}
                     />
+
                     <Route path="/categoies" element={<Category />} />
                     <Route path="/units" element={<Unit />} />
-                    <Route path="/settingpage" element={<Setting />} />
+                    <Route path="/setting" element={<Setting />} />
                     <Route
                       path="/manufacturerreturnlist"
                       element={<ManufacturerReturnList />}
@@ -183,10 +185,12 @@ const App = () => {
                       element={<WastageReturnList />}
                     />
                     <Route path="/listofstaff" element={<StaffList />} />
-                    <Route path="/client" element={<Client />} />
+
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/activity" element={<ActivityPage />} />
                     <Route path="/message" element={<MessagePage />} />
+                    <Route path="/wastagereturnlist" element={<ExpireSoon />} />
+                    <Route path="/session" element={<SessionGet />} />
                     <Route
                       path="/notification"
                       element={<NotificationPage />}
@@ -199,6 +203,7 @@ const App = () => {
                     <Route path="/saledashboard" element={<SaleDashboard />} />
                     <Route path="/samplestock" element={<SampleStock />} />
                     <Route path="/addstock" element={<AddStock />} />
+                    <Route path="/retailstock" element={<RetailStock />} />
                     <Route path="/add-supply" element={<AddSupply />} />
                     <Route path="*" element={<Navigate to="/" />} />
                   </Routes>

@@ -13,7 +13,6 @@ const SupplyItem = () => {
         const res = await getAllSupplyItems();
         setItems(res);
       } catch (err) {
-        console.error("Fetch failed:", err);
         setError("Failed to fetch supply items.");
       } finally {
         setLoading(false);
@@ -28,9 +27,10 @@ const SupplyItem = () => {
 
   return (
     <div className="p-6">
-      {/* ✅ Go back to Supplies page */}
       <div className="flex justify-between mb-4">
-        <h1 className="text-xl font-bold">Supply Item List</h1>
+        <h1 className="text-xl font-bold text-gray-800 dark:text-white">
+          Supply Item List
+        </h1>
         <Link
           to="/supplies"
           className="text-green-500 hover:underline font-medium"
@@ -39,25 +39,35 @@ const SupplyItem = () => {
         </Link>
       </div>
 
-      <table className="min-w-full table-auto border border-gray-300 rounded-md shadow-sm">
-        <thead className="bg-gray-100 text-left text-sm font-semibold text-gray-700">
+      <table className="min-w-full table-auto border border-gray-300 dark:border-gray-600 rounded-md shadow-sm">
+        <thead className="bg-gray-100 dark:bg-slate-800 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
           <tr>
-            <th className="border px-4 py-2">#</th>
-            <th className="border px-4 py-2">Supply ID</th>
-            <th className="border px-4 py-2">Medicine</th>
-            <th className="border px-4 py-2">Quantity</th>
-            <th className="border px-4 py-2">Unit Price</th>
-            <th className="border px-4 py-2">Expire Date</th>
+            <th className="border px-4 py-2 dark:border-slate-700">#</th>
+            <th className="border px-4 py-2 dark:border-slate-700">
+              Supply ID
+            </th>
+            <th className="border px-4 py-2 dark:border-slate-700">Medicine</th>
+            <th className="border px-4 py-2 dark:border-slate-700">Quantity</th>
+            <th className="border px-4 py-2 dark:border-slate-700">
+              Unit Price
+            </th>
+            <th className="border px-4 py-2 dark:border-slate-700">
+              Expire Date
+            </th>
           </tr>
         </thead>
         <tbody>
           {items.length > 0 ? (
             items.map((item, idx) => (
-              <tr key={item.id} className="hover:bg-gray-50 even:bg-slate-200">
-                {/* ✅ Index */}
-                <td className="border px-4 py-2">{idx + 1}</td>
+              <tr
+                key={item.id}
+                className="hover:bg-gray-50 dark:hover:bg-slate-700 even:bg-slate-200 dark:even:bg-slate-800"
+              >
+                <td className="border px-4 py-2 dark:border-slate-700 dark:text-white">
+                  {idx + 1}
+                </td>
 
-                <td className="border px-4 py-2">
+                <td className="border px-4 py-2 dark:border-slate-700">
                   <Link
                     to="/supplies"
                     state={{ highlightedSupplyId: item.supply?.supply_id }}
@@ -67,7 +77,7 @@ const SupplyItem = () => {
                   </Link>
                 </td>
 
-                <td className="border px-4 py-2">
+                <td className="border px-4 py-2 dark:border-slate-700">
                   <Link
                     to="/listofmedicine"
                     state={{ highlightedBarcode: item.medicine?.barcode }}
@@ -79,18 +89,15 @@ const SupplyItem = () => {
                   </Link>
                 </td>
 
-                {/* ✅ Quantity */}
-                <td className="border px-4 py-2">
+                <td className="border px-4 py-2 dark:border-slate-700 dark:text-white">
                   {item.supply_quantity ?? "N/A"}
                 </td>
 
-                {/* ✅ Unit Price */}
-                <td className="border px-4 py-2">
+                <td className="border px-4 py-2 dark:border-slate-700 dark:text-white">
                   {item.unit_price ? `$${item.unit_price}` : "N/A"}
                 </td>
 
-                {/* ✅ Expire Date */}
-                <td className="border px-4 py-2">
+                <td className="border px-4 py-2 dark:border-slate-700 dark:text-white">
                   {item.expire_date
                     ? new Date(item.expire_date).toLocaleDateString()
                     : "N/A"}
@@ -101,7 +108,7 @@ const SupplyItem = () => {
             <tr>
               <td
                 colSpan="6"
-                className="border px-4 py-4 text-center text-gray-500"
+                className="border px-4 py-4 text-center text-gray-500 dark:text-gray-400 dark:border-slate-700"
               >
                 No supply items found.
               </td>

@@ -37,7 +37,6 @@ const Supply = () => {
       const data = await getAllSupply();
       setInvoices(data);
     } catch (err) {
-      console.error("Failed to fetch supplies", err);
       toast.error("Failed to load supplies");
     }
   };
@@ -80,7 +79,9 @@ const Supply = () => {
   return (
     <div className="mb-20">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-bold dark:text-slate-200">Supply List</h1>
+        <h1 className="text-xl font-bold text-gray-800 dark:text-slate-200">
+          Supply List
+        </h1>
       </div>
 
       <input
@@ -91,19 +92,25 @@ const Supply = () => {
           setSearchTerm(e.target.value);
           setCurrentPage(1);
         }}
-        className="mb-4 px-3 py-2 border rounded w-full max-w-sm"
+        className="mb-4 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded w-full max-w-sm bg-white dark:bg-slate-800 text-gray-800 dark:text-white"
       />
 
-      <table className="min-w-full table-auto border border-slate-200 shadow-sm rounded-md">
-        <thead className="bg-slate-200 text-left text-sm font-semibold text-gray-700">
+      <table className="min-w-full table-auto border border-slate-200 dark:border-slate-700 shadow-sm rounded-md">
+        <thead className="bg-slate-200 dark:bg-slate-800 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
           <tr>
-            <th className="border px-4 py-3">Supply ID</th>
-            <th className="border px-4 py-3">Supplier</th>
-            <th className="border px-4 py-3 ">Supply Date</th>
-            <th className="border px-4 py-3 hidden sm:table-cell">
+            <th className="border px-4 py-3 dark:border-slate-700">
+              Supply ID
+            </th>
+            <th className="border px-4 py-3 dark:border-slate-700">Supplier</th>
+            <th className="border px-4 py-3 dark:border-slate-700">
+              Supply Date
+            </th>
+            <th className="border px-4 py-3 hidden sm:table-cell dark:border-slate-700">
               Invoice ID
             </th>
-            <th className="border px-4 py-3 hidden sm:table-cell">Actions</th>
+            <th className="border px-4 py-3 hidden sm:table-cell dark:border-slate-700">
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -114,28 +121,28 @@ const Supply = () => {
                 <tr
                   key={item.id}
                   data-supply={item.supply_id}
-                  className={`hover:bg-gray-50 dark:hover:bg-gray-700 even:bg-slate-200 text-md ${
-                    isHighlighted ? "bg-green-100" : ""
+                  className={`hover:bg-gray-50 dark:hover:bg-gray-700 even:bg-slate-200 dark:even:bg-slate-700 text-md ${
+                    isHighlighted ? "bg-green-100 dark:bg-green-900" : ""
                   }`}
                 >
-                  <td className="border px-4 py-2 text-green-600">
+                  <td className="border px-4 py-2 text-green-600 dark:border-slate-700">
                     {item.supply_id || "N/A"}
                   </td>
                   <td
-                    className="max-w-xs truncate whitespace-nowrap overflow-hidden border px-4 py-2 dark:text-white"
+                    className="max-w-xs truncate whitespace-nowrap overflow-hidden border px-4 py-2 dark:border-slate-700 dark:text-white"
                     title={item.supplier?.company_id || "N/A"}
                   >
                     {item.supplier?.company_id || "N/A"}
                   </td>
-                  <td className="border px-4 py-2 dark:text-white">
+                  <td className="border px-4 py-2 dark:text-white dark:border-slate-700">
                     {item.invoice_date
                       ? new Date(item.invoice_date).toLocaleDateString("en-GB")
                       : "N/A"}
                   </td>
-                  <td className="border px-4 py-2 text-green-500 hidden sm:table-cell">
+                  <td className="border px-4 py-2 text-green-500 dark:border-slate-700 hidden sm:table-cell">
                     {item.invoice_id || "N/A"}
                   </td>
-                  <td className="border px-2 py-2  space-x-2 hidden sm:table-cell">
+                  <td className="border px-2 py-2 space-x-2 hidden sm:table-cell dark:border-slate-700">
                     <button
                       onClick={() => navigate(`/edit-supply/${item.id}`)}
                       className="text-blue-500 hover:bg-slate-200 dark:hover:bg-slate-600 p-2 rounded-lg transition"
@@ -159,7 +166,10 @@ const Supply = () => {
             })
           ) : (
             <tr>
-              <td colSpan={5} className="text-center text-gray-500 py-4">
+              <td
+                colSpan={5}
+                className="text-center text-gray-500 dark:text-gray-400 py-4"
+              >
                 No supplies found.
               </td>
             </tr>
@@ -171,7 +181,7 @@ const Supply = () => {
         <button
           onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
           disabled={currentPage === 1}
-          className="px-3 py-1 bg-gray-300 rounded disabled:opacity-50"
+          className="px-3 py-1 bg-gray-300 dark:bg-slate-700 rounded disabled:opacity-50"
         >
           Prev
         </button>
@@ -180,7 +190,9 @@ const Supply = () => {
             key={i}
             onClick={() => setCurrentPage(i + 1)}
             className={`px-3 py-1 rounded ${
-              currentPage === i + 1 ? "bg-blue-600 text-white" : "bg-gray-200"
+              currentPage === i + 1
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 dark:bg-slate-600 dark:text-white"
             }`}
           >
             {i + 1}
@@ -189,7 +201,7 @@ const Supply = () => {
         <button
           onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
           disabled={currentPage === totalPages}
-          className="px-3 py-1 bg-gray-300 rounded disabled:opacity-50"
+          className="px-3 py-1 bg-gray-300 dark:bg-slate-700 rounded disabled:opacity-50"
         >
           Next
         </button>

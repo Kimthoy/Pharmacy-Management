@@ -26,7 +26,7 @@ const UnitDashboard = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedUnit, setSelectedUnit] = useState(null);
 
-  // Pagination
+  
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
@@ -66,7 +66,7 @@ const UnitDashboard = () => {
         setError("Failed to delete unit.");
       }
     } catch (err) {
-      console.error(err);
+      
       setError("An unexpected error occurred.");
     }
   };
@@ -78,9 +78,9 @@ const UnitDashboard = () => {
         desc: selectedUnit.desc,
       });
       setShowEditModal(false);
-      fetchUnits(); // Refresh the list
+      fetchUnits(); 
     } catch (error) {
-      console.error("Error updating unit:", error);
+      
       setError("Failed to update unit.");
     }
   };
@@ -96,7 +96,7 @@ const UnitDashboard = () => {
       const data = await getAllUnits();
       setUnits(data);
     } catch (err) {
-      console.error("Fetch error:", err);
+      
       setError("Failed to fetch units.");
     } finally {
       setLoading(false);
@@ -133,7 +133,7 @@ const UnitDashboard = () => {
         setShowModal(false);
         fetchUnits();
       } catch (err) {
-        console.error("Full error:", err);
+        
         const errorMessage = err?.message || "Failed to create unit.";
         setError(errorMessage);
       } finally {
@@ -144,7 +144,7 @@ const UnitDashboard = () => {
   );
 
   return (
-    <div className="sm:p-6 mb-20">
+    <div className="sm:p-6 dark:text-slate-300 mb-20">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">{t("unit.title")}</h1>
         <button
@@ -158,9 +158,9 @@ const UnitDashboard = () => {
       {/* Create Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
-          <div className="bg-white sm:p-6 p-3 rounded-lg shadow-md w-full max-w-md">
+          <div className="bg-white dark:bg-slate-800 sm:p-6 p-3 rounded-lg shadow-md w-full max-w-md">
             <h2 className="text-lg font-bold mb-2">{t("unit.TitleNew")}</h2>
-            <p className="text-sm text-gray-600 mb-4">{t("unit.formdesc")}</p>
+            <p className="text-sm dark:text-slate-300 text-gray-600 mb-4">{t("unit.formdesc")}</p>
             <form onSubmit={handleSubmit} className="space-y-4">
               {success && <p className="text-green-600 text-sm">{success}</p>}
               {error && <p className="text-red-600 text-sm">{error}</p>}
@@ -174,7 +174,7 @@ const UnitDashboard = () => {
                   value={unit.unit_name}
                   onChange={handleUnitChange}
                   required
-                  className="w-full border px-3 py-2 rounded-lg"
+                  className="w-full dark:bg-slate:0 dark:text-slate-900 border px-3 py-2 rounded-lg"
                 />
               </div>
               <div>
@@ -185,14 +185,14 @@ const UnitDashboard = () => {
                   name="desc"
                   value={unit.desc}
                   onChange={handleUnitChange}
-                  className="w-full border px-3 py-2 rounded-lg"
+                  className="w-full dark:bg-slate-0 dark:text-slate-900 border px-3 py-2 rounded-lg"
                 />
               </div>
               <div className="flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 border rounded-lg shadow-lg active:shadow-none text-red-700"
+                  className="px-4 dark:bg-slate-200 py-2 border rounded-lg shadow-lg active:shadow-none text-red-700 dark:hover:bg-slate-300"
                 >
                   {t("unit.BtnCancel")}
                 </button>
@@ -213,7 +213,7 @@ const UnitDashboard = () => {
       <div className="overflow-x-auto">
         <table className="min-w-full table-auto border-collapse border border-gray-300">
           <thead>
-            <tr className="bg-gray-100">
+            <tr className="bg-gray-100 dark:bg-slate-800">
               <th className="border px-4 py-2 text-left">
                 {t("unit.ColName")}
               </th>
@@ -230,7 +230,7 @@ const UnitDashboard = () => {
               currentItems.map((u, index) => (
                 <tr
                   key={index}
-                  className="border-t even:bg-slate-100 border-gray-200 dark:border-gray-700"
+                  className="border-t even:bg-slate-100 dark:even:bg-slate-800 border-gray-200 dark:border-gray-700"
                 >
                   <td
                     className="px-4 py-3 max-w-[150px] truncate"
@@ -248,7 +248,7 @@ const UnitDashboard = () => {
                   <td className="px-4 py-3 flex gap-2">
                     <button
                       onClick={() => handleEditUnit(u)}
-                      className="text-blue-600  sm:hover:bg-slate-700 sm:hover:rounded-lg sm:p-4 sm:hover:bg-opacity-20"
+                      className="text-blue-600 sm:hover:bg-slate-700 sm:hover:rounded-lg sm:p-4 sm:hover:bg-opacity-20"
                     >
                       <FaEdit className="sm:w-5 w-4 sm:h-5 h-4" />
                     </button>
@@ -338,7 +338,7 @@ const UnitDashboard = () => {
         <button
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
           disabled={currentPage === 1}
-          className="px-3 py-1 bg-gray-300 rounded-lg disabled:opacity-50"
+          className="px-3 dark:text-slate-800 py-1 bg-gray-100 rounded-lg disabled:opacity-50"
         >
           {t("unit.BtnPrev")}
         </button>
@@ -362,7 +362,7 @@ const UnitDashboard = () => {
             setCurrentPage((prev) => Math.min(prev + 1, totalPages))
           }
           disabled={currentPage === totalPages}
-          className="px-3 py-1 bg-gray-300 rounded-lg disabled:opacity-50"
+          className="px-3 py-1 dark:text-slate-900 bg-gray-200 rounded-lg disabled:opacity-50"
         >
           {t("unit.BtnNext")}
         </button>

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toast } from "react-toastify"; 
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api";
 
@@ -12,10 +13,9 @@ export const createSupply = async (suppliesData) => {
     const response = await axios.post(`${API_URL}/supplies`, suppliesData, {
       headers: getAuthHeader(),
     });
-    console.log("Success:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Error:", error.response?.data || error.message);
+    toast.error("Failed to create supplies");
     throw error.response?.data || { message: "Failed to create supplies" };
   }
 };
@@ -25,15 +25,11 @@ export const getAllSupply = async () => {
     const response = await axios.get(`${API_URL}/supplies`, {
       headers: getAuthHeader(),
     });
-    console.log("API response:", response.data);
     return Array.isArray(response.data)
       ? response.data
       : response.data.data || [];
   } catch (error) {
-    console.error(
-      "Error fetching supplies:",
-      error.response?.data || error.message
-    );
+    toast.error("Failed to fetch supplies");
     throw error.response?.data || { message: "Failed to fetch supplies" };
   }
 };
@@ -45,11 +41,8 @@ export const updateSupply = async (id, data) => {
     });
     return response.data;
   } catch (error) {
-    if (error.response) {
-      throw error.response.data;
-    } else {
-      throw { message: "Network error" };
-    }
+    toast.error("Failed to update supply");
+    throw error.response?.data || { message: "Failed to update supply" };
   }
 };
 
@@ -58,10 +51,9 @@ export const deleteSupply = async (id) => {
     const response = await axios.delete(`${API_URL}/supplies/${id}`, {
       headers: getAuthHeader(),
     });
-    return response.data; 
+    return response.data;
   } catch (error) {
-    console.error("Delete error:", error.response?.data || error.message);
+    toast.error("Failed to delete supply");
     throw error.response?.data || { message: "Failed to delete supply" };
   }
 };
- 

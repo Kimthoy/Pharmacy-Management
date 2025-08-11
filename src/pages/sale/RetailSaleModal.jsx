@@ -51,18 +51,13 @@ const RetailSaleModal = ({ isOpen, setIsOpen, products, addToCart }) => {
         setErrors({ general: t("retailSale.errorProductNotFound") });
         return;
       }
-      console.log(
-        "Submitting for product_id:",
-        formData.product_id,
-        "Product:",
-        selectedProduct
-      );
+    
       // Update supplies table
       const supplyId = selectedProduct.supply_id || formData.product_id; // Fallback to product_id if supply_id not provided
       const response = await axios.patch(`/api/supplies/${supplyId}`, {
         qty: -parseInt(formData.qty),
       });
-      console.log("API response:", response.data);
+     
       // Add to cart only if API call succeeds
       addToCart({
         ...selectedProduct,
@@ -71,7 +66,7 @@ const RetailSaleModal = ({ isOpen, setIsOpen, products, addToCart }) => {
       setFormData({ product_id: "", qty: "" });
       setIsOpen(false);
     } catch (err) {
-      console.error("Error updating supplies:", err);
+   
       if (err.response?.status === 404) {
         setErrors({ general: t("retailSale.errorProductNotFound") });
       } else {

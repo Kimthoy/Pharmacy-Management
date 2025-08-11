@@ -68,7 +68,7 @@ const AddWastageReturn = () => {
       return;
     }
     try {
-      console.log("Submitting wastage return:", formData);
+     
       setSuccess(t("addWastageReturn.success"));
       setFormData({
         customer: "",

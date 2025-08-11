@@ -1,7 +1,4 @@
-// import { Button } from "../../components/ui/Button";
-
 import { Link } from "react-router-dom";
-
 const InfoCard = ({ icon: Icon, title, content, linkLabel, linkTo }) => (
   <div className="bg-white shadow-lg sm:shadow-lg dark:bg-gray-800  rounded-lg p-4  transition-all dark:hover:shadow-gray-500">
     <div className="flex items-center justify-between">
