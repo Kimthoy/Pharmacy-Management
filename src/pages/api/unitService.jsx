@@ -19,16 +19,8 @@ export const createUnit = async (unitData) => {
 };
 
 export const getAllUnits = async () => {
-  try {
-    const response = await axios.get(`${API_URL}/units`, {
-      headers: getAuthHeader(),
-    });
-    return Array.isArray(response.data)
-      ? response.data
-      : response.data.data || [];
-  } catch (error) {
-    throw error.response?.data || { message: "Failed to fetch units" };
-  }
+  const res = await axios.get(`${API_URL}/units`, { headers: getAuthHeader() });
+  return Array.isArray(res.data) ? res.data : res.data?.data ?? [];
 };
 
 export const updateUnit = async (id, data) => {

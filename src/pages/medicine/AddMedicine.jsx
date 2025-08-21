@@ -13,7 +13,6 @@ const AddMedicine = () => {
 
   const [toast, setToast] = useState({ message: "", type: "" });
   const [isScanning, setIsScanning] = useState(false);
-  const [scannerInstance, setScannerInstance] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -23,7 +22,6 @@ const AddMedicine = () => {
   const [unit, setUnit] = useState([]);
 
   const barcodeRef = useRef(null);
-  const openScanner = () => setIsScanning(true);
 
   const [medicine, setMedicine] = useState({
     medicine_name: "",
@@ -39,22 +37,15 @@ const AddMedicine = () => {
     manufacturer: "",
     origin: "",
     purchase: "",
-    // unified pivot fields for BOX only
-    strips_per_box: "",
-    tablets_per_box: "",
   });
 
   useEffect(() => {
-    if (barcodeRef.current) {
-      barcodeRef.current.focus();
-    }
+    if (barcodeRef.current) barcodeRef.current.focus();
   }, []);
 
   const focusBarcodeField = () => {
     setTimeout(() => {
-      if (barcodeRef.current) {
-        barcodeRef.current.focus();
-      }
+      if (barcodeRef.current) barcodeRef.current.focus();
     }, 200);
   };
 
@@ -64,10 +55,7 @@ const AddMedicine = () => {
   };
 
   const handleScanSuccess = (decodedText) => {
-    setMedicine((prev) => ({
-      ...prev,
-      barcode: decodedText,
-    }));
+    setMedicine((prev) => ({ ...prev, barcode: decodedText }));
     setIsScanning(false);
     focusBarcodeField();
   };
@@ -77,7 +65,7 @@ const AddMedicine = () => {
       try {
         const data = await getAllUnits();
         setUnit(data);
-      } catch (err) {
+      } catch {
         setError("Failed to fetch units.");
       }
     };
@@ -87,7 +75,10 @@ const AddMedicine = () => {
   const handleAmountBlur = () => {
     setMedicine((prev) => ({
       ...prev,
-      price: parseFloat(prev.price || 0).toFixed(2),
+      price:
+        prev.price === "" || prev.price === null
+          ? ""
+          : Number(prev.price).toFixed(2),
     }));
   };
 
@@ -96,7 +87,7 @@ const AddMedicine = () => {
       try {
         const data = await getAllCategory();
         setCategory(data);
-      } catch (err) {
+      } catch {
         setError("Failed to fetch categories.");
       }
     };
@@ -127,14 +118,11 @@ const AddMedicine = () => {
     }
   }, []);
 
-  // Barcode scanner start
+  // Barcode scanner
   useEffect(() => {
     if (!isScanning) return;
 
-    const scanner = new Html5QrcodeScanner("scanner", {
-      fps: 10,
-      qrbox: 250,
-    });
+    const scanner = new Html5QrcodeScanner("scanner", { fps: 10, qrbox: 250 });
 
     scanner.render(
       (decodedText) => {
@@ -143,12 +131,10 @@ const AddMedicine = () => {
         setIsScanning(false);
         focusBarcodeField();
       },
-      (error) => {
-        console.warn("Scan error:", error);
+      (scanError) => {
+        console.warn("Scan error:", scanError);
       }
     );
-
-    setScannerInstance(scanner);
 
     return () => {
       scanner.clear().catch(() => {});
@@ -162,6 +148,7 @@ const AddMedicine = () => {
     value: cat.id,
     label: cat.category_name,
   }));
+
   const unitOptions = unit.map((unt) => ({
     value: unt.id,
     label: unt.unit_name,
@@ -181,84 +168,45 @@ const AddMedicine = () => {
     }));
   };
 
-  // BOX helpers
-  const getBoxUnitId = () => {
-    const box = unitOptions.find((opt) => opt.label === "Box");
-    return box?.value ?? null;
-  };
-
-  const isBoxSelected = () => {
-    const boxId = getBoxUnitId();
-    return boxId ? medicine.unit_ids.includes(boxId) : false;
-  };
-
-  // number inputs for box fields
-  const handleQuantityUnitChange = (e) => {
-    const { name, value } = e.target;
-
-    if (value === "") {
-      setMedicine((prev) => ({ ...prev, [name]: "" }));
-      return;
-    }
-
-    const n = Number(value);
-    if (Number.isNaN(n) || n < 0) return;
-
-    setMedicine((prev) => ({ ...prev, [name]: n }));
-  };
-
   // Submit
   const handleMedicineSubmit = useCallback(
     async (e) => {
       e.preventDefault();
       setIsLoading(true);
       setError("");
+      setSuccess("");
       try {
         const formData = new FormData();
-        formData.append("medicine_name", medicine.medicine_name);
-        formData.append("barcode", medicine.barcode);
-        formData.append("price", parseFloat(medicine.price) || 0);
+        formData.append("medicine_name", medicine.medicine_name || "");
+        formData.append("barcode", medicine.barcode || "");
+        formData.append(
+          "price",
+          medicine.price === ""
+            ? ""
+            : String(parseFloat(String(medicine.price)) || 0)
+        );
         formData.append("weight", medicine.weight || "");
         formData.append("medicine_detail", medicine.medicine_detail || "");
         formData.append("manufacturer", medicine.manufacturer || "");
         formData.append("origin", medicine.origin || "");
         formData.append("purchase", medicine.purchase || "");
 
+        // categories
         medicine.category_ids.forEach((id) =>
-          formData.append("category_ids[]", id)
+          formData.append("category_ids[]", String(id))
         );
 
-        // unified units[] with Box-only pivot fields
-        const boxId = getBoxUnitId();
-        medicine.unit_ids.forEach((uId, idx) => {
-          formData.append(`units[${idx}][unit_id]`, String(uId));
-          if (boxId && uId === boxId) {
-            if (
-              medicine.strips_per_box !== "" &&
-              medicine.strips_per_box != null
-            ) {
-              formData.append(
-                `units[${idx}][strips_per_box]`,
-                String(Number(medicine.strips_per_box))
-              );
-            }
-            if (
-              medicine.tablets_per_box !== "" &&
-              medicine.tablets_per_box != null
-            ) {
-              formData.append(
-                `units[${idx}][tablets_per_box]`,
-                String(Number(medicine.tablets_per_box))
-              );
-            }
-          }
-        });
+        // only send unit_ids (no nested units, no box fields)
+        medicine.unit_ids.forEach((id) =>
+          formData.append("unit_ids[]", String(id))
+        );
 
         if (medicine.image instanceof File) {
           formData.append("image", medicine.image);
         }
 
         await createMedicine(formData);
+
         setSuccess("Created successfully!");
         setToast({ message: "Medicine added successfully!", type: "success" });
 
@@ -277,14 +225,18 @@ const AddMedicine = () => {
           category_ids: [],
           unit_ids: [],
           image: null,
-          strips_per_box: "",
-          tablets_per_box: "",
         });
         setImagePreview(null);
         focusBarcodeField();
       } catch (err) {
         console.error(err);
-        setError(err?.message || "Failed to create medicine");
+        const backendMsg =
+          err?.response?.data?.message ||
+          (err?.response?.data?.errors &&
+            Object.entries(err.response.data.errors)
+              .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(", ") : v}`)
+              .join(" | "));
+        setError(backendMsg || err?.message || "Failed to create medicine");
         setToast({ message: "Failed to add medicine", type: "error" });
       } finally {
         setIsLoading(false);
@@ -323,7 +275,7 @@ const AddMedicine = () => {
             {t("add-medicine.AddMedicine")}
           </h2>
           <p className="text-gray-500 italic text-md dark:text-gray-400">
-            {t("add-medicine.title-addmedicine")}
+            {t("add-micine.title-addmedicine")}
           </p>
         </div>
       </div>
@@ -349,7 +301,7 @@ const AddMedicine = () => {
               />
               <button
                 type="button"
-                onClick={startScanner}
+                onClick={() => setIsScanning(true)}
                 className="absolute right-1 top-1/2 -translate-y-1/2 px-3 py-1 rounded-md text-sm"
               >
                 <LuScanBarcode className="w-5 h-5 text-green-600" />
@@ -416,47 +368,6 @@ const AddMedicine = () => {
             />
           </div>
 
-          {/* Box-only inputs */}
-          {isBoxSelected() && (
-            <>
-              <div className="flex flex-col">
-                <label
-                  htmlFor="strips_per_box"
-                  className="mb-2 text-md font-medium text-gray-700 dark:text-gray-300"
-                >
-                  {t("add-medicine.StripsperBox")}
-                </label>
-                <input
-                  type="number"
-                  id="strips_per_box"
-                  name="strips_per_box"
-                  min={1}
-                  value={medicine.strips_per_box ?? ""}
-                  onChange={handleQuantityUnitChange}
-                  className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
-                />
-              </div>
-
-              <div className="flex flex-col">
-                <label
-                  htmlFor="tablets_per_box"
-                  className="mb-2 text-md font-medium text-gray-700 dark:text-gray-300"
-                >
-                  {t("add-medicine.TabletsperBox")}
-                </label>
-                <input
-                  type="number"
-                  id="tablets_per_box"
-                  name="tablets_per_box"
-                  min={1}
-                  value={medicine.tablets_per_box ?? ""}
-                  onChange={handleQuantityUnitChange}
-                  className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
-                />
-              </div>
-            </>
-          )}
-
           <div>
             <label className="dark:text-slate-300">
               {t("add-medicine.Category")}
@@ -481,7 +392,7 @@ const AddMedicine = () => {
               {t("add-medicine.Unit")}
             </label>
             <Select
-              name="unit_id"
+              name="unit_ids"
               options={unitOptions}
               value={unitOptions.filter((opt) =>
                 Array.isArray(medicine.unit_ids)
@@ -502,7 +413,6 @@ const AddMedicine = () => {
             >
               {t("add-medicine.Photo")}
             </label>
-
             <input
               id="medicine-image"
               name="image"
@@ -511,7 +421,6 @@ const AddMedicine = () => {
               onChange={handleMedicineChange}
               className="mt-2 border px-2 py-2 rounded-lg"
             />
-
             {imagePreview && (
               <img
                 src={imagePreview}
@@ -585,7 +494,7 @@ const AddMedicine = () => {
               value={medicine.medicine_detail}
               onChange={handleMedicineChange}
               className="text-md border border-gray-300 dark:border-gray-600 w-full sm:h-28 h-16 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
-            ></textarea>
+            />
           </div>
         </div>
 

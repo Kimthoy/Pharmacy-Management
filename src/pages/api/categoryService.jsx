@@ -19,18 +19,11 @@ export const createCategory = async (categoryData) => {
 };
 
 export const getAllCategory = async () => {
-  try {
-    const response = await axios.get(`${API_URL}/category`, {
-      headers: getAuthHeader(),
-    });
-    return Array.isArray(response.data)
-      ? response.data
-      : response.data.data || [];
-  } catch (error) {
-    throw error.response?.data || { message: "Failed to fetch category" };
-  }
+  const res = await axios.get(`${API_URL}/category`, {
+    headers: getAuthHeader(),
+  });
+  return Array.isArray(res.data) ? res.data : res.data?.data ?? [];
 };
-
 export const updateCategory = async (id, data) => {
   try {
     const response = await axios.put(`${API_URL}/category/${id}`, data, {

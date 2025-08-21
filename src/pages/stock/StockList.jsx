@@ -6,13 +6,14 @@ import "react-toastify/dist/ReactToastify.css";
 import retailStockService from "../api/retailStockService";
 import { useNavigate, useLocation } from "react-router-dom";
 
-const AUTO_REFRESH_MS = 0; // set to e.g. 30000 for 30s polling, or keep 0 to disable
+const AUTO_REFRESH_MS = 0; // set >0 to enable polling
 
 const StockList = () => {
   const [transferModalOpen, setTransferModalOpen] = useState(false);
   const [selectedStock, setSelectedStock] = useState(null);
   const [transferQty, setTransferQty] = useState("");
-  const [priceOut, setPriceOut] = useState("");
+  const [price, setPrice] = useState(""); // <- price (not price_out)
+  const [submitting, setSubmitting] = useState(false);
 
   const location = useLocation();
   const highlightedRetailStock = location.state?.highlightedRetailStock || null;
@@ -26,11 +27,6 @@ const StockList = () => {
   const itemsPerPage = 7;
   const { t } = useTranslation();
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = stocksData.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(stocksData.length / itemsPerPage);
-
   const fetchStocks = useCallback(async () => {
     setLoading(true);
     try {
@@ -43,12 +39,10 @@ const StockList = () => {
     }
   }, []);
 
-  // 1) Fetch on mount (covers browser reload)
   useEffect(() => {
     fetchStocks();
   }, [fetchStocks]);
 
-  // 2) Refetch when tab gains focus or network comes back
   useEffect(() => {
     const onFocus = () => fetchStocks();
     const onOnline = () => fetchStocks();
@@ -60,42 +54,73 @@ const StockList = () => {
     };
   }, [fetchStocks]);
 
-  // 3) Optional polling (set AUTO_REFRESH_MS > 0)
   useEffect(() => {
     if (!AUTO_REFRESH_MS) return;
     const id = setInterval(fetchStocks, AUTO_REFRESH_MS);
     return () => clearInterval(id);
   }, [fetchStocks]);
 
-  const totalStock = stocksData.reduce(
-    (sum, stock) => sum + (stock.quantity || 0),
-    0
-  );
-const totalStockLeng = stocksData.length;
+  const totalStock = stocksData.reduce((sum, s) => sum + (s.quantity || 0), 0);
+  const totalStockLeng = stocksData.length;
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = stocksData.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(stocksData.length / itemsPerPage);
+
   const handleOpenTransfer = (stock) => {
     setSelectedStock(stock);
     setTransferQty("");
-    setPriceOut("");
+    setPrice("");
     setTransferModalOpen(true);
   };
 
   const handleTransferSubmit = async () => {
-    if (!selectedStock || !transferQty || !priceOut) {
-      toast.error("Please fill all fields.");
-      return;
-    }
+    if (!selectedStock) return;
+
+    const available = Number(selectedStock.quantity || 0);
+    const qty = Number(transferQty);
+    const p = Number(price);
+
+    if (!qty || qty <= 0)
+      return toast.error("Quantity must be greater than 0.");
+    if (!Number.isInteger(qty))
+      return toast.error("Quantity must be an integer.");
+    if (qty > available)
+      return toast.error(`Cannot transfer more than available (${available}).`);
+    if (Number.isNaN(p) || p < 0)
+      return toast.error("Retail price is invalid.");
+
     try {
+      setSubmitting(true);
       await retailStockService.createRetailStock({
         stock_id: selectedStock.id,
-        quantity: parseInt(transferQty, 10),
-        price_out: parseFloat(priceOut),
+        medicine_id: selectedStock.id,
+        quantity: qty,
+        price: p,
+        tablet: selectedStock.medicine?.tablet ?? 0, // ✅ default to 0
+        capsule: selectedStock.medicine?.capsule ?? 0, // ✅ default to 0
       });
+
+      // Optimistic UI: decrease the row quantity
+      setStocksData((prev) =>
+        prev.map((s) =>
+          s.id === selectedStock.id
+            ? { ...s, quantity: (s.quantity || 0) - qty }
+            : s
+        )
+      );
+
       toast.success("Retail stock transferred successfully.");
       setTransferModalOpen(false);
-      fetchStocks(); // refresh after successful transfer
+
+      // Hard refresh to be sure
+      fetchStocks();
     } catch (err) {
       toast.error(err?.message || "Transfer failed.");
       console.error("Retail transfer failed:", err);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -230,7 +255,7 @@ const totalStockLeng = stocksData.length;
         </div>
       )}
 
-      {/* Transfer modal (unchanged aside from submit) */}
+      {/* Transfer modal */}
       {transferModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-xl">
@@ -242,14 +267,31 @@ const totalStockLeng = stocksData.length;
               <label className="block text-sm font-medium mb-1">
                 {t("stock-list.Quantity")}
               </label>
-              <input
-                type="number"
-                min="1"
-                max={selectedStock?.quantity}
-                value={transferQty}
-                onChange={(e) => setTransferQty(e.target.value)}
-                className="w-full border rounded px-3 py-2"
-              />
+              <div className="flex gap-2">
+                <input
+                  type="number"
+                  min="1"
+                  max={selectedStock?.quantity}
+                  value={transferQty}
+                  onChange={(e) => setTransferQty(e.target.value)}
+                  className="w-full border rounded px-3 py-2"
+                  disabled={submitting}
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setTransferQty(String(selectedStock?.quantity || 0))
+                  }
+                  className="px-3 py-2 border rounded hover:bg-gray-50"
+                  disabled={submitting || (selectedStock?.quantity || 0) <= 0}
+                >
+                  Max
+                </button>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                {t("stock-list.Available") || "Available"}:{" "}
+                <b>{selectedStock?.quantity ?? 0}</b>
+              </p>
             </div>
 
             <div className="mb-4">
@@ -260,24 +302,33 @@ const totalStockLeng = stocksData.length;
                 type="number"
                 min="0"
                 step="0.01"
-                value={priceOut}
-                onChange={(e) => setPriceOut(e.target.value)}
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
                 className="w-full border rounded px-3 py-2"
+                disabled={submitting}
               />
             </div>
 
             <div className="flex justify-end gap-2">
               <button
-                onClick={handleTransferSubmit}
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-              >
-                {t("stock-list.btnConfirmTransfer") || "Confirm"}
-              </button>
-              <button
                 onClick={() => setTransferModalOpen(false)}
                 className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+                disabled={submitting}
               >
                 {t("stock-list.btnCancel") || "Cancel"}
+              </button>
+              <button
+                onClick={handleTransferSubmit}
+                className={`text-white px-4 py-2 rounded ${
+                  submitting
+                    ? "bg-green-400"
+                    : "bg-green-600 hover:bg-green-700"
+                }`}
+                disabled={submitting}
+              >
+                {submitting
+                  ? t("stock-list.Transferring") || "Transferring..."
+                  : t("stock-list.btnConfirmTransfer") || "Confirm"}
               </button>
             </div>
           </div>

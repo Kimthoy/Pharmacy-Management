@@ -6,8 +6,18 @@ const getAuthHeader = () => {
   const token = localStorage.getItem("token");
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
+const USE_CENTS = true;
 
-// Normalize axios errors so callers can always read err.message
+const api = axios.create({ baseURL: API_URL });
+
+// Attach bearer token automatically (from localStorage)
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+// Normalize axios/Laravel errors so callers can rely on err.message
 const normErr = (error, fallback = "Request failed") => {
   const res = error?.response?.data;
   if (!res) return { message: fallback };
@@ -15,43 +25,51 @@ const normErr = (error, fallback = "Request failed") => {
   return { message: res.message || fallback, errors: res.errors };
 };
 
+// Convert UI price (float string) to server int cents if required
+const toServerPrice = (price) => {
+  const p = Number(price);
+  if (Number.isNaN(p) || p < 0) return 0;
+  return USE_CENTS ? Math.round(p * 100) : p;
+};
+
 /**
  * GET /retail-stocks
- * params: { page?, perPage?, ...any filters }
+ * params: { page?, perPage?, ...filters }
  * returns: { data, meta, links? }
  */
 export const getRetailStocks = async (params = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/retail-stocks`, {
-      headers: getAuthHeader(),
-      params,
-    });
-    const payload = response.data || {};
-    // Laravel Resource::collection(paginate()) => { data: [...], meta, links }
+    const { data } = await api.get("/retail-stocks", { params });
     return {
-      data: payload.data ?? [],
-      meta: payload.meta ?? {},
-      links: payload.links ?? undefined,
+      data: data?.data ?? [],
+      meta: data?.meta ?? {},
+      links: data?.links ?? undefined,
     };
   } catch (error) {
-    throw normErr(error, "Failed to fetch stocks");
+    throw normErr(error, "Failed to fetch retail stocks");
   }
 };
 
 /**
  * POST /retail-stocks
- * body: { stock_id: number, quantity: number, price_out: number }
- * returns: single resource object
+ * body: { stock_id:number, quantity:number, price:number|decimal, tablet?:number, capsule?:number }
+ * This is your "transfer to retail" call.
  */
 export const createRetailStock = async (data) => {
   try {
-    const response = await axios.post(`${API_URL}/retail-stocks`, data, {
+    // get logged-in user_id from token payload or localStorage
+    const userId = localStorage.getItem("user_id"); // <- you need to store this at login
+
+    const payload = {
+      ...data,
+      user_id: userId, // backend will use this
+    };
+
+    const response = await axios.post(`${API_URL}/retail-stocks`, payload, {
       headers: {
         ...getAuthHeader(),
         "Content-Type": "application/json",
       },
-      // If you use Sanctum cookies instead of Bearer tokens, enable:
-      // withCredentials: true,
     });
     return response.data?.data ?? response.data;
   } catch (error) {
@@ -65,10 +83,8 @@ export const createRetailStock = async (data) => {
  */
 export const getRetailStockById = async (id) => {
   try {
-    const response = await axios.get(`${API_URL}/retail-stocks/   ${id}`, {
-      headers: getAuthHeader(),
-    });
-    return response.data?.data ?? response.data;
+    const { data } = await api.get(`/retail-stocks/${id}`);
+    return data?.data ?? data;
   } catch (error) {
     throw normErr(error, "Failed to fetch retail stock");
   }
@@ -76,20 +92,18 @@ export const getRetailStockById = async (id) => {
 
 /**
  * DELETE /retail-stocks/{id}
- * returns: { message } or { data }
+ * returns: { message } or resource
  */
 export const deleteRetailStock = async (id) => {
   try {
-    const response = await axios.delete(`${API_URL}/retail-stocks/${id}`, {
-      headers: getAuthHeader(),
-    });
-    return response.data;
+    const { data } = await api.delete(`/retail-stocks/${id}`);
+    return data;
   } catch (error) {
     throw normErr(error, "Failed to delete retail stock");
   }
 };
 
-export const retailStockService = {
+const retailStockService = {
   getRetailStocks,
   createRetailStock,
   getRetailStockById,

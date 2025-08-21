@@ -47,11 +47,8 @@ const AddSupply = () => {
             }))
           );
         } else {
-          
         }
-      } catch (err) {
-        
-      }
+      } catch (err) {}
     };
 
     fetchData();
@@ -92,9 +89,7 @@ const AddSupply = () => {
             barcode: m.barcode,
           }))
         );
-      } catch (err) {
-        
-      }
+      } catch (err) {}
     };
 
     fetchData();
@@ -317,7 +312,7 @@ const AddSupply = () => {
         </div>
 
         {/* Table Layout for larger screens */}
-        <div className="hidden sm:block overflow-x-auto">
+        <div className="hidden sm:block ">
           <table className="min-w-full text-sm border dark:border-gray-700 bg-white dark:bg-slate-800">
             <thead>
               <tr className="bg-gray-100 dark:bg-slate-700 text-left">

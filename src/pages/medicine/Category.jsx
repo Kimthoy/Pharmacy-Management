@@ -97,9 +97,10 @@ const CategoryDashboard = () => {
       const data = await getAllCategory();
       setCategories(data);
     } catch (err) {
-    
+      console.log("Error :", err);
       setError("Failed to fetch categories.");
     } finally {
+
       setLoading(false);
     }
   };

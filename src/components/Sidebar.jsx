@@ -128,7 +128,6 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
 
   return (
     <div>
-      
       <button
         className="md:hidden fixed top-3 left-4 z-50 sm:p-2 p-1 bg-green-500 text-white rounded-md"
         onClick={toggleSidebar}
@@ -136,7 +135,6 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
         {isOpen ? <HiX className="w-6 h-6" /> : <HiMenu className="w-6 h-6" />}
       </button>
 
-      
       {isOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
@@ -144,7 +142,6 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
         ></div>
       )}
 
-      
       <div
         className={`h-screen flex-shrink-0 bg-green-600 dark:bg-gray-900 dark:shadow-gray-800 transition-all duration-300 fixed z-[200] md:static
       ${isOpen ? "w-52" : "w-0 md:w-[80px]"} md:hover:w-64 
@@ -255,17 +252,6 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                 );
               })}
             </ul>
-            <hr className="h-3 text-white w-full" />
-            <button className="flex items-center w-full px-4 py-3 mt-2 text-md rounded-lg bg-red-600 text-white hover:bg-red-700 hover:scale-105 hover:shadow-md transition-all">
-              <FiLogOut className="w-6 h-6 flex-shrink-0" />
-              <span
-                className={`ml-3 transition-all whitespace-nowrap overflow-hidden 
-              ${isOpen ? "opacity-100 max-w-[200px]" : "opacity-0 max-w-0 ml-0"}
-            `}
-              >
-                Log Out
-              </span>
-            </button>
           </nav>
         </div>
       </div>

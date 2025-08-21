@@ -1,27 +1,23 @@
 import { useState, useEffect } from "react";
-import { FaSort, FaCog } from "react-icons/fa";
-import { useTranslation } from "../../hooks/useTranslation";
-import { useTheme } from "../../context/ThemeContext";
-import { FaRegEdit } from "react-icons/fa";
+import { FaSort, FaCog, FaRegEdit } from "react-icons/fa";
 import { TbHttpDelete } from "react-icons/tb";
 import { GrView } from "react-icons/gr";
-import Select from "react-select";
+import { useTranslation } from "../../hooks/useTranslation";
+import { useTheme } from "../../context/ThemeContext";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
 import {
   getUsers,
   createUser,
   updateUser,
-  toggleUserStatus,
   deleteUser,
 } from "../api/userService";
 
 const ManageStaff = () => {
   const { t } = useTranslation();
   const { theme } = useTheme();
+
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
   const [currentPage, setCurrentPage] = useState(1);
@@ -31,100 +27,38 @@ const ManageStaff = () => {
   const [editUserId, setEditUserId] = useState(null);
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isToggling, setIsToggling] = useState({});
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    role: "",
+    role: "cashier",
     status: "Active",
     password: "",
+    phone: "",
+    gender: "",
   });
   const [formError, setFormError] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteConfirmUser, setDeleteConfirmUser] = useState(null);
-  const confirmDeleteUser = (user) => {
-    setDeleteConfirmUser(user);
-  };
 
-  const genderOptions = [
-    { value: "", label: t("staff.selectGender") },
-    { value: "male", label: t("staff.male") },
-    { value: "female", label: t("staff.female") },
-  ];
-
-  const roleOptions = [
-    { value: "", label: "Admin" },
-    { value: "cashier", label: "Cashier" },
-    { value: "partner", label: "Partner" },
-  ];
-
-  const filteredRoleOptions =
-    modalMode === "add"
-      ? roleOptions.filter((opt) => opt.label !== "Admin")
-      : formData.role === "Admin"
-      ? roleOptions
-      : roleOptions.filter((opt) => opt.label !== "Admin");
-
-  const statusOptions = [
-    { value: "Active", label: t("staff.statusActive") },
-    { value: "Inactive", label: t("staff.statusInactive") },
-  ];
-
-  const handleViewDetail = (user) => {
-    setSelectedUser(user);
-    setIsModalOpen(true);
-  };
-
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-    setCurrentPage(1);
-  };
-
-  const handleDeleteConfirmed = async () => {
-    if (!deleteConfirmUser) return;
-
-    setIsDeleting(true); // ✅ start loading
-
-    try {
-      await deleteUser(deleteConfirmUser.id);
-      toast.success(`${deleteConfirmUser.username} deleted successfully`);
-      fetchUsers(); // refresh list
-    } catch (error) {
-      
-      toast.error("Failed to delete user");
-    } finally {
-      setIsDeleting(false); // ✅ stop loading
-      setDeleteConfirmUser(null); // close modal
-    }
-  };
-
-  const handleCancelDelete = () => {
-    setDeleteConfirmUser(null);
-  };
-
+  // ===== API calls =====
   const fetchUsers = async () => {
     setIsLoading(true);
     try {
       const response = await getUsers();
-      let transformedUsers = [];
-      if (response.data && Array.isArray(response.data)) {
-        transformedUsers = response.data.map((user) => ({
+      const transformedUsers =
+        response.data?.map((user) => ({
           id: user.id,
           name: user.username || user.name || "Unknown",
           email: user.email || "No email",
-          role: user.role || "admin",
+          role: user.role || "cashier",
           status: user.is_active ? "Active" : "Inactive",
           username: user.username || user.name || "Unknown",
           phone: user.phone || "",
           gender: user.gender || "",
-        }));
-      } else {
-        
-      }
+        })) || [];
       setUsers(transformedUsers);
     } catch (error) {
-      
       toast.error("Failed to load users");
       setUsers([]);
     } finally {
@@ -136,10 +70,9 @@ const ManageStaff = () => {
     fetchUsers();
   }, []);
 
-  // ✅ When adding a staff member
+  // ====== Actions ======
   const handleAddStaff = () => {
     setModalMode("add");
-
     setFormData({
       name: "",
       email: "",
@@ -149,7 +82,6 @@ const ManageStaff = () => {
       phone: "",
       gender: "",
     });
-
     setFormError("");
     setShowModal(true);
   };
@@ -157,32 +89,27 @@ const ManageStaff = () => {
   const handleEditStaff = (user) => {
     setModalMode("edit");
     setEditUserId(user.id);
-
     setFormData({
-      username: user.username || user.name || "",
-      name: user.name || user.username || "",
+      name: user.name || "",
       email: user.email || "",
       role: user.role?.toLowerCase() || "cashier",
-      status: user.is_active ? "Active" : "Inactive",
+      status: user.status || "Active",
       password: "",
       phone: user.phone || "",
       gender: user.gender || "",
     });
-
     setFormError("");
     setShowModal(true);
   };
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+
     if (!formData.name.trim()) {
       setFormError(t("staff.error.nameRequired"));
       return;
     }
-    if (
-      !formData.email.trim() ||
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)
-    ) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       setFormError(t("staff.error.invalidEmail"));
       return;
     }
@@ -190,62 +117,70 @@ const ManageStaff = () => {
       setFormError(t("staff.error.passwordRequired"));
       return;
     }
+
     try {
-      const updatedData = {
+      const payload = {
         username: formData.name,
         email: formData.email,
         role: formData.role,
         is_active: formData.status === "Active",
-        phone: formData.phone || null,
-        gender: formData.gender || null,
+        phone: formData.phone,
+        gender: formData.gender,
+        ...(formData.password && { password: formData.password }),
       };
-      if (formData.password.trim()) {
-        updatedData.password = formData.password;
-      }
+
       if (modalMode === "add") {
-        await createUser(updatedData);
+        await createUser(payload);
         toast.success(t("staff.success.staffAdded", { name: formData.name }));
       } else {
-        await updateUser(editUserId, updatedData);
+        await updateUser(editUserId, payload);
         toast.success(t("staff.success.staffUpdated", { name: formData.name }));
       }
+
       setShowModal(false);
       fetchUsers();
-      setFormError("");
     } catch (error) {
-      
       toast.error(
         error.response?.data?.message ||
-          error.response?.data?.errors?.[0] ||
           error.message ||
           t("staff.error.submitFailed")
       );
     }
   };
 
-  const handleFormChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const confirmDeleteUser = (user) => {
+    setDeleteConfirmUser(user);
   };
 
-  const sortedList = Array.isArray(users)
-    ? [...users].sort((a, b) =>
-        sortOrder === "asc"
-          ? a.name.localeCompare(b.name)
-          : b.name.localeCompare(a.name)
-      )
-    : [];
+  const handleDeleteConfirmed = async () => {
+    if (!deleteConfirmUser) return;
+    setIsDeleting(true);
+    try {
+      await deleteUser(deleteConfirmUser.id);
+      toast.success(`${deleteConfirmUser.username} deleted successfully`);
+      fetchUsers();
+    } catch {
+      toast.error("Failed to delete user");
+    } finally {
+      setIsDeleting(false);
+      setDeleteConfirmUser(null);
+    }
+  };
 
-  const filteredList = sortedList
-    // Search filter
-    .filter((user) =>
-      user.name.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-    // ✅ Hide admins
-    .filter((user) => user.role?.toLowerCase() !== "admin");
+  // ===== Filters & Pagination =====
+  const sortedList = [...users].sort((a, b) =>
+    sortOrder === "asc"
+      ? a.name.localeCompare(b.name)
+      : b.name.localeCompare(a.name)
+  );
+
+  const filteredList = sortedList.filter(
+    (user) =>
+      user.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      user.role?.toLowerCase() !== "admin"
+  );
 
   const totalPages = Math.ceil(filteredList.length / itemsPerPage);
-
   const paginatedList = filteredList.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -253,289 +188,211 @@ const ManageStaff = () => {
 
   return (
     <div className="sm:p-2 mb-14 dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen max-w-6xl mx-auto">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-xl font-bold text-gray-700 dark:text-gray-200">
-            {t("staff.StaffDashboard")}
-          </h1>
-          <span className="text-md font-normal text-gray-400 dark:text-gray-300">
-            {t("staff.StaffDashboardDesc")}
-          </span>
+          <h1 className="text-xl font-bold">{t("staff.StaffDashboard")}</h1>
+          <p className="text-gray-400">{t("staff.StaffDashboardDesc")}</p>
         </div>
-        <div className="flex items-center space-x-2 mt-4 md:mt-0">
-          <button
-            onClick={handleAddStaff}
-            className="text-md text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-4 py-1 rounded-lg dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition"
-            aria-label={t("staff.addStaff")}
-          >
-            {t("staff.addStaff")}
-          </button>
-        </div>
+        <button
+          onClick={handleAddStaff}
+          className="px-4 py-2 rounded-lg border text-emerald-500 border-emerald-500 hover:bg-emerald-500 hover:text-white"
+        >
+          {t("staff.addStaff")}
+        </button>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg border-gray-200 dark:border-gray-600">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-md font-bold text-gray-700 dark:text-gray-200">
-            {t("staff.staffList")}
-          </h2>
-          <div className="flex items-center space-x-3">
-            <input
-              type="text"
-              placeholder={t("staff.searchPlaceholder")}
-              value={searchQuery}
-              onChange={handleSearch}
-              className="text-md border border-gray-400 dark:border-gray-600 px-3 py-1 rounded-lg font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
-              aria-label={t("staff.searchPlaceholder")}
-            />
+      {/* Table */}
+      <table className="w-full border border-gray-300 dark:border-gray-600">
+        <thead>
+          <tr className="text-center">
+            <td className="py-3">{t("staff.name")}</td>
+            <td className="py-3">{t("staff.email")}</td>
+            <td className="py-3">{t("staff.role")}</td>
+            <td className="py-3">{t("staff.status")}</td>
+            <td className="py-3">{t("staff.actions")}</td>
+          </tr>
+        </thead>
+        <tbody>
+          {paginatedList.length > 0 ? (
+            paginatedList.map((user) => (
+              <tr key={user.id} className="text-center border">
+                <td className="py-3">{user.name}</td>
+                <td className="text-emerald-500 py-3">{user.email}</td>
+                <td>{user.role}</td>
+                <td
+                  className={
+                    user.status === "Active"
+                      ? "text-green-600 py-3"
+                      : "text-red-600"
+                  }
+                >
+                  {user.status}
+                </td>
+                <td className="py-3">
+                  <div className="flex justify-center space-x-2">
+                    <button
+                      className="text-blue-500"
+                      onClick={() => handleEditStaff(user)}
+                    >
+                      <FaRegEdit className="w-5 h-5" />
+                    </button>
+                    <button
+                      className="text-green-500"
+                      onClick={() => {
+                        setSelectedUser(user);
+                        setIsModalOpen(true); // ✅ open the modal
+                      }}
+                    >
+                      <GrView className="w-5 h-5" />
+                    </button>
+
+                    <button
+                      className="text-red-500"
+                      onClick={() => confirmDeleteUser(user)}
+                    >
+                      <TbHttpDelete className="w-5 h-5" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="5" className="text-center p-6">
+                {t("staff.noRecords")}
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+      {/* ✅ View Detail Modal */}
+      {isModalOpen && selectedUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 px-4">
+          <div className="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 sm:p-8 overflow-hidden">
             <button
-              onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-              className="bg-white dark:bg-gray-700 px-4 py-2 rounded-lg shadow-lg dark:shadow-gray-600 flex items-center space-x-2 border border-gray-400 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600"
-              aria-label={
-                sortOrder === "asc" ? "Sort descending" : "Sort ascending"
-              }
+              onClick={() => setIsModalOpen(false)}
+              className="absolute top-3 right-3 text-gray-500 hover:text-red-500 dark:text-gray-300 dark:hover:text-red-400 transition"
             >
-              <FaSort />
+              ✕
             </button>
-            <button
-              className="bg-white hidden sm:flex dark:bg-gray-700 px-4 py-2 rounded-lg shadow-lg dark:shadow-gray-600 items-center space-x-2 border border-gray-400 dark:border-gray-600 text-emerald-500 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-600"
-              aria-label="Settings"
-            >
-              <FaCog />
-            </button>
+            <h2 className="text-2xl font-semibold mb-6 text-gray-800 dark:text-white text-center">
+              👤 User Details
+            </h2>
+            <ul className="space-y-3 text-sm text-gray-700 dark:text-gray-200">
+              <li>
+                <strong>👤 Username:</strong> {selectedUser.username}
+              </li>
+              <li>
+                <strong>📧 Email:</strong> {selectedUser.email}
+              </li>
+              <li>
+                <strong>🔐 Role:</strong> {selectedUser.role}
+              </li>
+              <li>
+                <strong>📱 Phone:</strong> {selectedUser.phone}
+              </li>
+              <li>
+                <strong>📈 Status:</strong> {selectedUser.status}
+              </li>
+              <li>
+                <strong>⚧ Gender:</strong> {selectedUser.gender}
+              </li>
+            </ul>
+            <div className="mt-8 text-center">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="inline-block px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
+      )}
 
-        <div className="w-full">
-          <table className="w-full dark:text-slate-100 border-collapse border border-gray-300 dark:border-gray-600">
-            <thead>
-              <tr className="text-center">
-                <td className="py-2 px-3">{t("staff.name")}</td>
-                <td className="py-2 px-3">{t("staff.email")}</td>
-                <td className="py-2 px-3">{t("staff.role")}</td>
-                <td className="py-2 px-3">{t("staff.status")}</td>
-                <td className="py-2 px-3">{t("staff.actions")}</td>
-              </tr>
-            </thead>
-            <tbody>
-              {paginatedList.length > 0 ? (
-                paginatedList.map((user) => (
-                  <tr
-                    key={user.id}
-                    className={`border text-center dark:even:bg-slate-700 even:bg-slate-100 transition-all border-gray-300 dark:border-gray-600 ${
-                      user.status === "Active"
-                        ? "hover:bg-slate-200 dark:hover:bg-slate-700 hover:cursor-pointer hover:shadow-lg"
-                        : "bg-gray-100 text-gray-400 dark:bg-slate-800 dark:text-gray-500 cursor-not-allowed"
-                    }`}
-                  >
-                    <td className="p-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300">
-                      {user.name || "No name"}
-                    </td>
-                    <td
-                      title={user.email}
-                      className="truncate max-w-20 p-4 border-gray-300 dark:border-gray-600 text-emerald-500 dark:text-emerald-400"
-                    >
-                      {user.email || "No email"}
-                    </td>
-                    <td className="truncate max-w-44 p-3 border border-gray-300 dark:border-gray-600 text-gray-400 dark:text-gray-300">
-                      {user.role || "No role"}
-                    </td>
-                    <td
-                      className={`p-3 border border-gray-300 dark:border-gray-600 ${
-                        user.status === "Active"
-                          ? "text-green-600 dark:text-green-400"
-                          : "text-red-600 dark:text-red-400"
-                      }`}
-                    >
-                      {user.status || "No status"}
-                    </td>
-                    <td className="p-3 border border-gray-300 dark:border-gray-600">
-                      {user.role === "admin" ? (
-                        <span className="text-gray-400 italic">
-                          Admin Protected
-                        </span>
-                      ) : (
-                        <div className="flex justify-center space-x-2">
-                          <button
-                            onClick={() => handleEditStaff(user)}
-                            className="text-md border text-blue-700 border-blue-500 dark:border-blue-400 px-2 py-1 rounded-lg transition hover:bg-blue-600 hover:text-white"
-                          >
-                            <FaRegEdit className="w-5 h-5" />
-                          </button>
-                          <button
-                            onClick={() => handleViewDetail(user)}
-                            className="text-md border px-2 py-1 rounded-lg transition text-green-600 border-green-600 hover:text-white hover:bg-green-600 dark:text-green-400 dark:border-green-200 dark:hover:bg-green-600 dark:hover:text-white"
-                          >
-                            <GrView className="w-5 h-5" />
-                          </button>
-                          <button
-                            onClick={() => confirmDeleteUser(user)}
-                            className="text-md border border-red-500 dark:border-red-400 px-2 py-1 rounded-lg transition text-red-600 hover:bg-red-600 hover:text-white"
-                          >
-                            <TbHttpDelete className="w-5 h-5" />
-                          </button>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan="5"
-                    className="p-16 border border-gray-300 dark:border-gray-600 text-center text-gray-500 dark:text-gray-400"
-                  >
-                    {t("staff.noRecords")}
-                  </td>
-                </tr>
+      {/* === ADD / EDIT MODAL === */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg w-full max-w-lg">
+            <h2 className="text-xl font-bold mb-4">
+              {modalMode === "add" ? "Add Staff" : "Edit Staff"}
+            </h2>
+            {formError && <p className="text-red-500">{formError}</p>}
+            <form onSubmit={handleFormSubmit} className="space-y-3">
+              <input
+                type="text"
+                name="name"
+                placeholder="Name"
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                className="w-full border p-2 rounded"
+              />
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+                className="w-full border p-2 rounded"
+              />
+              {modalMode === "add" && (
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
+                  className="w-full border p-2 rounded"
+                />
               )}
-            </tbody>
-          </table>
-
-          {isModalOpen && selectedUser && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 px-4">
-              <div className="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 sm:p-8 overflow-hidden">
+              <select
+                value={formData.role}
+                onChange={(e) =>
+                  setFormData({ ...formData, role: e.target.value })
+                }
+                className="w-full border p-2 rounded"
+              >
+                <option value="cashier">Cashier</option>
+                <option value="partner">Partner</option>
+              </select>
+              <select
+                value={formData.status}
+                onChange={(e) =>
+                  setFormData({ ...formData, status: e.target.value })
+                }
+                className="w-full border p-2 rounded"
+              >
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+              <div className="flex justify-end space-x-2">
                 <button
-                  onClick={() => setIsModalOpen(false)}
-                  className="absolute top-3 right-3 text-gray-500 hover:text-red-500 dark:text-gray-300 dark:hover:text-red-400 transition"
-                  aria-label="Close modal"
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 rounded border"
                 >
-                  ✕
+                  Cancel
                 </button>
-                <h2 className="text-2xl font-semibold mb-6 text-gray-800 dark:text-white text-center">
-                  👤 User Details
-                </h2>
-                <ul className="space-y-3 text-sm text-gray-700 dark:text-gray-200">
-                  <li>
-                    <span className="font-medium text-gray-600 dark:text-gray-400">
-                      👤 Username:
-                    </span>{" "}
-                    {selectedUser.username}
-                  </li>
-                  <li>
-                    <span className="font-medium text-gray-600 dark:text-gray-400">
-                      📧 Email:
-                    </span>{" "}
-                    {selectedUser.email}
-                  </li>
-                  <li>
-                    <span className="font-medium text-gray-600 dark:text-gray-400">
-                      🔐 Role:
-                    </span>{" "}
-                    {selectedUser.role}
-                  </li>
-                  <li>
-                    <span className="font-medium text-gray-600 dark:text-gray-400">
-                      📱 Phone:
-                    </span>{" "}
-                    {selectedUser.phone}
-                  </li>
-                  <li>
-                    <span className="font-medium text-gray-600 dark:text-gray-400">
-                      📈 Status:
-                    </span>{" "}
-                    {selectedUser.status}
-                  </li>
-                  <li>
-                    <span className="font-medium text-gray-600 dark:text-gray-400">
-                      ⚧ Gender:
-                    </span>{" "}
-                    {selectedUser.gender}
-                  </li>
-                </ul>
-                <div className="mt-8 text-center">
-                  <button
-                    onClick={() => setIsModalOpen(false)}
-                    className="inline-block px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition"
-                  >
-                    Close
-                  </button>
-                </div>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded bg-emerald-500 text-white"
+                >
+                  {modalMode === "add" ? "Create" : "Update"}
+                </button>
               </div>
-            </div>
-          )}
-
-          {deleteConfirmUser && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 max-w-sm w-full">
-                <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200">
-                  Confirm Deletion
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300 mt-2">
-                  Are you sure you want to delete{" "}
-                  <span className="font-semibold">
-                    {deleteConfirmUser.username}
-                  </span>
-                  ? This action cannot be undone.
-                </p>
-                <div className="flex justify-end mt-4 space-x-2">
-                  <button
-                    onClick={handleCancelDelete}
-                    className="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleDeleteConfirmed}
-                    disabled={isDeleting}
-                    className={`px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 ${
-                      isDeleting ? "opacity-70 cursor-not-allowed" : ""
-                    }`}
-                  >
-                    {isDeleting ? "Deleting..." : "Yes, Delete"}
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+            </form>
+          </div>
         </div>
-      </div>
+      )}
 
-      <div className="flex flex-col md:flex-row justify-between items-center mt-4">
-        <div className="hidden sm:flex items-center space-x-2">
-          <span className="text-gray-400 dark:text-gray-300 text-md">
-            {t("staff.show")}
-          </span>
-          <select
-            className="text-md border border-gray-400 dark:border-gray-600 px-2 py-2 rounded-lg font-light focus:outline-emerald-400 focus:border-emerald-700 dark:bg-gray-700 dark:text-gray-200"
-            value={itemsPerPage}
-            onChange={(e) => {
-              setItemsPerPage(Number(e.target.value));
-              setCurrentPage(1);
-            }}
-            aria-label={t("staff.entriesPerPage")}
-          >
-            <option value={5}>5</option>
-            <option value={10}>10</option>
-            <option value={15}>15</option>
-          </select>
-          <span className="text-gray-400 dark:text-gray-300 text-md">
-            {t("staff.entries")}
-          </span>
-        </div>
-        <div className="flex items-center space-x-2 mt-4 md:mt-0">
-          <button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage(currentPage - 1)}
-            className="text-md text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-lg dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition disabled:opacity-50"
-            aria-label="Previous page"
-          >
-            {t("staff.previous")}
-          </button>
-          <span className="text-gray-700 dark:text-gray-200 text-md">
-            {t("staff.page")} {currentPage} {t("staff.of")} {totalPages}
-          </span>
-          <button
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage(currentPage + 1)}
-            className="text-md text-emerald-500 dark:text-emerald-400 border border-emerald-500 dark:border-emerald-400 px-3 py-2 rounded-lg dark:hover:text-white hover:text-white hover:bg-emerald-500 dark:hover:bg-emerald-400 transition disabled:opacity-50"
-            aria-label="Next page"
-          >
-            {t("staff.next")}
-          </button>
-        </div>
-      </div>
-
-      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 };
