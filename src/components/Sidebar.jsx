@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { MdSpaceDashboard } from "react-icons/md";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "../../src/hooks/useTranslation";
@@ -7,8 +8,11 @@ import { CiRepeat, CiSettings } from "react-icons/ci";
 import { FiSettings } from "react-icons/fi";
 import { FaUserDoctor } from "react-icons/fa6";
 import { MdPointOfSale } from "react-icons/md";
-import { FiLogOut } from "react-icons/fi";
 import { TbTruckDelivery } from "react-icons/tb";
+import { CiMedicalCross } from "react-icons/ci";
+import { FaTruckMedical } from "react-icons/fa6";
+import { MdAssignmentReturn } from "react-icons/md";
+
 import {
   UserGroupIcon,
   UserPlusIcon,
@@ -27,7 +31,12 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const menuItems = [
-    { name: t("sidebar.dashboards"), icon: TfiDashboard, path: "/" },
+    { name: t("sidebar.dashboards"), icon: MdSpaceDashboard, path: "/" },
+    {
+      name: t("sidebar.retail-product"),
+      icon: CiMedicalCross,
+      path: "/retail-product",
+    },
     {
       name: t("sidebar.medicine"),
       icon: BiCapsule,
@@ -68,12 +77,16 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
       subItems: [
         { name: t("sidebar.AddStock"), path: "/add-supply" },
         { name: t("sidebar.StockList"), path: "/stocklist" },
-        { name: t("sidebar.RetailStock"), path: "/retailstock" },
       ],
     },
     {
+      name: t("sidebar.RetailStock"),
+      icon: LiaWarehouseSolid,
+      path: "/retailstock",
+    },
+    {
       name: t("sidebar.manufacturer"),
-      icon: TbTruckDelivery,
+      icon: FaTruckMedical,
       path: "/menufacturer",
       subItems: [
         { name: t("sidebar.manufacturerList"), path: "/manufacturerlist" },
@@ -83,10 +96,10 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
     },
     {
       name: t("sidebar.returns"),
-      icon: CiRepeat,
+      icon: MdAssignmentReturn,
       path: "/return",
       subItems: [
-        { name: t("sidebar.wastageReturnList"), path: "/wastagereturnlist" },
+        { name: t("sidebar.wastageReturnList"), path: "/returns-table" },
       ],
     },
 
@@ -108,7 +121,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
     {
       name: t("sidebar.setting"),
       icon: FiSettings,
-      path: "/setting",
+      path: "/setting-page",
     },
   ];
 

@@ -86,8 +86,14 @@ const StockReport = () => {
     if (valA > valB) return sortOrder === "asc" ? 1 : -1;
     return 0;
   });
+
+  const totalStockQuantity = filteredData.reduce(
+    (sum, item) => sum + (item.quantity || 0),
+    0
+  );
+
   const totalStockValue = filteredData.reduce(
-    (sum, item) => sum + item.quantity * parseFloat(item.price_in || 0),
+    (sum, item) => sum + parseFloat(item.price_in || 0),
     0
   );
   const lowStockItems = filteredData.filter(
@@ -156,12 +162,24 @@ const StockReport = () => {
       {/* Summary & Chart */}
       <div className="grid md:grid-cols-2 gap-2 mb-6">
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-          <p className="text-gray-500 dark:text-gray-300 mb-5">
-            Total Stock Value
-          </p>
-          <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mb-5">
-            ${totalStockValue.toFixed(2)}
-          </p>
+          <div className="flex gap-12">
+            <div>
+              <p className="text-gray-500 dark:text-gray-300 mb-5">
+                Total Stock Value
+              </p>
+              <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mb-5">
+                ${totalStockValue.toFixed(2)}
+              </p>
+            </div>
+            <div>
+              <p className="text-gray-500 dark:text-gray-300 mb-5">
+                Total Stock Quantity
+              </p>
+              <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mb-5">
+                {totalStockQuantity} /Unit
+              </p>
+            </div>
+          </div>
           <p className="text-gray-500 dark:text-gray-300 mt-2">
             Low Stock Items:{" "}
             <span className="font-bold text-red-500 text-lg p-4">
@@ -262,12 +280,10 @@ const StockReport = () => {
       >
         <thead>
           <tr className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
-            <th className="sm:flex hidden p-2 border">ID</th>
             <th className="p-2 border">Medicine Name</th>
             <th className="p-2 border">Quantity</th>
             <th className="p-2 border">Price In</th>
             <th className="p-2 border">Received Date</th>
-            <th className="p-2 border">Notes</th>
           </tr>
         </thead>
         <tbody>
@@ -277,9 +293,6 @@ const StockReport = () => {
                 key={stock.id}
                 className="border hover:bg-gray-50 dark:hover:bg-gray-800"
               >
-                <td className="p-2 border sm:flex hidden text-gray-800 dark:text-gray-200">
-                  {stock.id}
-                </td>
                 <td className="p-2 border text-gray-800 dark:text-gray-200">
                   {stock.medicine?.medicine_name}
                 </td>
@@ -297,9 +310,6 @@ const StockReport = () => {
                 </td>
                 <td className="p-2 border text-gray-800 dark:text-gray-200">
                   {new Date(stock.received_date).toLocaleDateString()}
-                </td>
-                <td className="p-2 border text-gray-800 dark:text-gray-200">
-                  {stock.notes || "N/A"}
                 </td>
               </tr>
             ))

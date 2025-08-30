@@ -1,14 +1,9 @@
-import React, { Suspense, lazy, useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+// src/App.jsx
+import React, { Suspense, lazy, useState, useEffect, useContext } from "react";
+import { useLocation, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  Navigate,
-} from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext";
 import Loader from "./components/Loader";
 import TopBar from "./components/TopBar";
@@ -16,11 +11,17 @@ import Footer from "./components/Footer";
 import Sidebar from "./components/Sidebar";
 import Register from "./pages/auth/Register";
 import { LanguageProvider } from "./context/LanguageContext";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider, AuthContext } from "./context/AuthContext";
+
+// Lazy pages
 const ProfileDashboard = lazy(() => import("./pages/profile/ProfileDashboard"));
-const Setting = lazy(() => import("./pages/setting/Setting"));
+const SettingPage = lazy(() => import("./pages/setting/SettingsPage"));
+
+const SettingPageForm = lazy(() =>
+  import("./pages/setting/SystemSettingsForm")
+);
 const ExpireSoon = lazy(() => import("./pages/dashboard/ExpiringSoonList"));
-const ActivityPage = lazy(() => import("./pages/profile/ActivityPage"));
+
 const AddSupply = lazy(() => import("./pages/stock/AddSupply"));
 const Login = lazy(() => import("./pages/auth/Login"));
 const CustomerList = lazy(() => import("./pages/customer/ListCustomer"));
@@ -44,6 +45,7 @@ const MedicineDetail = lazy(() => import("./pages/medicine/MedicineDetail"));
 const AddWastageReturn = lazy(() => import("./pages/return/AddWastageReturn"));
 const SaleDashboard = lazy(() => import("./pages/sale/Sale"));
 const RetailStock = lazy(() => import("./pages/stock/RetailStock"));
+const RetailMedicine = lazy(() => import("./pages/retail/RetailProduct"));
 const AddManufacturerReturn = lazy(() =>
   import("./pages/return/AddManufacturerReturn")
 );
@@ -57,15 +59,23 @@ const WastageReturnList = lazy(() =>
   import("./pages/return/WastageReturnList")
 );
 const StaffList = lazy(() => import("./pages/staff/ManageStaff"));
-
+const ReturnsTable = lazy(() => import("./pages/return/ReturnsTable"));
 const Profile = lazy(() => import("./pages/profile/AboutUser"));
 const StockList = lazy(() => import("./pages/stock/StockList"));
-const MessagePage = lazy(() => import("./pages/setting/Message"));
-const NotificationPage = lazy(() => import("./pages/setting/Notification"));
 const Unit = lazy(() => import("./pages/medicine/Unit"));
 const SampleStock = lazy(() => import("./pages/sample/InventoryDashboard"));
 const AddStock = lazy(() => import("./pages/sample/InventoryForm"));
-const SessionGet = lazy(() => import("./pages/setting/Session"));
+const SaleRetail = lazy(() => import("./pages/retail/SaleRetail"));
+
+function RequireAuth() {
+  const { token } = useContext(AuthContext);
+  return token ? <Outlet /> : <Navigate to="/login" replace />;
+}
+function PublicOnly({ children }) {
+  const { token } = useContext(AuthContext);
+  return token ? <Navigate to="/" replace /> : children;
+}
+
 const App = () => {
   const location = useLocation();
   const [langCode, setLangCode] = useState(
@@ -94,23 +104,26 @@ const App = () => {
     loadContent();
   }, []);
 
+  const HIDE_CHROME_ROUTES = ["/login", "/register", "/profiledashboard"];
+  const hideChrome = HIDE_CHROME_ROUTES.includes(location.pathname);
+
   return isLoading ? (
-    <div className="flex items-center  justify-center  h-screen bg-white dark:bg-gray-900">
+    <div className="flex items-center justify-center h-screen bg-white dark:bg-gray-900">
       <Loader />
     </div>
   ) : (
     <ThemeProvider>
       <AuthProvider>
         <LanguageProvider>
-          <div className="flex font-battambang h-screen  font-notoserifkhmer  bg-white dark:bg-gray-900">
-            {location.pathname !== "/profiledashboard" && (
+          <div className="flex  h-screen font-notoserifkhmer bg-white dark:bg-gray-900">
+            {!hideChrome && (
               <Sidebar
                 setSelectedPage={setSelectedPage}
                 selectedPage={selectedPage}
               />
             )}
-            <div className="flex-1  flex-col flex">
-              {location.pathname !== "/profiledashboard" && (
+            <div className="flex-1 flex-col flex">
+              {!hideChrome && (
                 <TopBar
                   onLanguageChange={(lang) => {
                     setLangCode(lang);
@@ -123,94 +136,130 @@ const App = () => {
                 <Suspense fallback={<Loader />}>
                   <Routes>
                     <Route
-                      path="/"
-                      element={<Dashboard langCode={langCode} />}
-                    />
-                    <Route path="/customerlist" element={<CustomerList />} />
-
-                    <Route
-                      path="/insertcustomer"
-                      element={<InsertCustomer />}
+                      path="/login"
+                      element={
+                        <PublicOnly>
+                          <Login />
+                        </PublicOnly>
+                      }
                     />
                     <Route
-                      path="/manufacturerlist"
-                      element={<ManufacturerList />}
-                    />
-                    <Route path="/supplies" element={<Supplies />} />
-                    <Route path="/supplyitems" element={<SupplyItems />} />
-                    <Route path="/reports" element={<SalesReport />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route path="/salereport" element={<SellReport />} />
-                    <Route path="/purchasreport" element={<PurchaseReport />} />
-                    <Route path="/stockreport" element={<StockReport />} />
-                    <Route path="/expensepage" element={<ExpensePage />} />
-                    <Route path="/incomepage" element={<IncomePage />} />
-                    <Route path="/stocklist" element={<StockList />} />
-                    <Route
-                      path="/invoicedetail"
-                      element={<InvoiceDetailsPage />}
-                    />
-                    <Route path="/invoicelist" element={<InvoiceListPage />} />
-                    <Route path="/aboutuser" element={<AboutUser />} />
-                    <Route
-                      path="/addmedicinepage/:id?"
-                      element={<AddMedicine />}
+                      path="/register"
+                      element={
+                        <PublicOnly>
+                          <Register />
+                        </PublicOnly>
+                      }
                     />
 
-                    <Route path="/listofmedicine" element={<MedicineList />} />
+                    <Route element={<RequireAuth />}>
+                      <Route
+                        path="/"
+                        element={<Dashboard langCode={langCode} />}
+                      />
+                      <Route path="/customerlist" element={<CustomerList />} />
+                      <Route
+                        path="/insertcustomer"
+                        element={<InsertCustomer />}
+                      />
+                      <Route
+                        path="/manufacturerlist"
+                        element={<ManufacturerList />}
+                      />
+                      <Route path="/supplies" element={<Supplies />} />
+                      <Route path="/setting-page" element={<SettingPage />} />
 
-                    <Route
-                      path="/medicinedetail/:id"
-                      element={<MedicineDetail />}
-                    />
+                      <Route
+                        path="/setting-page-form"
+                        element={<SettingPageForm />}
+                      />
+                      <Route path="/supplyitems" element={<SupplyItems />} />
 
-                    <Route path="/categoies" element={<Category />} />
-                    <Route path="/units" element={<Unit />} />
-                    <Route path="/setting" element={<Setting />} />
-                    <Route
-                      path="/manufacturerreturnlist"
-                      element={<ManufacturerReturnList />}
-                    />
-                    <Route
-                      path="/addwastagereturn"
-                      element={<AddWastageReturn />}
-                    />
-                    <Route
-                      path="/addmanufacturerreturn"
-                      element={<AddManufacturerReturn />}
-                    />
-                    <Route
-                      path="/wastagereturnlist"
-                      element={<WastageReturnList />}
-                    />
-                    <Route path="/listofstaff" element={<StaffList />} />
+                      <Route path="/reports" element={<SalesReport />} />
+                      <Route path="/salereport" element={<SellReport />} />
+                      <Route
+                        path="/purchasreport"
+                        element={<PurchaseReport />}
+                      />
+                      <Route path="/stockreport" element={<StockReport />} />
+                      <Route path="/expensepage" element={<ExpensePage />} />
+                      <Route path="/incomepage" element={<IncomePage />} />
+                      <Route path="/stocklist" element={<StockList />} />
+                      <Route path="/sale-retail" element={<SaleRetail />} />
+                      <Route
+                        path="/retail-product"
+                        element={<RetailMedicine />}
+                      />
+                      <Route
+                        path="/invoicedetail"
+                        element={<InvoiceDetailsPage />}
+                      />
+                      <Route
+                        path="/invoicelist"
+                        element={<InvoiceListPage />}
+                      />
+                      <Route path="/aboutuser" element={<AboutUser />} />
+                      <Route
+                        path="/addmedicinepage/:id?"
+                        element={<AddMedicine />}
+                      />
+                      <Route
+                        path="/listofmedicine"
+                        element={<MedicineList />}
+                      />
+                      <Route path="/returns-table" element={<ReturnsTable />} />
+                      <Route
+                        path="/medicinedetail/:id"
+                        element={<MedicineDetail />}
+                      />
+                      <Route path="/categoies" element={<Category />} />
+                      <Route path="/units" element={<Unit />} />
 
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/activity" element={<ActivityPage />} />
-                    <Route path="/message" element={<MessagePage />} />
-                    <Route path="/wastagereturnlist" element={<ExpireSoon />} />
-                    <Route path="/session" element={<SessionGet />} />
-                    <Route
-                      path="/notification"
-                      element={<NotificationPage />}
-                    />
-                    <Route
-                      path="/profiledashboard"
-                      element={<ProfileDashboard />}
-                    />
+                      <Route
+                        path="/manufacturerreturnlist"
+                        element={<ManufacturerReturnList />}
+                      />
+                      <Route
+                        path="/addwastagereturn"
+                        element={<AddWastageReturn />}
+                      />
+                      <Route
+                        path="/addmanufacturerreturn"
+                        element={<AddManufacturerReturn />}
+                      />
+                      <Route
+                        path="/wastagereturnlist"
+                        element={<WastageReturnList />}
+                      />
+                      <Route path="/listofstaff" element={<StaffList />} />
+                      <Route path="/profile" element={<Profile />} />
+                      <Route path="/expire-soon" element={<ExpireSoon />} />
 
-                    <Route path="/saledashboard" element={<SaleDashboard />} />
-                    <Route path="/samplestock" element={<SampleStock />} />
-                    <Route path="/addstock" element={<AddStock />} />
-                    <Route path="/retailstock" element={<RetailStock />} />
-                    <Route path="/add-supply" element={<AddSupply />} />
-                    <Route path="*" element={<Navigate to="/" />} />
+                      <Route
+                        path="/profiledashboard"
+                        element={<ProfileDashboard />}
+                      />
+                      <Route
+                        path="/saledashboard"
+                        element={<SaleDashboard />}
+                      />
+                      <Route path="/samplestock" element={<SampleStock />} />
+                      <Route path="/addstock" element={<AddStock />} />
+                      <Route path="/retailstock" element={<RetailStock />} />
+                      <Route path="/add-supply" element={<AddSupply />} />
+                    </Route>
+
+                    <Route path="*" element={<AuthAwareRedirect />} />
                   </Routes>
                 </Suspense>
               </div>
-              <Footer />
-              <ToastContainer position="top-right" autoClose={3000} />
+
+              {!hideChrome && <Footer />}
+              <ToastContainer
+                position="top-left"
+                
+                autoClose={1000}
+              />
             </div>
           </div>
         </LanguageProvider>
@@ -218,5 +267,10 @@ const App = () => {
     </ThemeProvider>
   );
 };
+
+function AuthAwareRedirect() {
+  const { token } = useContext(AuthContext);
+  return <Navigate to={token ? "/" : "/login"} replace />;
+}
 
 export default App;

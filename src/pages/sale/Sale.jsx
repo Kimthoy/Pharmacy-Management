@@ -8,7 +8,7 @@ import ToastNotification from "./ToastNotification";
 import compoundMedicines from "./compoundMedicines";
 import { HiMiniShoppingCart } from "react-icons/hi2";
 import { getAllMedicines } from "../api/medicineService";
-import { createSale } from "../api/saleService";
+import { createSale, buildSalePayload } from "../api/saleService";
 import "./sell.css";
 
 const Sale = () => {
@@ -18,7 +18,7 @@ const Sale = () => {
     const savedCart = localStorage.getItem("cart");
     return savedCart ? JSON.parse(savedCart) : [];
   });
-
+  const [forceHideCart, setForceHideCart] = useState(false);
   const [isOrderReviewModalOpen, setIsOrderReviewModalOpen] = useState(false);
   const [isRetailSaleOpen, setIsRetailSaleOpen] = useState(false);
   const [toast, setToast] = useState(null);
@@ -35,7 +35,6 @@ const Sale = () => {
         const data = Array.isArray(response) ? response : response?.data ?? [];
         setProducts(data);
       } catch (err) {
-        
         setProducts([]);
         setToast({
           message: "បរាជ័យក្នុងការទាញទិន្នន័យថ្នាំ",
@@ -61,6 +60,7 @@ const Sale = () => {
       const existingItem = prev.find(
         (item) => item.id === product.id && !item.packaging
       );
+
       if (existingItem) {
         return prev.map((item) =>
           item.id === product.id && !item.packaging
@@ -68,10 +68,13 @@ const Sale = () => {
             : item
         );
       }
+
       return [
         ...prev,
         {
           ...product,
+          image: product.image || product.image_url || null,
+          name: product.medicine_name || product.name,
           quantity: product.quantity || 1,
           typeofmedicine:
             product.typeofmedicine ||
@@ -127,27 +130,41 @@ const Sale = () => {
     setIsOrderReviewModalOpen(true);
   };
 
+  const isPackageLine = (it) =>
+    Boolean(it.package_id) || String(it.typeofmedicine || "").includes("ផ្សំ");
   const confirmOrder = async () => {
-    const saleData = {
-      sale_date: new Date().toISOString().slice(0, 10),
-      payment_method: paymentMethod,
-      total_amount: totalPrice,
-      card_number: cardNumber || null,
-      items: cart.map((item) => ({
-        medicine_id: item.medicine_id || item.id,
-        quantity: item.quantity,
-        unit_price: item.price,
-      })),
-    };
+    // Split cart into normal medicines vs packages
+    const normalItems = cart
+      .filter((it) => !isPackageLine(it))
+      .map((it) => ({
+        medicine_id: it.medicine_id || it.id, // medicines.id
+        quantity: Number(it.quantity || 1),
+        unit_price: Number(displayPrice(it.price)), // USD number
+      }));
+
+    const saleRetailItems = cart
+      .filter((it) => isPackageLine(it))
+      .map((it) => ({
+        package_id: it.package_id || it.id, // packages.id
+        quantity: Number(it.quantity || 1),
+        unit_price: Number(displayPrice(it.price)), // USD number
+      }));
+
+    const payload = buildSalePayload({
+      saleDate: new Date().toISOString().slice(0, 10),
+      paymentMethod: paymentMethod,
+      items: normalItems,
+      saleRetailItems, // key matches controller: sale_retail_items
+      // extra: { card_number: cardNumber || null }            // if you want to send more fields
+    });
 
     try {
-      await createSale(saleData);
+      await createSale(payload);
       setCart([]);
       setCardNumber("");
       setIsOrderReviewModalOpen(false);
       setToast({ message: "ការបញ្ជាទិញបានជោគជ័យ!", type: "success" });
     } catch (error) {
-      
       setToast({
         message:
           "បរាជ័យក្នុងការបញ្ជាទិញ: " + (error.message || "Unknown error"),
@@ -194,22 +211,24 @@ const Sale = () => {
   }, [products]);
 
   return (
-    <div className="flex mb-14 h-screen bg-white dark:bg-gray-900 font-khmer relative">
+    <div className="flex  h-[426px] bg-white dark:bg-gray-900 font-khmer relative ">
       <div className="flex-1 flex flex-col md:flex-row">
-        <div className="flex-1 sm:p-6 p-2">
-          <Header
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            isCompoundMode={isCompoundMode}
-            setCompoundModeType={(type) => {
-              const isCompound = type === "compound";
-              setCurrentProducts(
-                isCompound ? updatedCompoundMedicines : products
-              );
-              setIsCompoundMode(isCompound);
-            }}
-            openRetailSaleModal={() => setIsRetailSaleOpen(true)}
-          />
+        <div className="flex-1 overflow-y-scroll h-full sm:p-6 ">
+          <div className="sm:sticky sticky sm:-top-6 -top-0 sm:z-10 z-10">
+            <Header
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              isCompoundMode={isCompoundMode}
+              setCompoundModeType={(type) => {
+                const isCompound = type === "compound";
+                setCurrentProducts(
+                  isCompound ? updatedCompoundMedicines : products
+                );
+                setIsCompoundMode(isCompound);
+              }}
+              openRetailSaleModal={() => setIsRetailSaleOpen(true)}
+            />
+          </div>
 
           <ProductList
             products={filteredProducts}
@@ -217,35 +236,36 @@ const Sale = () => {
             handleAddToCartClick={handleAddToCartClick}
             displayPrice={displayPrice}
             showCompoundMedicines={isCompoundMode}
+            closeCart={() => setCartOpen(false)}
+            forceHideCart={(v) => setForceHideCart(Boolean(v))}
           />
         </div>
 
-        
-        {!isOrderReviewModalOpen && !isRetailSaleOpen && (
-          <Cart
-            cart={cart}
-            isCartOpen={isCartOpen}
-            clearCart={clearCart}
-            placeOrder={placeOrder}
-            onClose={() => setCartOpen(false)}
-            onCheckout={() => {
-              setCartOpen(false);
-              
-            }}
-          />
-        )}
+        <div>
+          {!isOrderReviewModalOpen && !isRetailSaleOpen && (
+            <Cart
+              cart={cart}
+              open={isCartOpen}
+              clearCart={clearCart}
+              placeOrder={placeOrder}
+              onClose={() => setCartOpen(false)} // backdrop/close button
+              onCheckout={() => setCartOpen(false)}
+              forceHidden={forceHideCart} // <-- hides even on desktop when true
+            />
+          )}
+        </div>
 
-        
-        <button
-          className="md:hidden fixed bottom-4 mb-14 flex right-0 focus:shadow-none bg-green-600 text-white p-3 rounded-md shadow-lg"
-          onClick={() => setCartOpen(true)}
-          aria-label="បើកកន្ត្រក"
-        >
-          <HiMiniShoppingCart className="w-6 h-6" /> ({totalQuantity})
-        </button>
+        {!isCartOpen && (
+          <button
+            className="md:hidden fixed bottom-4 mb-14 flex right-0 focus:shadow-none bg-green-600 text-white p-3 rounded-md shadow-lg"
+            onClick={() => setCartOpen(true)}
+            aria-label="បើកកន្ត្រក"
+          >
+            <HiMiniShoppingCart className="w-6 h-6" /> ({totalQuantity})
+          </button>
+        )}
       </div>
 
-      
       <OrderReviewModal
         isOpen={isOrderReviewModalOpen}
         setIsOpen={setIsOrderReviewModalOpen}
@@ -255,11 +275,10 @@ const Sale = () => {
         setPaymentMethod={setPaymentMethod}
         cardNumber={cardNumber}
         setCardNumber={setCardNumber}
-        confirmOrder={confirmOrder}
+        onConfirm={confirmOrder}
         displayPrice={displayPrice}
       />
 
-      
       <RetailSaleModal
         isOpen={isRetailSaleOpen}
         setIsOpen={setIsRetailSaleOpen}

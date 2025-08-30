@@ -1,21 +1,34 @@
 {
   "retail-stock": {
     "RetailStockManager": "ការគ្រប់គ្រងស្តុកលក់រាយ",
-    "Medicine": "ថ្នាំ",
-    "Category": "ប្រភេទ",
-    "Units": "ឯកតា",
-    "Transferredbox": "ចំនួនដែលផ្ទេរ/ប្រអប់",
-    "Tabletbox": "ចំនួនបន្ទះ/ប្រអប់",
-    "Capsuletablet": "ចំនួនគ្រាប់/បន្ទះ",
-    "Capsulebox": "ចំនួនគ្រាប់/ប្រអប់",
-    "Pricebox": "តម្លែលក់រាយ/ប្រអប់",
-    "TransferDate": "ថ្ងៃខែផុតចូលស្តុក",
-    "NotFound": "រកមិនឃើញ បញ្ជីថ្នាំទេ !",
-    "Prev": "ពីមុន",
+    "Medicine": "ឱសថ",
+    "Quantity": "ចំនួនដែលផ្គត់ផ្គង់",
+    "Tablet": "បន្ទះ/ប្រអប់",
+    "Capsule": "គ្រាប់/ប្រអប់",
+    "PriceTablet": "តម្លៃ/បន្ទះ",
+    "PriceCapsule": "តម្លៃ/គ្រាប់",
+    "New": "ថ្មី",
+    "Pricebox": "តម្លៃ/ប្រអប់",
+    "UpdatedAt": "បានធ្វើបច្ចុប្បន្នភាព",
+    "Actions": "សកម្មភាព",
+
+    "InvalidQuantity": "បរិមាណមិនត្រឹមត្រូវ",
+    "InvalidPrice": "តម្លៃមិនត្រឹមត្រូវ",
+    "Saved": "បានរក្សាទុក។",
+    "SaveFailed": "ការរក្សាទុកបរាជ័យ។",
+    "Saving": "កំពុងរក្សាទុក…",
+    "Save": "រក្សាទុក",
+    "Cancel": "បោះបង់",
+    "Edit": "កែប្រែ",
+
+    "Prev": "មុន",
+    "Next": "បន្ទាប់",
     "Page": "ទំព័រ",
-    "Next": "បន្ទាប់"
+    "of": "នៃ",
+    "NotFound": "រកមិនឃើញទិន្នន័យ"
   },
   "stock-list": {
+    "New": "ថ្មី",
     "TotalofStocksquantity": "ចំនួនថ្នាំសរុប",
     "totalofquantity": "ថ្នាំ",
     "Typestock": "សរុបប្រភេទថ្នាំ",
@@ -115,7 +128,7 @@
   },
   "medicine-list": {
     "TotalMedicines": "ចំនួនថ្នាំសរុប",
-    
+
     "Confirmation": "តើអ្នកប្រាកដថាចង់លុបមែនឬទេ?",
     "Noted": "ការលុបនេះនឹងមិនអាចធ្វើឡើងវិញបានទេ !",
     "Yes": "បាទ/ចាស",
@@ -407,6 +420,7 @@
   },
 
   "sidebar": {
+    "retail-product": "ថ្នាំផ្សំ",
     "RetailStock": "ស្តុកលក់រាយ",
     "setting": "ការកំណត់",
     "AddStock": "បញ្ជូលឃ្លាំង",

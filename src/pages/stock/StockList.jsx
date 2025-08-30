@@ -6,13 +6,14 @@ import "react-toastify/dist/ReactToastify.css";
 import retailStockService from "../api/retailStockService";
 import { useNavigate, useLocation } from "react-router-dom";
 
-const AUTO_REFRESH_MS = 0; // set >0 to enable polling
+const AUTO_REFRESH_MS = 0; // polling off
+const NEW_WINDOW_HOURS = 48; // <<< 2 days
 
 const StockList = () => {
   const [transferModalOpen, setTransferModalOpen] = useState(false);
   const [selectedStock, setSelectedStock] = useState(null);
   const [transferQty, setTransferQty] = useState("");
-  const [price, setPrice] = useState(""); // <- price (not price_out)
+  const [price, setPrice] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const location = useLocation();
@@ -60,6 +61,21 @@ const StockList = () => {
     return () => clearInterval(id);
   }, [fetchStocks]);
 
+  // --- helpers for "NEW" badge (2 days) ---
+  const isRecentlyAdded = (iso) => {
+    if (!iso) return false;
+    const ts = Date.parse(iso);
+    if (Number.isNaN(ts)) return false;
+    return Date.now() - ts <= NEW_WINDOW_HOURS * 60 * 60 * 1000;
+  };
+  // try a few plausible fields for when the stock was created
+  const getCreatedAt = (s) =>
+    s?.created_at ||
+    s?.medicine?.created_at ||
+    s?.supply_created_at ||
+    s?.updated_at ||
+    null;
+
   const totalStock = stocksData.reduce((sum, s) => sum + (s.quantity || 0), 0);
   const totalStockLeng = stocksData.length;
 
@@ -98,11 +114,10 @@ const StockList = () => {
         medicine_id: selectedStock.id,
         quantity: qty,
         price: p,
-        tablet: selectedStock.medicine?.tablet ?? 0, // ✅ default to 0
-        capsule: selectedStock.medicine?.capsule ?? 0, // ✅ default to 0
+        tablet: selectedStock.medicine?.tablet ?? 0,
+        capsule: selectedStock.medicine?.capsule ?? 0,
       });
 
-      // Optimistic UI: decrease the row quantity
       setStocksData((prev) =>
         prev.map((s) =>
           s.id === selectedStock.id
@@ -113,8 +128,6 @@ const StockList = () => {
 
       toast.success("Retail stock transferred successfully.");
       setTransferModalOpen(false);
-
-      // Hard refresh to be sure
       fetchStocks();
     } catch (err) {
       toast.error(err?.message || "Transfer failed.");
@@ -186,6 +199,8 @@ const StockList = () => {
           {currentItems.length > 0 ? (
             currentItems.map((stock) => {
               const isHighlighted = highlightedId === stock.id;
+              const isNew = isRecentlyAdded(getCreatedAt(stock));
+
               return (
                 <tr
                   key={stock.id}
@@ -196,9 +211,16 @@ const StockList = () => {
                 >
                   <td className="px-4 py-2">{stock.id}</td>
                   <td className="px-4 py-2">
-                    {stock.medicine?.medicine_name ||
-                      stock.medicine?.name ||
-                      "N/A"}
+                    <div className="flex items-center gap-2">
+                      {stock.medicine?.medicine_name ||
+                        stock.medicine?.name ||
+                        "N/A"}
+                      {isNew && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-100 text-green-800 font-semibold">
+                          {t("stock-list.New") || "ថ្មី"}
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-4 py-3">{stock.quantity}</td>
                   <td className="px-4 py-2">${stock.price_in}</td>
@@ -255,7 +277,6 @@ const StockList = () => {
         </div>
       )}
 
-      {/* Transfer modal */}
       {transferModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-xl">

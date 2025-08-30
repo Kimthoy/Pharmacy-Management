@@ -1,49 +1,56 @@
-import React, { createContext, useContext, useState } from "react";
+import { createContext, useEffect, useMemo, useState } from "react";
+import axios from "axios";
 
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    localStorage.getItem("isAuthenticated") === "true" || false
-  );
-  const [user, setUser] = useState(
-    JSON.parse(localStorage.getItem("user")) || null
-  );
-  const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const getSaved = () => {
+    const token =
+      localStorage.getItem("token") || sessionStorage.getItem("token");
+    const user = localStorage.getItem("user") || sessionStorage.getItem("user");
+    return { token, user: user ? JSON.parse(user) : null };
+  };
 
-  const login = (userData, authToken) => {
-    setIsAuthenticated(true);
-    setUser(userData);
-    setToken(authToken);
-    localStorage.setItem("isAuthenticated", "true");
-    localStorage.setItem("user", JSON.stringify(userData));
-    localStorage.setItem("token", authToken);
+  const [{ token, user }, setAuth] = useState(getSaved());
+
+  useEffect(() => {
+    if (token) {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    } else {
+      delete axios.defaults.headers.common["Authorization"];
+    }
+  }, [token]);
+
+  const login = (userData, newToken, remember = false) => {
+    const storage = remember ? localStorage : sessionStorage;
+    storage.setItem("token", newToken);
+    storage.setItem("user", JSON.stringify(userData));
+
+    (remember ? sessionStorage : localStorage).removeItem("token");
+    (remember ? sessionStorage : localStorage).removeItem("user");
+
+    setAuth({ token: newToken, user: userData });
   };
 
   const logout = () => {
-    setIsAuthenticated(false);
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem("isAuthenticated");
-    localStorage.removeItem("user");
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
+    delete axios.defaults.headers.common["Authorization"];
+    setAuth({ token: null, user: null });
   };
 
-  return (
-    <AuthContext.Provider
-      value={{ isAuthenticated, user, token, login, logout }}
-    >
-      {children}
-    </AuthContext.Provider>
+  const value = useMemo(
+    () => ({
+      token,
+      user,
+      isAuthenticated: !!token,
+      login,
+      logout,
+    }),
+    [token, user]
   );
-};
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
-
-export { AuthContext };

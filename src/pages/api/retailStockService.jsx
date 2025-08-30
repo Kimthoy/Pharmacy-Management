@@ -2,11 +2,7 @@ import axios from "axios";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api";
 
-const getAuthHeader = () => {
-  const token = localStorage.getItem("token");
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
-const USE_CENTS = true;
+const USE_CENTS = true; // set false if your API already uses decimal prices
 
 const api = axios.create({ baseURL: API_URL });
 
@@ -25,7 +21,7 @@ const normErr = (error, fallback = "Request failed") => {
   return { message: res.message || fallback, errors: res.errors };
 };
 
-// Convert UI price (float string) to server int cents if required
+// Convert UI price (float string/number) to server int cents if required
 const toServerPrice = (price) => {
   const p = Number(price);
   if (Number.isNaN(p) || p < 0) return 0;
@@ -50,37 +46,42 @@ export const getRetailStocks = async (params = {}) => {
   }
 };
 
+export const getToretailProduct = async (params = {}) => {
+  try {
+    const { data } = await api.get("/retail-stocks", { params });
+    return data?.data ?? [];
+  } catch (error) {
+    throw normErr(error, "Failed to fetch retail stocks");
+  }
+};
+
 /**
  * POST /retail-stocks
- * body: { stock_id:number, quantity:number, price:number|decimal, tablet?:number, capsule?:number }
- * This is your "transfer to retail" call.
+ * body: { medicine_id, quantity, price, tablet?, capsule?, price_tablet?, price_capsule? }
  */
-export const createRetailStock = async (data) => {
+export const createRetailStock = async (payload) => {
   try {
-    // get logged-in user_id from token payload or localStorage
-    const userId = localStorage.getItem("user_id"); // <- you need to store this at login
-
-    const payload = {
-      ...data,
-      user_id: userId, // backend will use this
+    const userId = localStorage.getItem("user_id"); // set this at login
+    const body = {
+      ...payload,
+      user_id: userId ?? undefined,
     };
+    if (body.price !== undefined) body.price = toServerPrice(body.price);
+    if (body.price_tablet !== undefined)
+      body.price_tablet = toServerPrice(body.price_tablet);
+    if (body.price_capsule !== undefined)
+      body.price_capsule = toServerPrice(body.price_capsule);
 
-    const response = await axios.post(`${API_URL}/retail-stocks`, payload, {
-      headers: {
-        ...getAuthHeader(),
-        "Content-Type": "application/json",
-      },
+    const { data } = await api.post("/retail-stocks", body, {
+      headers: { "Content-Type": "application/json" },
     });
-    return response.data?.data ?? response.data;
+    return data?.data ?? data;
   } catch (error) {
     throw normErr(error, "Failed to create retail stock");
   }
 };
 
-/**
- * GET /retail-stocks/{id}
- * returns: single resource object
- */
+
 export const getRetailStockById = async (id) => {
   try {
     const { data } = await api.get(`/retail-stocks/${id}`);
@@ -89,25 +90,25 @@ export const getRetailStockById = async (id) => {
     throw normErr(error, "Failed to fetch retail stock");
   }
 };
-
-/**
- * DELETE /retail-stocks/{id}
- * returns: { message } or resource
- */
-export const deleteRetailStock = async (id) => {
+export const updateRetailStock = async (id, payload) => {
   try {
-    const { data } = await api.delete(`/retail-stocks/${id}`);
-    return data;
+    // PATCH is the right verb for partial updates
+    const { data } = await api.patch(`/retail-stocks/${id}`, payload, {
+      headers: { "Content-Type": "application/json" },
+    });
+    return data?.data ?? data;
   } catch (error) {
-    throw normErr(error, "Failed to delete retail stock");
+    throw normErr(error, "Failed to update retail stock");
   }
 };
 
 const retailStockService = {
   getRetailStocks,
+  getToretailProduct,
   createRetailStock,
+  updateRetailStock,
   getRetailStockById,
-  deleteRetailStock,
+
 };
 
 export default retailStockService;

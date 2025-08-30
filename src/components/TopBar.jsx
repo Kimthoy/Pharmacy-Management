@@ -5,7 +5,9 @@ import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
 import MessageModal from "../components/MessageModal";
 import { MdOutlineSettingsSuggest } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { getExpiringSoonItems } from "../pages/api/supplyItemService";
+
 import {
   MessageCircle,
   Bell,
@@ -16,9 +18,8 @@ import {
   Sun,
   Moon,
 } from "lucide-react";
-import { Link } from "react-router-dom";
-import Modal from "../components/Modal"; // Assuming this is your existing Modal component
-import NotificationModal from "../components/NotificationModal"; // New component for notifications
+import Modal from "../components/Modal";
+import NotificationModal from "../components/NotificationModal";
 
 const languageOptions = [
   { value: "en", label: "English", iconPath: "/icon_en.jpg" },
@@ -42,9 +43,7 @@ const LanguageSelector = ({
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
+    const interval = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -68,7 +67,7 @@ const LanguageSelector = ({
         onKeyDown={(e) =>
           (e.key === "Enter" || e.key === " ") && setOpen(!open)
         }
-        className="flex items-center bg-white dark:bg-gray-800 border border-emerald-500 dark:border-emerald-400  px-3 py-1 shadow-sm hover:border-emerald-600 dark:hover:border-emerald-300 transition-all rounded-lg duration-200 w-32 justify-between"
+        className="flex items-center bg-white dark:bg-gray-800 border border-emerald-500 dark:border-emerald-400 px-3 py-1 shadow-sm hover:border-emerald-600 dark:hover:border-emerald-300 transition-all rounded-lg duration-200 w-32 justify-between"
         aria-expanded={open}
         aria-label={t("topbar.selectLanguage")}
       >
@@ -96,7 +95,7 @@ const LanguageSelector = ({
         </svg>
       </button>
       {open && (
-        <ul className="absolute z-50  mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg animate-fade-in">
+        <ul className="absolute z-50 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg animate-fade-in">
           {languageOptions.map((lang) => (
             <li
               key={lang.value}
@@ -148,11 +147,11 @@ const ProfileDropdown = ({
             className="w-6 h-6 rounded-full object-cover"
           />
         ) : (
-          <UserCircle size={24} className="text-green-700 dark:text-white " />
+          <UserCircle size={24} className="text-green-700 dark:text-white" />
         )}
       </button>
       {isDropdownOpen && (
-        <div className="absolute right-0 z-50 mt-2 w-56 bg-white dark:bg-gray-800 border border-emerald-200 dark:border-gray-600 shadow-lg rounded-lg py-2 animate-fade-in">
+        <div className="absolute right-0 z-[999] mt-2 w-56 bg-white dark:bg-gray-800 border border-emerald-200 dark:border-gray-600 shadow-lg rounded-lg py-2 animate-fade-in">
           <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-600">
             <p className="font-semibold text-gray-800 dark:text-gray-200">
               {user?.name || t("topbar.unknownUser")}
@@ -214,37 +213,113 @@ const AuthButtons = ({ t }) => (
   </div>
 );
 
-const TopBar = ({ onSearch }) => {
+const TopBar = ({ onSearch = () => {} }) => {
   const { isAuthenticated, logout, user } = useContext(AuthContext);
   const { theme, toggleTheme } = useTheme(false);
   const { language, changeLanguage } = useLanguage();
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false); // For logout confirmation
-  const [isMessageDropdownOpen, setIsMessageDropdownOpen] = useState(false); // For message dropdown
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isMessageDropdownOpen, setIsMessageDropdownOpen] = useState(false);
   const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] =
-    useState(false); // For notification dropdown
+    useState(false);
+
   const dropdownRef = useRef(null);
   const selectorRef = useRef(null);
   const messageDropdownRef = useRef(null);
   const notificationDropdownRef = useRef(null);
+  const mobileDropdownRef = useRef(null);
+
+  // 1) Static notifications (declare first)
+  const notifications = [
+    {
+      id: "sys-1",
+      title: "New Message",
+      message: "Iliash Hossain sent you a message.",
+      time: "Now",
+      status: "unread",
+      icon: "message",
+      href: "/messages",
+    },
+    {
+      id: "sys-2",
+      title: "System Update",
+      message: "Server maintenance scheduled at 10 PM.",
+      time: "2:30 PM",
+      status: "read",
+      icon: "bell",
+      href: "/settingspage",
+    },
+    {
+      id: "sys-3",
+      title: "Alert",
+      message: "Low stock for Paracetamol.",
+      time: "9:15 AM",
+      status: "unread",
+      icon: "alert",
+      href: "/inventory/low-stock",
+    },
+  ];
+
+  // 2) Expiring soon (fetch + badge)
+  const [expiringSoon, setExpiringSoon] = useState([]);
+  const [expiringSoonCount, setExpiringSoonCount] = useState(0);
+
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        mobileDropdownRef.current &&
-        !mobileDropdownRef.current.contains(event.target)
-      ) {
-        setIsMobileDropdownOpen(false);
+    let alive = true;
+    const loadExpiringSoon = async () => {
+      try {
+        const items = await getExpiringSoonItems({ months: 2, perPage: 0 });
+        if (!alive) return;
+        const list = Array.isArray(items) ? items : [];
+        setExpiringSoon(list);
+        setExpiringSoonCount(list.length);
+      } catch (e) {
+        console.error(e);
       }
     };
-
-    document.addEventListener("mousedown", handleClickOutside);
+    loadExpiringSoon();
+    const id = setInterval(loadExpiringSoon, 10 * 60 * 1000);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      alive = false;
+      clearInterval(id);
     };
   }, []);
+
+  const expiringAsNotifications = (expiringSoon || [])
+    .slice(0, 10)
+    .map((it, idx) => ({
+      id: `exp-${it?.id ?? idx}`,
+      title: "Expiring Soon",
+      message: `${
+        it?.medicine?.medicine_name || it?.medicine?.name || "Unknown"
+      } ${t("topbar.expiresOn") || "expires on"} ${
+        it?.expire_date
+          ? new Date(it.expire_date).toLocaleDateString()
+          : "No date"
+      }`,
+      time: "now",
+      status: "unread",
+      icon: "alert",
+      type: "warning",
+      href: "/expire-soon",
+      state: { highlightId: it?.id },
+    }));
+
+  const combinedNotifications = [...expiringAsNotifications, ...notifications];
+  const totalUnread =
+    expiringSoonCount +
+    notifications.filter((n) => n.status === "unread").length;
+
+  const handleNotificationClick = (item) => {
+    const target =
+      item?.href || (item?.type === "warning" ? "/expire-soon" : null);
+    if (target) navigate(target, { state: item?.state || {} });
+    setIsNotificationDropdownOpen(false);
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -266,14 +341,18 @@ const TopBar = ({ onSearch }) => {
       ) {
         setIsNotificationDropdownOpen(false);
       }
+      if (
+        mobileDropdownRef.current &&
+        !mobileDropdownRef.current.contains(event.target)
+      ) {
+        setIsMobileDropdownOpen(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  });
-  const handleLogout = () => {
-    setIsModalOpen(true);
-  };
+  }, []);
 
+  const handleLogout = () => setIsModalOpen(true);
   const confirmLogout = () => {
     logout();
     setIsDropdownOpen(false);
@@ -281,7 +360,6 @@ const TopBar = ({ onSearch }) => {
     window.location.href = "/login";
   };
 
-  // Mock data for recent chats
   const recentChats = [
     {
       id: 1,
@@ -317,55 +395,21 @@ const TopBar = ({ onSearch }) => {
     },
   ];
 
-  const notifications = [
-    {
-      id: 1,
-      title: "New Message",
-      message: "Iliash Hossain sent you a message.",
-      time: "Now",
-      status: "unread",
-      icon: "message",
-    },
-    {
-      id: 2,
-      title: "System Update",
-      message: "Server maintenance scheduled at 10 PM.",
-      time: "2:30 PM",
-      status: "read",
-      icon: "bell",
-    },
-    {
-      id: 3,
-      title: "Alert",
-      message: "Low stock for Paracetamol.",
-      time: "9:15 AM",
-      status: "unread",
-      icon: "alert",
-    },
-  ];
   const [searchTerm, setSearchTerm] = useState("");
   const [isMobileDropdownOpen, setIsMobileDropdownOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
-  const mobileDropdownRef = useRef(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
     onSearch(value);
   };
-  const navigate = useNavigate();
-  const [showTopBar, setShowTopBar] = useState(true);
-
-  const openProfileDashboard = () => {
-    navigate("/profiledashboard");
-  };
-  const [currentTime, setCurrentTime] = useState(new Date());
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   const timeString = currentTime.toLocaleTimeString("en-US", {
     hour: "2-digit",
@@ -379,10 +423,13 @@ const TopBar = ({ onSearch }) => {
     month: "short",
     day: "numeric",
   });
+
+  const openProfileDashboard = () => navigate("/profiledashboard");
+
   return (
-    <div className="bg-white dark:bg-gray-900 z-10 sm:h-20 h-16 flex flex-col sm:flex-row items-center justify-between sm:shadow-sm shadow-lg dark:shadow-gray-800 ">
+    <div className="bg-white dark:bg-gray-900 z-50 sm:h-20 h-16 flex flex-col sm:flex-row items-center justify-between sm:shadow-sm shadow-lg dark:shadow-gray-800">
       <button
-        className="sm:hidden mr-6 bg-gray-200 absolute right-0 mt-2 p-2 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 transition dark:text-white dark:bg-slate-700 "
+        className="sm:hidden mr-6 bg-gray-200 absolute right-0 mt-2 p-2 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 transition dark:text-white dark:bg-slate-700"
         onClick={openProfileDashboard}
       >
         <MdOutlineSettingsSuggest size={24} />
@@ -414,34 +461,34 @@ const TopBar = ({ onSearch }) => {
         </div>
       )}
 
-      {/* Left Section: Logo & Title */}
-      <div className="sm:flex flex justify-center  items-center  w-full sm:mt-1 mt-1">
+      <div className="sm:flex flex justify-center items-center w-full sm:mt-1 mt-1">
         <img src="/logo.png" alt="Logo" className="rounded sm:w-16 w-12 ml-6" />
         <h1 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-gray-200 animate-color-cycle">
           {t("navigation.title", { username: "Panharith" })}
         </h1>
 
         <div className="ml-5 sm:flex hidden">
-          {" "}
           <input
             type="text"
             placeholder={t("topbar.search")}
             value={searchTerm}
             onChange={handleSearch}
-            className="w-full px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-lg  dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="w-full px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
             aria-label={t("topbar.search")}
           />
         </div>
       </div>
+
       <div className="w-40 mr-5 text-right text-sm font-medium text-gray-700 dark:text-gray-200 leading-tight hidden sm:block">
         <div>{timeString}</div>
         <div className="text-xs">{dateString}</div>
       </div>
+
       <div className="flex items-center space-x-3 mt-4 sm:mt-0">
         <div className="relative" ref={messageDropdownRef}>
           <button
             onClick={() => setIsMessageDropdownOpen(!isMessageDropdownOpen)}
-            className="p-3 hover:shadow-lg rounded-lg  hover:bg-gray-100 dark:hover:bg-gray-700 transition dark:text-white text-green-600"
+            className="p-3 hover:shadow-lg rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition dark:text-white text-green-600"
             aria-label={t("topbar.messages")}
           >
             <MessageCircle
@@ -449,35 +496,52 @@ const TopBar = ({ onSearch }) => {
               className="animate-bounce-hover sm:flex hidden"
             />
           </button>
-          {isMessageDropdownOpen && (
-            <MessageModal
-              isOpen={isMessageDropdownOpen}
-              onClose={() => setIsMessageDropdownOpen(false)}
-              recentChats={recentChats}
-              t={t}
-            />
-          )}
+          <div className="z-30">
+            {isMessageDropdownOpen && (
+              <MessageModal
+                isOpen={isMessageDropdownOpen}
+                onClose={() => setIsMessageDropdownOpen(false)}
+                recentChats={recentChats}
+                t={t}
+              />
+            )}
+          </div>
         </div>
 
-        {/* Notification Button */}
         <div className="relative" ref={notificationDropdownRef}>
           <button
             onClick={() =>
               setIsNotificationDropdownOpen(!isNotificationDropdownOpen)
             }
-            className="p-3 hover:shadow-lg rounded-lg  hover:bg-slate-100 dark:hover:bg-gray-700 transition dark:text-white text-green-600 b"
-            aria-label={t("topbar.notifications")}
+            className="relative p-3 hidden sm:flex hover:shadow-lg rounded-lg hover:bg-slate-100 dark:hover:bg-gray-700 transition dark:text-white text-green-600"
+            aria-label={
+              totalUnread > 0
+                ? `${t("topbar.notifications")} – ${totalUnread} ${
+                    t("topbar.new") || "new"
+                  }`
+                : t("topbar.notifications")
+            }
+            aria-live="polite"
           >
             <Bell size={24} className="sm:flex hidden" />
+            {totalUnread > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-600 text-white text-[10px] leading-[18px] flex items-center justify-center shadow-lg">
+                {totalUnread > 99 ? "99+" : totalUnread}
+              </span>
+            )}
           </button>
-          {isNotificationDropdownOpen && (
-            <NotificationModal
-              isOpen={isNotificationDropdownOpen}
-              onClose={() => setIsNotificationDropdownOpen(false)}
-              notifications={notifications}
-              t={t}
-            />
-          )}
+
+          <div className="z-30">
+            {isNotificationDropdownOpen && (
+              <NotificationModal
+                isOpen={isNotificationDropdownOpen}
+                onClose={() => setIsNotificationDropdownOpen(false)}
+                notifications={combinedNotifications}
+                onItemClick={handleNotificationClick} // << navigate on click
+                t={t}
+              />
+            )}
+          </div>
         </div>
 
         <button
@@ -485,7 +549,7 @@ const TopBar = ({ onSearch }) => {
           title={
             theme === "light" ? "Switch to dark mode" : "Switch to light mode"
           }
-          className="p-3 sm:flex hidden  rounded-lg hover:bg-gray-100 hover:shadow-lg dark:hover:bg-gray-700 transition dark:text-white"
+          className="p-3 sm:flex hidden rounded-lg hover:bg-gray-100 hover:shadow-lg dark:hover:bg-gray-700 transition dark:text-white"
         >
           {theme === "light" ? (
             <Moon size={25} className="text-green-600" />
@@ -494,7 +558,7 @@ const TopBar = ({ onSearch }) => {
           )}
         </button>
 
-        <div className=" sm:flex hidden shadow-lg rounded-lg">
+        <div className="sm:flex hidden shadow-lg rounded-lg">
           <LanguageSelector
             langCode={language}
             onLanguageChange={changeLanguage}
@@ -512,7 +576,7 @@ const TopBar = ({ onSearch }) => {
               isDropdownOpen={isDropdownOpen}
               setIsDropdownOpen={setIsDropdownOpen}
               dropdownRef={dropdownRef}
-              handleLogout={handleLogout}
+              handleLogout={() => setIsModalOpen(true)}
               t={t}
             />
           ) : (
@@ -521,11 +585,15 @@ const TopBar = ({ onSearch }) => {
         </div>
       </div>
 
-      {/* Logout Confirmation Modal */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onConfirm={confirmLogout}
+        onConfirm={() => {
+          logout();
+          setIsDropdownOpen(false);
+          setIsModalOpen(false);
+          window.location.href = "/login";
+        }}
         message={t("topbar.logoutConfirm")}
       />
     </div>

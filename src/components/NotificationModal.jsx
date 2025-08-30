@@ -1,66 +1,83 @@
-import React from "react";
-import { MessageCircle, Bell, AlertTriangle } from "lucide-react";
+// NotificationModal.jsx
+import { Link } from "react-router-dom";
 
-const NotificationModal = ({ isOpen, onClose, notifications, t }) => {
+const NotificationModal = ({ isOpen, onClose, notifications = [], t }) => {
   if (!isOpen) return null;
 
-  const getIcon = (type) => {
-    switch (type) {
-      case "message":
-        return <MessageCircle size={16} className="text-emerald-500" />;
-      case "bell":
-        return <Bell size={16} className="text-blue-500" />;
-      case "alert":
-        return <AlertTriangle size={16} className="text-red-500" />;
-      default:
-        return null;
-    }
-  };
+  const stop = (e) => e.stopPropagation(); // prevent outside click handler from firing
 
   return (
-    <div className="absolute right-0 z-50 mt-2 w-72 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 shadow-lg rounded-lg py-2 animate-fade-in">
-      <div className="flex justify-between items-center border-b border-gray-200 dark:border-gray-600 px-4 py-2">
-        <h2 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
-          {t("topbar.notifications")}
-        </h2>
+    <div
+      className="absolute right-0 z-20 mt-2 w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg"
+      role="dialog"
+      aria-modal="true"
+      aria-label={t?.("topbar.notifications") || "Notifications"}
+      onClick={stop}
+    >
+      <div className="p-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+        <h4 className="font-semibold text-gray-800 dark:text-gray-100">
+          {t?.("topbar.notifications") || "Notifications"}
+        </h4>
         <button
           onClick={onClose}
-          className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-          aria-label={t("topbar.close")}
+          className="text-gray-500 hover:text-red-500"
+          aria-label={t?.("common.close") || "Close"}
+          title={t?.("common.close") || "Close"}
         >
           ✕
         </button>
       </div>
-      <div className="max-h-64 overflow-y-auto">
-        {notifications.map((notification) => (
-          <div
-            key={notification.id}
-            className="flex items-center justify-between px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+
+      <ul className="max-h-96  overflow-auto">
+        {notifications.length === 0 && (
+          <li className="p-4 text-sm text-gray-500 dark:text-gray-300">
+            {t?.("topbar.noNotifications") || "No notifications"}
+          </li>
+        )}
+
+        {notifications.map((n) => (
+          <li
+            key={n.id}
+            className="border-b border-gray-100 dark:border-gray-700"
           >
-            <div className="flex items-center space-x-3">
-              <div className="flex-shrink-0">{getIcon(notification.icon)}</div>
-              <div>
-                <p className="text-xs font-medium text-gray-800 dark:text-gray-200">
-                  {notification.title}
-                </p>
-                <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate w-40">
-                  {notification.message}
-                </p>
+            <Link
+              to={n.href || "/expiredate"} // <-- navigate here
+              state={n.state || {}}
+              className="block p-3 hover:bg-gray-50 dark:hover:bg-gray-700"
+              onClick={onClose} // close dropdown after click
+            >
+              <div className="flex items-start">
+                <div
+                  className={`mt-0.5 mr-2 h-2.5 w-2.5 rounded-full ${
+                    n.type === "warning"
+                      ? "bg-amber-500"
+                      : n.status === "unread"
+                      ? "bg-blue-500"
+                      : "bg-gray-400"
+                  }`}
+                  aria-hidden="true"
+                />
+                <div className="flex-1">
+                  <div className="text-sm font-medium text-gray-800 dark:text-gray-100">
+                    {n.title}
+                  </div>
+                  <div className="text-xs text-gray-600 dark:text-gray-300 truncate">
+                    {n.message}
+                  </div>
+                  <div className="mt-1 text-[11px] text-gray-400">{n.time}</div>
+                </div>
               </div>
-            </div>
-            <span className="text-[10px] text-gray-500 dark:text-gray-400">
-              {notification.time}
-            </span>
-          </div>
+            </Link>
+          </li>
         ))}
-      </div>
-      <div className="flex justify-between px-4 py-2 text-xs">
-        <span className="text-gray-500 dark:text-gray-400"></span>
+      </ul>
+
+      <div className="p-2 text-right">
         <button
           onClick={onClose}
-          className="text-emerald-500 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+          className="px-3 py-1 text-sm rounded-md bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200"
         >
-          {t("topbar.viewAll")}
+          {t?.("common.close") || "Close"}
         </button>
       </div>
     </div>

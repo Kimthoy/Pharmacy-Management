@@ -430,57 +430,6 @@ const AddMedicine = () => {
             )}
           </div>
 
-          <div className="flex flex-col">
-            <label
-              htmlFor="manufacturer"
-              className="mb-2 text-md font-medium text-gray-700 dark:text-gray-300"
-            >
-              {t("add-medicine.Manufacturer")}
-            </label>
-            <input
-              type="text"
-              id="manufacturer"
-              name="manufacturer"
-              value={medicine.manufacturer}
-              onChange={handleMedicineChange}
-              className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
-            />
-          </div>
-
-          <div className="flex flex-col">
-            <label
-              htmlFor="origin"
-              className="mb-2 text-md font-medium text-gray-700 dark:text-gray-300"
-            >
-              {t("add-medicine.Origin")}
-            </label>
-            <input
-              type="text"
-              id="origin"
-              name="origin"
-              value={medicine.origin}
-              onChange={handleMedicineChange}
-              className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
-            />
-          </div>
-
-          <div className="flex flex-col">
-            <label
-              htmlFor="purchase"
-              className="mb-2 text-md font-medium text-gray-700 dark:text-gray-300"
-            >
-              {t("add-medicine.Purchase")}
-            </label>
-            <input
-              type="text"
-              id="purchase"
-              name="purchase"
-              value={medicine.purchase}
-              onChange={handleMedicineChange}
-              className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
-            />
-          </div>
-
           <div className="flex flex-col col-span-1 md:col-span-3">
             <label
               htmlFor="medicine_detail"

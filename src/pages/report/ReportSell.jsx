@@ -11,10 +11,38 @@ import {
 } from "recharts";
 import { useTranslation } from "../../hooks/useTranslation";
 import { useTheme } from "../../context/ThemeContext";
-
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import * as XLSX from "xlsx";
+
+/* ---------- helpers ---------- */
+const toNum = (v) => Number.parseFloat(v ?? 0) || 0;
+const toDate = (v) => (v ? new Date(v) : new Date(0));
+/* used only in the Other (KHR) table */
+const formatKHR = (v) =>
+  new Intl.NumberFormat("km-KH", {
+    style: "currency",
+    currency: "KHR",
+    minimumFractionDigits: 0,
+  }).format(toNum(v));
+
+/* unify lines for export/filters */
+const getUnifiedItems = (sale) => {
+  const meds = (sale?.sale_items ?? []).map((it) => ({
+    key: `med-${it.id ?? Math.random()}`,
+    name:
+      it?.medicine?.medicine_name || it?.medicine_name || it?.name || "Unknown",
+    quantity: it?.quantity ?? 0,
+    kind: "medicine",
+  }));
+  const packs = (sale?.sale_retail_items ?? []).map((it) => ({
+    key: `pkg-${it.id ?? Math.random()}`,
+    name: it?.package?.name || it?.name || "Package",
+    quantity: it?.quantity ?? 0,
+    kind: "package",
+  }));
+  return [...meds, ...packs];
+};
 
 const SellReport = () => {
   const { t } = useTranslation();
@@ -38,79 +66,115 @@ const SellReport = () => {
   });
 
   useEffect(() => {
-    const fetchSales = async () => {
+    (async () => {
       try {
-        const response = await getAllSale();
-        const salesArray = Array.isArray(response)
-          ? response
-          : response?.data || [];
-        setSalesData(salesArray);
+        const rows = await getAllSale();
+        setSalesData(Array.isArray(rows) ? rows : []);
       } catch (err) {
-        setError(err.message || "Failed to fetch sales");
+        setError(err?.message || "Failed to fetch sales");
       } finally {
         setLoading(false);
       }
-    };
-    fetchSales();
+    })();
   }, []);
 
+  /* ---------- filtering ---------- */
   const filteredData = useMemo(() => {
+    const search = (filters.searchTerm || "").toLowerCase();
+    const start = filters.startDate ? new Date(filters.startDate) : null;
+    const end = filters.endDate ? new Date(filters.endDate) : null;
+    const monthTag = filters.month || "";
+
     return salesData.filter((sale) => {
-      const search = filters.searchTerm.toLowerCase();
+      const items = getUnifiedItems(sale);
+      const saleDate = toDate(sale.sale_date);
+
       const matchesSearch =
         !search ||
-        sale.user?.username?.toLowerCase().includes(search) ||
-        sale.user?.name?.toLowerCase().includes(search) ||
-        sale.payment_method?.toLowerCase().includes(search) ||
-        sale.sale_date?.toLowerCase().includes(search) ||
-        sale.items?.some((item) =>
-          item.medicine_name?.toLowerCase().includes(search)
-        );
-
-      const saleDate = new Date(sale.sale_date);
+        (sale.user?.username || "").toLowerCase().includes(search) ||
+        (sale.user?.name || "").toLowerCase().includes(search) ||
+        (sale.payment_method || "").toLowerCase().includes(search) ||
+        (sale.sale_date || "").toLowerCase().includes(search) ||
+        items.some((it) => (it.name || "").toLowerCase().includes(search));
 
       const dateMatch =
-        (!filters.startDate || saleDate >= new Date(filters.startDate)) &&
-        (!filters.endDate || saleDate <= new Date(filters.endDate));
+        (!start || saleDate >= start) && (!end || saleDate <= end);
 
-      const monthMatch = !filters.month
+      const monthMatch = !monthTag
         ? true
         : `${saleDate.getFullYear()}-${String(saleDate.getMonth() + 1).padStart(
             2,
             "0"
-          )}` === filters.month;
+          )}` === monthTag;
 
       return matchesSearch && dateMatch && monthMatch;
     });
   }, [salesData, filters]);
 
-  const chartData = useMemo(() => {
-    return [...filteredData]
-      .sort((a, b) => new Date(a.sale_date) - new Date(b.sale_date))
-      .map((sale) => ({
-        date: new Date(sale.sale_date).toLocaleDateString(),
-        amount: parseFloat(sale.total_amount),
-      }));
-  }, [filteredData]);
+  /* ---------- charts & totals ---------- */
+  const chartData = useMemo(
+    () =>
+      [...filteredData]
+        .sort((a, b) => toDate(a.sale_date) - toDate(b.sale_date))
+        .map((sale) => ({
+          date: toDate(sale.sale_date).toLocaleDateString(),
+          amount: toNum(sale.total_amount),
+        })),
+    [filteredData]
+  );
 
   const totalSales = useMemo(
     () =>
       filteredData.reduce(
-        (sum, sale) => sum + parseFloat(sale.total_amount || 0),
+        (sum, sale) => sum + (parseFloat(sale.total_amount) || 0),
         0
       ),
     [filteredData]
   );
 
+  /* split by section */
+  const productRows = useMemo(
+    () => filteredData.filter((s) => (s.sale_items ?? []).length > 0),
+    [filteredData]
+  );
+  const otherRows = useMemo(
+    () => filteredData.filter((s) => (s.sale_items ?? []).length === 0),
+    [filteredData]
+  );
+
+  /* ✅ section totals */
+  const productsTotalUSD = useMemo(
+    () => productRows.reduce((sum, s) => sum + toNum(s.total_amount), 0),
+    [productRows]
+  );
+  const otherTotalKHR = useMemo(
+    () => otherRows.reduce((sum, s) => sum + toNum(s.total_amount), 0),
+    [otherRows]
+  );
+
+  /* small chart for “other” sales */
+  const otherChartData = useMemo(
+    () =>
+      [...otherRows]
+        .sort((a, b) => toDate(a.sale_date) - toDate(b.sale_date))
+        .map((sale) => ({
+          date: toDate(sale.sale_date).toLocaleDateString(),
+          amount: toNum(sale.total_amount),
+        })),
+    [otherRows]
+  );
+
+  /* pagination for products table */
   const totalPages = Math.max(
     1,
-    Math.ceil(filteredData.length / pagination.rowsPerPage)
+    Math.ceil(productRows.length / pagination.rowsPerPage)
   );
   const paginatedData = useMemo(() => {
     const start = (pagination.currentPage - 1) * pagination.rowsPerPage;
-    return filteredData.slice(start, start + pagination.rowsPerPage);
-  }, [filteredData, pagination]);
+    return productRows.slice(start, start + pagination.rowsPerPage);
+  }, [productRows, pagination]);
 
+  /* ---------- export / print ---------- */
   const handlePrintTable = () => {
     const tableContent =
       document.getElementById("sales-report-table").outerHTML;
@@ -129,17 +193,13 @@ const SellReport = () => {
 
     const totalText = totalSales.toFixed(2);
 
-    const printWindow = window.open("", "_blank", "width=500,height=400");
-    printWindow.document.write(`
+    const w = window.open("", "_blank", "width=900,height=700");
+    w.document.write(`
       <html>
         <head>
           <title>Sales Report - ${selectedMonthText}</title>
           <style>
-        
-            body { 
-           
-          margin: 0;
-           font-family: Arial, sans-serif; padding: 20px; }
+            body { margin:0; font-family: Arial, sans-serif; padding: 20px; }
             h2 { text-align: center; }
             p { text-align: center; }
             table { width: 100%; border-collapse: collapse; margin-top: 20px; }
@@ -157,11 +217,10 @@ const SellReport = () => {
         </body>
       </html>
     `);
-
-    printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
-    printWindow.close();
+    w.document.close();
+    w.focus();
+    w.print();
+    w.close();
   };
 
   const handleDownloadPDF = async () => {
@@ -169,12 +228,10 @@ const SellReport = () => {
       alert("Report section not found!");
       return;
     }
-
     const canvas = await html2canvas(reportRef.current, {
       scale: 2,
       backgroundColor: "#fff",
     });
-
     const imgData = canvas.toDataURL("image/png");
     const pdf = new jsPDF("p", "mm", "a4");
     const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -184,56 +241,47 @@ const SellReport = () => {
   };
 
   const handleDownloadExcel = () => {
-    const excelRows = filteredData.flatMap((sale) => {
-      const baseInfo = {
+    const rows = filteredData.flatMap((sale) => {
+      const base = {
         Payment_Method: sale.payment_method || "N/A",
-        Sale_Date: new Date(sale.sale_date).toLocaleDateString(),
-        Total_Sale: parseFloat(sale.total_amount || 0),
+        Sale_Date: toDate(sale.sale_date).toLocaleDateString(),
+        Total_Sale: toNum(sale.total_amount),
       };
-
-      if (sale.sale_items?.length > 0) {
-        return sale.sale_items.map((item) => ({
-          ...baseInfo,
-          Product: item.medicine_name || "Unknown",
-          Quantity: item.quantity,
-        }));
+      const items = getUnifiedItems(sale);
+      if (items.length === 0) {
+        return [{ ...base, Product: "No items", Quantity: 0 }];
       }
-
-      return [
-        {
-          ...baseInfo,
-          Product: "No items",
-          Quantity: 0,
-        },
-      ];
+      return items.map((it) => ({
+        ...base,
+        Product: it.name,
+        Quantity: it.quantity,
+      }));
     });
 
-    if (excelRows.length === 0) {
+    if (rows.length === 0) {
       alert("No sales data to export!");
       return;
     }
 
-    const ws = XLSX.utils.json_to_sheet(excelRows);
+    const ws = XLSX.utils.json_to_sheet(rows);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Sales_Report");
     XLSX.writeFile(wb, `sales-report-${Date.now()}.xlsx`);
   };
 
-  if (loading) {
+  if (loading)
     return (
       <div className="p-6 text-center text-gray-500 dark:text-gray-300">
         {t("Loading sales report...")}
       </div>
     );
-  }
 
-  if (error) {
+  if (error)
     return (
       <div className="p-6 text-center text-red-500">
         {t("Error:")} {error}
       </div>
     );
-  }
 
   return (
     <div className="sm:p-6 mb-32 bg-white dark:bg-gray-900 min-h-screen">
@@ -242,15 +290,38 @@ const SellReport = () => {
           {t("sellreport.SalesReportTitle")}
         </h2>
       </div>
+
       <div ref={reportRef}>
-        <section className="mb-8">
+        {/* overall total still in USD */}
+        <section className="mb-4">
           <p className="text-gray-500 dark:text-gray-300 text-xs">
             {t("sellreport.SalesReportDesc")}
           </p>
-          <p className="mt-2 font-semibold text-emerald-600">
-            Total Sales (Filtered): ${totalSales.toFixed(2)}
-          </p>
         </section>
+
+        {/* small summary chips: section totals */}
+        <div className="grid sm:grid-cols-3 gap-3 mb-6">
+          <div className="rounded-md border p-3 dark:border-gray-700">
+            <div className="text-xs text-gray-500">Products Total (USD)</div>
+            <div className="text-lg font-semibold">
+              ${productsTotalUSD.toFixed(2)}
+            </div>
+          </div>
+          <div className="rounded-md border p-3 dark:border-gray-700">
+            <div className="text-xs text-gray-500">Other Total (KHR)</div>
+            <div className="text-lg font-semibold">
+              {formatKHR(otherTotalKHR)}
+            </div>
+          </div>
+          <div className="rounded-md border p-3 dark:border-gray-700">
+            <div className="text-xs text-gray-500">Entries</div>
+            <div className="text-lg font-semibold">
+              {productRows.length + otherRows.length}
+            </div>
+          </div>
+        </div>
+
+        {/* charts */}
         <div className="grid md:grid-cols-2 gap-6">
           <div className="bg-white dark:bg-gray-800 sm:p-6 sm:shadow-md dark:shadow-gray-700 sm:rounded-lg">
             <h3 className="sm:text-lg underline text-md mb-4 font-semibold text-gray-800 dark:text-gray-200">
@@ -271,7 +342,29 @@ const SellReport = () => {
               </LineChart>
             </ResponsiveContainer>
           </div>
+
+          <div className="bg-white dark:bg-gray-800 sm:p-6 sm:shadow-md dark:shadow-gray-700 sm:rounded-lg">
+            <h3 className="sm:text-lg underline text-md mb-4 font-semibold text-gray-800 dark:text-gray-200">
+              Other Sales (Packages / No items)
+            </h3>
+            <ResponsiveContainer width="100%" height={200}>
+              <LineChart data={otherChartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip />
+                <Line
+                  type="monotone"
+                  dataKey="amount"
+                  stroke="#10B981"
+                  strokeWidth={2}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </div>
+
+        {/* filters & exports */}
         <div className="flex gap-4 mt-6">
           <div>
             <label className="block text-gray-400 dark:text-gray-300 mb-1 text-md">
@@ -282,13 +375,9 @@ const SellReport = () => {
               className="border p-1 rounded-md dark:bg-gray-700 dark:text-gray-200"
               value={filters.month}
               onChange={(e) =>
-                setFilters((prev) => ({
-                  ...prev,
-                  month: e.target.value,
-                }))
+                setFilters((prev) => ({ ...prev, month: e.target.value }))
               }
             />
-
             <button
               onClick={handlePrintTable}
               className="px-4 py-2 text-green-600 underline"
@@ -310,10 +399,18 @@ const SellReport = () => {
           </div>
         </div>
 
+        {/* ===================== PRODUCTS TABLE (USD) ===================== */}
         <div className="bg-white dark:bg-gray-800 sm:p-6 sm:shadow-md dark:shadow-gray-700 rounded-lg mt-6">
-          <h3 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-6">
+          <h3 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-2">
             {t("sellreport.SalesRecords")}
           </h3>
+          <div className="text-sm text-gray-500 mb-4">
+            Section Total (USD):{" "}
+            <span className="font-semibold">
+              ${productsTotalUSD.toFixed(2)}
+            </span>
+          </div>
+
           <table
             id="sales-report-table"
             className="w-full bg-white dark:bg-gray-800 shadow-md dark:shadow-gray-700 rounded-lg border border-gray-200 dark:border-gray-600"
@@ -337,64 +434,44 @@ const SellReport = () => {
                 </th>
               </tr>
             </thead>
+
             <tbody>
               {paginatedData.length > 0 ? (
                 paginatedData.map((sale) =>
-                  sale.sale_items?.length > 0 ? (
-                    sale.sale_items.map((item, index) => (
-                      <tr
-                        key={`${sale.id}-${item.id}`}
-                        className="border-b border-gray-200 dark:border-gray-600"
-                      >
-                        {index === 0 && (
-                          <>
-                            <td
-                              className="px-4 py-4 text-gray-500 dark:text-gray-300"
-                              rowSpan={sale.sale_items.length}
-                            >
-                              {sale.payment_method || "N/A"}
-                            </td>
-                            <td
-                              className="px-4 py-4 text-gray-500 dark:text-gray-300"
-                              rowSpan={sale.sale_items.length}
-                            >
-                              {new Date(sale.sale_date).toLocaleDateString()}
-                            </td>
-                            <td
-                              className="px-4 py-4 text-gray-500 dark:text-gray-300"
-                              rowSpan={sale.sale_items.length}
-                            >
-                              ${parseFloat(sale.total_amount || 0).toFixed(2)}
-                            </td>
-                          </>
-                        )}
-                        <td className="px-4 py-4 text-gray-700 dark:text-gray-300">
-                          {item.medicine_name || "Unknown"}
-                        </td>
-                        <td className="px-4 py-4 text-gray-700 dark:text-gray-300">
-                          {item.quantity}
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr key={sale.id}>
-                      <td className="px-4 py-4 text-gray-500 dark:text-gray-300">
-                        {sale.payment_method || "N/A"}
+                  (sale.sale_items ?? []).map((item, index, arr) => (
+                    <tr key={`${sale.id}-${item.id}`}>
+                      {index === 0 && (
+                        <>
+                          <td
+                            className="px-4 py-4 text-gray-500 dark:text-gray-300"
+                            rowSpan={arr.length}
+                          >
+                            {sale.payment_method || "N/A"}
+                          </td>
+                          <td
+                            className="px-4 py-4 text-gray-500 dark:text-gray-300"
+                            rowSpan={arr.length}
+                          >
+                            {toDate(sale.sale_date).toLocaleDateString()}
+                          </td>
+                          <td
+                            className="px-4 py-4 text-gray-500 dark:text-gray-300"
+                            rowSpan={arr.length}
+                          >
+                            ${toNum(sale.total_amount).toFixed(2)}
+                          </td>
+                        </>
+                      )}
+                      <td className="px-4 py-4 text-gray-700 dark:text-gray-300">
+                        {item?.medicine?.medicine_name ||
+                          item?.medicine_name ||
+                          "Unknown"}
                       </td>
-                      <td className="px-4 py-4 text-gray-500 dark:text-gray-300">
-                        {new Date(sale.sale_date).toLocaleDateString()}
-                      </td>
-                      <td className="px-4 py-4 text-gray-500 dark:text-gray-300">
-                        ${parseFloat(sale.total_amount || 0).toFixed(2)}
-                      </td>
-                      <td
-                        colSpan="2"
-                        className="px-4 py-4 text-gray-500 dark:text-gray-300"
-                      >
-                        No items
+                      <td className="px-4 py-4 text-gray-700 dark:text-gray-300">
+                        {item.quantity}
                       </td>
                     </tr>
-                  )
+                  ))
                 )
               ) : (
                 <tr>
@@ -409,8 +486,114 @@ const SellReport = () => {
             </tbody>
           </table>
         </div>
+
+        {/* ===================== OTHER SALES TABLE (KHR ONLY) ===================== */}
+        <div className="bg-white dark:bg-gray-800 sm:p-6 sm:shadow-md dark:shadow-gray-700 rounded-lg mt-6">
+          <h3 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-2">
+            Other Sales Records — Packages / No items
+          </h3>
+          <div className="text-sm text-gray-500 mb-4">
+            Section Total (KHR):{" "}
+            <span className="font-semibold">{formatKHR(otherTotalKHR)}</span>
+          </div>
+
+          <table className="w-full bg-white dark:bg-gray-800 shadow-md dark:shadow-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+            <thead>
+              <tr className="border-b border-gray-200 dark:border-gray-600">
+                <th className="px-4 py-3 text-left text-gray-400 dark:text-gray-300 text-md">
+                  Payment Type
+                </th>
+                <th className="px-4 py-3 text-left text-gray-400 dark:text-gray-300 text-md">
+                  Sale Date
+                </th>
+                <th className="px-4 py-3 text-left text-gray-400 dark:text-gray-300 text-md">
+                  Total (KHR)
+                </th>
+                <th className="px-4 py-3 text-left text-gray-400 dark:text-gray-300 text-md">
+                  Package / Detail
+                </th>
+                <th className="px-4 py-3 text-left text-gray-400 dark:text-gray-300 text-md">
+                  Quantity
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {otherRows.length > 0 ? (
+                otherRows.map((sale) => {
+                  const packItems = sale.sale_retail_items ?? [];
+
+                  if (packItems.length === 0) {
+                    return (
+                      <tr key={`other-${sale.id}`}>
+                        <td className="px-4 py-4 text-gray-500 dark:text-gray-300">
+                          {sale.payment_method || "N/A"}
+                        </td>
+                        <td className="px-4 py-4 text-gray-500 dark:text-gray-300">
+                          {toDate(sale.sale_date).toLocaleDateString()}
+                        </td>
+                        <td className="px-4 py-4 text-gray-500 dark:text-gray-300">
+                          {formatKHR(sale.total_amount)}
+                        </td>
+                        <td className="px-4 py-4 text-gray-700 dark:text-gray-300">
+                          No items
+                        </td>
+                        <td className="px-4 py-4 text-gray-700 dark:text-gray-300">
+                          0
+                        </td>
+                      </tr>
+                    );
+                  }
+
+                  return packItems.map((it, idx, arr) => (
+                    <tr key={`other-${sale.id}-${it.id}`}>
+                      {idx === 0 && (
+                        <>
+                          <td
+                            className="px-4 py-4 text-gray-500 dark:text-gray-300"
+                            rowSpan={arr.length}
+                          >
+                            {sale.payment_method || "N/A"}
+                          </td>
+                          <td
+                            className="px-4 py-4 text-gray-500 dark:text-gray-300"
+                            rowSpan={arr.length}
+                          >
+                            {toDate(sale.sale_date).toLocaleDateString()}
+                          </td>
+                          <td
+                            className="px-4 py-4 text-gray-500 dark:text-gray-300"
+                            rowSpan={arr.length}
+                          >
+                            {formatKHR(sale.total_amount)}
+                          </td>
+                        </>
+                      )}
+                      <td className="px-4 py-4 text-gray-700 dark:text-gray-300">
+                        {it?.package?.name || it?.name || "Package"}
+                      </td>
+                      <td className="px-4 py-4 text-gray-700 dark:text-gray-300">
+                        {it.quantity}
+                      </td>
+                    </tr>
+                  ));
+                })
+              ) : (
+                <tr>
+                  <td
+                    colSpan="5"
+                    className="px-6 py-4 text-center text-gray-500 dark:text-gray-300"
+                  >
+                    No other sales found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
+      {/* pagination controls for the PRODUCTS table */}
       <div className="flex justify-between items-center mt-4">
         <div className="hidden sm:flex items-center gap-2">
           <label
@@ -426,7 +609,7 @@ const SellReport = () => {
             onChange={(e) =>
               setPagination({
                 currentPage: 1,
-                rowsPerPage: parseInt(e.target.value),
+                rowsPerPage: parseInt(e.target.value, 10),
               })
             }
           >

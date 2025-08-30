@@ -6,29 +6,8 @@ const Header = ({
   openRetailSaleModal,
 }) => {
   return (
-    <header className="mb-6">
-      <div className="flex justify-between flex-1 items-center mb-4">
-        <nav className="sm:flex hidden space-x-4 mb-3">
-          <button
-            className="text-gray-600 dark:text-white"
-            aria-label="ទំព័រដើម"
-          >
-            ទំព័រដើម
-          </button>
-          <button className="text-gray-600 dark:text-white" aria-label="ផលិតផល">
-            ផលិតផល
-          </button>
-          <button
-            onClick={openRetailSaleModal}
-            className="text-emerald-600 hover:border-emerald-600 hover:border border border-emerald-600 px-3 py-2  hover:bg-emerald-600 hover:text-white"
-            aria-label="លក់ថ្នាំរាយ"
-          >
-            លក់ថ្នាំរាយ
-          </button>
-        </nav>
-      </div>
-
-      <div className="flex justify-between items-center ">
+    <header className="mb-6 z-10">
+      <div className="flex justify-between items-center   bg-white">
         <input
           type="text"
           placeholder="ស្វែងរកថ្នាំ ..."

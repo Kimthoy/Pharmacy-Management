@@ -2,23 +2,35 @@
   "retail-stock": {
     "RetailStockManager": "Retail Stock Manager",
     "Medicine": "Medicine",
-    "Category": "Category",
-    "Units": "Units",
-    "Transferredbox": "Transferred/box",
-    "Tabletbox": "Tablet/box",
-    "Capsuletablet": "Capsule/tablet",
-    "Capsulebox": "Capsule/box",
-    "Pricebox": "Price/box",
-    "TransferDate": "Transfer Date",
-    "NotFound": "Not Found",
+    "Quantity": "Quantity",
+    "Tablet": "Tablet",
+    "Capsule": "Capsule",
+    "PriceTablet": "Price / Tablet",
+    "PriceCapsule": "Price / Capsule",
+    "Pricebox": "Price / Box",
+    "UpdatedAt": "Updated At",
+    "Actions": "Actions",
+
+    "InvalidQuantity": "Invalid quantity",
+    "InvalidPrice": "Invalid price",
+    "Saved": "Saved.",
+    "SaveFailed": "Save failed.",
+    "Saving": "Saving…",
+    "Save": "Save",
+    "Cancel": "Cancel",
+    "Edit": "Edit",
+    "New": "New",
     "Prev": "Prev",
+    "Next": "Next",
     "Page": "Page",
-    "Next": "Next"
+    "of": "of",
+    "NotFound": "No data found"
   },
   "loading": {
     "Loading": "Loading..."
   },
   "stock-list": {
+    "New":"New",
     "TotalofStocksquantity": "Total of Stocks",
     "totalofquantity": "medicines",
     "Typestock": "Type stock",
@@ -388,7 +400,6 @@
     "total-customer": "Total Customer"
   },
   "add-medicine": {
-    
     "Creating": "Creating..",
     "StripsperBox": "Tablet/box",
     "TabletsperBox": "Capsule/box",
@@ -447,6 +458,7 @@
   },
 
   "sidebar": {
+    "retail-product": "Retail Medicine",
     "RetailStock": "Retail Stock",
     "setting": "Settings",
     "AddStock": "Add Stocks",
@@ -1382,8 +1394,8 @@
   },
 
   "category": {
-    "Totalofcateogry":"Total of cateogry",
-    "categories":"categories",
+    "Totalofcateogry": "Total of cateogry",
+    "categories": "categories",
     "NotFound": "No category found !",
     "Title": "Category Dashboard",
     "New": "New",

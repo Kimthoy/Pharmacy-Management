@@ -4,8 +4,6 @@ import {
   ClipboardDocumentListIcon,
   ClockIcon,
   CurrencyRupeeIcon,
-  ExclamationTriangleIcon,
-  ShieldCheckIcon,
   UserGroupIcon,
   UsersIcon,
   Cog6ToothIcon,
@@ -24,7 +22,7 @@ import { getAllSale } from "../api/saleService";
 import { getAllSupplyItems } from "../api/supplyItemService";
 import { getExpiringSoonItems } from "../api/supplyItemService";
 import ExpiringSoonList from "./ExpiringSoonList";
-import ExpiredList from "./ExpiredList";
+
 const Dashboard = () => {
   const EXCHANGE_RATE = 4000;
   //medicine filters
@@ -94,7 +92,6 @@ const Dashboard = () => {
       setMedicines(data);
       setMeta(meta);
     } catch (err) {
-      
       setError("Failed to fetch medicines");
     } finally {
       setLoading(false);
@@ -110,9 +107,7 @@ const Dashboard = () => {
       setSuppliers(suppliers);
 
       const totalSupplier = suppliers.length;
-      
     } catch (err) {
-      
       setError("Failed to fetch supplier");
     } finally {
       setLoading(false);
@@ -122,7 +117,10 @@ const Dashboard = () => {
   useEffect(() => {
     fetchSuppliers();
   }, []);
-  const totalSupplier = suppliers.reduce((sum,suppliers)=>sum+(suppliers.id),0);
+  const totalSupplier = suppliers.reduce(
+    (sum, suppliers) => sum + suppliers.id,
+    0
+  );
   useEffect(() => {
     fetchMedicines();
   }, []);
@@ -149,7 +147,6 @@ const Dashboard = () => {
 
       setTotalCustomers(customersArray.length);
     } catch (err) {
-      
       setError(t("customerlist.FetchError"));
     } finally {
       setLoading(false);
@@ -171,9 +168,7 @@ const Dashboard = () => {
       setLowStockData(lowStock);
 
       setLowStockCount(lowStock.length);
-    } catch (error) {
-      
-    }
+    } catch (error) {}
   };
   useEffect(() => {
     fetchStocks();
@@ -193,7 +188,6 @@ const Dashboard = () => {
         );
         setTotalSalesAmount(total);
       } catch (err) {
-        
         setError(err.message || "Failed to fetch sales");
       } finally {
         setLoading(false);
@@ -216,7 +210,6 @@ const Dashboard = () => {
 
       setExpiredList(expiredItems);
     } catch (err) {
-      
       setExpiredList([]);
     }
   };
@@ -239,30 +232,25 @@ const Dashboard = () => {
         });
 
         setExpiringSoon(expiringSoonItems.length);
-      } catch (err) {
-        
-      }
+      } catch (err) {}
     };
 
     fetchExpiringSoon();
   }, []);
   useEffect(() => {
-    const fetchExpiringSoon = async () => {
+    const fetchExpiringData = async () => {
       try {
-        const response = await getExpiringSoonItems();
-        
+        const { expiringSoon, alreadyExpired } = await getExpiringSoonItems();
 
-        const expiringItems = Array.isArray(response)
-          ? response
-          : response.data || [];
-
-        setExpiringSoon(expiringItems.length);
-      } catch (error) {
-        
+        setExpiringSoon(expiringSoon); // store the array, not just count
+        setAlreadyExpired(alreadyExpired);
+      } catch (err) {
+        setExpiringSoon([]);
+        setAlreadyExpired([]);
       }
     };
 
-    fetchExpiringSoon();
+    fetchExpiringData();
   }, []);
 
   return (
@@ -314,7 +302,8 @@ const Dashboard = () => {
       </div>
       <DashboardStatus />
 
-      <ExpiredList expiredList={expiredList} />
+      <ExpiringSoonList expiringSoonList={expiringSoon} />
+
       <SystemMonitor activities={dashboardData.recentActivities} />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

@@ -1,9 +1,7 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../../context/AuthContext";
-import { useTranslation } from "../../hooks/useTranslation";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-
 import axios from "axios";
 import {
   FaFacebookF,
@@ -12,236 +10,299 @@ import {
   FaPinterestP,
   FaYoutube,
 } from "react-icons/fa";
+import { FiEye, FiEyeOff } from "react-icons/fi";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
+
+const weekdays = [
+  "អាទិត្យ", // Sunday
+  "ចន្ទ", // Monday
+  "អង្គារ", // Tuesday
+  "ពុធ", // Wednesday
+  "ព្រហស្បតិ៍", // Thursday
+  "សុក្រ", // Friday
+  "សៅរ៍", // Saturday
+];
+
+const months = [
+  "មករា", // January
+  "កុម្ភៈ", // February
+  "មីនា", // March
+  "មេសា", // April
+  "ឧសភា", // May
+  "មិថុនា", // June
+  "កក្កដា", // July
+  "សីហា", // August
+  "កញ្ញា", // September
+  "តុលា", // October
+  "វិច្ឆិកា", // November
+  "ធ្នូ", // December
+];
+
+function getKhmerDateString(now) {
+  const weekday = weekdays[now.getDay()];
+  const day = now.getDate();
+  const month = months[now.getMonth()];
+  const year = now.getFullYear();
+  return `ថ្ងៃ​ ${weekday} ទី ${day} ខែ ${month} ឆ្នាំ ${year}`;
+}
 
 const Login = () => {
-  const { t } = useTranslation();
   const { login } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [capsOn, setCapsOn] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentTime, setCurrentTime] = useState("");
+  const [currentDate, setCurrentDate] = useState("");
   const navigate = useNavigate();
-  const currentTime = new Date().toLocaleString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-    timeZone: "Asia/Phnom_Penh",
-  });
 
-  const currentDate = new Date().toLocaleDateString("km-KH", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+  useEffect(() => {
+    const updateDateTime = () => {
+      const now = new Date();
+
+      const timeString = now.toLocaleTimeString("km-KH", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true,
+        timeZone: "Asia/Phnom_Penh",
+      });
+
+      setCurrentTime(timeString);
+      setCurrentDate(getKhmerDateString(now));
+    };
+
+    updateDateTime(); // run once immediately
+    const timer = setInterval(updateDateTime, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const API_BASE =
+    (import.meta && import.meta.env && import.meta.env.VITE_API_BASE_URL) ||
+    "http://localhost:8000";
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+    setIsSubmitting(true);
 
     try {
-      const response = await axios.post("http://localhost:8000/api/login", {
+      const { data } = await axios.post(`${API_BASE}/api/login`, {
         email,
         password,
       });
 
-      if (!response.data.access_token) {
-        throw new Error(t("login.noToken"));
+      if (!data?.access_token) {
+        throw new Error("មិនមាន Token");
       }
 
       const userData = {
-        name: response.data.user.username || "User",
-        email: response.data.user.email || email,
+        name: data.user?.username || "អ្នកប្រើប្រាស់",
+        email: data.user?.email || email,
         profile_picture: "",
-        role: response.data.user.role || "Pharmacist",
-        contact: response.data.user.phone || "",
-        join_date: response.data.user.created_at
-          ? response.data.user.created_at.split(" ")[0]
+        role: data.user?.role || "Pharmacist",
+        contact: data.user?.phone || "",
+        join_date: data.user?.created_at
+          ? String(data.user.created_at).split(" ")[0]
           : new Date().toISOString().split("T")[0],
       };
 
-      const token = response.data.access_token;
-      localStorage.setItem("token", token);
+      const token = data.access_token;
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-      login(userData, token);
+      const keep = rememberMe ? localStorage : sessionStorage;
+      const clear = rememberMe ? sessionStorage : localStorage;
+      keep.setItem("token", token);
+      keep.setItem("user", JSON.stringify(userData));
+      clear.removeItem("token");
+      clear.removeItem("user");
 
-      const role = userData.role.toLowerCase();
-      if (role === "admin") {
-        navigate("/dashboard");
-      } else if (role === "cashier") {
-        navigate("/saledashboard");
-      } else {
-        setError(t("login.invalidRole"));
-        toast.error(t("login.invalidRole"));
-        return;
-      }
+      login(userData, token, rememberMe);
 
-      toast.success(t("login.success"));
-    } catch (error) {
+      toast.success("ចូលបានដោយជោគជ័យ!");
+    } catch (err) {
       const errorMsg =
-        error.response?.data?.message === "Unauthenticated"
-          ? t("login.invalidCredentials")
-          : error.response?.data?.message ||
-            error.message ||
-            t("login.genericError");
+        err.response?.data?.message === "Unauthenticated"
+          ? "អុីម៉ែល ឬ ពាក្យសម្ងាត់ មិនត្រឹមត្រូវ"
+          : err.response?.data?.message ||
+            err.message ||
+            "មានបញ្ហាក្នុងការចូល។";
 
       setError(errorMsg);
       toast.error(errorMsg);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen mb-14 bg-gray-100 flex flex-col items-center justify-center font-khmer">
-      <div className="w-full max-w-md mt-4 p-8 space-y-6 bg-white rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold text-center text-gray-900">
-          {t("login.signIn")}
-        </h2>
-        <p className="text-center text-gray-600">
-          or{" "}
-          <Link to="/register" className="text-blue-600 hover:underline">
-            {t("login.createAccount")}
-          </Link>
-        </p>
-        {error && <p className="text-red-600 text-center">{error}</p>}
-        <form onSubmit={handleLogin} className="space-y-6">
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
-            >
-              {t("login.email")} *
-            </label>
-            <input
-              type="email"
-              id="email"
-              required
-              autoComplete="off"
-              placeholder={t("login.emailPlaceholder")}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
-              {t("login.password")} *
-            </label>
-            <input
-              type="password"
-              id="password"
-              required
-              autoComplete="new-password"
-              placeholder={t("login.passwordPlaceholder")}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
-            />
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="rememberMe"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
-              />
-              <label
-                htmlFor="rememberMe"
-                className="ml-2 block text-sm text-gray-900"
-              >
-                {t("login.rememberMe")}
-              </label>
-            </div>
-            <div className="text-sm">
-              <button className="font-medium text-blue-600 hover:underline">
-                {t("login.lostPassword")}
-              </button>
-            </div>
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
-          >
-            {t("login.signIn")}
-          </button>
-        </form>
-        <p className="text-sm text-gray-600 text-center">
-          {t("login.currentTime", {
-            time: currentTime,
-            date: currentDate,
-          })}
-        </p>
-      </div>
+    <div className="w-full grid grid-cols-1 lg:grid-cols-2 bg-gradient-to-br from-emerald-50 to-white dark:from-gray-950 dark:to-gray-900">
+      {/* ផ្នែកខាងឆ្វេង */}
+      <section className="hidden lg:flex relative items-center justify-center p-10">
+        <div className="absolute inset-6 rounded-3xl bg-emerald-600/10 blur-[70px] pointer-events-none" />
+        <div className="relative z-10 max-w-lg">
+          <h1 className="text-4xl font-extrabold tracking-tight text-emerald-700 dark:text-emerald-400">
+            ហាងឱសថ បញ្ញារិទ្ធ
+          </h1>
+          <p className="mt-4 text-lg text-gray-700/80 dark:text-gray-300">
+            គ្រប់គ្រងស្តុក ការលក់ និងហិរញ្ញវត្ថុ ក្នុងផ្ទាំងតែមួយ។
+          </p>
 
-      <footer className="mt-8 w-full bg-gray-800 text-white py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col items-center space-y-4">
-            <div className="flex space-x-4">
-              <a
-                href="https://facebook.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white hover:text-gray-300"
-              >
-                <FaFacebookF size={20} />
-              </a>
-              <a
-                href="https://twitter.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white hover:text-gray-300"
-              >
-                <FaTwitter size={20} />
-              </a>
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white hover:text-gray-300"
-              >
-                <FaInstagram size={20} />
-              </a>
-              <a
-                href="https://pinterest.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white hover:text-gray-300"
-              >
-                <FaPinterestP size={20} />
-              </a>
-              <a
-                href="https://youtube.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white hover:text-gray-300"
-              >
-                <FaYoutube size={20} />
-              </a>
-            </div>
-            <div className="flex space-x-4 text-sm">
-              <Link to="/" className="hover:underline">
-                {t("footer.home")}
-              </Link>
-              <Link to="/about" className="hover:underline">
-                {t("footer.about")}
-              </Link>
-              <Link to="/shop" className="hover:underline">
-                {t("footer.shop")}
-              </Link>
-              <Link to="/contact" className="hover:underline">
-                {t("footer.contact")}
-              </Link>
-            </div>
-            <p className="text-sm">
-              © 2025 Panharith Pharmacy. {t("footer.rights")}
+          <div className="mt-8 rounded-2xl border border-emerald-200/60 dark:border-emerald-700/40 p-5 bg-white/70 dark:bg-gray-900/40 backdrop-blur">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              ពេលវេលា: {currentTime} — {currentDate}
             </p>
           </div>
+
+          <div className="mt-8 flex items-center gap-4 text-gray-600 dark:text-gray-300">
+            <a
+              href="https://facebook.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FaFacebookF size={18} />
+            </a>
+            <a
+              href="https://twitter.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FaTwitter size={18} />
+            </a>
+            <a
+              href="https://instagram.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FaInstagram size={18} />
+            </a>
+            <a
+              href="https://pinterest.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FaPinterestP size={18} />
+            </a>
+            <a
+              href="https://youtube.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FaYoutube size={18} />
+            </a>
+          </div>
+
+          <p className="mt-10 text-xs text-gray-500 dark:text-gray-400">
+            © 2025 ហាងឱសថ បញ្ញារិទ្ធ។ រក្សាសិទ្ធិគ្រប់យ៉ាង។
+          </p>
         </div>
-      </footer>
+      </section>
+
+      {/* ផ្នែកខាងស្តាំ */}
+      <section className="flex items-center justify-center p-6 sm:p-10">
+        <div className="w-full max-w-md rounded-3xl shadow-2xl bg-white dark:bg-gray-900 border border-gray-200/70 dark:border-gray-800 p-8 sm:p-10">
+          <div className="mb-6">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+              ចូលប្រព័ន្ធ
+            </h2>
+            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+              សូមបំពេញ អុីម៉ែល និង ពាក្យសម្ងាត់ ដើម្បីចូលប្រើ។
+            </p>
+          </div>
+
+          {error && (
+            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-red-700">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleLogin} className="space-y-5">
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                អុីម៉ែល *
+              </label>
+              <input
+                type="email"
+                id="email"
+                autoComplete="username"
+                required
+                placeholder="បញ្ចូលអុីម៉ែល"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="mt-1 w-full rounded-xl border px-3 py-2 focus:ring-emerald-600"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                ពាក្យសម្ងាត់ *
+              </label>
+              <div className="mt-1 relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  autoComplete="current-password"
+                  required
+                  placeholder="បញ្ចូលពាក្យសម្ងាត់"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onKeyUp={(e) => setCapsOn(e.getModifierState("CapsLock"))}
+                  className="w-full rounded-xl border px-3 py-2 pr-10 focus:ring-emerald-600"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((s) => !s)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2"
+                >
+                  {showPassword ? <FiEyeOff /> : <FiEye />}
+                </button>
+              </div>
+              {capsOn && (
+                <p className="mt-1 text-xs text-amber-600">
+                  Caps Lock កំពុងដំណើរការ
+                </p>
+              )}
+            </div>
+
+            <div className="flex items-center justify-between">
+              <label className="inline-flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="h-4 w-4 text-emerald-600"
+                />
+                <span className="text-sm">ចងចាំខ្ញុំ</span>
+              </label>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full inline-flex items-center justify-center gap-2 bg-emerald-600 text-white py-2.5 rounded-xl hover:bg-emerald-700 disabled:opacity-70"
+            >
+              {isSubmitting && (
+                <AiOutlineLoading3Quarters className="animate-spin" />
+              )}
+              ចូលប្រព័ន្ធ
+            </button>
+          </form>
+
+          <p className="mt-8 text-center text-xs text-gray-500 lg:hidden">
+            © 2025 ហាងឱសថ បញ្ញារិទ្ធ។ រក្សាសិទ្ធិគ្រប់យ៉ាង។
+          </p>
+        </div>
+      </section>
     </div>
   );
 };
