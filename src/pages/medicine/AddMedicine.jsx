@@ -66,10 +66,11 @@ const AddMedicine = () => {
         const data = await getAllUnits();
         setUnit(data);
       } catch {
-        setError("Failed to fetch units.");
+        setError(t("add-medicine.Errors.UnitsFailed"));
       }
     };
     fetchUnit();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleAmountBlur = () => {
@@ -88,10 +89,11 @@ const AddMedicine = () => {
         const data = await getAllCategory();
         setCategory(data);
       } catch {
-        setError("Failed to fetch categories.");
+        setError(t("add-medicine.Errors.CategoriesFailed"));
       }
     };
     fetchCategory();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleMedicineChange = useCallback((e) => {
@@ -131,9 +133,7 @@ const AddMedicine = () => {
         setIsScanning(false);
         focusBarcodeField();
       },
-      (scanError) => {
-        console.warn("Scan error:", scanError);
-      }
+      () => {}
     );
 
     return () => {
@@ -157,14 +157,14 @@ const AddMedicine = () => {
   const handleCategoryChange = (selectedOptions) => {
     setMedicine((prev) => ({
       ...prev,
-      category_ids: selectedOptions.map((opt) => opt.value),
+      category_ids: (selectedOptions || []).map((opt) => opt.value),
     }));
   };
 
   const handleUnitChange = (selectedOptions) => {
     setMedicine((prev) => ({
       ...prev,
-      unit_ids: selectedOptions.map((opt) => opt.value),
+      unit_ids: (selectedOptions || []).map((opt) => opt.value),
     }));
   };
 
@@ -191,12 +191,9 @@ const AddMedicine = () => {
         formData.append("origin", medicine.origin || "");
         formData.append("purchase", medicine.purchase || "");
 
-        // categories
         medicine.category_ids.forEach((id) =>
           formData.append("category_ids[]", String(id))
         );
-
-        // only send unit_ids (no nested units, no box fields)
         medicine.unit_ids.forEach((id) =>
           formData.append("unit_ids[]", String(id))
         );
@@ -207,8 +204,11 @@ const AddMedicine = () => {
 
         await createMedicine(formData);
 
-        setSuccess("Created successfully!");
-        setToast({ message: "Medicine added successfully!", type: "success" });
+        setSuccess(t("add-medicine.Messages.Created"));
+        setToast({
+          message: t("add-medicine.Messages.ToastSuccess"),
+          type: "success",
+        });
 
         // Reset
         setMedicine({
@@ -229,20 +229,24 @@ const AddMedicine = () => {
         setImagePreview(null);
         focusBarcodeField();
       } catch (err) {
-        console.error(err);
         const backendMsg =
           err?.response?.data?.message ||
           (err?.response?.data?.errors &&
             Object.entries(err.response.data.errors)
               .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(", ") : v}`)
               .join(" | "));
-        setError(backendMsg || err?.message || "Failed to create medicine");
-        setToast({ message: "Failed to add medicine", type: "error" });
+        const msg =
+          backendMsg || err?.message || t("add-medicine.Messages.CreateFailed");
+        setError(msg);
+        setToast({
+          message: t("add-medicine.Messages.ToastFailed"),
+          type: "error",
+        });
       } finally {
         setIsLoading(false);
       }
     },
-    [medicine]
+    [medicine, t]
   );
 
   return (
@@ -275,17 +279,19 @@ const AddMedicine = () => {
             {t("add-medicine.AddMedicine")}
           </h2>
           <p className="text-gray-500 italic text-md dark:text-gray-400">
-            {t("add-micine.title-addmedicine")}
+            {/* FIX: you had "add-micine.title-addmedicine" – use this key instead */}
+            {t("add-medicine.Subtitle")}
           </p>
         </div>
       </div>
 
       <form onSubmit={handleMedicineSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Barcode */}
           <div className="flex flex-col">
             <label
               htmlFor="barcode"
-              className="mb-2 text-md font-medium text-gray-700 dark:text-gray-300"
+              className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
             >
               {t("add-medicine.Barcode")}
             </label>
@@ -297,16 +303,22 @@ const AddMedicine = () => {
                 name="barcode"
                 value={medicine.barcode || ""}
                 onChange={handleMedicineChange}
-                className="w-full text-md border border-gray-300 dark:border-gray-600 px-3 py-2 pr-16 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
+                placeholder={t("add-medicine.BarcodePh")}
+                className="w-full text-md border border-gray-300 dark:border-gray-600 px-3 py-2 pr-16 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-100 transition"
               />
               <button
                 type="button"
                 onClick={() => setIsScanning(true)}
+                aria-label={t("add-medicine.Scan")}
                 className="absolute right-1 top-1/2 -translate-y-1/2 px-3 py-1 rounded-md text-sm"
+                title={t("add-medicine.Scan")}
               >
                 <LuScanBarcode className="w-5 h-5 text-green-600" />
               </button>
             </div>
+            <p className="text-xs text-gray-500 mt-1">
+              {t("add-medicine.BarcodeHelp")}
+            </p>
           </div>
 
           {isScanning && (
@@ -316,10 +328,11 @@ const AddMedicine = () => {
             />
           )}
 
+          {/* Name */}
           <div className="flex flex-col">
             <label
               htmlFor="medicine_name"
-              className="mb-2 text-md font-medium text-gray-700 dark:text-gray-300"
+              className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
             >
               {t("add-medicine.Madicinename")}
             </label>
@@ -329,14 +342,19 @@ const AddMedicine = () => {
               name="medicine_name"
               value={medicine.medicine_name}
               onChange={handleMedicineChange}
-              className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
+              placeholder={t("add-medicine.NamePh")}
+              className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-100 transition"
             />
+            <p className="text-xs text-gray-500 mt-1">
+              {t("add-medicine.NameHelp")}
+            </p>
           </div>
 
+          {/* Price */}
           <div className="flex flex-col">
             <label
               htmlFor="price"
-              className="mb-2 text-md font-medium text-gray-700 dark:text-gray-300"
+              className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
             >
               {t("add-medicine.Price")}
             </label>
@@ -347,14 +365,19 @@ const AddMedicine = () => {
               value={medicine.price}
               onBlur={handleAmountBlur}
               onChange={handleMedicineChange}
-              className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
+              placeholder={t("add-medicine.PricePh")}
+              className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-100 transition"
             />
+            <p className="text-xs text-gray-500 mt-1">
+              {t("add-medicine.PriceHelp")}
+            </p>
           </div>
 
+          {/* Weight */}
           <div className="flex flex-col">
             <label
               htmlFor="weight"
-              className="mb-2 text-md font-medium text-gray-700 dark:text-gray-300"
+              className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
             >
               {t("add-medicine.Weight")}
             </label>
@@ -364,12 +387,83 @@ const AddMedicine = () => {
               name="weight"
               value={medicine.weight}
               onChange={handleMedicineChange}
-              className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
+              placeholder={t("add-medicine.WeightPh")}
+              className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-100 transition"
             />
+            <p className="text-xs text-gray-500 mt-1">
+              {t("add-medicine.WeightHelp")}
+            </p>
           </div>
 
+          {/* Manufacturer */}
+          <div className="flex flex-col">
+            <label
+              htmlFor="manufacturer"
+              className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
+              {t("add-medicine.Manufacturer")}
+            </label>
+            <input
+              type="text"
+              id="manufacturer"
+              name="manufacturer"
+              value={medicine.manufacturer}
+              onChange={handleMedicineChange}
+              placeholder={t("add-medicine.ManufacturerPh")}
+              className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-100 transition"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              {t("add-medicine.ManufacturerHelp")}
+            </p>
+          </div>
+
+          {/* Origin */}
+          <div className="flex flex-col">
+            <label
+              htmlFor="origin"
+              className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
+              {t("add-medicine.Origin")}
+            </label>
+            <input
+              type="text"
+              id="origin"
+              name="origin"
+              value={medicine.origin}
+              onChange={handleMedicineChange}
+              placeholder={t("add-medicine.OriginPh")}
+              className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-100 transition"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              {t("add-medicine.OriginHelp")}
+            </p>
+          </div>
+
+          {/* Purchase */}
+          <div className="flex flex-col">
+            <label
+              htmlFor="purchase"
+              className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
+              {t("add-medicine.Purchase")}
+            </label>
+            <input
+              type="text"
+              id="purchase"
+              name="purchase"
+              value={medicine.purchase}
+              onChange={handleMedicineChange}
+              placeholder={t("add-medicine.PurchasePh")}
+              className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-100 transition"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              {t("add-medicine.PurchaseHelp")}
+            </p>
+          </div>
+
+          {/* Categories */}
           <div>
-            <label className="dark:text-slate-300">
+            <label className="text-sm font-medium dark:text-slate-300">
               {t("add-medicine.Category")}
             </label>
             <Select
@@ -384,11 +478,16 @@ const AddMedicine = () => {
               isMulti
               classNamePrefix="select"
               className="mt-2"
+              placeholder={t("add-medicine.CategoryPh")}
             />
+            <p className="text-xs text-gray-500 mt-1">
+              {t("add-medicine.CategoryHelp")}
+            </p>
           </div>
 
+          {/* Units */}
           <div>
-            <label className="dark:text-slate-300">
+            <label className="text-sm font-medium dark:text-slate-300">
               {t("add-medicine.Unit")}
             </label>
             <Select
@@ -403,13 +502,18 @@ const AddMedicine = () => {
               isMulti
               classNamePrefix="select"
               className="mt-2"
+              placeholder={t("add-medicine.UnitPh")}
             />
+            <p className="text-xs text-gray-500 mt-1">
+              {t("add-medicine.UnitHelp")}
+            </p>
           </div>
 
+          {/* Image */}
           <div className="flex flex-col w-full max-w-lg relative">
             <label
               htmlFor="medicine-image"
-              className=" text-md text-gray-900 dark:text-gray-100 tracking-wide"
+              className="text-sm font-medium text-gray-900 dark:text-gray-100"
             >
               {t("add-medicine.Photo")}
             </label>
@@ -419,21 +523,25 @@ const AddMedicine = () => {
               type="file"
               accept="image/*"
               onChange={handleMedicineChange}
-              className="mt-2 border px-2 py-2 rounded-lg"
+              className="mt-2 border px-2 py-2 rounded-lg dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
             />
+            <p className="text-xs text-gray-500 mt-1">
+              {t("add-medicine.PhotoHelp")}
+            </p>
             {imagePreview && (
               <img
                 src={imagePreview}
-                alt="preview"
+                alt={t("add-medicine.PhotoPreviewAlt")}
                 className="mt-2 h-28 w-28 object-cover rounded-md border"
               />
             )}
           </div>
 
+          {/* Details */}
           <div className="flex flex-col col-span-1 md:col-span-3">
             <label
               htmlFor="medicine_detail"
-              className="mb-2 text-md font-medium text-gray-700 dark:text-gray-300"
+              className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
             >
               {t("add-medicine.MedicineInformation")}
             </label>
@@ -442,8 +550,12 @@ const AddMedicine = () => {
               name="medicine_detail"
               value={medicine.medicine_detail}
               onChange={handleMedicineChange}
-              className="text-md border border-gray-300 dark:border-gray-600 w-full sm:h-28 h-16 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-200 transition"
+              placeholder={t("add-medicine.DetailPh")}
+              className="text-md border border-gray-300 dark:border-gray-600 w-full sm:h-28 h-16 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-100 transition"
             />
+            <p className="text-xs text-gray-500 mt-1">
+              {t("add-medicine.DetailHelp")}
+            </p>
           </div>
         </div>
 

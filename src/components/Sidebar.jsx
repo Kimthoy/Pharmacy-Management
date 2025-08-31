@@ -142,7 +142,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
   return (
     <div>
       <button
-        className="md:hidden fixed top-3 left-4 z-50 sm:p-2 p-1 bg-green-500 text-white rounded-md"
+        className="md:hidden fixed top-3 left-4 z-[999] sm:p-2 p-1 bg-green-500 text-white rounded-md"
         onClick={toggleSidebar}
       >
         {isOpen ? <HiX className="w-6 h-6" /> : <HiMenu className="w-6 h-6" />}
@@ -202,7 +202,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                     >
                       <div className="flex items-center">
                         <Icon
-                          className={`w-6 h-6 flex-shrink-0 transition-colors duration-200
+                          className={`w-7 h-7 flex-shrink-0 transition-colors duration-200
                         ${
                           isParentActive
                             ? "text-green-700 dark:text-white"

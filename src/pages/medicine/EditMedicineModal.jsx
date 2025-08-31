@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
 import { updateMedicine } from "../api/medicineService";
-import Swal from "sweetalert2";
 import { useTranslation } from "../../hooks/useTranslation";
 import Select from "react-select";
 import { getAllCategory } from "../api/categoryService";
@@ -8,12 +7,10 @@ import { getAllUnits } from "../api/unitService";
 
 const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
   const { t } = useTranslation();
-
   const [categories, setCategories] = useState([]);
   const [units, setUnits] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Form state
   const [formData, setFormData] = useState({
     id: null,
     medicine_name: "",
@@ -23,18 +20,17 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
     medicine_detail: "",
     category_ids: [],
     unit_ids: [],
-    image: null, // preview URL or existing absolute URL
-    imageFile: null, // File to upload
+    image: null,
+    imageFile: null,
     manufacturer: "",
     origin: "",
     purchase: "",
     medicine_status: "",
-    // BOX-only fields (pivot)
     strips_per_box: "",
     tablets_per_box: "",
   });
 
-  // ========== Fetch lookups ==========
+  // === Fetch categories & units ===
   useEffect(() => {
     if (!isOpen) return;
     (async () => {
@@ -45,22 +41,19 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
         ]);
         setCategories(catRes || []);
         setUnits(unitRes || []);
-      } catch (_) {
-        // noop – your UI already has guards
-      }
+      } catch {}
     })();
   }, [isOpen]);
 
-  // ========== Prefill from initialData ==========
+  // === Prefill from initialData ===
   useEffect(() => {
     if (!isOpen || !initialData) return;
-
-    // pull pivot fields if Box exists in the loaded record
     const boxUnit = (initialData.units || []).find(
       (u) => String(u.unit_name).toLowerCase() === "box"
     );
 
     setFormData({
+      ...formData,
       id: initialData.id ?? null,
       medicine_name: initialData.medicine_name ?? "",
       price: initialData.price ?? "",
@@ -69,7 +62,7 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
       medicine_detail: initialData.medicine_detail ?? "",
       category_ids: (initialData.categories || []).map((c) => c.id),
       unit_ids: (initialData.units || []).map((u) => u.id),
-      image: initialData.image || null, // already a URL coming from the Resource
+      image: initialData.image || null,
       imageFile: null,
       manufacturer: initialData.manufacturer ?? "",
       origin: initialData.origin ?? "",
@@ -80,7 +73,6 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
     });
   }, [isOpen, initialData]);
 
-  // ========== Select options ==========
   const categoryOptions = useMemo(
     () => categories.map((c) => ({ value: c.id, label: c.category_name })),
     [categories]
@@ -90,93 +82,59 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
     [units]
   );
 
-  // ========== Helpers for Box ==========
-  const getBoxUnitId = () => {
-    const box = unitOptions.find((opt) => opt.label === "Box");
-    return box?.value ?? null;
-  };
+  const getBoxUnitId = () =>
+    unitOptions.find((opt) => opt.label === "Box")?.value;
   const isBoxSelected = () => {
     const boxId = getBoxUnitId();
     return boxId ? formData.unit_ids.includes(boxId) : false;
   };
 
-  // ========== Handlers ==========
   const handleChange = (e) => {
-    const { name, value, type } = e.target;
-    const val = type === "number" ? (value === "" ? "" : Number(value)) : value;
-    setFormData((prev) => ({ ...prev, [name]: val }));
+    const { name, value } = e.target;
+    setFormData((p) => ({ ...p, [name]: value }));
   };
 
   const handleNumberChange = (e) => {
     const { name, value } = e.target;
-    if (value === "") return setFormData((p) => ({ ...p, [name]: "" }));
-    const n = Number(value);
-    if (Number.isNaN(n) || n < 0) return;
-    setFormData((p) => ({ ...p, [name]: n }));
-  };
-
-  const handleCategoryChange = (selected) => {
-    setFormData((prev) => ({
-      ...prev,
-      category_ids: selected ? selected.map((opt) => opt.value) : [],
+    setFormData((p) => ({
+      ...p,
+      [name]: value === "" ? "" : Math.max(0, Number(value)),
     }));
   };
 
+  const handleCategoryChange = (selected) =>
+    setFormData((p) => ({
+      ...p,
+      category_ids: selected ? selected.map((o) => o.value) : [],
+    }));
+
   const handleUnitChange = (selected) => {
-    const nextUnitIds = selected ? selected.map((opt) => opt.value) : [];
-
-    // If the user deselects Box, clear box-only fields to avoid sending stale pivots
+    const ids = selected ? selected.map((o) => o.value) : [];
     const boxId = getBoxUnitId();
-    const boxStillSelected = boxId ? nextUnitIds.includes(boxId) : false;
-
-    setFormData((prev) => ({
-      ...prev,
-      unit_ids: nextUnitIds,
-      strips_per_box: boxStillSelected ? prev.strips_per_box : "",
-      tablets_per_box: boxStillSelected ? prev.tablets_per_box : "",
+    const boxStill = boxId ? ids.includes(boxId) : false;
+    setFormData((p) => ({
+      ...p,
+      unit_ids: ids,
+      strips_per_box: boxStill ? p.strips_per_box : "",
+      tablets_per_box: boxStill ? p.tablets_per_box : "",
     }));
   };
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    setFormData((prev) => ({ ...prev, image: url, imageFile: file }));
+    setFormData((p) => ({
+      ...p,
+      image: URL.createObjectURL(file),
+      imageFile: file,
+    }));
   };
 
   const handleSubmit = async () => {
+    if (!formData.id) return;
+
+    setIsLoading(true);
     try {
-      if (!formData.id) {
-        Swal.fire({
-          icon: "error",
-          title: "Invalid ID",
-          text: "Missing record ID.",
-        });
-        return;
-      }
-
-      setIsLoading(true);
-
-      // Build `units[]` payload expected by backend
-      const unitsPayload = formData.unit_ids.map((uId) => {
-        if (isBoxSelected() && uId === getBoxUnitId()) {
-          return {
-            unit_id: uId,
-            strips_per_box:
-              formData.strips_per_box !== "" && formData.strips_per_box != null
-                ? Number(formData.strips_per_box)
-                : undefined,
-            tablets_per_box:
-              formData.tablets_per_box !== "" &&
-              formData.tablets_per_box != null
-                ? Number(formData.tablets_per_box)
-                : undefined,
-          };
-        }
-        return { unit_id: uId };
-      });
-
-      // Send only fields your backend `update()` cares about
       const payload = {
         medicine_name: formData.medicine_name,
         barcode: formData.barcode,
@@ -187,26 +145,21 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
         origin: formData.origin,
         purchase: formData.purchase,
         category_ids: formData.category_ids,
-        units: unitsPayload,
+        units: formData.unit_ids.map((uId) =>
+          isBoxSelected() && uId === getBoxUnitId()
+            ? {
+                unit_id: uId,
+                strips_per_box: Number(formData.strips_per_box) || undefined,
+                tablets_per_box: Number(formData.tablets_per_box) || undefined,
+              }
+            : { unit_id: uId }
+        ),
         imageFile: formData.imageFile ?? undefined,
       };
 
       const res = await updateMedicine(formData.id, payload);
-
-      Swal.fire({
-        icon: "success",
-        title: "Updated!",
-        text: `${formData.medicine_name} has been updated successfully.`,
-      });
-
       onClose();
       onSave?.(res);
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Failed to update",
-        text: error?.message || "Please check the form data and try again.",
-      });
     } finally {
       setIsLoading(false);
     }
@@ -215,127 +168,156 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-      <div className="bg-white dark:bg-slate-800 p-6 sm:py-14 sm:w-[50%] w-full sm:h-full h-full overflow-y-auto shadow-lg">
-        <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-slate-200">
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50">
+      <div className="bg-white dark:bg-slate-800 p-6 sm:py-10 sm:w-[60%] w-full h-full overflow-y-auto rounded-xl">
+        <h2 className="text-2xl font-semibold mb-6 text-gray-800 dark:text-slate-200">
           {t("edit-medicine.EditTitle")}
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Barcode */}
           <div>
-            <label>{t("edit-medicine.Barcode")}</label>
+            <label className="block font-medium">
+              {t("edit-medicine.Barcode")}
+            </label>
             <input
-              type="text"
               name="barcode"
-              value={formData.barcode || ""}
+              value={formData.barcode}
               onChange={handleChange}
-              placeholder="Barcode Number"
-              className="w-full p-2 border"
+              placeholder={t("edit-medicine.BarcodePh")}
+              className="w-full p-2 border rounded"
             />
+            <p className="text-xs text-gray-500">
+              {t("edit-medicine.BarcodeDesc")}
+            </p>
           </div>
 
+          {/* Name */}
           <div>
-            <label>{t("edit-medicine.Name")}</label>
+            <label className="block font-medium">
+              {t("edit-medicine.Name")}
+            </label>
             <input
-              type="text"
               name="medicine_name"
-              value={formData.medicine_name || ""}
+              value={formData.medicine_name}
               onChange={handleChange}
-              placeholder="Medicine Name"
-              className="w-full p-2 border"
+              placeholder={t("edit-medicine.NamePh")}
+              className="w-full p-2 border rounded"
             />
+            <p className="text-xs text-gray-500">
+              {t("edit-medicine.NameDesc")}
+            </p>
           </div>
 
+          {/* Price */}
           <div>
-            <label>{t("edit-medicine.Price")}</label>
+            <label className="block font-medium">
+              {t("edit-medicine.Price")}
+            </label>
             <input
               type="number"
               name="price"
-              value={formData.price ?? ""}
+              value={formData.price}
               onChange={handleNumberChange}
-              placeholder="Price"
-              className="w-full p-2 border"
+              placeholder={t("edit-medicine.PricePh")}
+              className="w-full p-2 border rounded"
             />
+            <p className="text-xs text-gray-500">
+              {t("edit-medicine.PriceDesc")}
+            </p>
           </div>
 
+          {/* Weight */}
           <div>
-            <label>{t("edit-medicine.Weight")}</label>
+            <label className="block font-medium">
+              {t("edit-medicine.Weight")}
+            </label>
             <input
-              type="text"
               name="weight"
-              value={formData.weight || ""}
+              value={formData.weight}
               onChange={handleChange}
-              placeholder="Weight"
-              className="w-full p-2 border"
+              placeholder={t("edit-medicine.WeightPh")}
+              className="w-full p-2 border rounded"
             />
+            <p className="text-xs text-gray-500">
+              {t("edit-medicine.WeightDesc")}
+            </p>
           </div>
 
+          {/* Category */}
           <div>
-            <label>{t("edit-medicine.Category")}</label>
+            <label className="block font-medium">
+              {t("edit-medicine.Category")}
+            </label>
             <Select
               isMulti
-              name="category_ids"
               options={categoryOptions}
-              value={categoryOptions.filter((opt) =>
-                formData.category_ids?.includes(opt.value)
+              value={categoryOptions.filter((o) =>
+                formData.category_ids.includes(o.value)
               )}
               onChange={handleCategoryChange}
             />
+            <p className="text-xs text-gray-500">
+              {t("edit-medicine.CategoryDesc")}
+            </p>
           </div>
 
+          {/* Unit */}
           <div>
-            <label>{t("edit-medicine.Unit")}</label>
+            <label className="block font-medium">
+              {t("edit-medicine.Unit")}
+            </label>
             <Select
-              name="unit_ids"
               isMulti
               options={unitOptions}
-              value={unitOptions.filter((opt) =>
-                formData.unit_ids?.includes(opt.value)
+              value={unitOptions.filter((o) =>
+                formData.unit_ids.includes(o.value)
               )}
               onChange={handleUnitChange}
-              className="basic-multi-select"
-              classNamePrefix="select"
             />
+            <p className="text-xs text-gray-500">
+              {t("edit-medicine.UnitDesc")}
+            </p>
           </div>
 
           {/* Manufacturer */}
           <div>
-            <label htmlFor="manufacturer">
+            <label className="block font-medium">
               {t("edit-medicine.Manufacturer")}
             </label>
             <input
-              type="text"
               name="manufacturer"
               value={formData.manufacturer}
               onChange={handleChange}
-              placeholder="Manufacturer"
-              className="w-full p-2 border"
+              placeholder={t("edit-medicine.ManufacturerPh")}
+              className="w-full p-2 border rounded"
             />
           </div>
 
           {/* Origin */}
           <div>
-            <label htmlFor="origin">{t("edit-medicine.Origin")}</label>
+            <label className="block font-medium">
+              {t("edit-medicine.Origin")}
+            </label>
             <input
-              type="text"
               name="origin"
               value={formData.origin}
               onChange={handleChange}
-              placeholder="Country of Origin"
-              className="w-full p-2 border"
+              placeholder={t("edit-medicine.OriginPh")}
+              className="w-full p-2 border rounded"
             />
           </div>
 
-          {/* Medicine Status (not persisted in code above, keep if needed) */}
+          {/* Status */}
           <div>
-            <label htmlFor="medicine_status">
+            <label className="block font-medium">
               {t("edit-medicine.MedicineStatus")}
             </label>
             <select
               name="medicine_status"
               value={formData.medicine_status}
               onChange={handleChange}
-              className="w-full p-2 border"
+              className="w-full p-2 border rounded"
             >
               <option value="">{t("edit-medicine.SelectStatus")}</option>
               <option value="prescription">
@@ -350,78 +332,74 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
 
           {/* Image */}
           <div>
-            <label>{t("edit-medicine.Image")}</label>
-            <input
-              type="file"
-              accept="image/*"
-              className="border h-12 p-2 cursor-pointer"
-              onChange={handleFileChange}
-            />
+            <label className="block font-medium">
+              {t("edit-medicine.Image")}
+            </label>
+            <input type="file" accept="image/*" onChange={handleFileChange} />
             {formData.image && (
               <img
                 src={formData.image}
                 alt="Preview"
-                className="w-12 h-12 object-cover mt-2"
+                className="w-16 h-16 mt-2 object-cover"
               />
             )}
           </div>
         </div>
-        {/* Box-only fields */}
+
+        {/* Box only */}
         {isBoxSelected() && (
-          <div className="flex gap-3">
+          <div className="grid grid-cols-2 gap-4 mt-4">
             <div>
               <label>{t("edit-medicine.TabletPerBox")}</label>
               <input
                 type="number"
                 name="strips_per_box"
-                min={1}
-                value={formData.strips_per_box ?? ""}
+                value={formData.strips_per_box}
                 onChange={handleNumberChange}
                 placeholder="e.g. 10"
-                className="w-full p-2 border"
+                className="w-full p-2 border rounded"
               />
             </div>
-
             <div>
               <label>{t("edit-medicine.CapsulePerBox")}</label>
               <input
                 type="number"
                 name="tablets_per_box"
-                min={1}
-                value={formData.tablets_per_box ?? ""}
+                value={formData.tablets_per_box}
                 onChange={handleNumberChange}
                 placeholder="e.g. 100"
-                className="w-full p-2 border"
+                className="w-full p-2 border rounded"
               />
             </div>
           </div>
         )}
-        <div className="mt-4">
+
+        {/* Detail */}
+        <div className="mt-6">
           <label>{t("edit-medicine.Detail")}</label>
           <textarea
             name="medicine_detail"
-            value={formData.medicine_detail || ""}
+            value={formData.medicine_detail}
             onChange={handleChange}
-            placeholder="Medicine Details"
-            className="w-full h-24 p-2 border"
+            placeholder={t("edit-medicine.DetailPh")}
+            className="w-full p-2 border rounded"
             rows={3}
           />
         </div>
 
-        <div className="sm:mb-0 mb-20 flex justify-end space-x-2 mt-6">
+        {/* Actions */}
+        <div className="flex justify-end gap-2 mt-6">
           <button
             onClick={onClose}
-            className="bg-gray-400 px-4 py-2 text-white hover:bg-opacity-80"
+            className="bg-gray-400 px-4 py-2 rounded text-white"
           >
             {t("edit-medicine.BtnCancel")}
           </button>
           <button
             disabled={isLoading}
             onClick={handleSubmit}
-            className={`px-4 py-2 text-white ${
-              isLoading
-                ? "bg-blue-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-opacity-90"
+            className={`px-4 py-2 rounded text-white ${
+              isLoading ? "bg-blue-400" : "bg-blue-600 hover:bg-blue-700"
             }`}
           >
             {isLoading

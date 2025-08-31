@@ -1,15 +1,16 @@
 import { useRef, useEffect, useState, useMemo } from "react";
-import { FaEllipsisH } from "react-icons/fa";
 import { BiEdit, BiTrash } from "react-icons/bi";
 import { RiTableView } from "react-icons/ri";
-import { useTranslation } from "../../hooks/useTranslation";
 import { FaSpinner } from "react-icons/fa";
+import Swal from "sweetalert2";
+import { useTranslation } from "../../hooks/useTranslation";
 import {
   getAllCustomer,
   updateCustomer,
   deleteCustomer,
 } from "../api/customerService";
 import EditCustomerModal from "../../components/Customer/EditCustomerModal";
+
 const CustomerList = () => {
   const { t } = useTranslation();
   const menuRef = useRef(null);
@@ -23,26 +24,23 @@ const CustomerList = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [customers, setCustomers] = useState([]);
-  const [totalCustomers, setTotalCustomers] = useState(0); // ✅ NEW state
+  const [totalCustomers, setTotalCustomers] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // ✅ fetch customers
   const fetchCustomer = async () => {
     setLoading(true);
     try {
       const response = await getAllCustomer();
-
       const customersArray = Array.isArray(response)
         ? response
         : Array.isArray(response?.data)
         ? response.data
         : [];
-
       setCustomers(customersArray);
-
       setTotalCustomers(customersArray.length);
     } catch (err) {
-      
       setError(t("customerlist.FetchError"));
     } finally {
       setLoading(false);
@@ -65,16 +63,28 @@ const CustomerList = () => {
 
   const toggleMenu = (index) => setOpenMenu(openMenu === index ? null : index);
 
+  // ✅ SweetAlert confirm instead of window.confirm
   const handleDeleteClick = async (id) => {
-    if (!window.confirm(t("customerlist.ConfirmDelete"))) return;
-    setDeletingId(id);
-
-    const success = await deleteCustomer(id, t);
-    if (success) {
-      setCustomers((prev) => prev.filter((cus) => cus.id !== id));
-    }
-
-    setDeletingId(null);
+    Swal.fire({
+      title: t("customerlist.ConfirmTitle"),
+      text: t("customerlist.ConfirmText"),
+      icon: "warning",
+      showCancelButton: true,
+      cancelButtonText: t("customerlist.Cancel"),
+      confirmButtonText: t("customerlist.YesDelete"),
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        setDeletingId(id);
+        const success = await deleteCustomer(id, t);
+        if (success) {
+          setCustomers((prev) => prev.filter((cus) => cus.id !== id));
+          Swal.fire(t("customerlist.Deleted"), "", "success");
+        }
+        setDeletingId(null);
+      }
+    });
   };
 
   const handleSaveCustomer = async (id, updatedData) => {
@@ -83,7 +93,7 @@ const CustomerList = () => {
       await fetchCustomer();
       setShowEditModal(false);
     } catch (error) {
-      
+      // error handled gracefully
     }
   };
 
@@ -132,9 +142,10 @@ const CustomerList = () => {
         />
       </div>
       <p className="text-gray-600 dark:text-gray-300">
-        Total Customers: <span className="font-semibold">{totalCustomers}</span>
+        {t("customerlist.Total")}{" "}
+        <span className="font-semibold">{totalCustomers}</span>
       </p>
-      <div className="w-full  overflow-auto h-full">
+      <div className="w-full overflow-auto h-full">
         <table className="min-w-[420px] w-full bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
           <thead className="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 text-md">
             <tr>
@@ -142,6 +153,9 @@ const CustomerList = () => {
                 {t("customerlist.Customer")}
               </th>
               <th className="px-4 py-2 text-left">{t("customerlist.Phone")}</th>
+              <th className="hidden md:table-cell px-4 py-2 text-left">
+                {t("customerlist.Email")}
+              </th>
               <th className="hidden md:table-cell px-4 py-2 text-left">
                 {t("customerlist.Item")}
               </th>
@@ -166,12 +180,11 @@ const CustomerList = () => {
                     key={cus.id}
                     className="border-t border-gray-200 dark:border-gray-700"
                   >
-                    <td className="px-4 py-3">
-                      {cus.name}
-                      <br />
-                      <span className="text-xs text-gray-400">{cus.email}</span>
-                    </td>
+                    <td className="px-4 py-3">{cus.name}</td>
                     <td className="px-4 py-3">{cus.phone}</td>
+                    <td className="hidden md:table-cell px-4 py-3">
+                      {cus.email}
+                    </td>
                     <td className="hidden md:table-cell px-4 py-3">
                       {cus.item} ({cus.quantity})
                     </td>
@@ -181,13 +194,13 @@ const CustomerList = () => {
                     <td className={`hidden md:table-cell px-4 py-3 ${color}`}>
                       {text}
                     </td>
-                    <td className="px-4  py-3 flex  gap-2">
+                    <td className="px-4 py-3 flex gap-2">
                       <button
                         onClick={() => {
                           setSelectedCustomer(cus);
                           setShowModal(true);
                         }}
-                        className="flex items-center px-3 py-1 "
+                        className="flex items-center px-3 py-1"
                       >
                         <RiTableView className="mr-2 w-5 h-5 text-blue-600" />
                       </button>
@@ -202,16 +215,12 @@ const CustomerList = () => {
                       </button>
                       <button
                         onClick={() => handleDeleteClick(cus.id)}
-                        className="flex items-center px-3 py-1 "
+                        className="flex items-center px-3 py-1"
                       >
                         {deletingId === cus.id ? (
-                          <>
-                            <FaSpinner className="animate-spin mr-2 w-5 h-5 text-red-600" />
-                          </>
+                          <FaSpinner className="animate-spin mr-2 w-5 h-5 text-red-600" />
                         ) : (
-                          <>
-                            <BiTrash className="mr-2 w-5 h-5 text-red-600" />
-                          </>
+                          <BiTrash className="mr-2 w-5 h-5 text-red-600" />
                         )}
                       </button>
                     </td>
@@ -221,7 +230,7 @@ const CustomerList = () => {
             ) : (
               <tr>
                 <td
-                  colSpan="6"
+                  colSpan="7"
                   className="text-center py-6 text-gray-500 dark:text-gray-400"
                 >
                   {t("customerlist.NotFound")}
@@ -232,6 +241,7 @@ const CustomerList = () => {
         </table>
       </div>
 
+      {/* Pagination + RowsPerPage */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 mt-6">
         <select
           className="border border-gray-300 dark:border-gray-600 p-2 rounded-md dark:bg-gray-700 dark:text-gray-200"
@@ -244,6 +254,9 @@ const CustomerList = () => {
           <option value="5">5</option>
           <option value="10">10</option>
           <option value="15">15</option>
+          <option value="20">20</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
         </select>
 
         <div className="flex items-center space-x-2">
@@ -268,6 +281,7 @@ const CustomerList = () => {
         </div>
       </div>
 
+      {/* Details Modal */}
       {showModal && selectedCustomer && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-6 relative">
@@ -301,11 +315,16 @@ const CustomerList = () => {
                 <strong>{t("customerlist.Amount")}:</strong> $
                 {selectedCustomer.amount}
               </p>
+              <p>
+                <strong>{t("customerlist.Status")}:</strong>{" "}
+                {selectedCustomer.status}
+              </p>
             </div>
           </div>
         </div>
       )}
 
+      {/* Edit Modal */}
       {showEditModal && editingCustomer && (
         <EditCustomerModal
           isOpen={showEditModal}

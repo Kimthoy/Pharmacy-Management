@@ -1,4 +1,86 @@
 {
+  "common": {
+    "close": "Close",
+    "cancel": "Cancel",
+    "create": "Create",
+    "update": "Update",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "copy": "Copy",
+    "copied": "Copied",
+    "copyFailed": "Copy failed"
+  },
+  "staff": {
+    "StaffDashboard": "Staff Dashboard",
+    "StaffDashboardDesc": "Manage your team members, roles, and access.",
+    "addStaff": "Add Staff",
+    "editStaff": "Edit Staff",
+
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "phone": "Phone",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "other": "Other",
+
+    "role": "Role",
+    "role.cashier": "Cashier",
+    "role.partner": "Partner",
+
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+
+    "actions": "Actions",
+    "view": "View",
+    "edit": "Edit",
+    "delete": "Delete",
+
+    "userDetails": "User Details",
+    "username": "Username",
+
+    "loading": "Loading...",
+    "noRecords": "No staff found.",
+    "searchPlaceholder": "Search staff...",
+    "page": "page",
+    "sortByName": "Sort by name",
+    "sortAsc": "A → Z",
+    "sortDesc": "Z → A",
+
+    "showing": "Showing",
+    "to": "to",
+    "of": "of",
+    "results": "results",
+    "prev": "Prev",
+    "next": "Next",
+
+    "confirmDeleteTitle": "Delete Staff",
+    "confirmDeleteMsg": "Are you sure you want to delete {{name}}? This action cannot be undone.",
+
+    "success": {
+      "staffAdded": "{{name}} added successfully",
+      "staffUpdated": "{{name}} updated successfully",
+      "deleted": "deleted successfully"
+    },
+
+    "error": {
+      "loadFailed": "Failed to load users",
+      "submitFailed": "Submit failed",
+      "deleteFailed": "Failed to delete user",
+      "nameRequired": "Name is required",
+      "invalidEmail": "Please enter a valid email",
+      "passwordRequired": "Password is required"
+    },
+
+    "helper": {
+      "name": "Use full legal name",
+      "email": "We’ll never share this email",
+      "password": "Minimum 6 characters, include letters & numbers",
+      "phone": "Include country code"
+    }
+  },
   "stock-report": {
     "TotalStockValue": "Total Stock Value",
     "/Unit": " /Unit",
@@ -162,48 +244,94 @@
     "UnitPrice": "Unit Price",
     "AddNew": "Add New"
   },
+
   "unit": {
-    "NotFound": "No unit found !",
-    "Confirmation": "Are you sure delete this record?",
-    "title": "Unit Dashboard",
-    "ColName": "Unit Name",
+    "Title": "Unit Dashboard",
+    "Subtitle": "Create and manage measurement units (e.g., piece, kg, bottle).",
+
+    "BtnNew": "New Unit",
+    "TitleNew": "Create Unit",
+    "FormDesc": "Fill in the details to add a new unit.",
+
+    "Name": "Unit Name",
+    "NamePh": "e.g. Piece",
+    "NameHelp": "Use short, descriptive names.",
+    "Desc": "Description",
+    "DescPh": "Optional details about this unit",
+    "DescHelp": "Optional. Up to 200 characters.",
+
+    "BtnSave": "Save",
+    "BtnSaving": "Saving...",
+    "BtnCancel": "Cancel",
+    "BtnEdit": "Edit",
+    "BtnDelete": "Delete",
+
+    "ColName": "Name",
     "ColDesc": "Description",
     "ColActions": "Actions",
-    "BtnNew": "New",
-    "BtnCancel": "Cancel",
-    "BtnSaving": "Saving...",
-    "BtnSave": "Save",
-    "BtnPrev": "Previous",
+
+    "FormEdit": "Edit Unit",
+    "EditDesc": "Update the information and save your changes.",
+
+    "SearchLabel": "Search units",
+    "SearchPlaceholder": "Search by name...",
+
+    "BtnPrev": "Prev",
     "BtnNext": "Next",
-    "TitleNew": "Create new unit !",
-    "formdesc": "Please fill all this column to create.",
-    "name": "Unit Name",
-    "desc": "Description"
+    "Loading": "Loading...",
+    "NotFound": "No units found.",
+
+    "ConfirmTitle": "Are you sure?",
+    "ConfirmText": "You won't be able to revert this!",
+    "ConfirmYes": "Yes, delete it!",
+    "ConfirmNo": "Cancel",
+
+    "MsgCreated": "Unit created successfully.",
+    "MsgDeleted": "Unit deleted successfully.",
+    "ErrCreate": "Failed to create unit.",
+    "ErrDelete": "Failed to delete unit.",
+    "ErrUpdate": "Failed to update unit.",
+    "ErrFetch": "Failed to fetch units.",
+    "ErrUnexpected": "An unexpected error occurred."
   },
+
   "edit-medicine": {
-    "TabletPerBox": "TabletPerBox",
-    "CapsulePerBox": "CapsulePerBox",
     "EditTitle": "Edit Medicine",
-    "Barcode": "Barcode Number",
-    "Name": "Name",
+    "Barcode": "Barcode",
+    "BarcodePh": "Enter barcode number",
+    "BarcodeDesc": "Unique code for scanning.",
+    "Name": "Medicine Name",
+    "NamePh": "Enter medicine name",
+    "NameDesc": "Official or trade name.",
     "Price": "Price",
+    "PricePh": "Enter price",
+    "PriceDesc": "Selling price per unit.",
     "Weight": "Weight",
-    "Unit": "Unit",
+    "WeightPh": "Enter weight",
+    "WeightDesc": "e.g. 500mg",
     "Category": "Category",
-    "Detail": "Medicine Details",
-    "Image": "Image",
-    "BtnCancel": "Cancel",
-    "BtnSave": "Save",
-    "BtnSaving": "Saving...",
+    "CategoryDesc": "Select one or more categories.",
+    "Unit": "Unit",
+    "UnitDesc": "Select packaging units.",
     "Manufacturer": "Manufacturer",
-    "Origin": "Country of Origin",
+    "ManufacturerPh": "Enter manufacturer name",
+    "Origin": "Origin",
+    "OriginPh": "Enter country of origin",
     "MedicineStatus": "Medicine Status",
-    "SelectStatus": "Select Status",
+    "SelectStatus": "Select status",
     "Prescription": "Prescription",
     "NonPrescription": "Non-Prescription",
-    "OTC": "Over The Counter",
-    "Purchase": "Purchase Info / Cost"
+    "OTC": "Over the Counter (OTC)",
+    "Image": "Image",
+    "TabletPerBox": "Strips per Box",
+    "CapsulePerBox": "Tablets per Box",
+    "Detail": "Details",
+    "DetailPh": "Enter detailed description",
+    "BtnCancel": "Cancel",
+    "BtnSave": "Save",
+    "BtnSaving": "Saving..."
   },
+
   "profile": {
     "menu": {
       "profile": "Profile",
@@ -225,28 +353,36 @@
   "navigation": {
     "title": "Panharith Pharmacy"
   },
+
   "medicine-list": {
-    "Confirmation": "Are you sure delete this record?",
-    "TotalMedicines": "Total of Medicines",
-    "Noted": "The deleting do not undo !",
-    "Yes": "Yes",
-    "Cancel": "Cancel",
+    "TitleMedicine": "Medicine List",
+    "SearchLabel": "Search medicines",
+    "SearchMedicine": "Search by medicine name...",
+    "SearchHelp": "Type to filter by name.",
     "Loading": "Loading...",
-    "NotFound": "No Medicine Found !",
-    "TitleMedicine": "Medicine Lists",
-    "SearchMedicine": "Search for medicine name...",
+    "NotFound": "No medicines found.",
+    "Name": "Name",
+    "Price": "Price",
+    "Weight": "Weight",
     "Unit": "Unit",
     "Category": "Category",
     "Description": "Description",
     "Actions": "Actions",
-    "Name": "Name",
-    "Price": "Price",
-    "Weight": "Weight",
-    "Disable": "Disable",
-    "Enable": "Enable",
-    "Prev": "Previous",
-    "Next": "Next"
+    "Detail": "Details",
+    "Edit": "Edit",
+    "Delete": "Delete",
+    "Deleting": "Deleting...",
+    "Prev": "Prev",
+    "Next": "Next",
+
+    "FetchError": "Failed to fetch medicines",
+
+    "ConfirmTitle": "Are you sure?",
+    "ConfirmText": "You won't be able to revert this!",
+    "ConfirmYes": "Yes, delete it!",
+    "ConfirmNo": "Cancel"
   },
+
   "medicine-view": {
     "BarCode": "BarCode Number",
     "Quantity": "Quantity",
@@ -468,11 +604,6 @@
     "InvalidContact": "Please enter a valid phone number (10-12 digits)",
     "UpdateFailed": "Failed to update profile. Please try again."
   },
-  "common": {
-    "download": "Download",
-    "viewReport": "View Detailed Report",
-    "goTo": "Go to"
-  },
 
   "navigation": {
     "title": "Panharith Pharmacy"
@@ -493,62 +624,70 @@
     "title-customer": "Customer",
     "total-customer": "Total Customer"
   },
-  "add-medicine": {
-    "Creating": "Creating..",
-    "StripsperBox": "Tablet/box",
-    "TabletsperBox": "Capsule/box",
-    "Create": "Create",
-    "Scan": "Scan",
-    "Barcode": "Barcode Number",
-    "Barcode-Placeholder": "Barcode",
-    "Unit": "Unit",
-    "Photo": "Photo",
-    "ExpireDate ": "Expire Date",
-    "AddMedicine": "Add Medicine",
-    "title-addmedicine": "You can add a medicine by filling this form.",
-    "MecineName-PlaceHolder": "Enter Medincine Name",
-    "Madicinename": "Madicine name",
-    "Price": "Price",
-    "Price-PlaceHolder": "Enter Price",
-    "Quantity": "Quantity",
-    "Quantity-PlaceHolder": "Enter Quantity",
-    "InStockDate": "Date",
-    "StockDate-PlaceHolder": "Choose Stock Date",
-    "Weight": "Weight",
-    "Weight-PlaceHolder": "Enter Weight Example: 250mg",
-    "BarcodeScan": "Barcode Scan",
-    "BarcodeScan-PlaceHolder": "Enter Barcode Scan",
-    "ExpireDate": "Expire Date",
-    "Status": "Status",
-    "Status-PlaceHolder": "Choose Status",
-    "Category": "Category",
-    "Category-PlaceHolder": "Choose Category",
-    "MedicineInformation": "Medicine Information",
-    "MedicineInformation-PlaceHolder": "Enter Medicine Information",
-    "ButtonAddMedicine": "Add Medicine",
-    "ButtonAddSupplier": "Add Supplier",
-    "CloseScanner": "Close Scanner",
 
-    "SupplierFormTitle": "Add Supplier Information",
-    "SupplierFormDescription": "Please fill out the form below to add a new supplier.",
-    "SupplierName": "Supplier Name",
-    "PharmacyName": "Pharmacy Name",
-    "Address": "Address",
-    "InvoiceID": "Invoice ID",
-    "Save": "Save",
-    "Cancel": "Cancel",
+  "add-medicine": {
+    "AddMedicine": "Add Medicine",
+    "Subtitle": "Fill in the details below and save a new medicine record.",
+
+    "Barcode": "Barcode",
+    "BarcodePh": "Enter barcode",
+    "BarcodeHelp": "Scan with a barcode scanner or click the icon to use your camera.",
+    "Scan": "Scan barcode",
+
+    "Madicinename": "Medicine Name",
+    "NamePh": "e.g. Paracetamol 500mg",
+    "NameHelp": "Use the official or trade name that staff will recognize.",
+
+    "Price": "Price",
+    "PricePh": "e.g. 3.50",
+    "PriceHelp": "Selling price per unit. Will auto-format on blur.",
+
+    "Weight": "Weight",
+    "WeightPh": "e.g. 500mg or 120ml",
+    "WeightHelp": "Add the strength or net content if applicable.",
 
     "Manufacturer": "Manufacturer",
-    "Manufacturer-Placeholder": "Enter Manufacturer Name",
+    "ManufacturerPh": "e.g. ABC Pharma Co., Ltd.",
+    "ManufacturerHelp": "Optional. Company that produced the medicine.",
+
     "Origin": "Country of Origin",
-    "Origin-Placeholder": "Enter Country of Origin",
-    "MedicineStatus": "Medicine Status",
-    "SelectStatus": "Select Status",
-    "Prescription": "Prescription",
-    "NonPrescription": "Non-Prescription",
-    "OTC": "Over The Counter",
-    "Purchase": "Purchase Info / Cost",
-    "Purchase-Placeholder": "Enter Purchase Price or Source"
+    "OriginPh": "e.g. India, Thailand",
+    "OriginHelp": "Optional. Country where it was manufactured.",
+
+    "Purchase": "Purchase Info",
+    "PurchasePh": "e.g. supplier, invoice or cost",
+    "PurchaseHelp": "Optional. Internal note for where/price you purchased.",
+
+    "Category": "Categories",
+    "CategoryPh": "Select one or more categories",
+    "CategoryHelp": "Used to group medicines for filtering and reporting.",
+
+    "Unit": "Units",
+    "UnitPh": "Select one or more units",
+    "UnitHelp": "Packaging or sale units (e.g., piece, box, bottle).",
+
+    "Photo": "Photo",
+    "PhotoHelp": "Optional. JPG or PNG up to a few MB.",
+    "PhotoPreviewAlt": "Preview image",
+
+    "MedicineInformation": "Details / Notes",
+    "DetailPh": "Add usage notes, common brand names, storage, etc.",
+    "DetailHelp": "Optional. Helpful internal notes or public description.",
+
+    "Create": "Create",
+    "Creating": "Creating...",
+
+    "Messages": {
+      "Created": "Created successfully!",
+      "ToastSuccess": "Medicine added successfully!",
+      "ToastFailed": "Failed to add medicine",
+      "CreateFailed": "Failed to create medicine."
+    },
+
+    "Errors": {
+      "UnitsFailed": "Failed to fetch units.",
+      "CategoriesFailed": "Failed to fetch categories."
+    }
   },
 
   "sidebar": {
@@ -654,58 +793,55 @@
   },
 
   "add-customer": {
-    "AddCustomer": "Add Customer",
-    "AddCustomerDesc": "You can add a customer by filling these fields.",
-    "Name": "Name",
-    "NamePlaceholder": "Enter customer name",
-    "Phone": "Phone",
+    "AddCustomer": "Add New Customer",
+    "AddCustomerDesc": "Fill in the customer information to save in the system.",
+    "Name": "Full Name",
+    "NamePlaceholder": "Enter customer's full name",
+    "NameDesc": "The complete name of the customer.",
+    "Phone": "Phone Number",
     "PhonePlaceholder": "Enter phone number",
+    "PhoneDesc": "Provide a valid contact number.",
     "Email": "Email",
     "EmailPlaceholder": "Enter email address",
+    "EmailDesc": "Used for contact or invoices.",
     "Address": "Address",
-    "AddressPlaceholder": "Enter address",
+    "AddressPlaceholder": "Enter full address",
+    "AddressDesc": "The detailed address of the customer.",
     "PurchasedItem": "Purchased Item",
-    "PurchasedItemPlaceholder": "Enter purchased item",
-    "PurchasedQuantity": "Purchased Quantity",
-    "PurchasedQuantityPlaceholder": "Enter quantity",
-    "Amount": "Amount",
-    "AmountPlaceholder": "Enter amount",
-    "Status": "Status",
-    "StatusActive": "Active",
-    "StatusInactive": "Inactive",
-    "CustomerDetails": "Customer Details",
-    "CustomerDetailsPlaceholder": "Enter customer details",
+    "PurchasedItemPlaceholder": "Enter item name",
+    "PurchasedItemDesc": "Specify which product the customer purchased.",
+    "PurchasedQuantity": "Quantity",
+    "PurchasedQuantityDesc": "Number of items purchased.",
+    "Amount": "Total Amount",
+    "AmountDesc": "Total cost (in USD).",
     "ButtonAddCustomer": "Add Customer"
   },
   "customerlist": {
-    "NotFound": "No customer found !",
-    "CustomerDetails": "Customer Details",
-    "Name": "Name",
-    "Email": "Email",
-    "Update": "Update",
-    "Cancel": "Cancel",
-    "View": "Details",
-    "Address": "Address",
-    "CustomerListTitle": "Customer Lists",
+    "CustomerListTitle": "Customer List",
     "SearchPlaceholder": "Search by name...",
+    "Total": "Total Customers:",
     "Customer": "Customer",
-    "ID": "ID",
     "Phone": "Phone",
-    "PurchaseDetails": "Purchase Details",
+    "Email": "Email",
     "Item": "Item",
-    "Quantity": "Quantity",
     "Amount": "Amount",
     "Status": "Status",
+    "Actions": "Actions",
     "StatusActive": "Active",
     "StatusInactive": "Inactive",
-    "Actions": "Actions",
-    "Edit": "Edit",
-    "Remove": "Remove",
-    "RowsPerPage": "Rows per page",
     "Previous": "Previous",
+    "Next": "Next",
     "Page": "Page",
     "Of": "of",
-    "Next": "Next"
+    "NotFound": "No customers found",
+    "CustomerDetails": "Customer Details",
+    "Name": "Name",
+    "ConfirmTitle": "Are you sure?",
+    "ConfirmText": "This action cannot be undone!",
+    "YesDelete": "Yes, delete it!",
+    "Cancel": "Cancel",
+    "Deleted": "Deleted successfully!",
+    "FetchError": "Failed to fetch customers"
   },
   "customerledger": {
     "CustomerLedgerTitle": "Customer Ledger",
@@ -1187,59 +1323,6 @@
     }
   },
 
-  "staff": {
-    "password": "Password",
-    "StaffDashboard": "Staff Dashboard",
-    "StaffDashboardDesc": "Manage your staff members efficiently",
-    "addStaff": "Add Staff",
-    "staffList": "Staff List",
-    "searchPlaceholder": "Search staff...",
-    "name": "Name",
-    "email": "Email",
-    "role": "Role",
-    "status": "Status",
-    "actions": "Actions",
-    "noRecords": "No records found",
-    "show": "Show",
-    "entries": "entries",
-    "page": "Page",
-    "of": "of",
-    "previous": "Previous",
-    "next": "Next",
-    "error": {
-      "nameRequired": "Name is required",
-      "invalidEmail": "Invalid email format",
-      "passwordRequired": "Password is required for new staff",
-      "submitFailed": "Failed to submit form",
-      "unauthenticated": "You are not authenticated",
-      "statusToggleFailed": "Failed to toggle status "
-    },
-    "success": {
-      "staffAdded": "Staff member added successfully",
-      "staffUpdated": "Staff member updated successfully",
-      "statusToggled": "Status for changed!"
-    },
-    "edit": "Edit",
-    "editDisabled": "Cannot edit  (inactive)",
-    "disable": "Disable",
-    "enable": "Enable",
-    "loading": "Loading...",
-    "roleAdmin": "Admin",
-    "roleCashier": "Cashier",
-    "rolePartner": "Partner",
-    "statusActive": "Active",
-    "statusInactive": "Inactive",
-    "cancel": "Cancel",
-    "add": "Add",
-    "save": "Save",
-    "phone": "Phone",
-    "gender": "Gender",
-    "selectGender": "Select Gender",
-    "male": "Male",
-    "female": "Female",
-    "other": "Other",
-    "preferNotToSay": "Prefer not to say"
-  },
   "invoice": {
     "title": "Invoices",
     "description": "You have total {count} invoices.",
@@ -1506,28 +1589,56 @@
   },
 
   "category": {
-    "Totalofcateogry": "Total of cateogry",
-    "categories": "categories",
-    "NotFound": "No category found !",
     "Title": "Category Dashboard",
-    "New": "New",
-    "CreateCategory": "Create a category !",
-    "searchPlaceholder": "Search categories...",
-    "Desc": "Please fill this column to create a category !",
-    "Name": "Category Name",
-    "Description": "Description",
-    "noRecords": "No categories found.",
-    "CateName": "Category Name",
-    "CateDescription": "Category Description",
+    "Subtitle": "Create and manage categories for your products and menus.",
+    "Total": "{{count}} categories in total",
+    "New": "New Category",
 
+    "CreateCategory": "Create Category",
+    "Desc": "Fill in the details below to create a new category.",
+    "Name": "Category Name",
+    "NamePh": "e.g. Drinks",
+    "NameHelp": "Use short, descriptive names.",
+    "Description": "Description",
+    "DescriptionPh": "e.g. Cold and hot beverages",
+    "DescriptionHelp": "Optional. Up to 200 characters.",
+
+    "BtnSave": "Save",
+    "BtnSaving": "Saving...",
+    "BtnCancel": "Cancel",
+    "BtnEdit": "Edit",
+    "BtnDelete": "Delete",
+
+    "CateName": "Name",
+    "CateDescription": "Description",
     "Actions": "Actions",
 
-    "Prev": "Previous",
+    "CateEdit": "Edit Category",
+    "EditDesc": "Update the information and save your changes.",
+    "ColName": "Category Name",
+    "ColDesc": "Description",
+
+    "SearchLabel": "Search categories",
+    "SearchPlaceholder": "Search by name...",
+
+    "Prev": "Prev",
     "Next": "Next",
-    "BtnCancel": "Cancel",
-    "BtnSave": "Save",
-    "BtnSaving": "Saving..."
+    "Loading": "Loading...",
+    "NotFound": "No categories found.",
+
+    "ConfirmTitle": "Are you sure?",
+    "ConfirmText": "You won't be able to revert this!",
+    "ConfirmYes": "Yes, delete it!",
+    "ConfirmNo": "Cancel",
+
+    "MsgCreated": "Category created successfully.",
+    "MsgDeleted": "Category deleted successfully.",
+    "ErrCreate": "Failed to create category.",
+    "ErrDelete": "Failed to delete category.",
+    "ErrFetch": "Failed to fetch categories.",
+    "ErrUnexpected": "An unexpected error occurred."
   },
+
   "Sale": {
     "HomePage": "Home",
     "Products": "Products",

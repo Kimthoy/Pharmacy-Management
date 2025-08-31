@@ -183,67 +183,149 @@ const StockList = () => {
         </div>
       </div>
 
-      <table className="w-full border border-gray-300 rounded overflow-hidden mt-3">
-        <thead className="bg-gray-100">
-          <tr className="bg-green-600 text-white">
-            <th className="px-4 py-3 text-left">{t("stock-list.ID")}</th>
-            <th className="px-4 py-2 text-left">{t("stock-list.Medicine")}</th>
-            <th className="px-4 py-2 text-left">{t("stock-list.Qty")}</th>
-            <th className="px-4 py-2 text-left">{t("stock-list.PriceIn")}</th>
-            <th className="px-4 py-2 text-left">
-              {t("stock-list.Action") || "Action"}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {currentItems.length > 0 ? (
-            currentItems.map((stock) => {
-              const isHighlighted = highlightedId === stock.id;
-              const isNew = isRecentlyAdded(getCreatedAt(stock));
+      {/* DESKTOP/TABLET: normal table */}
+      <div className="hidden md:block mt-3">
+        <div className="w-full overflow-x-auto rounded border border-gray-300">
+          <table className="w-full min-w-[640px] table-auto">
+            <thead className="bg-green-600 text-white">
+              <tr>
+                <th className="px-4 py-3 text-left">{t("stock-list.ID")}</th>
+                <th className="px-4 py-2 text-left">
+                  {t("stock-list.Medicine")}
+                </th>
+                <th className="px-4 py-2 text-left">{t("stock-list.Qty")}</th>
+                <th className="px-4 py-2 text-left">
+                  {t("stock-list.PriceIn")}
+                </th>
+                <th className="px-4 py-2 text-left">
+                  {t("stock-list.Action")}
+                </th>
+              </tr>
+            </thead>
 
-              return (
-                <tr
-                  key={stock.id}
-                  data-retailstock={stock.id}
-                  className={`border hover:bg-slate-300 transition duration-300 ${
-                    isHighlighted ? "bg-yellow-100 text-black" : ""
-                  }`}
-                >
-                  <td className="px-4 py-2">{stock.id}</td>
-                  <td className="px-4 py-2">
-                    <div className="flex items-center gap-2">
-                      {stock.medicine?.medicine_name ||
-                        stock.medicine?.name ||
-                        "N/A"}
-                      {isNew && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-100 text-green-800 font-semibold">
-                          {t("stock-list.New") || "ថ្មី"}
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">{stock.quantity}</td>
-                  <td className="px-4 py-2">${stock.price_in}</td>
-                  <td className="px-4 py-2">
-                    <button
-                      className="text-sm text-blue-600 underline"
-                      onClick={() => handleOpenTransfer(stock)}
+            <tbody className="align-top">
+              {currentItems.length > 0 ? (
+                currentItems.map((stock) => {
+                  const isHighlighted = highlightedId === stock.id;
+                  const isNew = isRecentlyAdded(getCreatedAt(stock));
+                  return (
+                    <tr
+                      key={stock.id}
+                      data-retailstock={stock.id}
+                      className={`border-b hover:bg-slate-50 transition ${
+                        isHighlighted ? "bg-yellow-100 text-black" : ""
+                      }`}
                     >
-                      {t("stock-list.btnMoveToRetail") || "Move to Retail"}
-                    </button>
+                      <td className="px-4 py-2">{stock.id}</td>
+                      <td className="px-4 py-2">
+                        <div className="flex items-center gap-2">
+                          <span className="break-words">
+                            {stock.medicine?.medicine_name ||
+                              stock.medicine?.name ||
+                              "N/A"}
+                          </span>
+                          {isNew && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-100 text-green-800 font-semibold">
+                              {t("stock-list.New") || "ថ្មី"}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-2">{stock.quantity}</td>
+                      <td className="px-4 py-2">${stock.price_in}</td>
+                      <td className="px-4 py-2">
+                        <button
+                          className="text-sm text-blue-600 underline"
+                          onClick={() => handleOpenTransfer(stock)}
+                        >
+                          {t("stock-list.btnMoveToRetail") || "Move to Retail"}
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan={5} className="text-center py-20 text-gray-500">
+                    {loading ? "Loading..." : t("stock-list.NotFound")}
                   </td>
                 </tr>
-              );
-            })
-          ) : (
-            <tr>
-              <td colSpan="6" className="text-center py-20 text-gray-500">
-                {loading ? "Loading..." : t("stock-list.NotFound")}
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* MOBILE: card view (no sideways scroll) */}
+      <div className="md:hidden mt-3 space-y-3">
+        {currentItems.length > 0 ? (
+          currentItems.map((stock) => {
+            const isHighlighted = highlightedId === stock.id;
+            const isNew = isRecentlyAdded(getCreatedAt(stock));
+            return (
+              <div
+                key={stock.id}
+                className={`rounded-lg border border-gray-300 bg-white p-3 shadow-sm ${
+                  isHighlighted ? "bg-yellow-100" : ""
+                }`}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="font-medium">
+                    <div className="text-sm text-gray-500">
+                      {t("stock-list.ID")}
+                    </div>
+                    <div>{stock.id}</div>
+                  </div>
+                  {isNew && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-100 text-green-800 font-semibold">
+                      {t("stock-list.New") || "ថ្មី"}
+                    </span>
+                  )}
+                </div>
+
+                <div className="mt-2">
+                  <div className="text-sm text-gray-500">
+                    {t("stock-list.Medicine")}
+                  </div>
+                  <div className="break-words">
+                    {stock.medicine?.medicine_name ||
+                      stock.medicine?.name ||
+                      "N/A"}
+                  </div>
+                </div>
+
+                <div className="mt-2 grid grid-cols-2 gap-3">
+                  <div>
+                    <div className="text-sm text-gray-500">
+                      {t("stock-list.Qty")}
+                    </div>
+                    <div>{stock.quantity}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-500">
+                      {t("stock-list.PriceIn")}
+                    </div>
+                    <div>${stock.price_in}</div>
+                  </div>
+                </div>
+
+                <div className="mt-3">
+                  <button
+                    className="text-sm text-blue-600 underline"
+                    onClick={() => handleOpenTransfer(stock)}
+                  >
+                    {t("stock-list.btnMoveToRetail") || "Move to Retail"}
+                  </button>
+                </div>
+              </div>
+            );
+          })
+        ) : (
+          <div className="text-center py-10 text-gray-500">
+            {loading ? "Loading..." : t("stock-list.NotFound")}
+          </div>
+        )}
+      </div>
 
       {stocksData.length > itemsPerPage && (
         <div className="flex justify-center items-center mt-4 gap-2">

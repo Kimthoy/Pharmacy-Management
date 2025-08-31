@@ -65,7 +65,6 @@ const AddCustomer = () => {
           amount: parseFloat(customer.amount) || 0,
         };
 
-        
         await createCustomer(payload);
         setSuccess("Customer is create successfully !");
         setCustomer({
@@ -78,7 +77,6 @@ const AddCustomer = () => {
           amount: "",
         });
       } catch (err) {
-        
         const errorMessage = err?.message;
         setError(errorMessage);
       } finally {
@@ -103,26 +101,32 @@ const AddCustomer = () => {
 
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Name */}
           <div className="flex flex-col">
             <label
-              htmlFor=" "
+              htmlFor="name"
               className="mb-2 text-gray-700 dark:text-gray-300"
             >
               {t("add-customer.Name")}
             </label>
             <input
               type="text"
-              className="border border-gray-400 dark:border-gray-600 px-2 text-md py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 focus:placeholder:text-green-400 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
+              placeholder={t("add-customer.NamePlaceholder")}
+              className="border border-gray-400 dark:border-gray-600 px-2 text-md py-2 rounded-[4px] font-light focus:outline-green-400 dark:bg-gray-700 dark:text-gray-200"
               name="name"
               value={customer.name}
               onChange={handleCustomerChange}
             />
+            <small className="text-gray-500 dark:text-gray-400">
+              {t("add-customer.NameDesc")}
+            </small>
           </div>
 
+          {/* Phone */}
           <div className="flex flex-col">
             <label
               htmlFor="phone"
-              className="mb-2 font-medium text-gray-700 dark:text-gray-300"
+              className="mb-2 text-gray-700 dark:text-gray-300"
             >
               {t("add-customer.Phone")}
             </label>
@@ -130,12 +134,16 @@ const AddCustomer = () => {
               type="text"
               placeholder={t("add-customer.PhonePlaceholder")}
               name="phone"
-              className="border border-gray-400 dark:border-gray-600 px-2 text-md py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 focus:placeholder:text-green-400 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
+              className="border border-gray-400 dark:border-gray-600 px-2 py-2 rounded font-light dark:bg-gray-700 dark:text-gray-200"
               value={customer.phone}
               onChange={handleCustomerChange}
             />
+            <small className="text-gray-500 dark:text-gray-400">
+              {t("add-customer.PhoneDesc")}
+            </small>
           </div>
 
+          {/* Email */}
           <div className="flex flex-col">
             <label
               htmlFor="email"
@@ -147,12 +155,16 @@ const AddCustomer = () => {
               type="email"
               placeholder={t("add-customer.EmailPlaceholder")}
               name="email"
-              className="border border-gray-400 dark:border-gray-600 px-2 text-md py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 focus:placeholder:text-green-400 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
+              className="border border-gray-400 dark:border-gray-600 px-2 py-2 rounded font-light dark:bg-gray-700 dark:text-gray-200"
               value={customer.email}
               onChange={handleCustomerChange}
             />
+            <small className="text-gray-500 dark:text-gray-400">
+              {t("add-customer.EmailDesc")}
+            </small>
           </div>
 
+          {/* Address */}
           <div className="flex flex-col">
             <label
               htmlFor="address"
@@ -164,12 +176,16 @@ const AddCustomer = () => {
               type="text"
               placeholder={t("add-customer.AddressPlaceholder")}
               name="address"
-              className="border border-gray-400 dark:border-gray-600 px-2 text-md py-2 rounded-[4px] font-light focus纲绿-400 focus:border-green-700 focus:placeholder:text-green-400 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
+              className="border border-gray-400 dark:border-gray-600 px-2 py-2 rounded font-light dark:bg-gray-700 dark:text-gray-200"
               value={customer.address}
               onChange={handleCustomerChange}
             />
+            <small className="text-gray-500 dark:text-gray-400">
+              {t("add-customer.AddressDesc")}
+            </small>
           </div>
 
+          {/* Item */}
           <div className="flex flex-col">
             <label
               htmlFor="item"
@@ -181,12 +197,16 @@ const AddCustomer = () => {
               type="text"
               placeholder={t("add-customer.PurchasedItemPlaceholder")}
               name="item"
-              className="border border-gray-400 dark:border-gray-600 px-2 text-md py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 focus:placeholder:text-green-400 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
+              className="border border-gray-400 dark:border-gray-600 px-2 py-2 rounded font-light dark:bg-gray-700 dark:text-gray-200"
               value={customer.item}
               onChange={handleCustomerChange}
             />
+            <small className="text-gray-500 dark:text-gray-400">
+              {t("add-customer.PurchasedItemDesc")}
+            </small>
           </div>
 
+          {/* Quantity */}
           <div className="flex flex-col">
             <label
               htmlFor="quantity"
@@ -197,12 +217,16 @@ const AddCustomer = () => {
             <input
               type="number"
               name="quantity"
-              className="border border-gray-400 dark:border-gray-600 px-2 text-md py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 focus:placeholder:text-green-400 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
+              className="border border-gray-400 dark:border-gray-600 px-2 py-2 rounded font-light dark:bg-gray-700 dark:text-gray-200"
               value={customer.quantity}
               onChange={handleCustomerChange}
             />
+            <small className="text-gray-500 dark:text-gray-400">
+              {t("add-customer.PurchasedQuantityDesc")}
+            </small>
           </div>
 
+          {/* Amount */}
           <div className="flex flex-col">
             <label
               htmlFor="amount"
@@ -217,10 +241,14 @@ const AddCustomer = () => {
               value={customer.amount}
               onChange={handleCustomerChange}
               onBlur={handleAmountBlur}
-              className="border border-gray-400 dark:border-gray-600 px-2 text-md py-2 rounded-[4px] font-light focus:outline-green-400 focus:border-green-700 focus:placeholder:text-green-400 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
+              className="border border-gray-400 dark:border-gray-600 px-2 py-2 rounded font-light dark:bg-gray-700 dark:text-gray-200"
             />
+            <small className="text-gray-500 dark:text-gray-400">
+              {t("add-customer.AmountDesc")}
+            </small>
           </div>
         </div>
+
         <div className="mt-4">
           <button
             type="submit"
