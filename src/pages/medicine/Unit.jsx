@@ -160,7 +160,9 @@ const UnitDashboard = () => {
         <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
           <div className="bg-white dark:bg-slate-800 sm:p-6 p-3 rounded-lg shadow-md w-full max-w-md">
             <h2 className="text-lg font-bold mb-2">{t("unit.TitleNew")}</h2>
-            <p className="text-sm dark:text-slate-300 text-gray-600 mb-4">{t("unit.formdesc")}</p>
+            <p className="text-sm dark:text-slate-300 text-gray-600 mb-4">
+              {t("unit.formdesc")}
+            </p>
             <form onSubmit={handleSubmit} className="space-y-4">
               {success && <p className="text-green-600 text-sm">{success}</p>}
               {error && <p className="text-red-600 text-sm">{error}</p>}
@@ -213,7 +215,7 @@ const UnitDashboard = () => {
       <div className="overflow-x-auto">
         <table className="min-w-full table-auto border-collapse border border-gray-300">
           <thead>
-            <tr className="bg-gray-100 dark:bg-slate-800">
+            <tr className="bg-green-600 text-white dark:bg-slate-800">
               <th className="border px-4 py-2 text-left">
                 {t("unit.ColName")}
               </th>
@@ -226,7 +228,7 @@ const UnitDashboard = () => {
             </tr>
           </thead>
           <tbody className="text-md text-gray-700 dark:text-gray-200">
-          {currentItems.length > 0 ? (
+            {currentItems.length > 0 ? (
               currentItems.map((u, index) => (
                 <tr
                   key={index}
@@ -268,7 +270,7 @@ const UnitDashboard = () => {
                   colSpan="3"
                   className="text-center py-6 text-gray-500 dark:text-gray-400"
                 >
-                    {t("unit.NotFound") }
+                  {t("unit.NotFound")}
                 </td>
               </tr>
             )}

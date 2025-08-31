@@ -4,13 +4,14 @@ import {
   returnToManufacturer,
 } from "../api/supplyItemService";
 import ReturnModal from "./components/ReturnModal";
+import { useTranslation } from "../../hooks/useTranslation";
 
 const ExpiringSoonList = () => {
   const [expiringList, setExpiringList] = useState([]);
   const [expiredList, setExpiredList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const { t } = useTranslation();
   const [toast, setToast] = useState({ type: "", msg: "" });
 
   // modal state
@@ -99,7 +100,9 @@ const ExpiringSoonList = () => {
   if (loading) {
     return (
       <div className="bg-white dark:bg-gray-800 p-4 rounded shadow text-center">
-        <p className="text-gray-500">⏳ Loading expiring medicines...</p>
+        <p className="text-gray-500">
+          {t("expire-soon.Loading")}
+        </p>
       </div>
     );
   }
@@ -113,9 +116,9 @@ const ExpiringSoonList = () => {
   }
 
   return (
-    <div className="mb-7 bg-red-50 dark:bg-gray-800 p-4 rounded shadow-lg">
-      <h3 className="text-lg font-bold text-red-600 dark:text-gray-200 mb-3">
-        Medicines Expiring Soon
+    <div className="mb-7  dark:bg-gray-800 p-4 rounded shadow-lg">
+      <h3 className="text-lg font-bold text-black dark:text-gray-200 mb-3">
+        {t("expire-soon.Title")}
       </h3>
 
       {toast.msg && (
@@ -133,17 +136,15 @@ const ExpiringSoonList = () => {
       )}
 
       {expiringList.length === 0 ? (
-        <p className="text-gray-600 dark:text-gray-400">
-          ✅ No medicines expiring soon!
-        </p>
+        <p className="text-gray-600 dark:text-gray-400">{t("expire-soon.NotFound")}</p>
       ) : (
         <table className="w-full text-sm">
-          <thead className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+          <thead className="bg-green-600 dark:bg-gray-700 text-white dark:text-gray-200">
             <tr>
-              <th className="p-2 text-left">Medicine</th>
-              <th className="p-2 text-left">Quantity</th>
-              <th className="p-2 text-left">Expire Date</th>
-              <th className="p-2 text-left">Actions</th>
+              <th className="p-2 text-left"> {t("expire-soon.Medicine")}</th>
+              <th className="p-2 text-left"> {t("expire-soon.Quantity")}</th>
+              <th className="p-2 text-left"> {t("expire-soon.ExpireDate")}</th>
+              <th className="p-2 text-left"> {t("expire-soon.Actions")}</th>
             </tr>
           </thead>
           <tbody>
@@ -169,7 +170,7 @@ const ExpiringSoonList = () => {
                     onClick={() => openReturnModal(item)}
                     disabled={(item?.supply_quantity ?? 0) <= 0}
                   >
-                    Return
+                    {t("expire-soon.Return")}
                   </button>
                 </td>
               </tr>

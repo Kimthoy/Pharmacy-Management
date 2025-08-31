@@ -155,7 +155,7 @@ const StockReport = () => {
       {/* Header */}
       <div className="flex justify-between mb-4">
         <h2 className="text-lg font-bold text-gray-700 dark:text-gray-200">
-          Stock Report
+          {t("stock-report.StockReport")}
         </h2>
       </div>
 
@@ -165,7 +165,7 @@ const StockReport = () => {
           <div className="flex gap-12">
             <div>
               <p className="text-gray-500 dark:text-gray-300 mb-5">
-                Total Stock Value
+                {t("stock-report.TotalStockValue")}
               </p>
               <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mb-5">
                 ${totalStockValue.toFixed(2)}
@@ -173,17 +173,17 @@ const StockReport = () => {
             </div>
             <div>
               <p className="text-gray-500 dark:text-gray-300 mb-5">
-                Total Stock Quantity
+                {t("stock-report.TotalStockQuantity")}
               </p>
               <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mb-5">
-                {totalStockQuantity} /Unit
+                {totalStockQuantity} {t("stock-report./Unit")}
               </p>
             </div>
           </div>
           <p className="text-gray-500 dark:text-gray-300 mt-2">
-            Low Stock Items:{" "}
+            {t("stock-report.LowStockItems:")}{" "}
             <span className="font-bold text-red-500 text-lg p-4">
-              {lowStockItems} Medicines
+              {lowStockItems} {t("stock-report.Medicines")}
             </span>
           </p>
         </div>
@@ -221,7 +221,7 @@ const StockReport = () => {
         />
 
         <label className="py-2 text-gray-600 dark:text-gray-300">
-          Start Date
+          {t("stock-report.StartDate")}
         </label>
         <input
           type="date"
@@ -233,7 +233,7 @@ const StockReport = () => {
         />
 
         <label className="py-2 text-gray-600 dark:text-gray-300">
-          End Date
+          {t("stock-report.EndDate")}
         </label>
         <input
           type="date"
@@ -244,16 +244,22 @@ const StockReport = () => {
           className="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 p-2 rounded"
         />
 
-        <label className="text-gray-500 dark:text-gray-300">Sort By:</label>
+        <label className="text-gray-500 dark:text-gray-300">
+          {t("stock-report.SortBy")}
+        </label>
         <select
           value={sortField}
           onChange={(e) => setSortField(e.target.value)}
           className="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 p-2 rounded"
         >
-          <option value="medicine_name">Medicine Name</option>
-          <option value="quantity">Quantity</option>
-          <option value="price_in">Price</option>
-          <option value="received_date">Received Date</option>
+          <option value="medicine_name">
+            {t("stock-report.MedicineName")}
+          </option>
+          <option value="quantity">{t("stock-report.Quantity")}</option>
+          <option value="price_in">{t("stock-report.Price")}</option>
+          <option value="received_date">
+            {t("stock-report.ReceivedDate")}
+          </option>
         </select>
 
         <button
@@ -262,14 +268,16 @@ const StockReport = () => {
           }
           className="px-4 py-2 bg-emerald-500 text-white rounded"
         >
-          {sortOrder === "asc" ? "⬆ Ascending" : "⬇ Descending"}
+          {sortOrder === "asc"
+            ? t("stock-report.Ascending")
+            : t("stock-report.Descending")}
         </button>
 
         <button
           onClick={handlePrint}
           className="px-4 py-2 text-emerald-600 underline"
         >
-          🖨 Report Stock
+          {t("stock-report.ReportStock")}
         </button>
       </div>
 
@@ -279,11 +287,11 @@ const StockReport = () => {
         className="w-full border-collapse border border-gray-300 dark:border-gray-700"
       >
         <thead>
-          <tr className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
-            <th className="p-2 border">Medicine Name</th>
-            <th className="p-2 border">Quantity</th>
-            <th className="p-2 border">Price In</th>
-            <th className="p-2 border">Received Date</th>
+          <tr className="bg-green-600 dark:bg-gray-700 text-white dark:text-gray-200">
+            <th className="p-2 border">{t("stock-report.MedicineName")}</th>
+            <th className="p-2 border">{t("stock-report.Quantity")}</th>
+            <th className="p-2 border">{t("stock-report.PriceIn")}</th>
+            <th className="p-2 border">{t("stock-report.ReceivedDate")}</th>
           </tr>
         </thead>
         <tbody>
@@ -291,9 +299,9 @@ const StockReport = () => {
             paginatedData.map((stock) => (
               <tr
                 key={stock.id}
-                className="border hover:bg-gray-50 dark:hover:bg-gray-800"
+                className="border hover:shadow-inner transition-all hover:cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
               >
-                <td className="p-2 border text-gray-800 dark:text-gray-200">
+                <td className="p-3  border text-gray-800 dark:text-gray-200">
                   {stock.medicine?.medicine_name}
                 </td>
                 <td
@@ -319,7 +327,7 @@ const StockReport = () => {
                 colSpan="6"
                 className="p-4 text-center text-gray-500 dark:text-gray-400"
               >
-                No Stock Found
+                {t("stock-report.NoStockFound")}
               </td>
             </tr>
           )}
@@ -338,10 +346,12 @@ const StockReport = () => {
           }
           className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded disabled:opacity-50"
         >
-          Prev
+          {t("stock-report.Prev")}
         </button>
         <span className="text-gray-700 dark:text-gray-200">
-          Page {pagination.currentPage} of {totalPages}
+          {t("stock-report.Page")} {pagination.currentPage}{" "}
+          {t("stock-report.of")}
+          {totalPages}
         </span>
         <button
           disabled={pagination.currentPage === totalPages}
@@ -353,7 +363,7 @@ const StockReport = () => {
           }
           className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded disabled:opacity-50"
         >
-          Next
+          {t("stock-report.Next")}
         </button>
       </div>
     </div>

@@ -380,7 +380,7 @@ export default function RetailProduct() {
       {compounds.length > 0 && (
         <div className="overflow-y-scroll h-52 border rounded-lg dark:border-gray-700 mb-4">
           <table className="w-full text-sm">
-            <thead className="bg-gray-100 dark:bg-gray-800">
+            <thead className="bg-green-600 text-white dark:bg-gray-800">
               <tr>
                 <th className="border p-2 dark:border-gray-700">ឈ្មោះថ្នាំ</th>
                 <th className="border p-2 dark:border-gray-700">ចំនួនប្រើ</th>
@@ -426,7 +426,7 @@ export default function RetailProduct() {
           <h3 className="text-xl font-bold mb-2">កញ្ចប់ថ្នាំដែលបានរក្សាទុក</h3>
           <div className="overflow-y-scroll h-72 border rounded-lg dark:border-gray-700">
             <table className="w-full text-sm ">
-              <thead className="bg-gray-100 sticky top-0 dark:bg-gray-800">
+              <thead className="bg-green-600 text-white sticky top-0 dark:bg-gray-800">
                 <tr>
                   <th className="border p-2 dark:border-gray-700">
                     ឈ្មោះកញ្ចប់

@@ -20,7 +20,6 @@ const CategoryDashboard = () => {
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [saveloading, setSaveLoading] = useState(false);
-  
 
   const [category, setCategory] = useState({
     category_name: "",
@@ -59,7 +58,6 @@ const CategoryDashboard = () => {
   };
   const handleDeleteCategory = async (id) => {
     try {
-      
       const success = await deleteCategory(id);
       if (success) {
         setSuccess("Category deleted successfully.");
@@ -68,7 +66,6 @@ const CategoryDashboard = () => {
         setError("Failed to delete category.");
       }
     } catch (err) {
-     
       setError("An unexpected error occurred.");
     }
   };
@@ -80,10 +77,8 @@ const CategoryDashboard = () => {
         description: selectedCategory.description,
       });
       setShowEditModal(false);
-      fetchCategory(); 
-    } catch (error) {
-     
-    }
+      fetchCategory();
+    } catch (error) {}
   };
 
   const handleEditCategory = (category) => {
@@ -100,7 +95,6 @@ const CategoryDashboard = () => {
       console.log("Error :", err);
       setError("Failed to fetch categories.");
     } finally {
-
       setLoading(false);
     }
   };
@@ -130,14 +124,12 @@ const CategoryDashboard = () => {
           description: category.description,
         };
 
-       
         await createCategory(payload);
         setSuccess("category is create successfully !");
         setCategory({ category_name: "", description: "" });
         setShowModal(false);
-        fetchCategory(); 
+        fetchCategory();
       } catch (err) {
-       
         const errorMessage = err?.message || "Failed to create category.";
         setError(errorMessage);
       } finally {
@@ -217,14 +209,11 @@ const CategoryDashboard = () => {
           </div>
         </div>
       )}
-      <div className="bg-green-300 text-gray-600 w-full px-4 py-2 rounded-lg">
-        {t("category.Totalofcateogry")} : {totalCategory}{" "}
-        {t("category.categories")}
-      </div>
+
       <div className="overflow-x-auto">
         <table className="min-w-full table-auto border-collapse border border-gray-300">
           <thead>
-            <tr className="bg-gray-100 dark:bg-slate-500 dark:text-slate-200 ">
+            <tr className="bg-green-600 text-white dark:bg-slate-500 dark:text-slate-200 ">
               <td className="border px-4 py-2 text-left">
                 {t("category.CateName")}
               </td>

@@ -204,11 +204,9 @@ const MedicineList = () => {
         onChange={(e) => setSearchTerm(e.target.value)}
         className="border p-2 rounded mb-4 w-full max-w-sm dark:bg-slate-700 dark:text-slate-700"
       />
-      <div className="bg-green-300 text-gray-600 w-full px-4 py-2 rounded-lg">
-        {t("medicine-list.TotalMedicines")} : {totalMedicines}
-      </div>
+
       <table className="w-full border-gray-300 dark:bg-slate-800 dark:text-slate-300">
-        <thead className="bg-gray-100 dark:bg-slate-500 text-md">
+        <thead className="bg-green-600 text-white dark:bg-slate-500 text-md">
           <tr>
             <th className="border px-2 py-2">{t("medicine-list.Name")}</th>
             <th className="border px-2 py-2">{t("medicine-list.Price")}</th>

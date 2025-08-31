@@ -1,19 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-
-/**
- * Props:
- * - isOpen: boolean
- * - item: supply item (or null)
- * - onClose: () => void
- * - onConfirm: ({ quantity, reason }) => Promise<void> | void
- * - busy: boolean (show spinner/disable buttons while submitting)
- */
+import { useTranslation } from "../../../hooks/useTranslation";
 const ReturnModal = ({ isOpen, item, onClose, onConfirm, busy = false }) => {
   const [qty, setQty] = useState(0);
   const [reason, setReason] = useState("Expired - return to manufacturer");
-  const [step, setStep] = useState("edit"); // 'edit' | 'confirm'
+  const [step, setStep] = useState("edit");
   const [err, setErr] = useState("");
-
+  const { t } = useTranslation();
   const available = useMemo(() => item?.supply_quantity ?? 0, [item]);
 
   useEffect(() => {
@@ -64,7 +56,7 @@ const ReturnModal = ({ isOpen, item, onClose, onConfirm, busy = false }) => {
       <div className="w-full max-w-lg mx-4 rounded-xl bg-white dark:bg-gray-900 shadow-xl border border-gray-200 dark:border-gray-700">
         <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-            Return to Manufacturer
+            {t("return-manufacturer.ReturntoManufacturer")}
           </h3>
           <button
             className="text-gray-500 hover:text-red-600"
@@ -75,16 +67,25 @@ const ReturnModal = ({ isOpen, item, onClose, onConfirm, busy = false }) => {
           </button>
         </div>
 
-        <div className="px-4 py-4 space-y-3">
-          <div className="text-sm text-gray-700 dark:text-gray-200">
+        <div className="px-4 py-4 space-y-7">
+          <div className="text-sm text-gray-700 space-y-3 dark:text-gray-200">
             <div>
-              <span className="font-medium">Medicine:</span> {medName}
+              <span className="font-medium ">
+                {t("return-manufacturer.Medicine:")}
+              </span>{" "}
+              {medName}
             </div>
             <div>
-              <span className="font-medium">Available:</span> {available}
+              <span className="font-medium ">
+                {t("return-manufacturer.Available:")}
+              </span>{" "}
+              {available}
             </div>
             <div>
-              <span className="font-medium">Expire Date:</span> {expireDate}
+              <span className="font-medium ">
+                {t("return-manufacturer.ExpireDate:")}
+              </span>{" "}
+              {expireDate}
             </div>
           </div>
 
@@ -98,7 +99,7 @@ const ReturnModal = ({ isOpen, item, onClose, onConfirm, busy = false }) => {
             <>
               <div className="flex items-center gap-3">
                 <label className="w-20 text-sm text-gray-700 dark:text-gray-300">
-                  Quantity
+                  {t("return-manufacturer.Quantity")}
                 </label>
                 <input
                   type="number"
@@ -112,14 +113,13 @@ const ReturnModal = ({ isOpen, item, onClose, onConfirm, busy = false }) => {
 
               <div className="flex items-center gap-3">
                 <label className="w-20 text-sm text-gray-700 dark:text-gray-300">
-                  Reason
+                  {t("return-manufacturer.Reason")}
                 </label>
                 <input
                   type="text"
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
                   className="flex-1 px-2 py-1 border rounded dark:bg-gray-800 dark:border-gray-700"
-                  placeholder="Reason"
                 />
               </div>
             </>
@@ -128,11 +128,12 @@ const ReturnModal = ({ isOpen, item, onClose, onConfirm, busy = false }) => {
           {step === "confirm" && (
             <div className="p-3 rounded border bg-yellow-50 dark:bg-yellow-900/30 border-yellow-300 dark:border-yellow-700 text-yellow-800 dark:text-yellow-200">
               <div className="font-semibold mb-1">
-                Warning: this action will reduce stock!
+                {t("return-manufacturer.Warning:thisactionwillreducestock!")}
               </div>
-              <div className="text-sm">
-                You’re about to return <b>{qty}</b> unit(s) of <b>{medName}</b>.
-                This cannot be undone.
+              <div className="text-md">
+                {t("return-manufacturer.You'reabouttoreturn")} <b>{qty}</b>{" "}
+                {t("return-manufacturer.unit(s)of")} <b>{medName}</b>
+                {t("return-manufacturer.Thiscannotbeundone")}
               </div>
             </div>
           )}
@@ -145,14 +146,15 @@ const ReturnModal = ({ isOpen, item, onClose, onConfirm, busy = false }) => {
                 onClick={onClose}
                 className="px-3 py-1.5 rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100"
               >
-                Cancel
+                {t("return-manufacturer.Cancel")}
               </button>
               <button
                 onClick={onContinue}
                 disabled={busy}
                 className="px-3 py-1.5 rounded bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-60"
               >
-                Review &amp; Confirm
+                {t("return-manufacturer.Review")} &amp;{" "}
+                {t("return-manufacturer.Confirm")}
               </button>
             </>
           ) : (
@@ -161,14 +163,16 @@ const ReturnModal = ({ isOpen, item, onClose, onConfirm, busy = false }) => {
                 onClick={() => setStep("edit")}
                 className="px-3 py-1.5 rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100"
               >
-                Back
+                {t("return-manufacturer.Back")}
               </button>
               <button
                 onClick={onYes}
                 disabled={busy}
                 className="px-3 py-1.5 rounded bg-red-600 hover:bg-red-700 text-white disabled:opacity-60"
               >
-                {busy ? "Processing..." : "Yes, return"}
+                {busy
+                  ? t("return-manufacturer.Processing")
+                  : t("return-manufacturer.Yesreturn")}
               </button>
             </>
           )}

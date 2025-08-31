@@ -204,7 +204,7 @@ const ManageStaff = () => {
 
       {/* Table */}
       <table className="w-full border border-gray-300 dark:border-gray-600">
-        <thead>
+        <thead className="bg-green-600 text-white  ">
           <tr className="text-center">
             <td className="py-3">{t("staff.name")}</td>
             <td className="py-3">{t("staff.email")}</td>

@@ -61,7 +61,6 @@ const PurchaseReport = () => {
         });
         setPurchaseData(flattened);
       } catch (err) {
-     
         setError("Failed to load purchase report");
       } finally {
         setLoading(false);
@@ -191,8 +190,12 @@ const PurchaseReport = () => {
   };
 
   if (loading)
-    return <p className="p-6 text-center">⏳ Loading Purchase Report...</p>;
-  if (error) return <p className="p-6 text-center text-red-500">❌ {error}</p>;
+    return (
+      <p className="p-6 text-center">
+        {t("purchase-report.LoadingPurchaseReport")}
+      </p>
+    );
+  if (error) return <p className="p-6 text-center text-red-500">{error}</p>;
 
   return (
     <div className="sm:p-6 mb-16 bg-white dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen">
@@ -200,23 +203,22 @@ const PurchaseReport = () => {
       <section className="mb-4 flex justify-between items-center">
         <div>
           <h2 className="sm:text-2xl text-lg font-bold text-gray-700 dark:text-gray-200">
-            Purchase Report
+            {t("purchase-report.PurchaseReport")}
           </h2>
           <p className="text-md text-gray-500 dark:text-gray-300">
-            View all purchases by supplier, medicine, and cost.
+            {t("purchase-report.Viewallpurchasesbysupplier,medicine,andcost")}
           </p>
         </div>
       </section>
 
-      {/* Summary & Chart Section */}
       <div className="grid md:grid-cols-2 gap-6">
         <div className="bg-white dark:bg-gray-800 sm:p-6 sm:shadow-md rounded-lg">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
-            Purchase Summary
+            {t("purchase-report.PurchaseSummary")}
           </h3>
           <div className="mb-4">
             <p className="text-gray-600 dark:text-gray-300">
-              Total Purchase Amount
+              {t("purchase-report.TotalPurchaseAmount")}
             </p>
             <p className="sm:text-2xl text-lg font-bold text-emerald-600 dark:text-emerald-400">
               ${totalPurchaseAmount.toFixed(2)}
@@ -224,14 +226,16 @@ const PurchaseReport = () => {
           </div>
           <div className="mb-4">
             <p className="text-gray-600 dark:text-gray-300">
-              Total Purchase quantity:
+              {t("purchase-report.TotalPurchasequantity:")}
             </p>
             <p className="sm:text-2xl text-lg font-bold text-emerald-600 dark:text-emerald-400">
               {totalPurchaseValue}
             </p>
           </div>
           <div className="mb-4">
-            <p className="text-gray-600 dark:text-gray-300">Total Purchases</p>
+            <p className="text-gray-600 dark:text-gray-300">
+              {t("purchase-report.TotalPurchases")}
+            </p>
             <p className="sm:text-2xl text-lg font-bold text-gray-700 dark:text-gray-200">
               {totalPurchases}
             </p>
@@ -241,7 +245,7 @@ const PurchaseReport = () => {
         {/* Purchase Trend Chart */}
         <div className="bg-white dark:bg-gray-800 w-[440px] p-6 shadow-lg rounded-lg">
           <h3 className="sm:text-lg text-md font-semibold text-gray-800 dark:text-gray-200 mb-4">
-            Purchase Trend
+            {t("purchase-report.PurchaseTrend")}
           </h3>
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={chartData}>
@@ -269,13 +273,13 @@ const PurchaseReport = () => {
       {/* Filters Section */}
       <div className="bg-white dark:bg-gray-800 p-4 rounded-md shadow mb-6">
         <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">
-          Filter Purchases
+          {t("purchase-report.FilterPurchases")}
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
           <div>
             <label className="block text-gray-600 dark:text-gray-300 mb-1 text-sm font-medium">
-              Search
+              {t("purchase-report.Search")}
             </label>
             <input
               type="text"
@@ -290,7 +294,7 @@ const PurchaseReport = () => {
 
           <div>
             <label className="block text-gray-600 dark:text-gray-300 mb-1 text-sm font-medium">
-              Supplier
+              {t("purchase-report.Supplier")}
             </label>
             <input
               type="text"
@@ -305,7 +309,7 @@ const PurchaseReport = () => {
 
           <div>
             <label className="block text-gray-600 dark:text-gray-300 mb-1 text-sm font-medium">
-              Start Date
+              {t("purchase-report.StartDate")}
             </label>
             <input
               type="date"
@@ -319,7 +323,7 @@ const PurchaseReport = () => {
 
           <div>
             <label className="block text-gray-600 dark:text-gray-300 mb-1 text-sm font-medium">
-              End Date
+              {t("purchase-report.EndDate")}
             </label>
             <input
               type="date"
@@ -336,7 +340,7 @@ const PurchaseReport = () => {
               onClick={handlePrint}
               className="w-full md:w-auto px-4 py-2 text-emerald-600 underline transition-all"
             >
-              🖨 Print Report
+              {t("purchase-report.PrintReport")}
             </button>
           </div>
         </div>
@@ -345,14 +349,14 @@ const PurchaseReport = () => {
       {/* Purchase Table */}
       <table className="w-full border-collapse border border-gray-300 dark:border-gray-700">
         <thead>
-          <tr className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
-            <th className="p-2 border">Invoice ID</th>
-            <th className="p-2 border">Supplier</th>
-            <th className="p-2 border">Medicine</th>
-            <th className="p-2 border">Quantity</th>
-            <th className="p-2 border">Unit Price</th>
-            <th className="p-2 border">Total Cost</th>
-            <th className="p-2 border">Purchase Date</th>
+          <tr className="bg-green-600 text-white dark:bg-gray-700  dark:text-gray-200">
+            <th className="p-2 border">{t("purchase-report.InvoiceID")}</th>
+            <th className="p-2 border">{t("purchase-report.Supplier")}</th>
+            <th className="p-2 border">{t("purchase-report.Medicine")}</th>
+            <th className="p-2 border">{t("purchase-report.Quantity")}</th>
+            <th className="p-2 border">{t("purchase-report.UnitPrice")}</th>
+            <th className="p-2 border">{t("purchase-report.TotalCost")}</th>
+            <th className="p-2 border">{t("purchase-report.PurchaseDate")}</th>
           </tr>
         </thead>
         <tbody>
@@ -360,7 +364,7 @@ const PurchaseReport = () => {
             paginatedData.map((row) => (
               <tr
                 key={row.id}
-                className="border hover:bg-gray-50 dark:hover:bg-gray-800"
+                className="border hover:shadow-inner hover:shadow-green-300 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
               >
                 <td className="p-2 border text-emerald-600 dark:text-emerald-400">
                   {row.invoice_id}
@@ -391,7 +395,7 @@ const PurchaseReport = () => {
                 colSpan="7"
                 className="p-4 text-center text-gray-500 dark:text-gray-400"
               >
-                No Purchases Found
+                {t("purchase-report.NoPurchasesFound")}
               </td>
             </tr>
           )}
@@ -410,10 +414,11 @@ const PurchaseReport = () => {
           }
           className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded disabled:opacity-50"
         >
-          Prev
+          {t("purchase-report.Prev")}
         </button>
         <span>
-          Page {pagination.currentPage} of {totalPages}
+          {t("purchase-report.Page")} {pagination.currentPage}{" "}
+          {t("purchase-report.of")} {totalPages}
         </span>
         <button
           disabled={pagination.currentPage === totalPages}
@@ -425,7 +430,7 @@ const PurchaseReport = () => {
           }
           className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded disabled:opacity-50"
         >
-          Next
+          {t("purchase-report.Next")}
         </button>
       </div>
     </div>

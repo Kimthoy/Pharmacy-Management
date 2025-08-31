@@ -172,7 +172,7 @@ const StockList = () => {
         </div>
       </div>
 
-      <div className="bg-green-300 text-gray-600 w-full px-4 py-2 rounded-lg">
+      <div className="border flex  gap-8 border-green-300 text-gray-600 w-full px-4 py-2 rounded-lg">
         <div>
           {t("stock-list.TotalofStocksquantity")} : {totalStock}
           {t("stock-list.totalofquantity")}

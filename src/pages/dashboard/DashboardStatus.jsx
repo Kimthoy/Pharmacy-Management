@@ -3,9 +3,10 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { getAllSale } from "../api/saleService";
 import { getAllStocks } from "../api/stockService";
 import { getAllSupply } from "../api/suppliesService";
-
+import { useTranslation } from "../../hooks/useTranslation";
 import { Link } from "react-router-dom";
 const DashboardStatus = () => {
+  const { t } = useTranslation();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [stockData, setStockData] = useState([]);
@@ -214,9 +215,7 @@ const DashboardStatus = () => {
         );
 
         setPopularSales(sorted.slice(0, 5));
-      } catch (error) {
-        
-      }
+      } catch (error) {}
     };
 
     fetchPopularSales();
@@ -224,7 +223,11 @@ const DashboardStatus = () => {
 
   const renderDonut = (data, centerLabel) => (
     <div className="relative flex justify-center items-center w-full max-w-[250px] mx-auto">
-      <ResponsiveContainer width="100%" height={200} className={`z-20`}>
+      <ResponsiveContainer
+        width="100%"
+        height={200}
+        className={`z-20 `}
+      >
         <PieChart>
           <Pie
             data={data}
@@ -240,7 +243,7 @@ const DashboardStatus = () => {
           <Tooltip />
         </PieChart>
       </ResponsiveContainer>
-      <div className="absolute z-10 font-bold text-lg sm:text-xl text-gray-700 dark:text-gray-200">
+      <div className="absolute z-10 bg-transparent shadow-lg p-3 rounded-lg font-bold text-lg sm:text-xl text-gray-700 dark:text-gray-200">
         {centerLabel}
       </div>
     </div>
@@ -253,18 +256,18 @@ const DashboardStatus = () => {
         {/* Stock */}
         <div className="z-0 bg-gray-50 dark:bg-gray-800 rounded-lg p-4 shadow-lg">
           <h3 className="text-center text-base sm:text-lg font-semibold text-gray-700 dark:text-gray-200">
-            Stock Status
+            {t("dashboard-status.StockStatus")}
           </h3>
           {renderDonut(stockData, totalStock)}
-          <div className="mt-3 text-sm sm:text-md space-y-1">
+          <div className="mt-3 text-sm sm:text-md space-y-2 overflow-y-scroll h-56 shadow-lg p-3 rounded-xl shadow-green-100 bg-yellow-50">
             {stockData.map((d, idx) => (
               <div
                 key={idx}
-                className="flex justify-between text-gray-600 dark:text-gray-300"
+                className="flex hover:scale-105 hover:cursor-pointer transition-all justify-between text-gray-600 dark:text-gray-300"
               >
-                <span className="flex items-center gap-2">
+                <span className="flex items-center gap-2 ">
                   <span
-                    className="w-3 h-3 rounded-full"
+                    className=" w-3 h-3 rounded-full"
                     style={{ backgroundColor: d.color }}
                   ></span>
                   {d.name}
@@ -276,9 +279,9 @@ const DashboardStatus = () => {
           <div className="m-4 text-center">
             <Link
               to="/stockreport"
-              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+              className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
             >
-              → Go to stock report
+              {t("dashboard-status.Gotostockreport")}
             </Link>
           </div>
         </div>
@@ -286,14 +289,14 @@ const DashboardStatus = () => {
         {/* Sales */}
         <div className="z-0 bg-gray-50 dark:bg-gray-800 rounded-lg p-4 shadow-lg">
           <h3 className="text-center text-base sm:text-lg font-semibold text-gray-700 dark:text-gray-200">
-            Sales Status
+            {t("dashboard-status.SalesStatus")}
           </h3>
           {renderDonut(salesData, totalSales)}
-          <div className="mt-3 text-sm sm:text-md space-y-1">
+          <div className="mt-3 text-sm sm:text-md space-y-2 overflow-y-scroll h-56 shadow-lg p-3 rounded-xl shadow-green-100 bg-yellow-50">
             {salesData.map((d, idx) => (
               <div
                 key={idx}
-                className="flex justify-between text-gray-600 dark:text-gray-300"
+                className="flex hover:scale-105 hover:cursor-pointer transition-all justify-between text-gray-600 dark:text-gray-300"
               >
                 <span className="flex items-center gap-2">
                   <span
@@ -309,9 +312,9 @@ const DashboardStatus = () => {
           <div className="m-4 text-center">
             <Link
               to="/salereport"
-              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+              className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
             >
-              → Go to sale report
+              {t("dashboard-status.Gotosalereport")}
             </Link>
           </div>
         </div>
@@ -319,14 +322,14 @@ const DashboardStatus = () => {
         {/* Purchase */}
         <div className="z-0 bg-gray-50 dark:bg-gray-800 rounded-lg p-4 shadow-lg">
           <h3 className="text-center text-base sm:text-lg font-semibold text-gray-700 dark:text-gray-200">
-            Purchase Status
+            {t("dashboard-status.PurchaseStatus")}
           </h3>
           {renderDonut(purchaseChartData, totalPurchase)}
-          <div className="mt-3 text-sm sm:text-md space-y-1">
+          <div className="mt-3 text-sm sm:text-md space-y-2  overflow-y-scroll h-56 shadow-lg p-3 rounded-xl shadow-green-100 bg-yellow-50">
             {purchaseChartData.map((d, idx) => (
               <div
                 key={idx}
-                className="flex justify-between text-gray-600 dark:text-gray-300"
+                className="flex hover:scale-105 hover:cursor-pointer transition-all justify-between text-gray-600 dark:text-gray-300"
               >
                 <span className="flex items-center gap-2">
                   <span
@@ -342,26 +345,26 @@ const DashboardStatus = () => {
           <div className="m-4 text-center">
             <Link
               to="/purchasreport"
-              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+              className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
             >
-              → Go to purchase report
+              {t("dashboard-status.Gotopurchasereport")}
             </Link>
           </div>
         </div>
       </div>
 
       {/* Popular Products Table */}
-      <div className="bg-green-50 dark:bg-gray-800 rounded-lg shadow-lg">
-        <h3 className="px-4 py-3 text-base sm:text-lg font-semibold text-green-600 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700">
-          Popular Products
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+        <h3 className="px-4 py-3 text-base sm:text-lg font-semibold text-black dark:text-gray-200 border-b border-gray-200 dark:border-gray-700">
+          {t("dashboard-status.PopularProducts")}
         </h3>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm sm:text-md">
-            <thead className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+          <table className="w-full text-sm text-center sm:text-md">
+            <thead className="bg-green-600 dark:bg-gray-700 text-white dark:text-gray-200">
               <tr>
-                <th className="p-3 text-left">Medicine</th>
-                <th className="p-3 text-left">Quantity Sold</th>
-                <th className="p-3 text-left">Total Amount</th>
+                <th className="p-3 ">{t("dashboard-status.Medicine")}</th>
+                <th className="p-3 ">{t("dashboard-status.QuantitySold")}</th>
+                <th className="p-3 ">{t("dashboard-status.TotalAmount")}</th>
               </tr>
             </thead>
             <tbody>

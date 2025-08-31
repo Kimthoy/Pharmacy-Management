@@ -15,10 +15,8 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import * as XLSX from "xlsx";
 
-/* ---------- helpers ---------- */
 const toNum = (v) => Number.parseFloat(v ?? 0) || 0;
 const toDate = (v) => (v ? new Date(v) : new Date(0));
-/* used only in the Other (KHR) table */
 const formatKHR = (v) =>
   new Intl.NumberFormat("km-KH", {
     style: "currency",
@@ -26,7 +24,6 @@ const formatKHR = (v) =>
     minimumFractionDigits: 0,
   }).format(toNum(v));
 
-/* unify lines for export/filters */
 const getUnifiedItems = (sale) => {
   const meds = (sale?.sale_items ?? []).map((it) => ({
     key: `med-${it.id ?? Math.random()}`,
@@ -43,6 +40,19 @@ const getUnifiedItems = (sale) => {
   }));
   return [...meds, ...packs];
 };
+
+const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
+const isRecentSale = (dateStr) => {
+  const d = toDate(dateStr);
+  const now = new Date();
+  const diff = now - d;
+  return diff >= 0 && diff <= TWO_DAYS_MS;
+};
+const RecentBadge = () => (
+  <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+    លក់ថ្នីៗ
+  </span>
+);
 
 const SellReport = () => {
   const { t } = useTranslation();
@@ -132,7 +142,6 @@ const SellReport = () => {
     [filteredData]
   );
 
-  /* split by section */
   const productRows = useMemo(
     () => filteredData.filter((s) => (s.sale_items ?? []).length > 0),
     [filteredData]
@@ -142,7 +151,6 @@ const SellReport = () => {
     [filteredData]
   );
 
-  /* ✅ section totals */
   const productsTotalUSD = useMemo(
     () => productRows.reduce((sum, s) => sum + toNum(s.total_amount), 0),
     [productRows]
@@ -152,7 +160,6 @@ const SellReport = () => {
     [otherRows]
   );
 
-  /* small chart for “other” sales */
   const otherChartData = useMemo(
     () =>
       [...otherRows]
@@ -164,7 +171,6 @@ const SellReport = () => {
     [otherRows]
   );
 
-  /* pagination for products table */
   const totalPages = Math.max(
     1,
     Math.ceil(productRows.length / pagination.rowsPerPage)
@@ -174,7 +180,6 @@ const SellReport = () => {
     return productRows.slice(start, start + pagination.rowsPerPage);
   }, [productRows, pagination]);
 
-  /* ---------- export / print ---------- */
   const handlePrintTable = () => {
     const tableContent =
       document.getElementById("sales-report-table").outerHTML;
@@ -292,29 +297,33 @@ const SellReport = () => {
       </div>
 
       <div ref={reportRef}>
-        {/* overall total still in USD */}
         <section className="mb-4">
           <p className="text-gray-500 dark:text-gray-300 text-xs">
             {t("sellreport.SalesReportDesc")}
           </p>
         </section>
 
-        {/* small summary chips: section totals */}
         <div className="grid sm:grid-cols-3 gap-3 mb-6">
           <div className="rounded-md border p-3 dark:border-gray-700">
-            <div className="text-xs text-gray-500">Products Total (USD)</div>
+            <div className="text-xs text-gray-500">
+              {t("sellreport.ProductsTotal(USD)")}
+            </div>
             <div className="text-lg font-semibold">
               ${productsTotalUSD.toFixed(2)}
             </div>
           </div>
           <div className="rounded-md border p-3 dark:border-gray-700">
-            <div className="text-xs text-gray-500">Other Total (KHR)</div>
+            <div className="text-xs text-gray-500">
+              {t("sellreport.OtherTotal(KHR)")}
+            </div>
             <div className="text-lg font-semibold">
               {formatKHR(otherTotalKHR)}
             </div>
           </div>
           <div className="rounded-md border p-3 dark:border-gray-700">
-            <div className="text-xs text-gray-500">Entries</div>
+            <div className="text-xs text-gray-500">
+              {t("sellreport.Entries")}
+            </div>
             <div className="text-lg font-semibold">
               {productRows.length + otherRows.length}
             </div>
@@ -345,7 +354,7 @@ const SellReport = () => {
 
           <div className="bg-white dark:bg-gray-800 sm:p-6 sm:shadow-md dark:shadow-gray-700 sm:rounded-lg">
             <h3 className="sm:text-lg underline text-md mb-4 font-semibold text-gray-800 dark:text-gray-200">
-              Other Sales (Packages / No items)
+              {t("sellreport.OtherSales(Packages/Noitems)")}
             </h3>
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={otherChartData}>
@@ -367,8 +376,8 @@ const SellReport = () => {
         {/* filters & exports */}
         <div className="flex gap-4 mt-6">
           <div>
-            <label className="block text-gray-400 dark:text-gray-300 mb-1 text-md">
-              Filter by Month
+            <label className="block  dark:text-gray-300 mb-1 text-md">
+              {t("sellreport.FilterbyMonth")}
             </label>
             <input
               type="month"
@@ -382,19 +391,19 @@ const SellReport = () => {
               onClick={handlePrintTable}
               className="px-4 py-2 text-green-600 underline"
             >
-              🖨 Print Report
+              {t("sellreport.PrintReport")}
             </button>
             <button
               onClick={handleDownloadPDF}
               className="px-4 py-2 text-blue-600 underline"
             >
-              ⬇ PDF
+              PDF
             </button>
             <button
               onClick={handleDownloadExcel}
               className="px-4 py-2 text-emerald-600 underline"
             >
-              ⬇ Excel
+              Excel
             </button>
           </div>
         </div>
@@ -405,7 +414,7 @@ const SellReport = () => {
             {t("sellreport.SalesRecords")}
           </h3>
           <div className="text-sm text-gray-500 mb-4">
-            Section Total (USD):{" "}
+            {t("sellreport.SectionTotal(USD)")}:{" "}
             <span className="font-semibold">
               ${productsTotalUSD.toFixed(2)}
             </span>
@@ -413,24 +422,24 @@ const SellReport = () => {
 
           <table
             id="sales-report-table"
-            className="w-full bg-white dark:bg-gray-800 shadow-md dark:shadow-gray-700 rounded-lg border border-gray-200 dark:border-gray-600"
+            className="w-full bg-white dark:bg-gray-800  dark:shadow-gray-700  border-gray-200 dark:border-gray-600"
           >
             <thead>
-              <tr className="border-b border-gray-200 dark:border-gray-600">
-                <th className="px-4 py-3 text-left text-gray-400 dark:text-gray-300 text-md">
-                  Payment Type
+              <tr className="bg-green-600 text-white border-b border-gray-200 dark:border-gray-600">
+                <th className="px-4 py-3 text-left  dark:text-gray-300 text-md">
+                  {t("sellreport.PaymentType")}
                 </th>
-                <th className="px-4 py-3 text-left text-gray-400 dark:text-gray-300 text-md">
-                  Sale Date
+                <th className="px-4 py-3 text-left  dark:text-gray-300 text-md">
+                  {t("sellreport.SaleDate")}
                 </th>
-                <th className="px-4 py-3 text-left text-gray-400 dark:text-gray-300 text-md">
-                  Total
+                <th className="px-4 py-3 text-left  dark:text-gray-300 text-md">
+                  {t("sellreport.Total")}
                 </th>
-                <th className="px-4 py-3 text-left text-gray-400 dark:text-gray-300 text-md">
-                  Product
+                <th className="px-4 py-3 text-left  dark:text-gray-300 text-md">
+                  {t("sellreport.Product")}
                 </th>
-                <th className="px-4 py-3 text-left text-gray-400 dark:text-gray-300 text-md">
-                  Quantity
+                <th className="px-4 py-3 text-left  dark:text-gray-300 text-md">
+                  {t("sellreport.Quantity")}
                 </th>
               </tr>
             </thead>
@@ -439,11 +448,14 @@ const SellReport = () => {
               {paginatedData.length > 0 ? (
                 paginatedData.map((sale) =>
                   (sale.sale_items ?? []).map((item, index, arr) => (
-                    <tr key={`${sale.id}-${item.id}`}>
+                    <tr
+                      key={`${sale.id}-${item.id}`}
+                      className=" hover:cursor-pointer transition-all hover:shadow-lg"
+                    >
                       {index === 0 && (
                         <>
                           <td
-                            className="px-4 py-4 text-gray-500 dark:text-gray-300"
+                            className="px-4 py-4 text-gray-500 dark:text-gray-300 "
                             rowSpan={arr.length}
                           >
                             {sale.payment_method || "N/A"}
@@ -452,7 +464,11 @@ const SellReport = () => {
                             className="px-4 py-4 text-gray-500 dark:text-gray-300"
                             rowSpan={arr.length}
                           >
-                            {toDate(sale.sale_date).toLocaleDateString()}
+                            {/* NEW: show recent badge next to date */}
+                            <div className="flex items-center">
+                              {toDate(sale.sale_date).toLocaleDateString()}
+                              {isRecentSale(sale.sale_date) && <RecentBadge />}
+                            </div>
                           </td>
                           <td
                             className="px-4 py-4 text-gray-500 dark:text-gray-300"
@@ -479,7 +495,7 @@ const SellReport = () => {
                     colSpan="5"
                     className="px-6 py-4 text-center text-gray-500 dark:text-gray-300"
                   >
-                    No sales found
+                    {t("sellreport.Nosalesfound")}
                   </td>
                 </tr>
               )}
@@ -490,30 +506,30 @@ const SellReport = () => {
         {/* ===================== OTHER SALES TABLE (KHR ONLY) ===================== */}
         <div className="bg-white dark:bg-gray-800 sm:p-6 sm:shadow-md dark:shadow-gray-700 rounded-lg mt-6">
           <h3 className="text-md font-semibold text-gray-800 dark:text-gray-200 mb-2">
-            Other Sales Records — Packages / No items
+            {t("sellreport.OtherSalesRecords—Packages/Noitems")}
           </h3>
           <div className="text-sm text-gray-500 mb-4">
-            Section Total (KHR):{" "}
+            {t("sellreport.SectionTotal(KHR)")}:{" "}
             <span className="font-semibold">{formatKHR(otherTotalKHR)}</span>
           </div>
 
-          <table className="w-full bg-white dark:bg-gray-800 shadow-md dark:shadow-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+          <table className="w-full bg-white dark:bg-gray-800  dark:shadow-gray-700 rounded-lg  border-gray-200 dark:border-gray-600">
             <thead>
-              <tr className="border-b border-gray-200 dark:border-gray-600">
-                <th className="px-4 py-3 text-left text-gray-400 dark:text-gray-300 text-md">
-                  Payment Type
+              <tr className="bg-green-600 text-white border-b border-gray-200 dark:border-gray-600">
+                <th className="px-4 py-3 text-left  dark:text-gray-300 text-md">
+                  {t("sellreport.PaymentType")}
                 </th>
-                <th className="px-4 py-3 text-left text-gray-400 dark:text-gray-300 text-md">
-                  Sale Date
+                <th className="px-4 py-3 text-left  dark:text-gray-300 text-md">
+                  {t("sellreport.SaleDate")}
                 </th>
-                <th className="px-4 py-3 text-left text-gray-400 dark:text-gray-300 text-md">
-                  Total (KHR)
+                <th className="px-4 py-3 text-left  dark:text-gray-300 text-md">
+                  {t("sellreport.Total(KHR)")}
                 </th>
-                <th className="px-4 py-3 text-left text-gray-400 dark:text-gray-300 text-md">
-                  Package / Detail
+                <th className="px-4 py-3 text-left  dark:text-gray-300 text-md">
+                  {t("sellreport.Package/Detail")}
                 </th>
-                <th className="px-4 py-3 text-left text-gray-400 dark:text-gray-300 text-md">
-                  Quantity
+                <th className="px-4 py-3 text-left  dark:text-gray-300 text-md">
+                  {t("sellreport.Quantity")}
                 </th>
               </tr>
             </thead>
@@ -525,18 +541,25 @@ const SellReport = () => {
 
                   if (packItems.length === 0) {
                     return (
-                      <tr key={`other-${sale.id}`}>
+                      <tr
+                        key={`other-${sale.id}`}
+                        className=" hover:cursor-pointer transition-all hover:shadow-lg"
+                      >
                         <td className="px-4 py-4 text-gray-500 dark:text-gray-300">
                           {sale.payment_method || "N/A"}
                         </td>
                         <td className="px-4 py-4 text-gray-500 dark:text-gray-300">
-                          {toDate(sale.sale_date).toLocaleDateString()}
+                          {/* NEW: badge for no-items row too */}
+                          <div className="flex items-center">
+                            {toDate(sale.sale_date).toLocaleDateString()}
+                            {isRecentSale(sale.sale_date) && <RecentBadge />}
+                          </div>
                         </td>
                         <td className="px-4 py-4 text-gray-500 dark:text-gray-300">
                           {formatKHR(sale.total_amount)}
                         </td>
                         <td className="px-4 py-4 text-gray-700 dark:text-gray-300">
-                          No items
+                          {t("sellreport.Noitems")}
                         </td>
                         <td className="px-4 py-4 text-gray-700 dark:text-gray-300">
                           0
@@ -559,7 +582,11 @@ const SellReport = () => {
                             className="px-4 py-4 text-gray-500 dark:text-gray-300"
                             rowSpan={arr.length}
                           >
-                            {toDate(sale.sale_date).toLocaleDateString()}
+                            {/* NEW: badge for grouped rows */}
+                            <div className="flex items-center">
+                              {toDate(sale.sale_date).toLocaleDateString()}
+                              {isRecentSale(sale.sale_date) && <RecentBadge />}
+                            </div>
                           </td>
                           <td
                             className="px-4 py-4 text-gray-500 dark:text-gray-300"
@@ -584,7 +611,7 @@ const SellReport = () => {
                     colSpan="5"
                     className="px-6 py-4 text-center text-gray-500 dark:text-gray-300"
                   >
-                    No other sales found
+                    {t("sellreport.Noothersalesfound")}
                   </td>
                 </tr>
               )}
@@ -596,11 +623,8 @@ const SellReport = () => {
       {/* pagination controls for the PRODUCTS table */}
       <div className="flex justify-between items-center mt-4">
         <div className="hidden sm:flex items-center gap-2">
-          <label
-            htmlFor="rowsPerPage"
-            className="text-gray-400 dark:text-gray-300 text-md"
-          >
-            Rows per page
+          <label htmlFor="rowsPerPage" className=" dark:text-gray-300 text-md">
+            {t("sellreport.Rowsperpage")}
           </label>
           <select
             id="rowsPerPage"
@@ -630,10 +654,11 @@ const SellReport = () => {
             }
             disabled={pagination.currentPage === 1}
           >
-            Previous
+            {t("sellreport.Previous")}
           </button>
-          <span className="text-gray-400 dark:text-gray-300 text-md">
-            Page {pagination.currentPage} of {totalPages}
+          <span className=" dark:text-gray-300 text-md">
+            {t("sellreport.Page")} {pagination.currentPage} {t("sellreport.of")}{" "}
+            {totalPages}
           </span>
           <button
             className="px-3 py-1 bg-emerald-600 text-white rounded-md disabled:opacity-50"
@@ -645,7 +670,7 @@ const SellReport = () => {
             }
             disabled={pagination.currentPage === totalPages}
           >
-            Next
+            {t("sellreport.Next")}
           </button>
         </div>
       </div>
