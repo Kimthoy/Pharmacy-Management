@@ -207,6 +207,7 @@
   },
   "stock-list": {
     "New": "ថ្មី",
+    "Transferring": "កំពុងផ្ទេរ...",
     "TotalofStocksquantity": "ចំនួនថ្នាំសរុប",
     "totalofquantity": "ថ្នាំ",
     "Typestock": "សរុបប្រភេទថ្នាំ",
@@ -662,10 +663,10 @@
     "retail-product": "ថ្នាំផ្សំ",
     "RetailStock": "ស្តុកលក់រាយ",
     "setting": "ការកំណត់",
-    "AddStock": "បញ្ជូលឃ្លាំង",
+    "AddStock": "បញ្ជូលស្តុក",
     "supplyitems": "ផលិតផលផ្គត់ផ្គង់",
-    "stock": "ឃ្លាំង",
-    "StockList": "បញ្ជីឃ្លាំង",
+    "stock": "ស្តុក",
+    "StockList": "បញ្ជីស្តុក",
     "units": "ឯកតា",
     "supplies": "ការផ្គត់ផ្គង់",
     "supplier": "អ្នកផ្គត់ផ្គង់",
@@ -991,8 +992,9 @@
   },
   "topbar": {
     "recentChats": "ថ្មីៗ",
-
+    "expiresOn": "ផុតកំណត់នៅ",
     "viewAll": "មើលទាំងអស់",
+    "noNotifications": "មិនមានការជូនដំណឹង",
     "close": "បិទ",
 
     "confirm": "យល់ព្រម",

@@ -389,19 +389,19 @@ const SellReport = () => {
             />
             <button
               onClick={handlePrintTable}
-              className="px-4 py-2 text-green-600 underline"
+              className="px-2 py-2 text-green-600 underline"
             >
               {t("sellreport.PrintReport")}
             </button>
             <button
               onClick={handleDownloadPDF}
-              className="px-4 py-2 text-blue-600 underline"
+              className="px-2 py-2 text-blue-600 underline"
             >
               PDF
             </button>
             <button
               onClick={handleDownloadExcel}
-              className="px-4 py-2 text-emerald-600 underline"
+              className="px-2 py-2 text-emerald-600 underline"
             >
               Excel
             </button>
@@ -426,19 +426,19 @@ const SellReport = () => {
           >
             <thead>
               <tr className="bg-green-600 text-white border-b border-gray-200 dark:border-gray-600">
-                <th className="px-4 py-3 text-left  dark:text-gray-300 text-md">
+                <th className="px-2 py-3 text-left  dark:text-gray-300 text-md">
                   {t("sellreport.PaymentType")}
                 </th>
-                <th className="px-4 py-3 text-left  dark:text-gray-300 text-md">
+                <th className="px-2 py-3 text-left  dark:text-gray-300 text-md">
                   {t("sellreport.SaleDate")}
                 </th>
-                <th className="px-4 py-3 text-left  dark:text-gray-300 text-md">
+                <th className="px-2 py-3 text-left  dark:text-gray-300 text-md">
                   {t("sellreport.Total")}
                 </th>
-                <th className="px-4 py-3 text-left  dark:text-gray-300 text-md">
+                <th className="px-2 py-3 text-left  dark:text-gray-300 text-md">
                   {t("sellreport.Product")}
                 </th>
-                <th className="px-4 py-3 text-left  dark:text-gray-300 text-md">
+                <th className="px-2 py-3 text-left  dark:text-gray-300 text-md">
                   {t("sellreport.Quantity")}
                 </th>
               </tr>
@@ -455,13 +455,13 @@ const SellReport = () => {
                       {index === 0 && (
                         <>
                           <td
-                            className="px-4 py-4 text-gray-500 dark:text-gray-300 "
+                            className="px-2 py-4 text-gray-500 dark:text-gray-300 "
                             rowSpan={arr.length}
                           >
                             {sale.payment_method || "N/A"}
                           </td>
                           <td
-                            className="px-4 py-4 text-gray-500 dark:text-gray-300"
+                            className="px-2 py-4 text-gray-500 dark:text-gray-300"
                             rowSpan={arr.length}
                           >
                             {/* NEW: show recent badge next to date */}
@@ -471,19 +471,19 @@ const SellReport = () => {
                             </div>
                           </td>
                           <td
-                            className="px-4 py-4 text-gray-500 dark:text-gray-300"
+                            className="px-2 py-4 text-gray-500 dark:text-gray-300"
                             rowSpan={arr.length}
                           >
                             ${toNum(sale.total_amount).toFixed(2)}
                           </td>
                         </>
                       )}
-                      <td className="px-4 py-4 text-gray-700 dark:text-gray-300">
+                      <td className="px-2 py-4 text-gray-700 dark:text-gray-300">
                         {item?.medicine?.medicine_name ||
                           item?.medicine_name ||
                           "Unknown"}
                       </td>
-                      <td className="px-4 py-4 text-gray-700 dark:text-gray-300">
+                      <td className="px-2 py-4 text-gray-700 dark:text-gray-300">
                         {item.quantity}
                       </td>
                     </tr>
@@ -516,19 +516,19 @@ const SellReport = () => {
           <table className="w-full bg-white dark:bg-gray-800  dark:shadow-gray-700 rounded-lg  border-gray-200 dark:border-gray-600">
             <thead>
               <tr className="bg-green-600 text-white border-b border-gray-200 dark:border-gray-600">
-                <th className="px-4 py-3 text-left  dark:text-gray-300 text-md">
+                <th className="px-2 py-3 text-left  dark:text-gray-300 text-md">
                   {t("sellreport.PaymentType")}
                 </th>
-                <th className="px-4 py-3 text-left  dark:text-gray-300 text-md">
+                <th className="px-2 py-3 text-left  dark:text-gray-300 text-md">
                   {t("sellreport.SaleDate")}
                 </th>
-                <th className="px-4 py-3 text-left  dark:text-gray-300 text-md">
+                <th className="px-2 py-3 text-left  dark:text-gray-300 text-md">
                   {t("sellreport.Total(KHR)")}
                 </th>
-                <th className="px-4 py-3 text-left  dark:text-gray-300 text-md">
+                <th className="px-2 py-3 text-left  dark:text-gray-300 text-md">
                   {t("sellreport.Package/Detail")}
                 </th>
-                <th className="px-4 py-3 text-left  dark:text-gray-300 text-md">
+                <th className="px-2 py-3 text-left  dark:text-gray-300 text-md">
                   {t("sellreport.Quantity")}
                 </th>
               </tr>
@@ -545,23 +545,23 @@ const SellReport = () => {
                         key={`other-${sale.id}`}
                         className=" hover:cursor-pointer transition-all hover:shadow-lg"
                       >
-                        <td className="px-4 py-4 text-gray-500 dark:text-gray-300">
+                        <td className="px-2 py-4 text-gray-500 dark:text-gray-300">
                           {sale.payment_method || "N/A"}
                         </td>
-                        <td className="px-4 py-4 text-gray-500 dark:text-gray-300">
+                        <td className="px-2 py-4 text-gray-500 dark:text-gray-300">
                           {/* NEW: badge for no-items row too */}
                           <div className="flex items-center">
                             {toDate(sale.sale_date).toLocaleDateString()}
                             {isRecentSale(sale.sale_date) && <RecentBadge />}
                           </div>
                         </td>
-                        <td className="px-4 py-4 text-gray-500 dark:text-gray-300">
+                        <td className="px-2 py-4 text-gray-500 dark:text-gray-300">
                           {formatKHR(sale.total_amount)}
                         </td>
-                        <td className="px-4 py-4 text-gray-700 dark:text-gray-300">
+                        <td className="px-2 py-4 text-gray-700 dark:text-gray-300">
                           {t("sellreport.Noitems")}
                         </td>
-                        <td className="px-4 py-4 text-gray-700 dark:text-gray-300">
+                        <td className="px-2 py-4 text-gray-700 dark:text-gray-300">
                           0
                         </td>
                       </tr>
@@ -573,13 +573,13 @@ const SellReport = () => {
                       {idx === 0 && (
                         <>
                           <td
-                            className="px-4 py-4 text-gray-500 dark:text-gray-300"
+                            className="px-2 py-4 text-gray-500 dark:text-gray-300"
                             rowSpan={arr.length}
                           >
                             {sale.payment_method || "N/A"}
                           </td>
                           <td
-                            className="px-4 py-4 text-gray-500 dark:text-gray-300"
+                            className="px-2 py-4 text-gray-500 dark:text-gray-300"
                             rowSpan={arr.length}
                           >
                             {/* NEW: badge for grouped rows */}
@@ -589,17 +589,17 @@ const SellReport = () => {
                             </div>
                           </td>
                           <td
-                            className="px-4 py-4 text-gray-500 dark:text-gray-300"
+                            className="px-2 py-4 text-gray-500 dark:text-gray-300"
                             rowSpan={arr.length}
                           >
                             {formatKHR(sale.total_amount)}
                           </td>
                         </>
                       )}
-                      <td className="px-4 py-4 text-gray-700 dark:text-gray-300">
+                      <td className="px-2 py-4 text-gray-700 dark:text-gray-300">
                         {it?.package?.name || it?.name || "Package"}
                       </td>
-                      <td className="px-4 py-4 text-gray-700 dark:text-gray-300">
+                      <td className="px-2 py-4 text-gray-700 dark:text-gray-300">
                         {it.quantity}
                       </td>
                     </tr>

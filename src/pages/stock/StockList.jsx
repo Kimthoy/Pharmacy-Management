@@ -184,7 +184,7 @@ const StockList = () => {
       </div>
 
       {/* DESKTOP/TABLET: normal table */}
-      <div className="hidden md:block mt-3">
+      <div className="hidden md:block mt-3 mb-28">
         <div className="w-full overflow-x-auto rounded border border-gray-300">
           <table className="w-full min-w-[640px] table-auto">
             <thead className="bg-green-600 text-white">
@@ -257,7 +257,7 @@ const StockList = () => {
       </div>
 
       {/* MOBILE: card view (no sideways scroll) */}
-      <div className="md:hidden mt-3 space-y-3">
+      <div className="md:hidden mt-3  space-y-3">
         {currentItems.length > 0 ? (
           currentItems.map((stock) => {
             const isHighlighted = highlightedId === stock.id;
@@ -328,7 +328,7 @@ const StockList = () => {
       </div>
 
       {stocksData.length > itemsPerPage && (
-        <div className="flex justify-center items-center mt-4 gap-2">
+        <div className="flex justify-center items-center mt-4  gap-2">
           <button
             onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
             disabled={currentPage === 1}

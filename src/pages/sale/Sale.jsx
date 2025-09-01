@@ -1,3 +1,4 @@
+// src/pages/sale/Sale.jsx
 import { useState, useMemo, useEffect } from "react";
 import Header from "./Header";
 import ProductList from "./ProductList";
@@ -9,6 +10,10 @@ import compoundMedicines from "./compoundMedicines";
 import { HiMiniShoppingCart } from "react-icons/hi2";
 import { getAllMedicines } from "../api/medicineService";
 import { createSale, buildSalePayload } from "../api/saleService";
+import UnitSelectModal from "./UnitSelectModal";
+import BarcodeScanModal from "./BarcodeScanModal";
+import { BsUpcScan } from "react-icons/bs";
+
 import "./sell.css";
 
 const Sale = () => {
@@ -27,6 +32,8 @@ const Sale = () => {
   const [isCompoundMode, setIsCompoundMode] = useState(false);
   const [products, setProducts] = useState([]);
   const [currentProducts, setCurrentProducts] = useState([]);
+  const [unitModal, setUnitModal] = useState({ open: false, product: null });
+  const [isScanOpen, setIsScanOpen] = useState(false);
 
   useEffect(() => {
     const fetchMedicines = async () => {
@@ -55,16 +62,18 @@ const Sale = () => {
     setIsCompoundMode(false);
   }, [products]);
 
+  // Add base product instantly
   const addToCart = (product) => {
     setCart((prev) => {
+      const pid = product.id ?? product.medicine_id;
       const existingItem = prev.find(
-        (item) => item.id === product.id && !item.packaging
+        (item) => item.id === pid && !item.packaging
       );
 
       if (existingItem) {
         return prev.map((item) =>
-          item.id === product.id && !item.packaging
-            ? { ...item, quantity: item.quantity + 1 }
+          item.id === pid && !item.packaging
+            ? { ...item, quantity: (item.quantity || 1) + 1 }
             : item
         );
       }
@@ -73,6 +82,7 @@ const Sale = () => {
         ...prev,
         {
           ...product,
+          id: pid,
           image: product.image || product.image_url || null,
           name: product.medicine_name || product.name,
           quantity: product.quantity || 1,
@@ -91,6 +101,55 @@ const Sale = () => {
     });
   };
 
+  // Add with unit/packaging
+  const addToCartWithUnit = ({ product, unit, quantity }) => {
+    const price = Number(unit?.price ?? product.price ?? 0);
+    const id = product.id ?? product.medicine_id;
+    const nameBase = product.medicine_name || product.name || "ផលិតផល";
+
+    setCart((prev) => {
+      const matchIdx = prev.findIndex(
+        (item) =>
+          item.id === id &&
+          (item.package_id ?? null) === (unit?.package_id ?? null) &&
+          (item.packaging ?? "base") === (unit?.key ?? "base")
+      );
+
+      if (matchIdx > -1) {
+        const next = [...prev];
+        const existing = next[matchIdx];
+        next[matchIdx] = {
+          ...existing,
+          quantity: (existing.quantity || 1) + (quantity || 1),
+        };
+        return next;
+      }
+
+      return [
+        ...prev,
+        {
+          ...product,
+          id,
+          image: product.image || product.image_url || null,
+          name: `${nameBase} (${unit?.label || "ឯកតា"})`,
+          quantity: quantity || 1,
+          price,
+          packaging: unit?.key ?? "base",
+          package_id: unit?.package_id ?? null,
+          typeofmedicine:
+            product.typeofmedicine ||
+            (isCompoundMode ? "ថ្នាំផ្សំ" : "ថ្នាំធម្មតា"),
+        },
+      ];
+    });
+
+    setToast({
+      message: `${nameBase} (${unit?.label || "ឯកតា"}) ត្រូវបានបន្ថែមទៅកន្ត្រក`,
+      type: "success",
+    });
+  };
+
+  // Manual click → instant add
   const handleAddToCartClick = (product) => {
     addToCart(product);
   };
@@ -100,7 +159,10 @@ const Sale = () => {
   const filteredProducts = useMemo(() => {
     const safeList = Array.isArray(currentProducts) ? currentProducts : [];
     return safeList.filter((product) => {
-      const name = product?.name?.toLowerCase?.() || "";
+      const name =
+        product?.name?.toLowerCase?.() ||
+        product?.medicine_name?.toLowerCase?.() ||
+        "";
       return name.includes(searchQuery.toLowerCase());
     });
   }, [currentProducts, searchQuery]);
@@ -109,7 +171,6 @@ const Sale = () => {
     (sum, item) => sum + displayPrice(item.price) * (item.quantity || 1),
     0
   );
-
   const totalQuantity = cart.reduce(
     (sum, item) => sum + (item.quantity || 0),
     0
@@ -132,30 +193,29 @@ const Sale = () => {
 
   const isPackageLine = (it) =>
     Boolean(it.package_id) || String(it.typeofmedicine || "").includes("ផ្សំ");
+
   const confirmOrder = async () => {
-    // Split cart into normal medicines vs packages
     const normalItems = cart
       .filter((it) => !isPackageLine(it))
       .map((it) => ({
-        medicine_id: it.medicine_id || it.id, // medicines.id
+        medicine_id: it.medicine_id || it.id,
         quantity: Number(it.quantity || 1),
-        unit_price: Number(displayPrice(it.price)), // USD number
+        unit_price: Number(displayPrice(it.price)),
       }));
 
     const saleRetailItems = cart
       .filter((it) => isPackageLine(it))
       .map((it) => ({
-        package_id: it.package_id || it.id, // packages.id
+        package_id: it.package_id || it.id,
         quantity: Number(it.quantity || 1),
-        unit_price: Number(displayPrice(it.price)), // USD number
+        unit_price: Number(displayPrice(it.price)),
       }));
 
     const payload = buildSalePayload({
       saleDate: new Date().toISOString().slice(0, 10),
-      paymentMethod: paymentMethod,
+      paymentMethod,
       items: normalItems,
-      saleRetailItems, // key matches controller: sale_retail_items
-      // extra: { card_number: cardNumber || null }            // if you want to send more fields
+      saleRetailItems,
     });
 
     try {
@@ -173,48 +233,77 @@ const Sale = () => {
     }
   };
 
+  // auto-clear toast
   useEffect(() => {
-    if (toast) {
-      const timer = setTimeout(() => setToast(null), 3000);
-      return () => clearTimeout(timer);
-    }
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 3000);
+    return () => clearTimeout(timer);
   }, [toast]);
 
+  // persist cart
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
 
+  // Keyboard scanner (USB)
   useEffect(() => {
-    let barcodeBuffer = "";
+    let buffer = "";
     const handleKeydown = (e) => {
       if (e.key === "Enter") {
-        if (barcodeBuffer.length > 0) {
+        if (buffer.length > 0) {
           const matched = products.find(
-            (p) => String(p.barcode || p.medicine_code) === barcodeBuffer
+            (p) => String(p.barcode || p.medicine_code) === buffer
           );
           if (matched) {
-            addToCart(matched);
+            setUnitModal({ open: true, product: matched });
           } else {
             setToast({
-              message: `រកមិនឃើញផលិតផលសម្រាប់ Barcode: ${barcodeBuffer}`,
+              message: `រកមិនឃើញផលិតផលសម្រាប់ Barcode: ${buffer}`,
               type: "error",
             });
           }
         }
-        barcodeBuffer = "";
+        buffer = "";
       } else if (e.key.length === 1) {
-        barcodeBuffer += e.key;
+        buffer += e.key;
       }
     };
     window.addEventListener("keydown", handleKeydown);
     return () => window.removeEventListener("keydown", handleKeydown);
   }, [products]);
 
+  // Camera scanner
+  const handleBarcodeDetected = (codeText) => {
+    const raw = products.find(
+      (p) => String(p.barcode || p.medicine_code) === String(codeText)
+    );
+
+    if (!raw) {
+      setToast({
+        message: `រកមិនឃើញផលិតផលសម្រាប់ Barcode: ${codeText}`,
+        type: "error",
+      });
+      return;
+    }
+
+    const hasUnits =
+      (raw.packagings && raw.packagings.length > 0) ||
+      (raw.available_units && raw.available_units.length > 0);
+
+    if (hasUnits) {
+      setUnitModal({ open: true, product: raw });
+    } else {
+      addToCart(raw);
+    }
+
+    setIsScanOpen(false);
+  };
+
   return (
-    <div className="flex  h-[426px] bg-white dark:bg-gray-900 font-khmer relative ">
+    <div className="flex h-[426px] bg-white dark:bg-gray-900 font-khmer relative">
       <div className="flex-1 flex flex-col md:flex-row">
-        <div className="flex-1 overflow-y-scroll h-full sm:p-6 ">
-          <div className="sm:sticky sticky sm:-top-6 -top-0 sm:z-10 z-10">
+        <div className="flex-1 overflow-y-scroll h-full sm:p-6">
+          <div className="sm:sticky sticky sm:-top-6 -top-0 sm:z-30 z-30">
             <Header
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
@@ -248,22 +337,28 @@ const Sale = () => {
               open={isCartOpen}
               clearCart={clearCart}
               placeOrder={placeOrder}
-              onClose={() => setCartOpen(false)} // backdrop/close button
+              onClose={() => setCartOpen(false)}
               onCheckout={() => setCartOpen(false)}
-              forceHidden={forceHideCart} // <-- hides even on desktop when true
+              forceHidden={forceHideCart}
             />
           )}
         </div>
 
+        {/* Floating buttons */}
         {!isCartOpen && (
           <button
-            className="md:hidden fixed bottom-4 mb-14 flex right-0 focus:shadow-none bg-green-600 text-white p-3 rounded-md shadow-lg"
+            className="sm:hidden fixed flex bottom-4 right-0 mb-14 bg-green-600 text-white p-2 rounded-md shadow-lg z-[150]"
             onClick={() => setCartOpen(true)}
-            aria-label="បើកកន្ត្រក"
           >
             <HiMiniShoppingCart className="w-6 h-6" /> ({totalQuantity})
           </button>
         )}
+        <button
+          className="sm:hidden fixed bottom-36 right-0 z-[200] bg-white dark:bg-gray-800 border shadow-lg rounded-full p-3"
+          onClick={() => setIsScanOpen(true)}
+        >
+          <BsUpcScan className="w-6 h-6 text-green-600" />
+        </button>
       </div>
 
       <OrderReviewModal
@@ -284,6 +379,22 @@ const Sale = () => {
         setIsOpen={setIsRetailSaleOpen}
         products={currentProducts}
         addToCart={addToCart}
+      />
+
+      <UnitSelectModal
+        isOpen={unitModal.open}
+        product={unitModal.product}
+        onClose={() => setUnitModal({ open: false, product: null })}
+        onConfirm={({ product, unit, quantity }) => {
+          addToCartWithUnit({ product, unit, quantity });
+          setUnitModal({ open: false, product: null });
+        }}
+      />
+
+      <BarcodeScanModal
+        isOpen={isScanOpen}
+        onClose={() => setIsScanOpen(false)}
+        onDetected={handleBarcodeDetected}
       />
 
       <ToastNotification toast={toast} />

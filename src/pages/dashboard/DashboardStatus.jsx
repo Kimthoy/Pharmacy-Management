@@ -223,11 +223,7 @@ const DashboardStatus = () => {
 
   const renderDonut = (data, centerLabel) => (
     <div className="relative flex justify-center items-center w-full max-w-[250px] mx-auto">
-      <ResponsiveContainer
-        width="100%"
-        height={200}
-        className={`z-20 `}
-      >
+      <ResponsiveContainer width="100%" height={200} className={`z-20 `}>
         <PieChart>
           <Pie
             data={data}
@@ -243,7 +239,7 @@ const DashboardStatus = () => {
           <Tooltip />
         </PieChart>
       </ResponsiveContainer>
-      <div className="absolute z-10 bg-transparent shadow-lg p-3 rounded-lg font-bold text-lg sm:text-xl text-gray-700 dark:text-gray-200">
+      <div className="absolute z-10 bg-transparent   shadow-lg p-3 rounded-lg font-bold text-lg sm:text-xl text-gray-700 dark:text-gray-200">
         {centerLabel}
       </div>
     </div>
@@ -259,20 +255,20 @@ const DashboardStatus = () => {
             {t("dashboard-status.StockStatus")}
           </h3>
           {renderDonut(stockData, totalStock)}
-          <div className="mt-3 text-sm sm:text-md space-y-2 overflow-y-scroll h-56 shadow-lg p-3 rounded-xl shadow-green-100 bg-yellow-50">
+          <div className="mt-3 text-sm sm:text-md space-y-2 overflow-y-scroll h-56 dark:shadow-none shadow-lg p-3 rounded-xl shadow-green-100 bg-yellow-50">
             {stockData.map((d, idx) => (
               <div
                 key={idx}
                 className="flex hover:scale-105 hover:cursor-pointer transition-all justify-between text-gray-600 dark:text-gray-300"
               >
-                <span className="flex items-center gap-2 ">
+                <span className="flex items-center gap-2 dark:text-slate-600">
                   <span
                     className=" w-3 h-3 rounded-full"
                     style={{ backgroundColor: d.color }}
                   ></span>
                   {d.name}
                 </span>
-                <span>{d.value}</span>
+                <span className="dark:text-slate-600">{d.value}</span>
               </div>
             ))}
           </div>
@@ -292,20 +288,20 @@ const DashboardStatus = () => {
             {t("dashboard-status.SalesStatus")}
           </h3>
           {renderDonut(salesData, totalSales)}
-          <div className="mt-3 text-sm sm:text-md space-y-2 overflow-y-scroll h-56 shadow-lg p-3 rounded-xl shadow-green-100 bg-yellow-50">
+          <div className="mt-3 text-sm sm:text-md space-y-2 overflow-y-scroll h-56 dark:shadow-none shadow-lg p-3 rounded-xl shadow-green-100 bg-yellow-50">
             {salesData.map((d, idx) => (
               <div
                 key={idx}
                 className="flex hover:scale-105 hover:cursor-pointer transition-all justify-between text-gray-600 dark:text-gray-300"
               >
-                <span className="flex items-center gap-2">
+                <span className="flex items-center gap-2 dark:text-slate-600">
                   <span
                     className="w-3 h-3 rounded-full"
                     style={{ backgroundColor: d.color }}
                   ></span>
                   {d.name}
                 </span>
-                <span>{d.value}</span>
+                <span className="dark:text-slate-600">{d.value}</span>
               </div>
             ))}
           </div>
@@ -325,20 +321,20 @@ const DashboardStatus = () => {
             {t("dashboard-status.PurchaseStatus")}
           </h3>
           {renderDonut(purchaseChartData, totalPurchase)}
-          <div className="mt-3 text-sm sm:text-md space-y-2  overflow-y-scroll h-56 shadow-lg p-3 rounded-xl shadow-green-100 bg-yellow-50">
+          <div className="mt-3 text-sm sm:text-md space-y-2  overflow-y-scroll h-56 dark:shadow-none  shadow-lg p-3 rounded-xl shadow-green-100 bg-yellow-50">
             {purchaseChartData.map((d, idx) => (
               <div
                 key={idx}
                 className="flex hover:scale-105 hover:cursor-pointer transition-all justify-between text-gray-600 dark:text-gray-300"
               >
-                <span className="flex items-center gap-2">
+                <span className="flex items-center gap-2 dark:text-slate-600">
                   <span
                     className="w-3 h-3 rounded-full"
                     style={{ backgroundColor: d.color }}
                   ></span>
                   {d.name}
                 </span>
-                <span>{d.value}</span>
+                <span className="dark:text-slate-600">{d.value}</span>
               </div>
             ))}
           </div>

@@ -227,7 +227,7 @@ const MedicineTable = ({
   if (loading) return <p className="text-gray-500">កំពុងទាញទិន្នន័យ...</p>;
 
   return (
-    <div className="w-full mb-14 z-20 overflow-x-auto">
+    <div className="w-full mb-14 z-10 overflow-x-auto">
       <table className="sm:w-full table-auto border-collapse">
         <thead>
           <tr className="bg-gray-100 dark:bg-gray-700">
@@ -285,7 +285,7 @@ const MedicineTable = ({
 
       {/* ---------- Quick Sell Modal (Qty & Price) ---------- */}
       {showBuy && buyPkg && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[2000]">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999]">
           <div className="bg-white rounded-lg w-full sm:max-w-md max-w-sm shadow-xl">
             <div className="p-5 border-b">
               <h3 className="text-xl font-semibold">កំណត់ចំនួន និងតម្លៃ</h3>

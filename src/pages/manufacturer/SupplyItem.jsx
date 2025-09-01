@@ -26,7 +26,7 @@ const SupplyItem = () => {
   if (error) return <div className="p-4 text-red-600">{error}</div>;
 
   return (
-    <div className="p-6">
+    <div className="mb-16">
       <div className="flex justify-between mb-4">
         <h1 className="text-xl font-bold text-gray-800 dark:text-white">
           Supply Item List
@@ -42,12 +42,16 @@ const SupplyItem = () => {
       <table className="min-w-full table-auto border border-gray-300 dark:border-gray-600 rounded-md shadow-sm">
         <thead className="bg-gray-100 dark:bg-slate-800 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
           <tr>
-            <th className="border px-4 py-2 dark:border-slate-700">#</th>
+            <th className="border px-4 py-2 dark:border-slate-700 hidden sm:table-cell">
+              #
+            </th>
             <th className="border px-4 py-2 dark:border-slate-700">
               Supply ID
             </th>
             <th className="border px-4 py-2 dark:border-slate-700">Medicine</th>
-            <th className="border px-4 py-2 dark:border-slate-700">Quantity</th>
+            <th className="border px-4 py-2 dark:border-slate-700 hidden sm:table-cell">
+              Quantity
+            </th>
             <th className="border px-4 py-2 dark:border-slate-700">
               Unit Price
             </th>
@@ -63,11 +67,14 @@ const SupplyItem = () => {
                 key={item.id}
                 className="hover:bg-gray-50 dark:hover:bg-slate-700 even:bg-slate-200 dark:even:bg-slate-800"
               >
-                <td className="border px-4 py-2 dark:border-slate-700 dark:text-white">
+                <td className="hidden sm:table-cell border px-4 py-2 dark:border-slate-700 dark:text-white">
                   {idx + 1}
                 </td>
 
-                <td className="border px-4 py-2 dark:border-slate-700">
+                <td
+                  className="border px-4 py-2 dark:border-slate-700 truncate max-w-28"
+                  title={item.supply?.supply_id}
+                >
                   <Link
                     to="/supplies"
                     state={{ highlightedSupplyId: item.supply?.supply_id }}
@@ -89,7 +96,7 @@ const SupplyItem = () => {
                   </Link>
                 </td>
 
-                <td className="border px-4 py-2 dark:border-slate-700 dark:text-white">
+                <td className="border px-4 py-2 dark:border-slate-700 dark:text-white hidden sm:table-cell">
                   {item.supply_quantity ?? "N/A"}
                 </td>
 
@@ -97,7 +104,10 @@ const SupplyItem = () => {
                   {item.unit_price ? `$${item.unit_price}` : "N/A"}
                 </td>
 
-                <td className="border px-4 py-2 dark:border-slate-700 dark:text-white">
+                <td
+                  className="border px-4 py-2 dark:border-slate-700 dark:text-white truncate max-w-20"
+                  title={item.expire_date}
+                >
                   {item.expire_date
                     ? new Date(item.expire_date).toLocaleDateString()
                     : "N/A"}

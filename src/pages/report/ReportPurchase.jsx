@@ -243,7 +243,7 @@ const PurchaseReport = () => {
         </div>
 
         {/* Purchase Trend Chart */}
-        <div className="bg-white dark:bg-gray-800 w-[440px] p-6 shadow-lg rounded-lg">
+        <div className="bg-white dark:bg-gray-800 w-[440px] sm:p-6 shadow-lg rounded-lg">
           <h3 className="sm:text-lg text-md font-semibold text-gray-800 dark:text-gray-200 mb-4">
             {t("purchase-report.PurchaseTrend")}
           </h3>
@@ -354,8 +354,12 @@ const PurchaseReport = () => {
             <th className="p-2 border">{t("purchase-report.Supplier")}</th>
             <th className="p-2 border">{t("purchase-report.Medicine")}</th>
             <th className="p-2 border">{t("purchase-report.Quantity")}</th>
-            <th className="p-2 border">{t("purchase-report.UnitPrice")}</th>
-            <th className="p-2 border">{t("purchase-report.TotalCost")}</th>
+            <th className="p-2 border hidden sm:table-cell">
+              {t("purchase-report.UnitPrice")}
+            </th>
+            <th className="p-2 border hidden sm:table-cell">
+              {t("purchase-report.TotalCost")}
+            </th>
             <th className="p-2 border">{t("purchase-report.PurchaseDate")}</th>
           </tr>
         </thead>
@@ -378,10 +382,10 @@ const PurchaseReport = () => {
                 <td className="p-2 border text-gray-800 dark:text-gray-200">
                   {row.quantity}
                 </td>
-                <td className="p-2 border text-gray-800 dark:text-gray-200">
+                <td className="hidden sm:table-cell p-2 border text-gray-800 dark:text-gray-200">
                   ${row.unit_price.toFixed(2)}
                 </td>
-                <td className="p-2 border font-semibold text-gray-700 dark:text-gray-300">
+                <td className="hidden sm:table-cell p-2 border font-semibold text-gray-700 dark:text-gray-300">
                   ${row.total_cost.toFixed(2)}
                 </td>
                 <td className="p-2 border text-gray-800 dark:text-gray-200">

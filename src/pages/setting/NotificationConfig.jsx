@@ -4,7 +4,7 @@ export default function NotificationConfig({ settings, onChange }) {
   const email = settings.find((s) => s.key === "email_host")?.value || "";
 
   return (
-    <div className="p-4 border rounded bg-gray-50 mt-4">
+    <div className="p-2 border rounded bg-gray-50 mt-4">
       <h2 className="text-lg font-semibold mb-2">
         ការជូនដំណឹង (Notifications)
       </h2>

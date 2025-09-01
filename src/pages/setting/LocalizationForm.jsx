@@ -5,7 +5,7 @@ export default function LocalizationForm({ settings, onChange }) {
   const timezone = settings.find((s) => s.key === "timezone")?.value || "";
 
   return (
-    <div className="p-4 border rounded bg-gray-50 mt-4">
+    <div className="p-2 border rounded bg-gray-50 mt-4">
       <h2 className="text-lg font-semibold mb-2">
         កំណត់ភាសា និងរូបិយប័ណ្ណ (Localization)
       </h2>

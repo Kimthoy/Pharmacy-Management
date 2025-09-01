@@ -203,7 +203,7 @@ const Manufacturerlist = () => {
 
       {/* Table */}
       <div>
-        <table className="w-full sm:min-w-[600px] border-collapse bg-white dark:bg-gray-800 shadow-md dark:shadow-gray-700 sm:rounded-lg border border-gray-200 dark:border-gray-600">
+        <table className="w-full  border-collapse bg-white dark:bg-gray-800 shadow-md dark:shadow-gray-700 sm:rounded-lg border border-gray-200 dark:border-gray-600">
           <thead className="border border-gray-200 dark:border-gray-600">
             <tr>
               <th className="sm:flex hidden p-3 text-left text-gray-400 dark:text-gray-300 text-md">
@@ -251,7 +251,7 @@ const Manufacturerlist = () => {
                     {man.phone_number}
                   </td>
 
-                  <td className="p-3 flex">
+                  <td className="p-1 flex">
                     <button
                       onClick={() => handleEdit(man)}
                       className=" text-blue-600 p-3 hover:rounded-md hover:bg-slate-300  dark:hover:bg-slate-600 dark:text-blue-600"

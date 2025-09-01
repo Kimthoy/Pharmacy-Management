@@ -46,6 +46,7 @@ const AddWastageReturn = lazy(() => import("./pages/return/AddWastageReturn"));
 const SaleDashboard = lazy(() => import("./pages/sale/Sale"));
 const RetailStock = lazy(() => import("./pages/stock/RetailStock"));
 const RetailMedicine = lazy(() => import("./pages/retail/RetailProduct"));
+
 const AddManufacturerReturn = lazy(() =>
   import("./pages/return/AddManufacturerReturn")
 );
@@ -186,6 +187,7 @@ const App = () => {
                       <Route path="/incomepage" element={<IncomePage />} />
                       <Route path="/stocklist" element={<StockList />} />
                       <Route path="/sale-retail" element={<SaleRetail />} />
+
                       <Route
                         path="/retail-product"
                         element={<RetailMedicine />}
@@ -255,11 +257,7 @@ const App = () => {
               </div>
 
               {!hideChrome && <Footer />}
-              <ToastContainer
-                position="top-left"
-                
-                autoClose={1000}
-              />
+              <ToastContainer position="top-left" autoClose={1000} />
             </div>
           </div>
         </LanguageProvider>

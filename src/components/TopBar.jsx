@@ -233,36 +233,8 @@ const TopBar = ({ onSearch = () => {} }) => {
   const notificationDropdownRef = useRef(null);
   const mobileDropdownRef = useRef(null);
 
-  // 1) Static notifications (declare first)
-  const notifications = [
-    {
-      id: "sys-1",
-      title: "New Message",
-      message: "Iliash Hossain sent you a message.",
-      time: "Now",
-      status: "unread",
-      icon: "message",
-      href: "/messages",
-    },
-    {
-      id: "sys-2",
-      title: "System Update",
-      message: "Server maintenance scheduled at 10 PM.",
-      time: "2:30 PM",
-      status: "read",
-      icon: "bell",
-      href: "/settingspage",
-    },
-    {
-      id: "sys-3",
-      title: "Alert",
-      message: "Low stock for Paracetamol.",
-      time: "9:15 AM",
-      status: "unread",
-      icon: "alert",
-      href: "/inventory/low-stock",
-    },
-  ];
+ 
+  const notifications = [];
 
   // 2) Expiring soon (fetch + badge)
   const [expiringSoon, setExpiringSoon] = useState([]);
@@ -369,30 +341,6 @@ const TopBar = ({ onSearch = () => {} }) => {
       status: "online",
       avatar: "/path/to/avatar1.jpg",
     },
-    {
-      id: 2,
-      name: "Abu Bin Ishtiyak",
-      message: "Hi, I am Ishtiyak, can you help me wi...",
-      time: "4:49 AM",
-      status: "online",
-      avatar: "/path/to/avatar2.jpg",
-    },
-    {
-      id: 3,
-      name: "George Philips",
-      message: "Have you seen the claim from Rose?",
-      time: "6 Apr",
-      status: "offline",
-      avatar: "/path/to/avatar3.jpg",
-    },
-    {
-      id: 4,
-      name: "Softnio Group",
-      message: "You: I just bought a new computer b...",
-      time: "27 Mar",
-      status: "offline",
-      avatar: "/path/to/avatar4.jpg",
-    },
   ];
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -432,7 +380,7 @@ const TopBar = ({ onSearch = () => {} }) => {
         className="sm:hidden mr-6 bg-gray-200 absolute right-0 mt-2 p-2 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 transition dark:text-white dark:bg-slate-700"
         onClick={openProfileDashboard}
       >
-        <MdOutlineSettingsSuggest size={24} />
+        <MdOutlineSettingsSuggest size={24} className="text-green-600" />
       </button>
 
       {isMobileSearchOpen && (

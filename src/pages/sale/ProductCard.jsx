@@ -29,7 +29,7 @@ const ProductCard = ({ product, handleAddToCartClick, displayPrice }) => {
         </h3>
 
         <p className="font-semibold text-green-600 px-4 dark:text-gray-300 text-lg">
-          $ {displayPrice(product.price || product.price_in || 0).toFixed(2)}
+          $ {displayPrice(product.price || 0).toFixed(2)}
         </p>
 
         <span className="text-gray-400 px-4 dark:text-gray-400 text-md">

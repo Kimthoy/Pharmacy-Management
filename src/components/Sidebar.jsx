@@ -1,18 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { MdSpaceDashboard } from "react-icons/md";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "../../src/hooks/useTranslation";
 import { BiCapsule } from "react-icons/bi";
-import { CiRepeat, CiSettings } from "react-icons/ci";
-import { FiSettings } from "react-icons/fi";
-import { FaUserDoctor } from "react-icons/fa6";
-import { MdPointOfSale } from "react-icons/md";
-import { TbTruckDelivery } from "react-icons/tb";
 import { CiMedicalCross } from "react-icons/ci";
-import { FaTruckMedical } from "react-icons/fa6";
-import { MdAssignmentReturn } from "react-icons/md";
-
+import { FaUserDoctor, FaTruckMedical } from "react-icons/fa6";
+import { MdPointOfSale, MdAssignmentReturn } from "react-icons/md";
 import {
   UserGroupIcon,
   UserPlusIcon,
@@ -20,15 +14,46 @@ import {
 } from "@heroicons/react/24/outline";
 import { MdOutlineMonitorHeart } from "react-icons/md";
 import { LiaWarehouseSolid } from "react-icons/lia";
-import { HiOutlineCurrencyDollar } from "react-icons/hi2";
-import { TfiDashboard } from "react-icons/tfi";
+import { FiSettings } from "react-icons/fi";
 import { HiMenu, HiX } from "react-icons/hi";
 
 const Sidebar = ({ setSelectedPage, selectedPage }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+
   const [activeMenuItem, setActiveMenuItem] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
+
+  const sidebarRef = useRef(null);
+  const toggleBtnRef = useRef(null);
+
+  // Close sidebar when tapping/clicking outside on mobile
+  useEffect(() => {
+    const handler = (e) => {
+      const isMobile = window.innerWidth < 768;
+      if (!isMobile || !isOpen) return;
+
+      const sidebarEl = sidebarRef.current;
+      const toggleEl = toggleBtnRef.current;
+
+      const clickedInsideSidebar = sidebarEl && sidebarEl.contains(e.target);
+      const clickedToggle = toggleEl && toggleEl.contains(e.target);
+
+      if (!clickedInsideSidebar && !clickedToggle) {
+        setIsOpen(false);
+        setActiveMenuItem(null);
+      }
+    };
+
+    // Use both touch and mouse events for better reliability across devices
+    document.addEventListener("touchstart", handler, { passive: true });
+    document.addEventListener("mousedown", handler);
+
+    return () => {
+      document.removeEventListener("touchstart", handler);
+      document.removeEventListener("mousedown", handler);
+    };
+  }, [isOpen]);
 
   const menuItems = [
     { name: t("sidebar.dashboards"), icon: MdSpaceDashboard, path: "/" },
@@ -65,11 +90,8 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
         },
       ],
     },
-    {
-      name: t("sidebar.staff"),
-      icon: FaUserDoctor,
-      path: "/listofstaff",
-    },
+
+    { name: t("sidebar.staff"), icon: FaUserDoctor, path: "/listofstaff" },
     {
       name: t("sidebar.stock"),
       icon: LiaWarehouseSolid,
@@ -102,7 +124,6 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
         { name: t("sidebar.wastageReturnList"), path: "/returns-table" },
       ],
     },
-
     {
       name: t("sidebar.salepage"),
       icon: MdPointOfSale,
@@ -118,11 +139,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
         { name: t("sidebar.purchaseReport"), path: "/purchasreport" },
       ],
     },
-    {
-      name: t("sidebar.setting"),
-      icon: FiSettings,
-      path: "/setting-page",
-    },
+    { name: t("sidebar.setting"), icon: FiSettings, path: "/setting-page" },
   ];
 
   const handlePageSelection = (item, path) => {
@@ -135,31 +152,40 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
   };
 
   const toggleSidebar = () => {
-    setIsOpen(!isOpen);
+    setIsOpen((prev) => !prev);
     if (!isOpen) setActiveMenuItem(null);
   };
 
   return (
     <div>
+      {/* Toggle button (mobile) */}
       <button
-        className="md:hidden fixed top-3 left-4 z-[999] sm:p-2 p-1 bg-green-500 text-white rounded-md"
+        ref={toggleBtnRef}
+        className="md:hidden fixed top-3 left-4 z-[60] sm:p-2 p-1 bg-green-500 text-white rounded-md"
         onClick={toggleSidebar}
+        aria-label={
+          isOpen
+            ? t("sidebar.close") ?? "Close sidebar"
+            : t("sidebar.open") ?? "Open sidebar"
+        }
       >
         {isOpen ? <HiX className="w-6 h-6" /> : <HiMenu className="w-6 h-6" />}
       </button>
 
+      {/* Dimmed overlay; also closes on click */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
           onClick={toggleSidebar}
-        ></div>
+        />
       )}
 
+      {/* Sidebar */}
       <div
+        ref={sidebarRef}
         className={`h-screen flex-shrink-0 bg-green-600 dark:bg-gray-900 dark:shadow-gray-800 transition-all duration-300 fixed z-[200] md:static
-      ${isOpen ? "w-52" : "w-0 md:w-[80px]"} md:hover:w-64 
-      ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
-    `}
+        ${isOpen ? "w-52" : "w-0 md:w-[80px]"} md:hover:w-64
+        ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
         onMouseEnter={() => window.innerWidth >= 768 && setIsOpen(true)}
         onMouseLeave={() => {
           if (window.innerWidth >= 768) {
@@ -190,26 +216,24 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                         }
                       }}
                       className={`group flex items-center justify-between w-full px-4 py-2 mt-1 text-md rounded-lg transition-all duration-200
-                    ${
-                      isParentActive
-                        ? "bg-white text-green-700 dark:bg-green-600 dark:text-white"
-                        : "text-white dark:text-gray-200"
-                    }
-                    hover:bg-white hover:text-green-700
-                    dark:hover:bg-gray-700 dark:hover:text-white
-                    hover:scale-105 hover:shadow-lg
-                  `}
+                        ${
+                          isParentActive
+                            ? "bg-white text-green-700 dark:bg-green-600 dark:text-white"
+                            : "text-white dark:text-gray-200"
+                        }
+                        hover:bg-white hover:text-green-700
+                        dark:hover:bg-gray-700 dark:hover:text-white
+                        hover:scale-105 hover:shadow-lg`}
                     >
                       <div className="flex items-center">
                         <Icon
                           className={`w-7 h-7 flex-shrink-0 transition-colors duration-200
-                        ${
-                          isParentActive
-                            ? "text-green-700 dark:text-white"
-                            : "text-white dark:text-gray-300"
-                        }
-                        group-hover:text-green-700 dark:group-hover:text-green-400
-                      `}
+                            ${
+                              isParentActive
+                                ? "text-green-700 dark:text-white"
+                                : "text-white dark:text-gray-300"
+                            }
+                            group-hover:text-green-700 dark:group-hover:text-green-400`}
                         />
                         {isOpen && (
                           <span className="ml-2 whitespace-nowrap">{name}</span>
@@ -223,6 +247,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                           } text-white dark:text-green-400 group-hover:text-green-700`}
                           fill="currentColor"
                           viewBox="0 0 20 20"
+                          aria-hidden="true"
                         >
                           <path
                             fillRule="evenodd"
@@ -248,12 +273,11 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                                 handlePageSelection(sub.name, sub.path)
                               }
                               className={`w-full mb-1 mt-1 py-2 rounded-lg transition-all text-left ml-12 px-2 text-md
-                            ${
-                              selectedPage === sub.name
-                                ? "bg-green-500 text-white dark:bg-green-600"
-                                : "text-white dark:text-gray-200 hover:bg-white dark:hover:bg-gray-700 hover:text-green-600 dark:hover:text-green-400"
-                            }
-                          `}
+                                ${
+                                  selectedPage === sub.name
+                                    ? "bg-green-500 text-white dark:bg-green-600"
+                                    : "text-white dark:text-gray-200 hover:bg-white dark:hover:bg-gray-700 hover:text-green-600 dark:hover:text-green-400"
+                                }`}
                             >
                               {sub.name}
                             </button>

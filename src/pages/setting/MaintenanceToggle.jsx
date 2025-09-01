@@ -18,7 +18,7 @@ export default function MaintenanceToggle({ currentValue }) {
   };
 
   return (
-    <div className="p-4 border rounded bg-gray-50 mt-4">
+    <div className="p-2 border rounded bg-gray-50 mt-4">
       <h2 className="text-lg font-semibold mb-2">
         របៀបថែទាំ (Maintenance Mode)
       </h2>

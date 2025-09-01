@@ -42,7 +42,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="mb-24  space-y-6">
       <h1 className="text-xl font-semibold">System Settings</h1>
 
       <PharmacyProfileForm settings={settings} onChange={handleChange} />

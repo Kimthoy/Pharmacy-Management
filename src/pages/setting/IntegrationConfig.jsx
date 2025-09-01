@@ -4,7 +4,7 @@ export default function IntegrationConfig({ settings, onChange }) {
   const barcode = settings.find((s) => s.key === "barcode_prefix")?.value || "";
 
   return (
-    <div className="p-4 border rounded bg-gray-50 mt-4">
+    <div className="border rounded bg-gray-50 mt-4">
       <h2 className="text-lg font-semibold mb-2">
         ការរួមបញ្ចូលប្រព័ន្ធ (Integrations)
       </h2>

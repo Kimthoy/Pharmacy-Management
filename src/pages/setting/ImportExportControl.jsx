@@ -4,7 +4,7 @@ export default function ImportExportControl() {
   const exportData = () => alert("ការនាំចេញមិនទាន់អនុវត្តទេ!");
 
   return (
-    <div className="p-4 border rounded bg-gray-50 mt-4">
+    <div className=" border rounded bg-gray-50 mt-4">
       <h2 className="text-lg font-semibold mb-2">
         នាំចូល / នាំចេញ ទិន្នន័យ (Import / Export Data)
       </h2>

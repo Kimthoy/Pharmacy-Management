@@ -6,7 +6,7 @@ export default function PharmacyProfileForm({ settings, onChange }) {
   const branch = settings.find((s) => s.key === "branch_code")?.value || "";
 
   return (
-    <div className="p-4 border rounded bg-gray-50">
+    <div className="p-2 border rounded bg-gray-50">
       <h2 className="text-lg font-semibold mb-2">
         ព័ត៌មានអំពីឱសថស្ថាន (Pharmacy Profile)
       </h2>

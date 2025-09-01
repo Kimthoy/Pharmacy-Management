@@ -9,7 +9,7 @@ export default function BackupButton() {
   };
 
   return (
-    <div className="p-4 border rounded bg-gray-50">
+    <div className=" border rounded bg-gray-50">
       <h2 className="text-lg font-semibold mb-2">
         បម្រុងទុកទិន្នន័យ (Backup Data)
       </h2>
