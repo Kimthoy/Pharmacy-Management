@@ -128,7 +128,7 @@ export default function CheckoutModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center z-[60]">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center z-[600]">
       <div className="bg-white p-6 rounded-lg max-w-md w-full shadow-lg">
         <h2 className="text-xl font-bold mb-4 text-center">
           បញ្ជាក់ការបញ្ជាទិញ

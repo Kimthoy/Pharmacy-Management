@@ -35,7 +35,7 @@ const Cart = ({
 
   return (
     <div
-      className={`bg-white z-[555]   pb-12   shadow-sm p-4  transition-transform duration-300
+      className={`bg-white z-[997]   pb-12   shadow-sm p-4  transition-transform duration-300
         fixed bottom-0 left-0 sm:w-80 w-full h-[80vh] md:h-full md:static
         rounded-t-2xl flex flex-col
         ${open ? "translate-y-0" : "translate-y-full md:translate-y-0"}`}

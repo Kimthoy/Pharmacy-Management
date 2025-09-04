@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 import { createSupply } from "../api/suppliesService";
@@ -6,14 +6,18 @@ import { getAllSupplier } from "../api/supplierService";
 import { getAllMedicines } from "../api/medicineService";
 import { toast } from "react-toastify";
 import { useTranslation } from "../../hooks/useTranslation";
+import { BsUpcScan } from "react-icons/bs";
+
 const AddSupply = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
   const [supply, setSupply] = useState({
     supplier_id: null,
     invoice_date: "",
     invoice_id: "",
   });
-  const { t } = useTranslation();
+
   const [supplierOptions, setSupplierOptions] = useState([]);
   const [medicineOptions, setMedicineOptions] = useState([]);
   const [supplyItems, setSupplyItems] = useState([
@@ -21,139 +25,122 @@ const AddSupply = () => {
   ]);
   const [isLoading, setIsLoading] = useState(false);
 
+  // --- Camera scanner state ---
+  const [isScanOpen, setIsScanOpen] = useState(false);
+  const [isStartingScanner, setIsStartingScanner] = useState(false);
+  const quaggaRef = useRef(null);
+  const lastDetectedRef = useRef({ code: "", ts: 0 });
+
+  // ---------- data fetch ----------
   useEffect(() => {
     const fetchData = async () => {
       try {
         const suppliers = await getAllSupplier();
         const medicinesResponse = await getAllMedicines();
-
         const medicines = Array.isArray(medicinesResponse)
           ? medicinesResponse
-          : medicinesResponse.data || [];
+          : medicinesResponse?.data || [];
 
         setSupplierOptions(
-          suppliers.map((s) => ({
-            value: s.id,
-            label: s.company_name,
-          }))
+          (suppliers || []).map((s) => ({ value: s.id, label: s.company_name }))
         );
-
-        if (Array.isArray(medicines)) {
-          setMedicineOptions(
-            medicines.map((m) => ({
-              value: m.id,
-              label: m.medicine_name,
-              barcode: m.barcode,
-            }))
-          );
-        } else {
-        }
-      } catch (err) {}
-    };
-
-    fetchData();
-  }, []);
-
-  const handleSupplierChange = (selected) => {
-    setSupply((prev) => ({ ...prev, supplier_id: selected?.value || null }));
-  };
-
-  const handleItemChange = (index, field, value) => {
-    const updated = [...supplyItems];
-    updated[index][field] = value;
-    setSupplyItems(updated);
-  };
-
-  const addItem = () => {
-    setSupplyItems([
-      ...supplyItems,
-      { medicine_id: "", supply_quantity: "", expire_date: "", unit_price: "" },
-    ]);
-  };
-
-  const removeItem = (index) => {
-    const updated = [...supplyItems];
-    updated.splice(index, 1);
-    setSupplyItems(updated);
-  };
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const result = await getAllMedicines(1);
-        const medicines = result?.data || [];
-
         setMedicineOptions(
-          medicines.map((m) => ({
+          (medicines || []).map((m) => ({
             value: m.id,
             label: m.medicine_name,
             barcode: m.barcode,
           }))
         );
-      } catch (err) {}
+      } catch {
+        toast.error(t("common.fetchFailed") || "ទាញទិន្នន័យបរាជ័យ");
+      }
     };
-
     fetchData();
-  }, []);
+  }, [t]);
 
-  const handleBarcodeScan = (barcode) => {
-    const found = medicineOptions.find((m) => m.barcode === barcode);
-    if (!found) return toast.error(`Barcode ${barcode} not found`);
+  // ---------- helpers ----------
+  const handleSupplierChange = (selected) =>
+    setSupply((prev) => ({ ...prev, supplier_id: selected?.value || null }));
 
-    const index = supplyItems.findIndex(
-      (item) => item.medicine_id === found.value
-    );
-
-    if (index === -1) {
-      setSupplyItems((prev) => [
-        ...prev,
-        {
-          medicine_id: found.value,
-          supply_quantity: "1",
-          expire_date: "",
-          unit_price: "",
-        },
-      ]);
-      toast.success(`Added: ${found.label}`);
-    } else {
-      const updated = [...supplyItems];
-      updated[index].supply_quantity =
-        parseInt(updated[index].supply_quantity || "0") + 1;
-      setSupplyItems(updated);
-      toast.info(`Updated quantity for: ${found.label}`);
-    }
+  const handleItemChange = (index, field, value) => {
+    setSupplyItems((prev) => {
+      const updated = [...prev];
+      updated[index][field] = value;
+      return updated;
+    });
   };
 
+  const addItem = () =>
+    setSupplyItems((prev) => [
+      ...prev,
+      { medicine_id: "", supply_quantity: "", expire_date: "", unit_price: "" },
+    ]);
+
+  const removeItem = (index) =>
+    setSupplyItems((prev) => prev.filter((_, i) => i !== index));
+
+  const handleBarcodeScan = (barcode) => {
+    const found = medicineOptions.find(
+      (m) => String(m.barcode) === String(barcode)
+    );
+    if (!found) {
+      toast.error(`Barcode ${barcode} not found`);
+      return;
+    }
+
+    setSupplyItems((prev) => {
+      const idx = prev.findIndex((it) => it.medicine_id === found.value);
+      if (idx === -1) {
+        toast.success(`Added: ${found.label}`);
+        return [
+          ...prev,
+          {
+            medicine_id: found.value,
+            supply_quantity: "1",
+            expire_date: "",
+            unit_price: "",
+          },
+        ];
+      }
+      const next = [...prev];
+      next[idx].supply_quantity = String(
+        (parseInt(next[idx].supply_quantity || "0", 10) || 0) + 1
+      );
+      toast.info(`Updated quantity for: ${found.label}`);
+      return next;
+    });
+  };
+
+  // USB / keyboard scanner
   useEffect(() => {
     let buffer = "";
     let timeout;
-
     const handleKeyPress = (e) => {
       if (timeout) clearTimeout(timeout);
-
       if (e.key === "Enter") {
         if (buffer) handleBarcodeScan(buffer.trim());
         buffer = "";
-      } else {
+      } else if (e.key.length === 1) {
         buffer += e.key;
         timeout = setTimeout(() => (buffer = ""), 100);
       }
     };
-
     window.addEventListener("keypress", handleKeyPress);
     return () => window.removeEventListener("keypress", handleKeyPress);
-  }, [medicineOptions, supplyItems]);
+  }, [medicineOptions]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
     try {
       const payload = { ...supply, items: supplyItems };
       await createSupply(payload);
       toast.success("Supply created successfully!");
       navigate("/supplies");
     } catch (err) {
-      toast.error(err.message || "Submission failed.");
+      toast.error(
+        err?.response?.data?.message || err.message || "Submission failed."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -164,8 +151,184 @@ const AddSupply = () => {
     setSupply((prev) => ({ ...prev, invoice_date: today }));
   }, []);
 
+  // ---------- Quagga helpers ----------
+  const isSecureOrigin = () => window.isSecureContext;
+
+  const getRearCameraId = async () => {
+    await navigator.mediaDevices.getUserMedia({ video: true });
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const videos = devices.filter((d) => d.kind === "videoinput");
+    const rear =
+      videos.find((d) => /back|rear|environment/i.test(d.label || "")) ||
+      videos[videos.length - 1];
+    return rear?.deviceId;
+  };
+
+  const fixScannerDomSizing = () => {
+    const root = document.getElementById("scanner-container");
+    const video = root?.querySelector("video");
+    const canvas = root?.querySelector("canvas");
+    [video, canvas].forEach((el) => {
+      if (!el) return;
+      el.style.position = "absolute";
+      el.style.inset = "0";
+      el.style.width = "100%";
+      el.style.height = "100%";
+      el.style.objectFit = "cover";
+    });
+    if (video) {
+      video.setAttribute("playsinline", "true");
+      video.setAttribute("webkit-playsinline", "true");
+      video.muted = true;
+      video.autoplay = true;
+    }
+  };
+
+  // ---------- start / stop scanner ----------
+  const startScanner = async () => {
+    try {
+      if (!isSecureOrigin()) {
+        toast.error(
+          "Camera requires HTTPS or http://localhost. Use HTTPS or localhost."
+        );
+        setIsScanOpen(false);
+        return;
+      }
+      if (!navigator.mediaDevices?.getUserMedia) {
+        toast.error("Your browser does not support camera access.");
+        setIsScanOpen(false);
+        return;
+      }
+
+      setIsStartingScanner(true);
+      const Quagga = (await import("@ericblade/quagga2")).default;
+      quaggaRef.current = Quagga;
+
+      let deviceId = null;
+      try {
+        deviceId = await getRearCameraId();
+      } catch {
+        toast.error("Camera permission is required.");
+        setIsStartingScanner(false);
+        setIsScanOpen(false);
+        return;
+      }
+
+      await Quagga.init(
+        {
+          inputStream: {
+            type: "LiveStream",
+            constraints: deviceId
+              ? {
+                  deviceId: { exact: deviceId },
+                  aspectRatio: { ideal: 1.777 },
+                  width: { ideal: 1280 },
+                  height: { ideal: 720 },
+                }
+              : {
+                  facingMode: { ideal: "environment" },
+                  aspectRatio: { ideal: 1.777 },
+                  width: { ideal: 1280 },
+                  height: { ideal: 720 },
+                },
+            target: document.querySelector("#scanner-container"),
+            // match the frame roughly
+            area: { top: "20%", right: "8%", left: "8%", bottom: "20%" },
+          },
+          locator: { patchSize: "x-large", halfSample: true },
+          numOfWorkers:
+            navigator.hardwareConcurrency && navigator.hardwareConcurrency > 1
+              ? Math.min(4, navigator.hardwareConcurrency - 1)
+              : 2,
+          frequency: 10,
+          decoder: {
+            readers: [
+              "ean_reader",
+              "ean_8_reader",
+              "code_128_reader",
+              "code_39_reader",
+              "upc_reader",
+              "upc_e_reader",
+            ],
+          },
+          locate: true,
+        },
+        (err) => {
+          if (err) {
+            console.error(err);
+            toast.error("មិនអាចចាប់ផ្តើមកាមេរ៉ាបានទេ");
+            setIsScanOpen(false);
+            setIsStartingScanner(false);
+            return;
+          }
+          Quagga.start();
+          setIsStartingScanner(false);
+          requestAnimationFrame(fixScannerDomSizing);
+        }
+      );
+
+      // (optional) draw debug boxes
+      // quaggaRef.current.onProcessed((result) => { ... });
+
+      quaggaRef.current.onDetected((result) => {
+        const code = result?.codeResult?.code;
+        const now = Date.now();
+        if (!code) return;
+        if (
+          lastDetectedRef.current.code === code &&
+          now - lastDetectedRef.current.ts < 1000
+        ) {
+          return;
+        }
+        lastDetectedRef.current = { code, ts: now };
+        handleBarcodeScan(code);
+        stopScanner(true);
+      });
+    } catch (e) {
+      console.error(e);
+      toast.error("កំហុសកាមេរ៉ា");
+      setIsScanOpen(false);
+      setIsStartingScanner(false);
+    }
+  };
+
+  const stopScanner = (closeModal = false) => {
+    const Quagga = quaggaRef.current;
+    if (Quagga) {
+      try {
+        Quagga.offDetected();
+        Quagga.stop();
+      } catch {}
+    }
+    if (closeModal) setIsScanOpen(false);
+  };
+
+  useEffect(() => {
+    if (isScanOpen) {
+      lastDetectedRef.current = { code: "", ts: 0 };
+      startScanner();
+      return () => stopScanner(false);
+    }
+  }, [isScanOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ---------- Tailwind overlay ----------
+  const ScanOverlay = () => (
+    <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+      <div className="relative w-[84%] aspect-[5/3] rounded-[14px]">
+        {/* dim outside */}
+        <div className="absolute inset-0 rounded-[14px] shadow-[0_0_0_9999px_rgba(0,0,0,0.45)]" />
+        {/* thin border */}
+        <div className="absolute inset-0 rounded-[14px] shadow-[0_0_0_3px_rgba(255,255,255,0.92)_inset]" />
+
+        {/* moving scan line */}
+        <div className="absolute left-4 right-4 top-0 h-[2px] bg-white/90 animate-scanline" />
+      </div>
+    </div>
+  );
+
+  // ---------- UI ----------
   return (
-    <div className="shadow-lg bg-[#FBFBFB] dark:bg-slate-900 mb-14 max-w-5xl mx-auto px-4 py-6">
+    <div className="shadow-lg bg-[#FBFBFB] dark:bg-slate-900 mb-14 max-w-5xl mx-auto px-4 py-6 relative">
       <h2 className="text-lg font-bold dark:text-teal-50">
         {t("add-supply.title")}
       </h2>
@@ -223,7 +386,7 @@ const AddSupply = () => {
           {t("add-supply.SupplyItem")}
         </h3>
 
-        {/* Mobile Layout */}
+        {/* Mobile cards */}
         <div className="sm:hidden space-y-4">
           {supplyItems.map((item, index) => (
             <div
@@ -254,6 +417,7 @@ const AddSupply = () => {
                   isClearable
                 />
               </div>
+
               <div className="mb-3">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   {t("add-supply.Quantity")}
@@ -269,6 +433,7 @@ const AddSupply = () => {
                   }
                 />
               </div>
+
               <div className="mb-3">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   {t("add-supply.UnitPrice")}
@@ -284,6 +449,7 @@ const AddSupply = () => {
                   }
                 />
               </div>
+
               <div className="mb-3">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   {t("add-supply.ExpireDate")}
@@ -298,6 +464,7 @@ const AddSupply = () => {
                   }
                 />
               </div>
+
               <div className="text-right">
                 <button
                   type="button"
@@ -311,8 +478,8 @@ const AddSupply = () => {
           ))}
         </div>
 
-        {/* Table Layout for larger screens */}
-        <div className="hidden sm:block ">
+        {/* Desktop table */}
+        <div className="hidden sm:block">
           <table className="min-w-full text-sm border dark:border-gray-700 bg-white dark:bg-slate-800">
             <thead>
               <tr className="bg-gray-100 dark:bg-slate-700 text-left">
@@ -421,6 +588,66 @@ const AddSupply = () => {
           </button>
         </div>
       </form>
+
+      {/* Mobile scan FAB */}
+      <button
+        type="button"
+        onClick={() => setIsScanOpen(true)}
+        className="sm:hidden fixed bottom-6 right-6 z-[1000] rounded-full p-4 shadow-xl bg-white dark:bg-gray-800 border"
+        title="Scan barcode"
+        aria-label="Scan barcode"
+      >
+        <BsUpcScan className="w-7 h-7 text-green-600" />
+      </button>
+
+      {/* Scanner Modal */}
+      {isScanOpen && (
+        <div className="fixed inset-0 z-[1100] bg-black/70 flex items-center justify-center">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden w-11/12 max-w-md">
+            <div className="px-4 py-3 border-b dark:border-gray-700">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                  ស្កេន បាកូដ
+                </h3>
+                <button
+                  onClick={() => stopScanner(true)}
+                  className="text-gray-600 hover:text-red-500 dark:text-gray-300"
+                  aria-label="Close scanner"
+                >
+                  ✕
+                </button>
+              </div>
+              <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
+                ចង្អុលកូដបាកូដឱ្យនៅកណ្តាលប្រអប់ស្កេន ដើម្បីបន្ថែមទៅបញ្ជី។
+              </p>
+            </div>
+
+            <div className="p-3">
+              <div
+                id="scanner-container"
+                className="relative w-full h-[75vh] max-h-[520px] rounded-lg overflow-hidden"
+              >
+                {/* Quagga injects <video>/<canvas> here */}
+                <ScanOverlay />
+                {isStartingScanner && (
+                  <div className="absolute inset-0 flex items-center justify-center text-white">
+                    Opening camera…
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-end mt-3">
+                <button
+                  onClick={() => stopScanner(true)}
+                  className="px-4 py-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+                >
+                  បិទ
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

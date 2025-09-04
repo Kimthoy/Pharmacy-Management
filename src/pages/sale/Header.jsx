@@ -6,7 +6,7 @@ const Header = ({
   openRetailSaleModal,
 }) => {
   return (
-    <header className="mb-6 z-10">
+    <header className="mb-6 ">
       <div className="flex justify-between items-center   bg-white">
         <input
           type="text"
@@ -17,7 +17,7 @@ const Header = ({
           onChange={(e) => setSearchQuery(e.target.value)}
         />
 
-        <div className="flex items-center  z-10 gap-1 bg-gray-300 dark:bg-gray-800 border  p-1 ">
+        <div className="flex items-center  gap-1 bg-gray-300 dark:bg-gray-800 border  p-1 ">
           <button
             onClick={() => setCompoundModeType("regular")}
             className={`px-4 py-2 text-sm transition ${

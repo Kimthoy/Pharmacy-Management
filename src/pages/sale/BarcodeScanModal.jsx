@@ -79,7 +79,7 @@ export default function BarcodeScanModal({ isOpen, onClose, onDetected }) {
   return (
     <>
       {/* Fullscreen underlay with video */}
-      <div className="fixed inset-0 z-50 bg-black">
+      <div className="fixed inset-0 z-[997] bg-black">
         <video
           ref={videoRef}
           className="absolute inset-0 w-full h-full object-cover"

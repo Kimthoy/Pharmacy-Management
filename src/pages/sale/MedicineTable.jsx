@@ -227,8 +227,8 @@ const MedicineTable = ({
   if (loading) return <p className="text-gray-500">កំពុងទាញទិន្នន័យ...</p>;
 
   return (
-    <div className="w-full mb-14 z-10 overflow-x-auto">
-      <table className="sm:w-full table-auto border-collapse">
+    <div className="w-full z-[994] mb-14  overflow-x-auto bg-white">
+      <table className="sm:w-full table-auto border-collapse ">
         <thead>
           <tr className="bg-gray-100 dark:bg-gray-700">
             <th className="border border-gray-300 dark:border-gray-600 p-2  dark:text-gray-300 text-center">
@@ -285,7 +285,7 @@ const MedicineTable = ({
 
       {/* ---------- Quick Sell Modal (Qty & Price) ---------- */}
       {showBuy && buyPkg && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999]">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center ">
           <div className="bg-white rounded-lg w-full sm:max-w-md max-w-sm shadow-xl">
             <div className="p-5 border-b">
               <h3 className="text-xl font-semibold">កំណត់ចំនួន និងតម្លៃ</h3>
@@ -354,7 +354,7 @@ const MedicineTable = ({
       {/* ---------- Edit Modal ---------- */}
       {showEdit && (
         <div className="fixed  inset-0 sm:mt-20 mt-0 bg-black/40 flex items-center justify-center ">
-          <div className="bg-white rounded-lg h-[90%] w-[95%] overflow-y-scroll sm:max-w-xl max-w-lg shadow-xl">
+          <div className="bg-white z-[996]  rounded-lg sm:h-full h-[90%] w-[95%] overflow-y-scroll sm:max-w-xl max-w-lg shadow-xl">
             <div className="p-5 border-b">
               <h3 className="text-xl font-semibold">កែប្រែកញ្ចប់</h3>
             </div>
@@ -482,7 +482,7 @@ const MedicineTable = ({
               </div>
             </div>
 
-            <div className="p-5 border-t flex justify-end gap-2">
+            <div className="p-5 border-t flex justify-start gap-2">
               <button
                 className="px-4 py-2 text-red-500 rounded bg-gray-300"
                 onClick={closeEdit}

@@ -10,7 +10,7 @@ const ProductCard = ({ product, handleAddToCartClick, displayPrice }) => {
   const exchangeRate = 4100;
 
   return (
-    <div className="relative dark:bg-gray-800    rounded-lg shadow-lg p-3 w-full cursor-pointer h-full flex flex-col justify-between">
+    <div className="relative dark:bg-gray-800  bg-white  rounded-lg shadow-lg p-3 w-full cursor-pointer h-full flex flex-col justify-between">
       <div onClick={() => handleAddToCartClick(product)}>
         <div className="relative group">
           <img

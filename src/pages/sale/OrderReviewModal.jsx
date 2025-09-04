@@ -188,7 +188,7 @@ export default function OrderReviewModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 sm:mb-0  z-[200] flex items-center justify-center bg-black bg-opacity-40">
+    <div className="fixed inset-0 sm:mb-0  z-[998] flex items-center justify-center bg-black bg-opacity-40">
       <div className="bg-white dark:bg-gray-800 z-10 p-5 rounded-lg max-w-md w-full font-khmer">
         <h2 className="text-xl font-bold mb-4">បញ្ជាក់ការបញ្ជាទិញ</h2>
 

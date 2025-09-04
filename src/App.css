@@ -37,3 +37,29 @@
   }
 }
 
+/* Let Quagga's <video>/<canvas> fill the box */
+#scanner-container {
+  position: relative;
+  background: #000;
+}
+#scanner-container video,
+#scanner-container canvas {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+
+/* Moving scan line */
+@keyframes sweepY {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(calc(100% - 2px));
+  }
+}
+.animate-scanline {
+  animation: sweepY 2.2s linear infinite alternate;
+}

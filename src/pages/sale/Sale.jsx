@@ -303,7 +303,7 @@ const Sale = () => {
     <div className="flex h-[426px] bg-white dark:bg-gray-900 font-khmer relative">
       <div className="flex-1 flex flex-col md:flex-row">
         <div className="flex-1 overflow-y-scroll h-full sm:p-6">
-          <div className="sm:sticky sticky sm:-top-6 -top-4">
+          <div className="sm:sticky sticky sm:-top-6 -top-0 ">
             <Header
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
@@ -349,17 +349,20 @@ const Sale = () => {
         {/* Floating buttons */}
         {!isCartOpen && (
           <button
-            className="sm:hidden fixed flex bottom-4 right-0 mb-14 bg-green-600 text-white p-2 rounded-md shadow-lg "
+            className="z-[995] sm:hidden  fixed flex bottom-2 right-0 mb-14 bg-green-700 text-white p-2 rounded-full shadow-lg "
             onClick={() => setCartOpen(true)}
           >
-            <HiMiniShoppingCart className="w-6 h-6" /> ({totalQuantity})
+            <HiMiniShoppingCart className="w-7 h-7 " />{" "}
+            <span className="absolute top-[19%] left-[36%] text-green-700">
+              {totalQuantity}
+            </span>
           </button>
         )}
         <button
-          className="sm:hidden fixed bottom-36 right-0 bg-white dark:bg-gray-800 border shadow-lg rounded-full p-3"
+          className="z-[995] sm:hidden fixed bottom-28 right-0 bg-green-700 dark:bg-gray-800 border shadow-lg rounded-full p-2"
           onClick={() => setIsScanOpen(true)}
         >
-          <BsUpcScan className="w-6 h-6 text-green-600" />
+          <BsUpcScan className="w-7 h-7 text-white" />
         </button>
       </div>
 

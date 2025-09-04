@@ -161,7 +161,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
       {/* Toggle button (mobile) */}
       <button
         ref={toggleBtnRef}
-        className="md:hidden fixed top-2 right-[72px] z-[10] sm:p-2 p-2 bg-green-500 text-white rounded-md"
+        className="md:hidden fixed top-2 right-[72px]  sm:p-2 p-2 bg-green-500 text-white rounded-md"
         onClick={toggleSidebar}
         aria-label={
           isOpen
@@ -175,7 +175,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
       {/* Dimmed overlay; also closes on click */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-[1001] md:hidden"
           onClick={toggleSidebar}
         />
       )}
@@ -183,7 +183,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
       {/* Sidebar */}
       <div
         ref={sidebarRef}
-        className={`h-screen flex-shrink-0 bg-green-600 dark:bg-gray-900 dark:shadow-gray-800 transition-all duration-300 fixed z-[200] md:static
+        className={`h-screen z-[1001] flex-shrink-0 bg-green-600 dark:bg-gray-900 dark:shadow-gray-800 transition-all duration-300 fixed  md:static
         ${isOpen ? "w-52" : "w-0 md:w-[80px]"} md:hover:w-64
         ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
         onMouseEnter={() => window.innerWidth >= 768 && setIsOpen(true)}
