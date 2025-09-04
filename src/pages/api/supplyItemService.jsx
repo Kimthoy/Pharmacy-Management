@@ -18,6 +18,10 @@ const extractItemsArray = (payload) => {
 
   return [];
 };
+const api = axios.create({
+  baseURL: "http://localhost:8000/api", // or process.env / import.meta.env
+  headers: { Accept: "application/json" },
+});
 
 // Fetch all supply items
 export const getAllSupplyItems = async () => {
@@ -34,44 +38,54 @@ export const getAllSupplyItems = async () => {
     );
   }
 };
+api.interceptors.request.use((config) => {
+  const token =
+    (typeof localStorage !== "undefined" && localStorage.getItem("token")) ||
+    (typeof sessionStorage !== "undefined" && sessionStorage.getItem("token"));
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
-// Fetch expiring soon items (accepts params: months & perPage)
-// services/supplyItems.js
-// services/supplyItemService.js (or wherever this lives)
+// handle 401 globally
+api.interceptors.response.use(
+  (res) => res,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.replace("/login");
+    }
+    return Promise.reject(error);
+  }
+);
+
+// --- service function ---
 export const getExpiringSoonItems = async ({
   months = 2,
   perPage = 0,
-  inStock = true,        // ⬅️ new param (default: only items still in stock)
+  inStock = true,
 } = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/supply-items/expiring-soon`, {
-      headers: getAuthHeader(),
-      params: {
-        months,
-        per_page: perPage,
-        in_stock: inStock ? 1 : 0,   // ⬅️ tell backend to hide zero-stock
-      },
+    const { data } = await api.get("/supply-items/expiring-soon", {
+      params: { months, per_page: perPage, in_stock: inStock ? 1 : 0 },
     });
 
-    // Normalize any shape: [] | {data: []} | {data: {data: []}}
-    const items =
-      Array.isArray(response.data)
-        ? response.data
-        : Array.isArray(response.data?.data)
-        ? response.data.data
-        : Array.isArray(response.data?.data?.data)
-        ? response.data.data.data
-        : [];
+    const items = Array.isArray(data)
+      ? data
+      : Array.isArray(data?.data)
+      ? data.data
+      : Array.isArray(data?.data?.data)
+      ? data.data.data
+      : [];
 
-    // Extra guard in case the server isn’t updated yet
-    return inStock
-      ? items.filter((x) => (x?.supply_quantity ?? 0) > 0)
-      : items;
+    return inStock ? items.filter((x) => (x?.supply_quantity ?? 0) > 0) : items;
   } catch (error) {
-    throw new Error(error?.response?.data?.message || error.message);
+    console.error("❌ getExpiringSoonItems failed:", error);
+    throw error;
   }
 };
-
 
 // Client-side fallback: filter expired items from all items
 export const getExpiredItemsClientSide = async () => {

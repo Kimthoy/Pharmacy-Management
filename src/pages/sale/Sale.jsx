@@ -303,7 +303,7 @@ const Sale = () => {
     <div className="flex h-[426px] bg-white dark:bg-gray-900 font-khmer relative">
       <div className="flex-1 flex flex-col md:flex-row">
         <div className="flex-1 overflow-y-scroll h-full sm:p-6">
-          <div className="sm:sticky sticky sm:-top-6 -top-0 sm:z-30 z-30">
+          <div className="sm:sticky sticky sm:-top-6 -top-4">
             <Header
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
@@ -319,15 +319,17 @@ const Sale = () => {
             />
           </div>
 
-          <ProductList
-            products={filteredProducts}
-            cart={cart}
-            handleAddToCartClick={handleAddToCartClick}
-            displayPrice={displayPrice}
-            showCompoundMedicines={isCompoundMode}
-            closeCart={() => setCartOpen(false)}
-            forceHideCart={(v) => setForceHideCart(Boolean(v))}
-          />
+          <div className="z-50 sm:z-50">
+            <ProductList
+              products={filteredProducts}
+              cart={cart}
+              handleAddToCartClick={handleAddToCartClick}
+              displayPrice={displayPrice}
+              showCompoundMedicines={isCompoundMode}
+              closeCart={() => setCartOpen(false)}
+              forceHideCart={(v) => setForceHideCart(Boolean(v))}
+            />
+          </div>
         </div>
 
         <div>
@@ -347,14 +349,14 @@ const Sale = () => {
         {/* Floating buttons */}
         {!isCartOpen && (
           <button
-            className="sm:hidden fixed flex bottom-4 right-0 mb-14 bg-green-600 text-white p-2 rounded-md shadow-lg z-[150]"
+            className="sm:hidden fixed flex bottom-4 right-0 mb-14 bg-green-600 text-white p-2 rounded-md shadow-lg "
             onClick={() => setCartOpen(true)}
           >
             <HiMiniShoppingCart className="w-6 h-6" /> ({totalQuantity})
           </button>
         )}
         <button
-          className="sm:hidden fixed bottom-36 right-0 z-[200] bg-white dark:bg-gray-800 border shadow-lg rounded-full p-3"
+          className="sm:hidden fixed bottom-36 right-0 bg-white dark:bg-gray-800 border shadow-lg rounded-full p-3"
           onClick={() => setIsScanOpen(true)}
         >
           <BsUpcScan className="w-6 h-6 text-green-600" />

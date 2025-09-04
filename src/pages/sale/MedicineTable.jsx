@@ -353,8 +353,8 @@ const MedicineTable = ({
 
       {/* ---------- Edit Modal ---------- */}
       {showEdit && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[2000]">
-          <div className="bg-white rounded-lg w-full sm:max-w-xl max-w-lg shadow-xl">
+        <div className="fixed  inset-0 sm:mt-20 mt-0 bg-black/40 flex items-center justify-center ">
+          <div className="bg-white rounded-lg h-[90%] w-[95%] overflow-y-scroll sm:max-w-xl max-w-lg shadow-xl">
             <div className="p-5 border-b">
               <h3 className="text-xl font-semibold">កែប្រែកញ្ចប់</h3>
             </div>

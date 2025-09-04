@@ -14,28 +14,28 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 const weekdays = [
-  "អាទិត្យ", // Sunday
-  "ចន្ទ", // Monday
-  "អង្គារ", // Tuesday
-  "ពុធ", // Wednesday
-  "ព្រហស្បតិ៍", // Thursday
-  "សុក្រ", // Friday
-  "សៅរ៍", // Saturday
+  "អាទិត្យ",
+  "ចន្ទ",
+  "អង្គារ",
+  "ពុធ",
+  "ព្រហស្បតិ៍",
+  "សុក្រ",
+  "សៅរ៍",
 ];
 
 const months = [
-  "មករា", // January
-  "កុម្ភៈ", // February
-  "មីនា", // March
-  "មេសា", // April
-  "ឧសភា", // May
-  "មិថុនា", // June
-  "កក្កដា", // July
-  "សីហា", // August
-  "កញ្ញា", // September
-  "តុលា", // October
-  "វិច្ឆិកា", // November
-  "ធ្នូ", // December
+  "មករា",
+  "កុម្ភៈ",
+  "មីនា",
+  "មេសា",
+  "ឧសភា",
+  "មិថុនា",
+  "កក្កដា",
+  "សីហា",
+  "កញ្ញា",
+  "តុលា",
+  "វិច្ឆិកា",
+  "ធ្នូ",
 ];
 
 function getKhmerDateString(now) {
@@ -75,7 +75,7 @@ const Login = () => {
       setCurrentDate(getKhmerDateString(now));
     };
 
-    updateDateTime(); // run once immediately
+    updateDateTime();
     const timer = setInterval(updateDateTime, 1000);
 
     return () => clearInterval(timer);
@@ -97,7 +97,7 @@ const Login = () => {
       });
 
       if (!data?.access_token) {
-        throw new Error("មិនមាន Token");
+        throw new Error("មិនអាចចូលបានទេ!");
       }
 
       const userData = {
@@ -121,9 +121,19 @@ const Login = () => {
       clear.removeItem("token");
       clear.removeItem("user");
 
+      // Save to context
       login(userData, token, rememberMe);
 
-      toast.success("ចូលបានដោយជោគជ័យ!");
+      toast.success("ចូលបាន ដោយជោគជ័យ!");
+
+      // ✅ Navigate based on role
+      if (userData.role === "cashier") {
+        navigate("/saledashboard");
+      } else if (userData.role === "admin") {
+        navigate("/dashboard");
+      } else {
+        navigate("/"); // fallback
+      }
     } catch (err) {
       const errorMsg =
         err.response?.data?.message === "Unauthenticated"

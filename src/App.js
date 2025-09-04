@@ -16,12 +16,10 @@ import { AuthProvider, AuthContext } from "./context/AuthContext";
 // Lazy pages
 const ProfileDashboard = lazy(() => import("./pages/profile/ProfileDashboard"));
 const SettingPage = lazy(() => import("./pages/setting/SettingsPage"));
-
 const SettingPageForm = lazy(() =>
   import("./pages/setting/SystemSettingsForm")
 );
 const ExpireSoon = lazy(() => import("./pages/dashboard/ExpiringSoonList"));
-
 const AddSupply = lazy(() => import("./pages/stock/AddSupply"));
 const Login = lazy(() => import("./pages/auth/Login"));
 const CustomerList = lazy(() => import("./pages/customer/ListCustomer"));
@@ -46,7 +44,6 @@ const AddWastageReturn = lazy(() => import("./pages/return/AddWastageReturn"));
 const SaleDashboard = lazy(() => import("./pages/sale/Sale"));
 const RetailStock = lazy(() => import("./pages/stock/RetailStock"));
 const RetailMedicine = lazy(() => import("./pages/retail/RetailProduct"));
-
 const AddManufacturerReturn = lazy(() =>
   import("./pages/return/AddManufacturerReturn")
 );
@@ -72,9 +69,51 @@ function RequireAuth() {
   const { token } = useContext(AuthContext);
   return token ? <Outlet /> : <Navigate to="/login" replace />;
 }
+
 function PublicOnly({ children }) {
   const { token } = useContext(AuthContext);
   return token ? <Navigate to="/" replace /> : children;
+}
+
+/** Wrapper rendered INSIDE providers so it can read AuthContext */
+function ChromeWrapper({ children, selectedPage, setSelectedPage }) {
+  const location = useLocation();
+  const { user } = useContext(AuthContext);
+
+  // hide all chrome on these routes (matches your previous behavior)
+  const HIDE_CHROME_ROUTES = ["/login", "/register", "/profiledashboard"];
+  const hideChrome = HIDE_CHROME_ROUTES.includes(location.pathname);
+
+  // hide ONLY the Sidebar if user is cashier
+  const isCashier = user?.role === "cashier";
+  const hideSidebar = hideChrome || isCashier;
+
+  return (
+    <div className="flex h-screen font-notoserifkhmer bg-white dark:bg-gray-900">
+      {!hideSidebar && (
+        <Sidebar
+          setSelectedPage={setSelectedPage}
+          selectedPage={selectedPage}
+        />
+      )}
+      <div className="flex-1 flex-col flex">
+        {!hideChrome && (
+          <TopBar
+            onLanguageChange={(lang) => {
+              localStorage.setItem("selectedLanguage", lang);
+            }}
+          />
+        )}
+
+        <div className="flex-1 overflow-y-auto p-4 bg-white dark:bg-gray-900">
+          {children}
+        </div>
+
+        {!hideChrome && <Footer />}
+        <ToastContainer position="top-left" autoClose={1000} />
+      </div>
+    </div>
+  );
 }
 
 const App = () => {
@@ -105,9 +144,6 @@ const App = () => {
     loadContent();
   }, []);
 
-  const HIDE_CHROME_ROUTES = ["/login", "/register", "/profiledashboard"];
-  const hideChrome = HIDE_CHROME_ROUTES.includes(location.pathname);
-
   return isLoading ? (
     <div className="flex items-center justify-center h-screen bg-white dark:bg-gray-900">
       <Loader />
@@ -116,150 +152,111 @@ const App = () => {
     <ThemeProvider>
       <AuthProvider>
         <LanguageProvider>
-          <div className="flex  h-screen font-notoserifkhmer bg-white dark:bg-gray-900">
-            {!hideChrome && (
-              <Sidebar
-                setSelectedPage={setSelectedPage}
-                selectedPage={selectedPage}
-              />
-            )}
-            <div className="flex-1 flex-col flex">
-              {!hideChrome && (
-                <TopBar
-                  onLanguageChange={(lang) => {
-                    setLangCode(lang);
-                    localStorage.setItem("selectedLanguage", lang);
-                  }}
+          <ChromeWrapper
+            selectedPage={selectedPage}
+            setSelectedPage={setSelectedPage}
+          >
+            <Suspense fallback={<Loader />}>
+              <Routes>
+                {/* Public */}
+                <Route
+                  path="/login"
+                  element={
+                    <PublicOnly>
+                      <Login />
+                    </PublicOnly>
+                  }
                 />
-              )}
+                <Route
+                  path="/register"
+                  element={
+                    <PublicOnly>
+                      <Register />
+                    </PublicOnly>
+                  }
+                />
 
-              <div className="flex-1 overflow-y-auto p-4 bg-white dark:bg-gray-900">
-                <Suspense fallback={<Loader />}>
-                  <Routes>
-                    <Route
-                      path="/login"
-                      element={
-                        <PublicOnly>
-                          <Login />
-                        </PublicOnly>
-                      }
-                    />
-                    <Route
-                      path="/register"
-                      element={
-                        <PublicOnly>
-                          <Register />
-                        </PublicOnly>
-                      }
-                    />
+                {/* Protected */}
+                <Route element={<RequireAuth />}>
+                  <Route path="/" element={<Dashboard langCode={langCode} />} />
+                  <Route path="/customerlist" element={<CustomerList />} />
+                  <Route path="/insertcustomer" element={<InsertCustomer />} />
+                  <Route
+                    path="/manufacturerlist"
+                    element={<ManufacturerList />}
+                  />
+                  <Route path="/supplies" element={<Supplies />} />
+                  <Route path="/setting-page" element={<SettingPage />} />
+                  <Route
+                    path="/setting-page-form"
+                    element={<SettingPageForm />}
+                  />
+                  <Route path="/supplyitems" element={<SupplyItems />} />
+                  <Route path="/reports" element={<SalesReport />} />
+                  <Route path="/salereport" element={<SellReport />} />
+                  <Route path="/purchasreport" element={<PurchaseReport />} />
+                  <Route path="/stockreport" element={<StockReport />} />
+                  <Route path="/expensepage" element={<ExpensePage />} />
+                  <Route path="/incomepage" element={<IncomePage />} />
+                  <Route path="/stocklist" element={<StockList />} />
+                  <Route path="/sale-retail" element={<SaleRetail />} />
+                  <Route path="/retail-product" element={<RetailMedicine />} />
+                  <Route
+                    path="/invoicedetail"
+                    element={<InvoiceDetailsPage />}
+                  />
+                  <Route path="/invoicelist" element={<InvoiceListPage />} />
+                  <Route path="/aboutuser" element={<AboutUser />} />
+                  <Route
+                    path="/addmedicinepage/:id?"
+                    element={<AddMedicine />}
+                  />
+                  <Route path="/listofmedicine" element={<MedicineList />} />
+                  <Route path="/returns-table" element={<ReturnsTable />} />
+                  <Route
+                    path="/medicinedetail/:id"
+                    element={<MedicineDetail />}
+                  />
+                  <Route path="/categoies" element={<Category />} />
+                  <Route path="/units" element={<Unit />} />
+                  <Route
+                    path="/manufacturerreturnlist"
+                    element={<ManufacturerReturnList />}
+                  />
+                  <Route
+                    path="/addwastagereturn"
+                    element={<AddWastageReturn />}
+                  />
+                  <Route
+                    path="/addmanufacturerreturn"
+                    element={<AddManufacturerReturn />}
+                  />
+                  <Route
+                    path="/wastagereturnlist"
+                    element={<WastageReturnList />}
+                  />
+                  <Route path="/listofstaff" element={<StaffList />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/expire-soon" element={<ExpireSoon />} />
+                  <Route
+                    path="/profiledashboard"
+                    element={<ProfileDashboard />}
+                  />
 
-                    <Route element={<RequireAuth />}>
-                      <Route
-                        path="/"
-                        element={<Dashboard langCode={langCode} />}
-                      />
-                      <Route path="/customerlist" element={<CustomerList />} />
-                      <Route
-                        path="/insertcustomer"
-                        element={<InsertCustomer />}
-                      />
-                      <Route
-                        path="/manufacturerlist"
-                        element={<ManufacturerList />}
-                      />
-                      <Route path="/supplies" element={<Supplies />} />
-                      <Route path="/setting-page" element={<SettingPage />} />
+                  {/* Your sale page (Sidebar will auto-hide for cashiers) */}
+                  <Route path="/saledashboard" element={<SaleDashboard />} />
 
-                      <Route
-                        path="/setting-page-form"
-                        element={<SettingPageForm />}
-                      />
-                      <Route path="/supplyitems" element={<SupplyItems />} />
+                  <Route path="/samplestock" element={<SampleStock />} />
+                  <Route path="/addstock" element={<AddStock />} />
+                  <Route path="/retailstock" element={<RetailStock />} />
+                  <Route path="/add-supply" element={<AddSupply />} />
+                </Route>
 
-                      <Route path="/reports" element={<SalesReport />} />
-                      <Route path="/salereport" element={<SellReport />} />
-                      <Route
-                        path="/purchasreport"
-                        element={<PurchaseReport />}
-                      />
-                      <Route path="/stockreport" element={<StockReport />} />
-                      <Route path="/expensepage" element={<ExpensePage />} />
-                      <Route path="/incomepage" element={<IncomePage />} />
-                      <Route path="/stocklist" element={<StockList />} />
-                      <Route path="/sale-retail" element={<SaleRetail />} />
-
-                      <Route
-                        path="/retail-product"
-                        element={<RetailMedicine />}
-                      />
-                      <Route
-                        path="/invoicedetail"
-                        element={<InvoiceDetailsPage />}
-                      />
-                      <Route
-                        path="/invoicelist"
-                        element={<InvoiceListPage />}
-                      />
-                      <Route path="/aboutuser" element={<AboutUser />} />
-                      <Route
-                        path="/addmedicinepage/:id?"
-                        element={<AddMedicine />}
-                      />
-                      <Route
-                        path="/listofmedicine"
-                        element={<MedicineList />}
-                      />
-                      <Route path="/returns-table" element={<ReturnsTable />} />
-                      <Route
-                        path="/medicinedetail/:id"
-                        element={<MedicineDetail />}
-                      />
-                      <Route path="/categoies" element={<Category />} />
-                      <Route path="/units" element={<Unit />} />
-
-                      <Route
-                        path="/manufacturerreturnlist"
-                        element={<ManufacturerReturnList />}
-                      />
-                      <Route
-                        path="/addwastagereturn"
-                        element={<AddWastageReturn />}
-                      />
-                      <Route
-                        path="/addmanufacturerreturn"
-                        element={<AddManufacturerReturn />}
-                      />
-                      <Route
-                        path="/wastagereturnlist"
-                        element={<WastageReturnList />}
-                      />
-                      <Route path="/listofstaff" element={<StaffList />} />
-                      <Route path="/profile" element={<Profile />} />
-                      <Route path="/expire-soon" element={<ExpireSoon />} />
-
-                      <Route
-                        path="/profiledashboard"
-                        element={<ProfileDashboard />}
-                      />
-                      <Route
-                        path="/saledashboard"
-                        element={<SaleDashboard />}
-                      />
-                      <Route path="/samplestock" element={<SampleStock />} />
-                      <Route path="/addstock" element={<AddStock />} />
-                      <Route path="/retailstock" element={<RetailStock />} />
-                      <Route path="/add-supply" element={<AddSupply />} />
-                    </Route>
-
-                    <Route path="*" element={<AuthAwareRedirect />} />
-                  </Routes>
-                </Suspense>
-              </div>
-
-              {!hideChrome && <Footer />}
-              <ToastContainer position="top-left" autoClose={1000} />
-            </div>
-          </div>
+                {/* Catch-all */}
+                <Route path="*" element={<AuthAwareRedirect />} />
+              </Routes>
+            </Suspense>
+          </ChromeWrapper>
         </LanguageProvider>
       </AuthProvider>
     </ThemeProvider>

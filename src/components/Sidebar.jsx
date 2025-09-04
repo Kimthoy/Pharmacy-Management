@@ -161,7 +161,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
       {/* Toggle button (mobile) */}
       <button
         ref={toggleBtnRef}
-        className="md:hidden fixed top-3 left-4 z-[60] sm:p-2 p-1 bg-green-500 text-white rounded-md"
+        className="md:hidden fixed top-2 right-[72px] z-[10] sm:p-2 p-2 bg-green-500 text-white rounded-md"
         onClick={toggleSidebar}
         aria-label={
           isOpen
@@ -215,7 +215,7 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
                           handlePageSelection(name, path);
                         }
                       }}
-                      className={`group flex items-center justify-between w-full px-4 py-2 mt-1 text-md rounded-lg transition-all duration-200
+                      className={`group flex items-center justify-between w-full px-2 py-2 mt-1 text-md rounded-lg transition-all duration-200
                         ${
                           isParentActive
                             ? "bg-white text-green-700 dark:bg-green-600 dark:text-white"

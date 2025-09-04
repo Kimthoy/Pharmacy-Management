@@ -233,7 +233,6 @@ const TopBar = ({ onSearch = () => {} }) => {
   const notificationDropdownRef = useRef(null);
   const mobileDropdownRef = useRef(null);
 
- 
   const notifications = [];
 
   // 2) Expiring soon (fetch + badge)
@@ -375,7 +374,7 @@ const TopBar = ({ onSearch = () => {} }) => {
   const openProfileDashboard = () => navigate("/profiledashboard");
 
   return (
-    <div className="bg-white dark:bg-gray-900 z-50 sm:h-20 h-16 flex flex-col sm:flex-row items-center justify-between sm:shadow-sm shadow-lg dark:shadow-gray-800">
+    <div className="bg-white dark:bg-gray-900 sm:h-20 h-16 flex flex-col sm:flex-row items-center justify-between sm:shadow-sm shadow-lg dark:shadow-gray-800">
       <button
         className="sm:hidden mr-6 bg-gray-200 absolute right-0 mt-2 p-2 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 transition dark:text-white dark:bg-slate-700"
         onClick={openProfileDashboard}
@@ -410,10 +409,18 @@ const TopBar = ({ onSearch = () => {} }) => {
       )}
 
       <div className="sm:flex flex justify-center items-center w-full sm:mt-1 mt-1">
-        <img src="/logo.png" alt="Logo" className="rounded sm:w-16 w-12 ml-6" />
+        <img
+          src="/logo.png"
+          alt="Logo"
+          className=" sm:ml-0 ml-2 rounded sm:w-16 w-12 "
+        />
         <h1 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-gray-200 animate-color-cycle">
           {t("navigation.title", { username: "Panharith" })}
         </h1>
+        <div className="w-60 ml-12 text-sm font-medium text-gray-700 dark:text-gray-200 leading-tight ">
+          <div>{timeString}</div>
+          <div className="text-xs">{dateString}</div>
+        </div>
 
         <div className="ml-5 sm:flex hidden">
           <input
@@ -427,12 +434,7 @@ const TopBar = ({ onSearch = () => {} }) => {
         </div>
       </div>
 
-      <div className="w-40 mr-5 text-right text-sm font-medium text-gray-700 dark:text-gray-200 leading-tight hidden sm:block">
-        <div>{timeString}</div>
-        <div className="text-xs">{dateString}</div>
-      </div>
-
-      <div className="flex items-center space-x-3 mt-4 sm:mt-0">
+      <div className=" items-center space-x-3 mt-4 sm:flex hidden">
         <div className="relative" ref={messageDropdownRef}>
           <button
             onClick={() => setIsMessageDropdownOpen(!isMessageDropdownOpen)}
