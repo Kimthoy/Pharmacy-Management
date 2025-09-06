@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getReturns } from "../api/manuReturnService";
 
 const asArray = (p) =>
@@ -21,16 +21,33 @@ const fmtDate = (v) => {
   });
 };
 
+// helpers for filtering/sorting
+const rowDateValue = (r) => {
+  const v = r?.returned_at || r?.created_at;
+  const ts = Date.parse(v || "");
+  return Number.isFinite(ts) ? ts : null;
+};
+
 export default function ReturnsTable() {
   const [rows, setRows] = useState([]);
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(true);
+
+  // NEW: filters
+  const [filters, setFilters] = useState({
+    search: "",
+    startDate: "", // yyyy-mm-dd
+    endDate: "", // yyyy-mm-dd
+    sortBy: "date", // date | name | qty
+    sortDir: "desc", // asc | desc
+  });
 
   const load = async () => {
     try {
       setLoading(true);
       const list = await getReturns();
       setRows(asArray(list));
+      setErr("");
     } catch (e) {
       setErr(e.message || "Failed to load returns");
     } finally {
@@ -41,6 +58,66 @@ export default function ReturnsTable() {
   useEffect(() => {
     load();
   }, []);
+
+  // Build filtered + sorted view
+  const filteredSorted = useMemo(() => {
+    let out = rows;
+
+    // search by medicine name
+    if (filters.search.trim()) {
+      const q = filters.search.trim().toLowerCase();
+      out = out.filter((r) => {
+        const name = (r?.medicine?.medicine_name || r?.medicine?.name || "")
+          .toString()
+          .toLowerCase();
+        return name.includes(q);
+      });
+    }
+
+    // date range filter
+    if (filters.startDate) {
+      const startTs = Date.parse(filters.startDate + "T00:00:00");
+      out = out.filter((r) => {
+        const ts = rowDateValue(r);
+        return ts == null ? false : ts >= startTs;
+      });
+    }
+    if (filters.endDate) {
+      // include whole end day
+      const endTs = Date.parse(filters.endDate + "T23:59:59.999");
+      out = out.filter((r) => {
+        const ts = rowDateValue(r);
+        return ts == null ? false : ts <= endTs;
+      });
+    }
+
+    // sorting
+    const dir = filters.sortDir === "desc" ? -1 : 1;
+    const sortKey = filters.sortBy;
+
+    const getKey = (r) => {
+      switch (sortKey) {
+        case "name":
+          return (r?.medicine?.medicine_name || r?.medicine?.name || "")
+            .toString()
+            .toLowerCase();
+        case "qty":
+          return Number(r?.quantity ?? 0);
+        case "date":
+        default:
+          return rowDateValue(r) ?? 0;
+      }
+    };
+
+    return [...out].sort((a, b) => {
+      const A = getKey(a);
+      const B = getKey(b);
+      if (sortKey === "name") {
+        return String(A).localeCompare(String(B)) * dir;
+      }
+      return (Number(A) - Number(B)) * dir;
+    });
+  }, [rows, filters]);
 
   if (loading) return <div className="p-4 text-gray-500">Loading returns…</div>;
   if (err) return <div className="p-4 text-red-600">{err}</div>;
@@ -59,18 +136,74 @@ export default function ReturnsTable() {
         <h3 className="text-base sm:text-lg font-bold">
           Returns to Manufacturer
         </h3>
-        <button
-          onClick={load}
-          className="self-start sm:self-auto px-3 py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white"
-          aria-label="Refresh returns list"
-        >
-          Refresh
-        </button>
+        <div className="flex flex-wrap gap-2">
+          {/* FILTER BAR */}
+          <input
+            type="text"
+            placeholder="Search medicine…"
+            className="border rounded px-2 py-1"
+            value={filters.search}
+            onChange={(e) =>
+              setFilters((f) => ({ ...f, search: e.target.value }))
+            }
+          />
+          <input
+            type="date"
+            className="border rounded px-2 py-1"
+            value={filters.startDate}
+            onChange={(e) =>
+              setFilters((f) => ({ ...f, startDate: e.target.value }))
+            }
+          />
+          <input
+            type="date"
+            className="border rounded px-2 py-1"
+            value={filters.endDate}
+            onChange={(e) =>
+              setFilters((f) => ({ ...f, endDate: e.target.value }))
+            }
+          />
+          <select
+            className="border rounded px-2 py-1"
+            value={filters.sortBy}
+            onChange={(e) =>
+              setFilters((f) => ({ ...f, sortBy: e.target.value }))
+            }
+          >
+            <option value="date">Date</option>
+            <option value="name">Name</option>
+            <option value="qty">Qty</option>
+          </select>
+          <select
+            className="border rounded px-2 py-1"
+            value={filters.sortDir}
+            onChange={(e) =>
+              setFilters((f) => ({ ...f, sortDir: e.target.value }))
+            }
+          >
+            <option value="asc">Asc</option>
+            <option value="desc">Desc</option>
+          </select>
+          <button
+            onClick={() =>
+              setFilters({
+                search: "",
+                startDate: "",
+                endDate: "",
+                sortBy: "date",
+                sortDir: "desc",
+              })
+            }
+            className="px-3 py-1 rounded border"
+          >
+            Clear
+          </button>
+        </div>
       </div>
 
       {/* Mobile: card list */}
       <ul className="md:hidden space-y-3">
-        {rows.map((r) => {
+        {filteredSorted.map((r) => {
           const date = fmtDate(r.returned_at || r.created_at);
           const med = r?.medicine?.medicine_name || r?.medicine?.name || "—";
           const mfr = r?.supplier?.name || "—";
@@ -128,7 +261,7 @@ export default function ReturnsTable() {
               </tr>
             </thead>
             <tbody>
-              {rows.map((r) => (
+              {filteredSorted.map((r) => (
                 <tr
                   key={r.id}
                   className="border-b border-gray-200 dark:border-gray-700"

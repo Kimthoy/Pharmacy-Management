@@ -86,9 +86,6 @@ export const updateMedicine = async (id, data) => {
     appendIfPresent(fd, "weight", data.weight);
     appendIfPresent(fd, "barcode", data.barcode);
     appendIfPresent(fd, "medicine_detail", data.medicine_detail);
-    appendIfPresent(fd, "manufacturer", data.manufacturer);
-    appendIfPresent(fd, "origin", data.origin);
-    appendIfPresent(fd, "purchase", data.purchase);
     appendIfPresent(fd, "quantity", data.quantity);
 
     (data.category_ids ?? []).forEach((catId) => {

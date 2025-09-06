@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { getAllStocks } from "../api/stockService";
 import { useTranslation } from "../../hooks/useTranslation";
 import { ToastContainer, toast } from "react-toastify";
@@ -7,7 +7,7 @@ import retailStockService from "../api/retailStockService";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const AUTO_REFRESH_MS = 0; // polling off
-const NEW_WINDOW_HOURS = 48; // <<< 2 days
+const NEW_WINDOW_HOURS = 48; // 2 days
 
 const StockList = () => {
   const [transferModalOpen, setTransferModalOpen] = useState(false);
@@ -24,6 +24,13 @@ const StockList = () => {
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [highlightedId, setHighlightedId] = useState(null);
+
+  // --- minimal filters (client-side) ---
+  const [filters, setFilters] = useState({
+    search: "",
+    sortBy: "medicine_name", // medicine_name | quantity | price_in | created_at
+    sortDir: "asc", // asc | desc
+  });
 
   const itemsPerPage = 7;
   const { t } = useTranslation();
@@ -68,7 +75,6 @@ const StockList = () => {
     if (Number.isNaN(ts)) return false;
     return Date.now() - ts <= NEW_WINDOW_HOURS * 60 * 60 * 1000;
   };
-  // try a few plausible fields for when the stock was created
   const getCreatedAt = (s) =>
     s?.created_at ||
     s?.medicine?.created_at ||
@@ -76,13 +82,67 @@ const StockList = () => {
     s?.updated_at ||
     null;
 
+  // ---- client-side search + sort ----
+  const filteredSorted = useMemo(() => {
+    let out = stocksData;
+
+    // search by medicine name
+    if (filters.search.trim()) {
+      const q = filters.search.trim().toLowerCase();
+      out = out.filter((s) => {
+        const name = (s.medicine?.medicine_name || s.medicine?.name || "")
+          .toString()
+          .toLowerCase();
+        return name.includes(q);
+      });
+    }
+
+    // sort
+    const { sortBy, sortDir } = filters;
+    const dir = sortDir === "desc" ? -1 : 1;
+
+    const getName = (s) =>
+      (s.medicine?.medicine_name || s.medicine?.name || "")
+        .toString()
+        .toLowerCase();
+    const getValue = (s) => {
+      switch (sortBy) {
+        case "medicine_name":
+          return getName(s);
+        case "quantity":
+          return Number(s.quantity ?? 0);
+        case "price_in":
+          return Number(s.price_in ?? 0);
+        case "created_at":
+          return Date.parse(getCreatedAt(s) || 0) || 0;
+        default:
+          return 0;
+      }
+    };
+
+    return [...out].sort((a, b) => {
+      const A = getValue(a);
+      const B = getValue(b);
+
+      // string compare for names
+      if (sortBy === "medicine_name") {
+        return String(A).localeCompare(String(B)) * dir;
+      }
+
+      // numeric/ts compare
+      return (Number(A) - Number(B)) * dir;
+    });
+  }, [stocksData, filters]);
+
+  // totals reflect the whole dataset (not just filtered); change to filteredSorted if you want filtered totals
   const totalStock = stocksData.reduce((sum, s) => sum + (s.quantity || 0), 0);
   const totalStockLeng = stocksData.length;
 
-  const indexOfLastItem = currentPage * itemsPerPage;
+  // pagination works on the filtered + sorted list
+  const totalPages = Math.ceil(filteredSorted.length / itemsPerPage) || 1;
+  const indexOfLastItem = Math.min(currentPage, totalPages) * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = stocksData.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(stocksData.length / itemsPerPage);
+  const currentItems = filteredSorted.slice(indexOfFirstItem, indexOfLastItem);
 
   const handleOpenTransfer = (stock) => {
     setSelectedStock(stock);
@@ -111,13 +171,15 @@ const StockList = () => {
       setSubmitting(true);
       await retailStockService.createRetailStock({
         stock_id: selectedStock.id,
-        medicine_id: selectedStock.id,
+        // FIX: medicine_id should come from the medicine object, not the stock id
+        medicine_id: selectedStock.medicine?.id,
         quantity: qty,
         price: p,
         tablet: selectedStock.medicine?.tablet ?? 0,
         capsule: selectedStock.medicine?.capsule ?? 0,
       });
 
+      // optimistic update
       setStocksData((prev) =>
         prev.map((s) =>
           s.id === selectedStock.id
@@ -137,6 +199,7 @@ const StockList = () => {
     }
   };
 
+  // highlight jump
   useEffect(() => {
     if (highlightedRetailStock) {
       setHighlightedId(highlightedRetailStock);
@@ -151,36 +214,72 @@ const StockList = () => {
 
   return (
     <div className="p-4 sm:mb-4 mb-20">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold">{t("stock-list.title")}</h2>
-        <div className="flex gap-2">
-          <button
-            onClick={fetchStocks}
-            disabled={loading}
-            className={`px-3 py-2 rounded ${
-              loading ? "bg-gray-300" : "bg-blue-600 text-white"
-            }`}
-          >
-            {loading ? "Refreshing..." : "Refresh"}
-          </button>
-          <button
-            className="hidden sm:flex underline text-green-600"
-            onClick={() => navigate("/add-supply")}
-          >
-            {t("stock-list.btnGotoSupply")}
-          </button>
+      <div className=" mb-4">
+        <h2 className="text-xl font-bold text-slate-600 dark:text-slate-200">
+          {t("stock-list.title") || "Stock List"}
+        </h2>
+        <p className="text-slate-400 dark:text-slate-200">
+          ផ្ទាំងគ្រប់ស្តុកលក់ដុំ និងការផ្ទេរពីស្តុកលក់ដុំទៅកាន់ស្តុកលក់រាយ។
+        </p>
+      </div>
+
+      {/* summary */}
+      <div className="border flex gap-8 dark:text-slate-200 dark:bg-slate-500 dark:border-slate-200 border-green-300 text-gray-600 w-full px-4 py-2 rounded-lg">
+        <div>
+          {t("stock-list.TotalofStocksquantity") || "Total Quantity"} :{" "}
+          {totalStock}
+        </div>
+        <div>
+          {t("stock-list.Typestock") || "Types"} : {totalStockLeng}
         </div>
       </div>
 
-      <div className="border flex  gap-8 border-green-300 text-gray-600 w-full px-4 py-2 rounded-lg">
-        <div>
-          {t("stock-list.TotalofStocksquantity")} : {totalStock}
-          {t("stock-list.totalofquantity")}
-        </div>
-        <div>
-          {t("stock-list.Typestock")} : {totalStockLeng}
-          {t("stock-list.typeoftotal")}
-        </div>
+      {/* FILTER BAR (search + sort) */}
+      <div className="mt-3 mb-3 dark:bg-slate-700 bg-white border rounded-lg p-3 flex flex-wrap items-center gap-3">
+        <input
+          type="text"
+          className="border rounded px-2 py-1 flex-1 min-w-[220px]  dark:text-slate-200"
+          placeholder={
+            t("stock-list.SearchPlaceholder") || "Search medicine name..."
+          }
+          value={filters.search}
+          onChange={(e) => {
+            setFilters((f) => ({ ...f, search: e.target.value }));
+            setCurrentPage(1);
+          }}
+        />
+
+        <label className="text-sm dark:text-slate-200">
+          {t("stock-list.SortBy") || "Sort by"}
+        </label>
+        <select
+          className="border rounded px-2 py-1 dark:text-slate-500 "
+          value={filters.sortBy}
+          onChange={(e) => {
+            setFilters((f) => ({ ...f, sortBy: e.target.value }));
+            setCurrentPage(1);
+          }}
+        >
+          <option value="medicine_name">
+            {t("stock-list.Medicine") || "Medicine Name"}
+          </option>
+          <option value="quantity">{t("stock-list.Qty") || "Quantity"}</option>
+          <option value="price_in">
+            {t("stock-list.PriceIn") || "Price In"}
+          </option>
+        </select>
+
+        <select
+          className="border rounded px-2 py-1 dark:text-slate-500 "
+          value={filters.sortDir}
+          onChange={(e) => {
+            setFilters((f) => ({ ...f, sortDir: e.target.value }));
+            setCurrentPage(1);
+          }}
+        >
+          <option value="asc">{t("stock-list.Asc") || "Ascending"}</option>
+          <option value="desc">{t("stock-list.Desc") || "Descending"}</option>
+        </select>
       </div>
 
       {/* DESKTOP/TABLET: normal table */}
@@ -189,16 +288,20 @@ const StockList = () => {
           <table className="w-full min-w-[640px] table-auto">
             <thead className="bg-green-600 text-white">
               <tr>
-                <th className="px-4 py-3 text-left">{t("stock-list.ID")}</th>
-                <th className="px-4 py-2 text-left">
-                  {t("stock-list.Medicine")}
+                <th className="px-4 dark:text-slate-200 py-3 text-left">
+                  {t("stock-list.ID") || "ID"}
                 </th>
-                <th className="px-4 py-2 text-left">{t("stock-list.Qty")}</th>
-                <th className="px-4 py-2 text-left">
-                  {t("stock-list.PriceIn")}
+                <th className="px-4 dark:text-slate-200 py-2 text-left">
+                  {t("stock-list.Medicine") || "Medicine"}
                 </th>
-                <th className="px-4 py-2 text-left">
-                  {t("stock-list.Action")}
+                <th className="px-4 dark:text-slate-200 py-2 text-left">
+                  {t("stock-list.Qty") || "Qty"}
+                </th>
+                <th className="px-4 dark:text-slate-200 py-2 text-left">
+                  {t("stock-list.PriceIn") || "Price In"}
+                </th>
+                <th className="px-4 dark:text-slate-200 py-2 text-left">
+                  {t("stock-list.Action") || "Action"}
                 </th>
               </tr>
             </thead>
@@ -212,12 +315,14 @@ const StockList = () => {
                     <tr
                       key={stock.id}
                       data-retailstock={stock.id}
-                      className={`border-b hover:bg-slate-50 transition ${
+                      className={`border-b dark:hover:bg-slate-600 hover:bg-slate-50 transition ${
                         isHighlighted ? "bg-yellow-100 text-black" : ""
                       }`}
                     >
-                      <td className="px-4 py-2">{stock.id}</td>
-                      <td className="px-4 py-2">
+                      <td className="px-4 dark:text-slate-200 py-2">
+                        {stock.id}
+                      </td>
+                      <td className="px-4 dark:text-slate-200 py-2">
                         <div className="flex items-center gap-2">
                           <span className="break-words">
                             {stock.medicine?.medicine_name ||
@@ -231,11 +336,15 @@ const StockList = () => {
                           )}
                         </div>
                       </td>
-                      <td className="px-4 py-2">{stock.quantity}</td>
-                      <td className="px-4 py-2">${stock.price_in}</td>
-                      <td className="px-4 py-2">
+                      <td className="px-4 dark:text-slate-200 py-2">
+                        {stock.quantity}
+                      </td>
+                      <td className="px-4 dark:text-slate-200 py-2">
+                        ${stock.price_in}
+                      </td>
+                      <td className="px-4 dark:text-slate-200 py-2">
                         <button
-                          className="text-sm text-blue-600 underline"
+                          className="text-sm text-green-600 underline"
                           onClick={() => handleOpenTransfer(stock)}
                         >
                           {t("stock-list.btnMoveToRetail") || "Move to Retail"}
@@ -247,7 +356,9 @@ const StockList = () => {
               ) : (
                 <tr>
                   <td colSpan={5} className="text-center py-20 text-gray-500">
-                    {loading ? "Loading..." : t("stock-list.NotFound")}
+                    {loading
+                      ? "Loading..."
+                      : t("stock-list.NotFound") || "No stock found."}
                   </td>
                 </tr>
               )}
@@ -256,8 +367,8 @@ const StockList = () => {
         </div>
       </div>
 
-      {/* MOBILE: card view (no sideways scroll) */}
-      <div className="md:hidden mt-3  space-y-3">
+      {/* MOBILE: card view */}
+      <div className="md:hidden mt-3 space-y-3">
         {currentItems.length > 0 ? (
           currentItems.map((stock) => {
             const isHighlighted = highlightedId === stock.id;
@@ -272,7 +383,7 @@ const StockList = () => {
                 <div className="flex items-start justify-between">
                   <div className="font-medium">
                     <div className="text-sm text-gray-500">
-                      {t("stock-list.ID")}
+                      {t("stock-list.ID") || "ID"}
                     </div>
                     <div>{stock.id}</div>
                   </div>
@@ -285,7 +396,7 @@ const StockList = () => {
 
                 <div className="mt-2">
                   <div className="text-sm text-gray-500">
-                    {t("stock-list.Medicine")}
+                    {t("stock-list.Medicine") || "Medicine"}
                   </div>
                   <div className="break-words">
                     {stock.medicine?.medicine_name ||
@@ -297,13 +408,13 @@ const StockList = () => {
                 <div className="mt-2 grid grid-cols-2 gap-3">
                   <div>
                     <div className="text-sm text-gray-500">
-                      {t("stock-list.Qty")}
+                      {t("stock-list.Qty") || "Qty"}
                     </div>
                     <div>{stock.quantity}</div>
                   </div>
                   <div>
                     <div className="text-sm text-gray-500">
-                      {t("stock-list.PriceIn")}
+                      {t("stock-list.PriceIn") || "Price In"}
                     </div>
                     <div>${stock.price_in}</div>
                   </div>
@@ -322,19 +433,22 @@ const StockList = () => {
           })
         ) : (
           <div className="text-center py-10 text-gray-500">
-            {loading ? "Loading..." : t("stock-list.NotFound")}
+            {loading
+              ? "Loading..."
+              : t("stock-list.NotFound") || "No stock found."}
           </div>
         )}
       </div>
 
-      {stocksData.length > itemsPerPage && (
-        <div className="flex justify-center items-center mt-4  gap-2">
+      {/* Pagination */}
+      {filteredSorted.length > itemsPerPage && (
+        <div className="flex justify-center items-center mt-4 gap-2">
           <button
             onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
             disabled={currentPage === 1}
             className="px-3 py-1 bg-gray-300 rounded-lg disabled:opacity-50"
           >
-            {t("stock-list.btnPrev")}
+            {t("stock-list.btnPrev") || "Prev"}
           </button>
           {Array.from({ length: totalPages }, (_, i) => (
             <button
@@ -354,11 +468,12 @@ const StockList = () => {
             disabled={currentPage === totalPages}
             className="px-3 py-1 bg-gray-300 rounded-lg disabled:opacity-50"
           >
-            {t("stock-list.btnNext")}
+            {t("stock-list.btnNext") || "Next"}
           </button>
         </div>
       )}
 
+      {/* Transfer modal */}
       {transferModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-xl">
@@ -368,7 +483,7 @@ const StockList = () => {
 
             <div className="mb-4">
               <label className="block text-sm font-medium mb-1">
-                {t("stock-list.Quantity")}
+                {t("stock-list.Quantity") || "Quantity"}
               </label>
               <div className="flex gap-2">
                 <input
@@ -399,7 +514,7 @@ const StockList = () => {
 
             <div className="mb-4">
               <label className="block text-sm font-medium mb-1">
-                {t("stock-list.RetailPrice")}
+                {t("stock-list.RetailPrice") || "Retail Price"}
               </label>
               <input
                 type="number"
@@ -415,14 +530,14 @@ const StockList = () => {
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setTransferModalOpen(false)}
-                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+                className="bg-gray-400 text-white px-4 dark:text-slate-200 py-2 rounded hover:bg-gray-500"
                 disabled={submitting}
               >
                 {t("stock-list.btnCancel") || "Cancel"}
               </button>
               <button
                 onClick={handleTransferSubmit}
-                className={`text-white px-4 py-2 rounded ${
+                className={`text-white px-4 dark:text-slate-200 py-2 rounded ${
                   submitting
                     ? "bg-green-400"
                     : "bg-green-600 hover:bg-green-700"

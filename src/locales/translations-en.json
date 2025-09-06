@@ -1,4 +1,39 @@
 {
+  "retail-stock": {
+    "SortBy": "Sort By",
+    "SearchPlaceholder": "Search by medicine name...",
+    "Asc": "Ascending",
+    "Desc": "Descending",
+    "Apply": "Apply",
+    "Loading": "Loading...",
+
+    "RetailStockManager": "Retail Stock Manager",
+    "Medicine": "Medicine Name",
+    "Quantity": "Transfer Quantity",
+    "Tablet": "Tablet/box",
+    "Capsule": "Capsule/box",
+    "PriceTablet": "Price / Tablet",
+    "PriceCapsule": "Price / Capsule",
+    "New": "New",
+    "Pricebox": "Price / Box",
+    "UpdatedAt": "Updated At",
+    "Actions": "Actions",
+
+    "InvalidQuantity": "Invalid quantity",
+    "InvalidPrice": "Invalid price",
+    "Saved": "Saved",
+    "SaveFailed": "Save failed.",
+    "Saving": "Saving...",
+    "Save": "Save",
+    "Cancel": "Cancel",
+    "Edit": "Edit",
+
+    "Prev": "Prev",
+    "Next": "Next",
+    "Page": "Page",
+    "of": "of",
+    "NotFound": "No retail stock found."
+  },
   "common": {
     "close": "Close",
     "cancel": "Cancel",
@@ -136,7 +171,16 @@
     "Viewallpurchasesbysupplier,medicine,andcost": "View all purchases by supplier , medicine, and cost. "
   },
   "dashboard-status": {
+    "StockStatusDesc": "Distribution of current stock quantity by medicine.",
+    "SalesStatusDesc": "Distribution of items sold by medicine.",
+    "PurchaseStatusDesc": "Distribution of purchased quantity by medicine.",
+    "Value": "Value",
+    "NoPopularData": "No Popular Data",
+    "Percent": "Percent",
     "StockStatus": "Stock Status",
+    "Total": "Total",
+    "ShowDetails": "Show Details",
+    "HideDetails": "Hide  Details",
     "Gotostockreport": "Goto stock report",
     "SalesStatus": "Sales Status",
     "Gotosalereport": "Goto sale report",
@@ -145,9 +189,36 @@
     "PopularProducts": "Popular Medicines",
     "Medicine": "Medicine",
     "QuantitySold": "Quantity Sold",
-    "TotalAmount": "Total Amount"
+    "TotalAmount": "Total Amount",
+    "PopularProductsDescLong": "Showing top {topN} items in {currency} for {range}. Use the options to change sort and filters.",
+    "Options": {
+      "SortBy": "Sort by",
+      "Order": "Order",
+      "Currency": "Currency",
+      "Range": "Range",
+      "TopN": "Top"
+    },
+    "Sort": {
+      "Quantity": "Quantity sold",
+      "Amount": "Total amount"
+    },
+    "OrderDir": {
+      "Asc": "Ascending",
+      "Desc": "Descending"
+    },
+    "Currency": {
+      "USD": "USD",
+      "KHR": "KHR"
+    },
+    "Range": {
+      "7d": "Last 7 days",
+      "30d": "Last 30 days",
+      "90d": "Last 90 days",
+      "all": "All time"
+    }
   },
   "expire-soon": {
+    "Medicine": "Medicine Name",
     "Title": "Expiry Table Medicine",
     "Loading": "Loading...",
     "NotFound": "Not found medicin that expire !",
@@ -206,6 +277,11 @@
     "Loading": "Loading..."
   },
   "stock-list": {
+    "SearchPlaceholder": "Search by medicine name...",
+    "SortBy": "Sort By",
+    "Asc": "Ascending",
+    "Desc": "Descending",
+
     "New": "New",
     "TotalofStocksquantity": "Total of Stocks",
     "totalofquantity": "medicines",
@@ -355,6 +431,14 @@
   },
 
   "medicine-list": {
+    "FilterName": "Filter by name",
+    "FilterCategory": "Category",
+    "AllCategories": "All categories",
+    "FilterCategoryHelp": "Show only items in a category.",
+    "FilterDesc": "Description / detail",
+    "FilterDescPlaceholder": "Find in description, origin, manufacturer…",
+    "FilterDescHelp": "Search in description, origin, manufacturer, barcode or weight.",
+    "ClearFilters": "Clear filters",
     "TitleMedicine": "Medicine List",
     "SearchLabel": "Search medicines",
     "SearchMedicine": "Search by medicine name...",
@@ -432,33 +516,80 @@
       "expiring_soon": "Expiring Soon",
       "low_stock_items": "Low Stock Items"
     },
-    "info": {
-      "medicine": {
-        "title": "Medicine",
-        "content": "{count} total medicines",
-        "link": "View"
+    "topStats": {
+      "revenue": {
+        "subtitle": "Today",
+        "tooltip": "Gross sales (USD | KHR)",
+        "description": "Combined daily sales in USD and KHR.",
+        "badge": "Live",
+        "changeLabel": "vs last week",
+        "link": "View sales report"
       },
-      "sales_report": {
-        "title": "Sales Report",
-        "content": "{count} total sales",
-        "link": "View"
+      "medicines": {
+        "subtitle": "Catalog size",
+        "description": "Unique medicines currently listed.",
+        "badge": "OK",
+        "link": "Browse medicines"
+      },
+      "expiring": {
+        "subtitle": "Next 120 days",
+        "description": "Lots expiring within 120 days. Review and rotate stock.",
+        "badge": "Alert",
+        "link": "See expiring items"
+      },
+      "lowStock": {
+        "subtitle": "Below threshold (<50)",
+        "description": "Items that need replenishment soon.",
+        "badge": "Watch",
+        "link": "Open stock report"
+      }
+    },
+    "info": {
+      "inventory": {
+        "title": "Inventory Health",
+        "subtitle": "Today’s snapshot",
+        "description": "This card summarizes current inventory across all warehouses. Click the link to see the full breakdown by location and batch.",
+        "stats": {
+          "outOfStock": "Out of stock",
+          "lowStock": "Low stock (<10)",
+          "skus": "SKUs"
+        },
+        "meta": {
+          "topCategory": "Top category",
+          "highestStock": "Highest stock"
+        },
+        "badge": { "live": "Live" },
+        "link": "View report",
+        "footer": "Data source: Warehouse DB"
       },
       "suppliers": {
         "title": "Suppliers",
-        "content": "{count} total suppliers",
-        "link": "View"
+        "subtitle": "Your vendor & manufacturer partners",
+        "content": "Total suppliers: {count}",
+        "description": "Manage contact details, invoices and purchase history. Keep supplier info up to date to streamline procurement.",
+        "meta": { "top": "Top suppliers" },
+        "link": "View all",
+        "quickAdd": "Add supplier",
+        "quickPurchases": "Purchase report"
       },
       "customers": {
         "title": "Customers",
-        "content": "{count} total customers",
-        "link": "View"
+        "subtitle": "People you serve",
+        "content": "Total customers: {count}",
+        "description": "Track your customer base and their orders. Keep records complete to improve service quality.",
+        "meta": { "latest": "Most recent" },
+        "link": "View all",
+        "quickAdd": "Add customer",
+        "quickSales": "Sales report"
       },
       "prescriptions": {
         "title": "Prescriptions",
+        "subtitle": "Dispensing workflow status",
         "content": {
-          "pending": "{count} Pending",
-          "processed": "{count} Processed"
+          "pending": "Pending: {count}",
+          "processed": "Processed: {count}"
         },
+        "description": "Monitor pending prescriptions and track processed ones to maintain fast turnaround times.",
         "link": "View"
       }
     }
@@ -559,6 +690,7 @@
   },
 
   "topbar": {
+    "noNotifications": "No Notifications!",
     "recentChats": "Recent Chats",
     "viewAll": "View All",
     "close": "Close",
@@ -692,6 +824,7 @@
 
   "sidebar": {
     "retail-product": "Retail Medicine",
+    "order": "Orders",
     "RetailStock": "Retail Stock",
     "setting": "Settings",
     "AddStock": "Add Stocks",

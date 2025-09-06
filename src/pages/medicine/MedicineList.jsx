@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { BiEdit } from "react-icons/bi";
 import { TbHttpDelete, TbListDetails } from "react-icons/tb";
@@ -68,8 +68,6 @@ const MedicineList = () => {
 
   const [medicines, setMedicines] = useState([]);
   const [meta, setMeta] = useState({});
-  const [searchTerm, setSearchTerm] = useState("");
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -84,8 +82,14 @@ const MedicineList = () => {
 
   const highlightedBarcode = location.state?.highlightedBarcode || null;
 
+  // ------- Filters -------
+  const [nameQuery, setNameQuery] = useState(""); // name filter (was searchTerm)
+  const [descQuery, setDescQuery] = useState(""); // description/detail filter
+  const [categoryId, setCategoryId] = useState(""); // category filter
+
   const fetchMedicines = async (page = 1) => {
     setLoading(true);
+    setError(null);
     try {
       const { data, meta } = await getAllMedicines(page);
       setMedicines(data);
@@ -120,6 +124,7 @@ const MedicineList = () => {
   const handleEditClick = (medicine) => {
     setEditMedicineData(medicine);
     setEditModalOpen(true);
+    fetchMedicines(currentPage);
   };
 
   const handleSaveEdit = () => {
@@ -131,6 +136,7 @@ const MedicineList = () => {
   const confirmDelete = (id) => {
     setConfirmId(id);
     setConfirmOpen(true);
+    fetchMedicines(currentPage);
   };
 
   const handleDeleteMedicine = async (id) => {
@@ -147,9 +153,60 @@ const MedicineList = () => {
     }
   };
 
-  const filteredMedicines = (medicines ?? []).filter((med) =>
-    med.medicine_name?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Build category options (unique across current page)
+  const categoryOptions = useMemo(() => {
+    const map = new Map();
+    (medicines || []).forEach((m) =>
+      (m.categories || []).forEach((c) => {
+        if (c?.id) map.set(String(c.id), c.category_name || String(c.id));
+      })
+    );
+    return [
+      { id: "", name: t("medicine-list.AllCategories") || "All categories" },
+    ].concat(Array.from(map.entries()).map(([id, name]) => ({ id, name })));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [medicines, t]);
+
+  // Combined filtering (name + category + description/detail)
+  const filteredMedicines = useMemo(() => {
+    const n = nameQuery.trim().toLowerCase();
+    const d = descQuery.trim().toLowerCase();
+    const cat = String(categoryId || "");
+
+    return (medicines ?? []).filter((med) => {
+      const nameOk = !n
+        ? true
+        : String(med.medicine_name || "")
+            .toLowerCase()
+            .includes(n);
+
+      const catOk = !cat
+        ? true
+        : Array.isArray(med.categories) &&
+          med.categories.some((c) => String(c.id) === cat);
+
+      // "description and detail": we search in medicine_detail, manufacturer, origin, barcode, weight
+      const descFields = [
+        med.medicine_detail,
+        med.manufacturer,
+        med.origin,
+        med.barcode,
+        med.weight,
+      ]
+        .filter(Boolean)
+        .map((x) => String(x).toLowerCase());
+
+      const descOk = !d ? true : descFields.some((s) => s.includes(d));
+
+      return nameOk && catOk && descOk;
+    });
+  }, [medicines, nameQuery, descQuery, categoryId]);
+
+  const clearFilters = () => {
+    setNameQuery("");
+    setDescQuery("");
+    setCategoryId("");
+  };
 
   const handleDetailClick = (id) => {
     navigate(`/medicinedetail/${id}`);
@@ -161,6 +218,16 @@ const MedicineList = () => {
         <tr>
           <td colSpan="7" className="text-center py-4 dark:text-slate-300">
             {t("medicine-list.Loading")}
+          </td>
+        </tr>
+      );
+    }
+
+    if (error) {
+      return (
+        <tr>
+          <td colSpan="7" className="text-center py-4 text-red-600">
+            {error}
           </td>
         </tr>
       );
@@ -188,7 +255,9 @@ const MedicineList = () => {
         <td className="border px-2 py-1">
           {typeof med.price === "number" ? `$${med.price}` : med.price}
         </td>
-        <td className="hidden sm:table-cell border px-2 py-1">{med.weight}</td>
+        <td className="hidden sm:table-cell border px-2 py-1">
+          {med.weight || "—"}
+        </td>
         <td className="hidden sm:table-cell border px-2 py-1">
           {Array.isArray(med.units) && med.units.length > 0
             ? med.units.map((unt) => (
@@ -251,25 +320,94 @@ const MedicineList = () => {
 
   return (
     <div className="p-4 sm:mb-3 mb-12">
-      <h2 className="text-xl font-bold mb-4 dark:text-white">
+      <h2 className="text-xl font-bold mb-2 dark:text-white">
         {t("medicine-list.TitleMedicine")}
       </h2>
 
-      <div className="mb-4">
-        <label htmlFor="med-search" className="sr-only">
-          {t("medicine-list.SearchLabel") || t("medicine-list.SearchMedicine")}
-        </label>
-        <input
-          id="med-search"
-          type="text"
-          placeholder={t("medicine-list.SearchMedicine")}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="border p-2 rounded w-full max-w-sm dark:bg-slate-700 dark:text-white"
-        />
-        <p className="text-xs text-gray-500 mt-1">
-          {t("medicine-list.SearchHelp") || "Search by medicine name."}
-        </p>
+      {/* Filters */}
+      <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+        {/* Name */}
+        <div>
+          <label
+            htmlFor="med-name"
+            className="block text-sm text-gray-600 dark:text-gray-300"
+          >
+            {t("medicine-list.FilterName") || "Filter by name"}
+          </label>
+          <input
+            id="med-name"
+            type="text"
+            placeholder={t("medicine-list.SearchMedicine")}
+            value={nameQuery}
+            onChange={(e) => setNameQuery(e.target.value)}
+            className="border p-2 rounded w-full dark:bg-slate-700 dark:text-white"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            {t("medicine-list.SearchHelp") || "Search by medicine name."}
+          </p>
+        </div>
+
+        {/* Category */}
+        <div>
+          <label
+            htmlFor="med-cat"
+            className="block text-sm text-gray-600 dark:text-gray-300"
+          >
+            {t("medicine-list.FilterCategory") || "Category"}
+          </label>
+          <select
+            id="med-cat"
+            className="border p-2 rounded w-full dark:bg-slate-700 dark:text-white"
+            value={categoryId}
+            onChange={(e) => setCategoryId(e.target.value)}
+          >
+            {categoryOptions.map((opt) => (
+              <option key={opt.id || "all"} value={opt.id}>
+                {opt.name}
+              </option>
+            ))}
+          </select>
+          <p className="text-xs text-gray-500 mt-1">
+            {t("medicine-list.FilterCategoryHelp") ||
+              "Show only items in a category."}
+          </p>
+        </div>
+
+        {/* Description / Detail */}
+        <div>
+          <label
+            htmlFor="med-desc"
+            className="block text-sm text-gray-600 dark:text-gray-300"
+          >
+            {t("medicine-list.FilterDesc") || "Description / detail"}
+          </label>
+          <input
+            id="med-desc"
+            type="text"
+            placeholder={
+              t("medicine-list.FilterDescPlaceholder") ||
+              "Find in description, origin, manufacturer…"
+            }
+            value={descQuery}
+            onChange={(e) => setDescQuery(e.target.value)}
+            className="border p-2 rounded w-full dark:bg-slate-700 dark:text-white"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            {t("medicine-list.FilterDescHelp") ||
+              "Search in description, origin, manufacturer, barcode or weight."}
+          </p>
+        </div>
+      </div>
+
+      {/* Clear filters */}
+      <div className="mb-3">
+        <button
+          type="button"
+          onClick={clearFilters}
+          className="text-sm px-3 py-1 rounded border hover:bg-gray-50 dark:hover:bg-slate-700"
+        >
+          {t("medicine-list.ClearFilters") || "Clear filters"}
+        </button>
       </div>
 
       <table className="w-full border-gray-300 dark:bg-slate-800 dark:text-slate-300">

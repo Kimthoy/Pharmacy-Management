@@ -111,10 +111,16 @@ const Sidebar = ({ setSelectedPage, selectedPage }) => {
       icon: FaTruckMedical,
       path: "/menufacturer",
       subItems: [
-        { name: t("sidebar.manufacturerList"), path: "/manufacturerlist" },
+        { name: t("sidebar.manufacturerList"), path: "/supplier" },
         { name: t("sidebar.supplies"), path: "/supplies" },
         { name: t("sidebar.supplyitems"), path: "/supplyitems" },
       ],
+    },
+    {
+      name: t("sidebar.order"),
+      icon: FaTruckMedical,
+      path: "/order",
+    
     },
     {
       name: t("sidebar.returns"),

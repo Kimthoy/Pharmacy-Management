@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { getRetailStocks, updateRetailStock } from "../api/retailStockService";
 import { Link } from "react-router-dom";
 import { useTranslation } from "../../hooks/useTranslation";
@@ -6,40 +6,75 @@ import { useTranslation } from "../../hooks/useTranslation";
 const USE_CENTS = true;
 // how long an item counts as "just added"
 const NEW_WINDOW_HOURS = 24;
+const DEFAULT_PER_PAGE = 15;
 
 const RetailStockManager = () => {
   const [rows, setRows] = useState([]);
   const [message, setMessage] = useState("");
   const [savingId, setSavingId] = useState(null);
   const [editingId, setEditingId] = useState(null);
+  const [loading, setLoading] = useState(false);
+
   const [draft, setDraft] = useState({
     tablet: "",
     capsule: "",
     price_tablet: "",
     price_capsule: "",
   });
+
   const [meta, setMeta] = useState({
     current_page: 1,
     last_page: 1,
-    per_page: 15,
+    per_page: DEFAULT_PER_PAGE,
+    total: 0,
   });
+
+  // --- minimal filters: search + sort ---
+  const [filters, setFilters] = useState({
+    search: "",
+    sortBy: "medicine_name", // medicine_name | quantity | price_tablet | price_capsule | created_at
+    sortDir: "asc", // asc | desc
+    perPage: DEFAULT_PER_PAGE,
+  });
+
   const { t } = useTranslation();
-  const perPage = 15;
+
+  // Build params for backend (it will ignore unknown ones)
+  const buildRequestParams = (page = 1) => ({
+    page,
+    perPage: Number(filters.perPage) || DEFAULT_PER_PAGE,
+    search: filters.search?.trim() || undefined,
+    sort_by: filters.sortBy,
+    sort_dir: filters.sortDir,
+  });
 
   const fetchRetailStocks = async (page = 1) => {
     try {
-      const res = await getRetailStocks({ page, perPage });
+      setLoading(true);
+      const params = buildRequestParams(page);
+      const res = await getRetailStocks(params);
+
       setRows(Array.isArray(res.data) ? res.data : []);
-      setMeta(res.meta || { current_page: 1, last_page: 1, per_page: perPage });
+      setMeta(
+        res.meta || {
+          current_page: page,
+          last_page: 1,
+          per_page: params.perPage,
+          total: Array.isArray(res.data) ? res.data.length : 0,
+        }
+      );
       setMessage("");
     } catch (err) {
       setRows([]);
       setMessage(err?.message || "Failed to load retail stock data.");
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchRetailStocks(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ---------- helpers ----------
@@ -59,8 +94,7 @@ const RetailStockManager = () => {
     if (raw == null || raw === "") return "";
     const num = Number(raw);
     if (Number.isNaN(num)) return "";
-    const value = USE_CENTS ? num : num;
-    return Math.round(value).toString();
+    return Math.round(num).toString();
   };
 
   const fromDisplayPrice = (display) => {
@@ -68,7 +102,7 @@ const RetailStockManager = () => {
     const clean = String(display).replace(/[^0-9-]/g, "");
     const val = Number(clean);
     if (Number.isNaN(val)) return null;
-    return USE_CENTS ? Math.round(val) : Math.round(val);
+    return Math.round(val);
   };
 
   // recently added flag
@@ -161,11 +195,51 @@ const RetailStockManager = () => {
     if (p >= 1 && p <= last) fetchRetailStocks(p);
   };
 
+  // --- client-side fallback for search + sort ---
+  const clientFilteredRows = useMemo(() => {
+    let out = rows;
+
+    if (filters.search?.trim()) {
+      const q = filters.search.trim().toLowerCase();
+      out = out.filter((r) => {
+        const name = (r.medicine?.medicine_name || r.medicine || "")
+          .toString()
+          .toLowerCase();
+        return name.includes(q);
+      });
+    }
+
+    // sort
+    const key = filters.sortBy;
+    out = [...out].sort((a, b) => {
+      const dir = filters.sortDir === "desc" ? -1 : 1;
+
+      if (key === "medicine_name") {
+        const nameA = String(
+          a.medicine?.medicine_name || a.medicine || ""
+        ).toLowerCase();
+        const nameB = String(
+          b.medicine?.medicine_name || b.medicine || ""
+        ).toLowerCase();
+        return nameA.localeCompare(nameB) * dir;
+      }
+
+      const va = a[key];
+      const vb = b[key];
+      if (va == null && vb == null) return 0;
+      if (va == null) return 1;
+      if (vb == null) return -1;
+      return (Number(va) - Number(vb)) * dir;
+    });
+
+    return out;
+  }, [rows, filters]);
+
   // ---------- UI ----------
   return (
     <div className="max-w-6xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">
-        {t("retail-stock.RetailStockManager")}
+        {t("retail-stock.RetailStockManager") || "Retail Stock Manager"}
       </h1>
 
       {message && (
@@ -174,37 +248,87 @@ const RetailStockManager = () => {
         </div>
       )}
 
+      {/* Simple filter bar: Search + Sort */}
+      <div className="border rounded-lg p-3 mb-4 bg-white border-green-600 flex flex-wrap items-center gap-3">
+        <input
+          type="text"
+          className="border rounded px-2 py-1 flex-1 focus:outline-none "
+          placeholder={
+            t("retail-stock.SearchPlaceholder") || "Search medicine..."
+          }
+          value={filters.search}
+          onChange={(e) =>
+            setFilters((f) => ({ ...f, search: e.target.value }))
+          }
+        />
+
+        <label className="text-sm">
+          {t("retail-stock.SortBy") || "Sort by"}
+        </label>
+        <select
+          className="border rounded px-2 py-1"
+          value={filters.sortBy}
+          onChange={(e) =>
+            setFilters((f) => ({ ...f, sortBy: e.target.value }))
+          }
+        >
+          <option value="medicine_name">
+            {t("retail-stock.Medicine") || "Medicine Name"}
+          </option>
+          <option value="quantity">
+            {t("retail-stock.Quantity") || "Transfer Quantity"}
+          </option>
+          <option value="price_tablet">
+            {t("retail-stock.PriceTablet") || "Price / Tablet"}
+          </option>
+          <option value="price_capsule">
+            {t("retail-stock.PriceCapsule") || "Price / Capsule"}
+          </option>
+        </select>
+
+        <select
+          className="border rounded px-2 py-1"
+          value={filters.sortDir}
+          onChange={(e) =>
+            setFilters((f) => ({ ...f, sortDir: e.target.value }))
+          }
+        >
+          <option value="asc">{t("retail-stock.Asc") || "Ascending"}</option>
+          <option value="desc">{t("retail-stock.Desc") || "Descending"}</option>
+        </select>
+      </div>
+
       {/* Desktop / Tablet table */}
       <div className="hidden md:block overflow-x-auto border rounded-lg mb-6">
         <table className="min-w-full text-sm">
           <thead>
-            <tr className="bg-gray-100">
-              <th className="border p-2 text-left">
-                {t("retail-stock.Medicine")}
+            <tr className="bg-green-600 text-slate-100">
+              <th className="border p-2 dark:text-slate-100 text-left">
+                {t("retail-stock.Medicine") || "Medicine Name"}
               </th>
-              <th className="border p-2 text-right">
-                {t("retail-stock.Quantity")}
+              <th className="border p-2 dark:text-slate-100 text-right">
+                {t("retail-stock.Quantity") || "Transfer Quantity"}
               </th>
-              <th className="border p-2 text-right">
-                {t("retail-stock.Tablet")}
+              <th className="border p-2 dark:text-slate-100 text-right">
+                {t("retail-stock.Tablet") || "Tablet/box"}
               </th>
-              <th className="border p-2 text-right">
-                {t("retail-stock.Capsule")}
+              <th className="border p-2 dark:text-slate-100 text-right">
+                {t("retail-stock.Capsule") || "Capsule/box"}
               </th>
-              <th className="border p-2 text-right">
+              <th className="border p-2 dark:text-slate-100 text-right">
                 {t("retail-stock.PriceTablet") || "Price / Tablet"}
               </th>
-              <th className="border p-2 text-right">
+              <th className="border p-2 dark:text-slate-100 text-right">
                 {t("retail-stock.PriceCapsule") || "Price / Capsule"}
               </th>
-              <th className="border p-2">
+              <th className="border p-2 dark:text-slate-100">
                 {t("retail-stock.Actions") || "Actions"}
               </th>
             </tr>
           </thead>
           <tbody>
-            {rows.length > 0 ? (
-              rows.map((item) => {
+            {clientFilteredRows.length > 0 ? (
+              clientFilteredRows.map((item) => {
                 const medicineName =
                   item.medicine && typeof item.medicine === "object"
                     ? item.medicine.medicine_name
@@ -218,13 +342,16 @@ const RetailStockManager = () => {
                 const isNew = isRecentlyAdded(item.created_at);
 
                 return (
-                  <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="border p-2">
+                  <tr
+                    key={item.id}
+                    className="hover:bg-gray-50 dark:hover:bg-slate-600"
+                  >
+                    <td className="border p-2 dark:text-slate-100">
                       <div className="flex items-center gap-2">
                         <Link
                           to="/stocklist"
                           state={{ highlightedRetailStock: item.id }}
-                          className="text-blue-600 hover:underline"
+                          className="text-green-600 hover:underline dark:text-slate-200"
                         >
                           {medicineName}
                         </Link>
@@ -235,10 +362,10 @@ const RetailStockManager = () => {
                         )}
                       </div>
                     </td>
-                    <td className="border p-2 text-right">
+                    <td className="border p-2 dark:text-slate-100 text-right">
                       {formatNumber(qty)}
                     </td>
-                    <td className="border p-2 text-right">
+                    <td className="border p-2 dark:text-slate-100 text-right">
                       {isEditing ? (
                         <input
                           type="number"
@@ -253,7 +380,7 @@ const RetailStockManager = () => {
                         formatNumber(tablet)
                       )}
                     </td>
-                    <td className="border p-2 text-right">
+                    <td className="border p-2 dark:text-slate-100 text-right">
                       {isEditing ? (
                         <input
                           type="number"
@@ -268,7 +395,7 @@ const RetailStockManager = () => {
                         formatNumber(capsule)
                       )}
                     </td>
-                    <td className="border p-2 text-right">
+                    <td className="border p-2 dark:text-slate-100 text-right">
                       {isEditing ? (
                         <input
                           type="number"
@@ -290,7 +417,7 @@ const RetailStockManager = () => {
                         formatMoney(priceTablet)
                       )}
                     </td>
-                    <td className="border p-2 text-right">
+                    <td className="border p-2 dark:text-slate-100 text-right">
                       {isEditing ? (
                         <input
                           type="number"
@@ -312,7 +439,7 @@ const RetailStockManager = () => {
                         formatMoney(priceCapsule)
                       )}
                     </td>
-                    <td className="border p-2 whitespace-nowrap">
+                    <td className="border p-2 dark:text-slate-100 whitespace-nowrap">
                       {isEditing ? (
                         <div className="flex items-center gap-2 justify-end">
                           <button
@@ -349,7 +476,7 @@ const RetailStockManager = () => {
             ) : (
               <tr>
                 <td colSpan="7" className="text-center text-gray-500 py-4">
-                  {t("retail-stock.NotFound")} .
+                  {t("retail-stock.NotFound") || "No retail stock found."} .
                 </td>
               </tr>
             )}
@@ -359,8 +486,8 @@ const RetailStockManager = () => {
 
       {/* Mobile cards */}
       <div className="md:hidden space-y-3 mb-6">
-        {rows.length > 0 ? (
-          rows.map((item) => {
+        {clientFilteredRows.length > 0 ? (
+          clientFilteredRows.map((item) => {
             const medicineName =
               item.medicine && typeof item.medicine === "object"
                 ? item.medicine.medicine_name
@@ -394,14 +521,15 @@ const RetailStockManager = () => {
                     )}
                   </div>
                   <span className="text-xs text-gray-500">
-                    {t("retail-stock.Quantity")}: {formatNumber(qty)}
+                    {t("retail-stock.Quantity") || "Transfer Quantity"}:{" "}
+                    {formatNumber(qty)}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 mt-3">
                   <div>
                     <div className="text-xs text-gray-500">
-                      {t("retail-stock.Tablet")}
+                      {t("retail-stock.Tablet") || "Tablet/box"}
                     </div>
                     {isEditing ? (
                       <input
@@ -420,7 +548,7 @@ const RetailStockManager = () => {
 
                   <div>
                     <div className="text-xs text-gray-500">
-                      {t("retail-stock.Capsule")}
+                      {t("retail-stock.Capsule") || "Capsule/box"}
                     </div>
                     {isEditing ? (
                       <input
@@ -524,7 +652,7 @@ const RetailStockManager = () => {
           })
         ) : (
           <div className="text-center text-gray-500 py-6">
-            {t("retail-stock.NotFound")} .
+            {t("retail-stock.NotFound") || "No retail stock found."} .
           </div>
         )}
       </div>
@@ -534,20 +662,28 @@ const RetailStockManager = () => {
         <button
           className="px-3 py-1 border rounded disabled:opacity-50"
           onClick={() => goToPage((meta.current_page || 1) - 1)}
-          disabled={(meta.current_page || 1) <= 1}
+          disabled={(meta.current_page || 1) <= 1 || loading}
         >
-          {t("retail-stock.Prev")}
+          {t("retail-stock.Prev") || "Prev"}
         </button>
         <div className="text-sm">
-          {t("retail-stock.Page")} {meta.current_page || 1}{" "}
+          {t("retail-stock.Page") || "Page"} {meta.current_page || 1}{" "}
           {t("retail-stock.of") || "of"} {meta.last_page || 1}
+          {typeof meta.total === "number" ? (
+            <span className="text-gray-500">
+              {" "}
+              • {meta.total} {t("retail-stock.Items") || "items"}
+            </span>
+          ) : null}
         </div>
         <button
           className="px-3 py-1 border rounded disabled:opacity-50"
           onClick={() => goToPage((meta.current_page || 1) + 1)}
-          disabled={(meta.current_page || 1) >= (meta.last_page || 1)}
+          disabled={
+            (meta.current_page || 1) >= (meta.last_page || 1) || loading
+          }
         >
-          {t("retail-stock.Next")}
+          {t("retail-stock.Next") || "Next"}
         </button>
       </div>
     </div>

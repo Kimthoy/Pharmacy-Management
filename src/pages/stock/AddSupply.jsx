@@ -31,34 +31,73 @@ const AddSupply = () => {
   const quaggaRef = useRef(null);
   const lastDetectedRef = useRef({ code: "", ts: 0 });
 
-  // ---------- data fetch ----------
+  /* ---------------- helpers for paginated service (page, perPage) ---------------- */
+  // getAllMedicines(page, perPage) -> { data, meta:{ last_page } }
+  const fetchAllPagesViaArgs = async (serviceFn, perPage = 500) => {
+    let page = 1;
+    let last = 1;
+    const out = [];
+    do {
+      const res = await serviceFn(page, perPage);
+      const items = Array.isArray(res?.data) ? res.data : [];
+      out.push(...items);
+      last = res?.meta?.last_page || 1;
+      page += 1;
+    } while (page <= last);
+
+    // de-dupe by id
+    const seen = new Set();
+    return out.filter((it) => {
+      const id = it?.id;
+      if (id == null || seen.has(id)) return false;
+      seen.add(id);
+      return true;
+    });
+  };
+
+  const asArrayLoose = (res) =>
+    Array.isArray(res)
+      ? res
+      : Array.isArray(res?.data)
+      ? res.data
+      : Array.isArray(res?.data?.data)
+      ? res.data.data
+      : [];
+
+  /* ------------------------------ data fetch ------------------------------ */
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const suppliers = await getAllSupplier();
-        const medicinesResponse = await getAllMedicines();
-        const medicines = Array.isArray(medicinesResponse)
-          ? medicinesResponse
-          : medicinesResponse?.data || [];
+        // Suppliers (works for {data:[]} or raw array)
+        const suppliersRes = await getAllSupplier();
+        const suppliers = asArrayLoose(suppliersRes);
+
+        // Medicines: fetch ALL pages with your (page, perPage) signature
+        const medicines = await fetchAllPagesViaArgs(getAllMedicines, 800);
 
         setSupplierOptions(
-          (suppliers || []).map((s) => ({ value: s.id, label: s.company_name }))
-        );
-        setMedicineOptions(
-          (medicines || []).map((m) => ({
-            value: m.id,
-            label: m.medicine_name,
-            barcode: m.barcode,
+          suppliers.map((s) => ({
+            value: s.id,
+            label: s.company_name || s.name || `#${s.id}`,
           }))
         );
-      } catch {
+
+        setMedicineOptions(
+          medicines.map((m) => ({
+            value: m.id,
+            label: m.medicine_name || m.name || `#${m.id}`,
+            barcode: m.barcode ?? m.bar_code ?? m.ean ?? null,
+          }))
+        );
+      } catch (e) {
+        console.error(e);
         toast.error(t("common.fetchFailed") || "ទាញទិន្នន័យបរាជ័យ");
       }
     };
     fetchData();
   }, [t]);
 
-  // ---------- helpers ----------
+  /* ------------------------------ helpers ------------------------------ */
   const handleSupplierChange = (selected) =>
     setSupply((prev) => ({ ...prev, supplier_id: selected?.value || null }));
 
@@ -80,8 +119,9 @@ const AddSupply = () => {
     setSupplyItems((prev) => prev.filter((_, i) => i !== index));
 
   const handleBarcodeScan = (barcode) => {
+    const codeStr = String(barcode);
     const found = medicineOptions.find(
-      (m) => String(m.barcode) === String(barcode)
+      (m) => m.barcode != null && String(m.barcode) === codeStr
     );
     if (!found) {
       toast.error(`Barcode ${barcode} not found`);
@@ -151,7 +191,7 @@ const AddSupply = () => {
     setSupply((prev) => ({ ...prev, invoice_date: today }));
   }, []);
 
-  // ---------- Quagga helpers ----------
+  /* ---------------------------- Quagga helpers --------------------------- */
   const isSecureOrigin = () => window.isSecureContext;
 
   const getRearCameraId = async () => {
@@ -184,7 +224,6 @@ const AddSupply = () => {
     }
   };
 
-  // ---------- start / stop scanner ----------
   const startScanner = async () => {
     try {
       if (!isSecureOrigin()) {
@@ -232,7 +271,6 @@ const AddSupply = () => {
                   height: { ideal: 720 },
                 },
             target: document.querySelector("#scanner-container"),
-            // match the frame roughly
             area: { top: "20%", right: "8%", left: "8%", bottom: "20%" },
           },
           locator: { patchSize: "x-large", halfSample: true },
@@ -266,9 +304,6 @@ const AddSupply = () => {
           requestAnimationFrame(fixScannerDomSizing);
         }
       );
-
-      // (optional) draw debug boxes
-      // quaggaRef.current.onProcessed((result) => { ... });
 
       quaggaRef.current.onDetected((result) => {
         const code = result?.codeResult?.code;
@@ -309,24 +344,20 @@ const AddSupply = () => {
       startScanner();
       return () => stopScanner(false);
     }
-  }, [isScanOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isScanOpen]);
 
-  // ---------- Tailwind overlay ----------
+  /* ---------------------------- Scan overlay ---------------------------- */
   const ScanOverlay = () => (
     <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
       <div className="relative w-[84%] aspect-[5/3] rounded-[14px]">
-        {/* dim outside */}
         <div className="absolute inset-0 rounded-[14px] shadow-[0_0_0_9999px_rgba(0,0,0,0.45)]" />
-        {/* thin border */}
         <div className="absolute inset-0 rounded-[14px] shadow-[0_0_0_3px_rgba(255,255,255,0.92)_inset]" />
-
-        {/* moving scan line */}
         <div className="absolute left-4 right-4 top-0 h-[2px] bg-white/90 animate-scanline" />
       </div>
     </div>
   );
 
-  // ---------- UI ----------
+  /* -------------------------------- UI --------------------------------- */
   return (
     <div className="shadow-lg bg-[#FBFBFB] dark:bg-slate-900 mb-14 max-w-5xl mx-auto px-4 py-6 relative">
       <h2 className="text-lg font-bold dark:text-teal-50">

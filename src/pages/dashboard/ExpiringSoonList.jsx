@@ -99,10 +99,27 @@ const ExpiringSoonList = () => {
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-gray-800 p-4 rounded shadow text-center">
-        <p className="text-gray-500">
-          {t("expire-soon.Loading")}
-        </p>
+      <div className="bg-white dark:bg-gray-800 p-4 rounded shadow text-center mb-4">
+        <table className="w-full text-sm">
+          <thead className="bg-green-600 dark:bg-gray-700 text-white dark:text-gray-200">
+            <tr>
+              <th className="p-2 text-left"> {t("expire-soon.Medicine")}</th>
+              <th className="p-2 text-left"> {t("expire-soon.Quantity")}</th>
+              <th className="p-2 text-left"> {t("expire-soon.ExpireDate")}</th>
+              <th className="p-2 text-left"> {t("expire-soon.Actions")}</th>
+            </tr>
+          </thead>
+          <tbody className="text-center">
+            <tr>
+              <td colSpan={4}>
+                {" "}
+                <p className="text-gray-500 py-12">
+                  {t("expire-soon.Loading")}
+                </p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     );
   }
@@ -136,7 +153,29 @@ const ExpiringSoonList = () => {
       )}
 
       {expiringList.length === 0 ? (
-        <p className="text-gray-600 dark:text-gray-400">{t("expire-soon.NotFound")}</p>
+        <div>
+          <table className="w-full text-sm">
+            <thead className="bg-green-600 dark:bg-gray-700 text-white dark:text-gray-200">
+              <tr>
+                <th className="p-2 text-left"> {t("expire-soon.Medicine")}</th>
+                <th className="p-2 text-left"> {t("expire-soon.Quantity")}</th>
+                <th className="p-2 text-left">{t("expire-soon.ExpireDate")}</th>
+                <th className="p-2 text-left"> {t("expire-soon.Actions")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tbody className="text-center">
+                <tr>
+                  <td colSpan={4}>
+                    <p className="text-gray-500 py-12">
+                      {t("expire-soon.NotFound")}
+                    </p>
+                  </td>
+                </tr>
+              </tbody>
+            </tbody>
+          </table>
+        </div>
       ) : (
         <table className="w-full text-sm">
           <thead className="bg-green-600 dark:bg-gray-700 text-white dark:text-gray-200">

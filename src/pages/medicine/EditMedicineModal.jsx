@@ -7,9 +7,11 @@ import { getAllUnits } from "../api/unitService";
 
 const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
   const { t } = useTranslation();
+
   const [categories, setCategories] = useState([]);
   const [units, setUnits] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [errMsg, setErrMsg] = useState("");
 
   const [formData, setFormData] = useState({
     id: null,
@@ -20,17 +22,11 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
     medicine_detail: "",
     category_ids: [],
     unit_ids: [],
-    image: null,
-    imageFile: null,
-    manufacturer: "",
-    origin: "",
-    purchase: "",
-    medicine_status: "",
-    strips_per_box: "",
-    tablets_per_box: "",
+    image: null, // preview URL or server path
+    imageFile: null, // new file (optional)
   });
 
-  // === Fetch categories & units ===
+  // Load categories & units when the modal opens
   useEffect(() => {
     if (!isOpen) return;
     (async () => {
@@ -39,21 +35,18 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
           getAllCategory(),
           getAllUnits(),
         ]);
-        setCategories(catRes || []);
-        setUnits(unitRes || []);
-      } catch {}
+        setCategories(Array.isArray(catRes) ? catRes : catRes?.data || []);
+        setUnits(Array.isArray(unitRes) ? unitRes : unitRes?.data || []);
+      } catch {
+        // ignore
+      }
     })();
   }, [isOpen]);
 
-  // === Prefill from initialData ===
+  // Prefill from initialData (no stale spread; no removed fields)
   useEffect(() => {
     if (!isOpen || !initialData) return;
-    const boxUnit = (initialData.units || []).find(
-      (u) => String(u.unit_name).toLowerCase() === "box"
-    );
-
     setFormData({
-      ...formData,
       id: initialData.id ?? null,
       medicine_name: initialData.medicine_name ?? "",
       price: initialData.price ?? "",
@@ -64,31 +57,29 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
       unit_ids: (initialData.units || []).map((u) => u.id),
       image: initialData.image || null,
       imageFile: null,
-      manufacturer: initialData.manufacturer ?? "",
-      origin: initialData.origin ?? "",
-      purchase: initialData.purchase ?? "",
-      medicine_status: initialData.medicine_status ?? "",
-      strips_per_box: boxUnit?.pivot?.strips_per_box ?? "",
-      tablets_per_box: boxUnit?.pivot?.tablets_per_box ?? "",
     });
+    setErrMsg("");
   }, [isOpen, initialData]);
 
   const categoryOptions = useMemo(
-    () => categories.map((c) => ({ value: c.id, label: c.category_name })),
+    () =>
+      (categories || []).map((c) => ({
+        value: c.id,
+        label: c.category_name,
+      })),
     [categories]
   );
+
   const unitOptions = useMemo(
-    () => units.map((u) => ({ value: u.id, label: u.unit_name })),
+    () =>
+      (units || []).map((u) => ({
+        value: u.id,
+        label: u.unit_name,
+      })),
     [units]
   );
 
-  const getBoxUnitId = () =>
-    unitOptions.find((opt) => opt.label === "Box")?.value;
-  const isBoxSelected = () => {
-    const boxId = getBoxUnitId();
-    return boxId ? formData.unit_ids.includes(boxId) : false;
-  };
-
+  // Handlers
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((p) => ({ ...p, [name]: value }));
@@ -96,9 +87,10 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
 
   const handleNumberChange = (e) => {
     const { name, value } = e.target;
+    const v = value === "" ? "" : Number(value);
     setFormData((p) => ({
       ...p,
-      [name]: value === "" ? "" : Math.max(0, Number(value)),
+      [name]: value === "" ? "" : isNaN(v) ? p[name] : Math.max(0, v),
     }));
   };
 
@@ -108,17 +100,11 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
       category_ids: selected ? selected.map((o) => o.value) : [],
     }));
 
-  const handleUnitChange = (selected) => {
-    const ids = selected ? selected.map((o) => o.value) : [];
-    const boxId = getBoxUnitId();
-    const boxStill = boxId ? ids.includes(boxId) : false;
+  const handleUnitChange = (selected) =>
     setFormData((p) => ({
       ...p,
-      unit_ids: ids,
-      strips_per_box: boxStill ? p.strips_per_box : "",
-      tablets_per_box: boxStill ? p.tablets_per_box : "",
+      unit_ids: selected ? selected.map((o) => o.value) : [],
     }));
-  };
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
@@ -130,36 +116,52 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
     }));
   };
 
+  const validate = () => {
+    if (!formData.medicine_name.trim()) {
+      return t("edit-medicine.ErrName") || "Name is required.";
+    }
+    if (formData.price !== "" && Number(formData.price) < 0) {
+      return t("edit-medicine.ErrPrice") || "Price must be >= 0.";
+    }
+    if (formData.weight !== "" && Number(formData.weight) < 0) {
+      return t("edit-medicine.ErrWeight") || "Weight must be >= 0.";
+    }
+    return "";
+  };
+
   const handleSubmit = async () => {
     if (!formData.id) return;
+    const v = validate();
+    if (v) {
+      setErrMsg(v);
+      return;
+    }
 
     setIsLoading(true);
+    setErrMsg("");
     try {
+      // match updateMedicine signature
       const payload = {
         medicine_name: formData.medicine_name,
         barcode: formData.barcode,
         price: formData.price,
         weight: formData.weight,
         medicine_detail: formData.medicine_detail,
-        manufacturer: formData.manufacturer,
-        origin: formData.origin,
-        purchase: formData.purchase,
         category_ids: formData.category_ids,
-        units: formData.unit_ids.map((uId) =>
-          isBoxSelected() && uId === getBoxUnitId()
-            ? {
-                unit_id: uId,
-                strips_per_box: Number(formData.strips_per_box) || undefined,
-                tablets_per_box: Number(formData.tablets_per_box) || undefined,
-              }
-            : { unit_id: uId }
-        ),
+        unit_ids: formData.unit_ids,
         imageFile: formData.imageFile ?? undefined,
       };
 
-      const res = await updateMedicine(formData.id, payload);
-      onClose();
-      onSave?.(res);
+      await updateMedicine(formData.id, payload);
+      onClose?.();
+      onSave?.();
+    } catch (e) {
+      setErrMsg(
+        e?.response?.data?.message ||
+          e?.message ||
+          t("edit-medicine.UpdateFailed") ||
+          "Failed to update medicine."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -170,9 +172,15 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50">
       <div className="bg-white dark:bg-slate-800 p-6 sm:py-10 sm:w-[60%] w-full h-full overflow-y-auto rounded-xl">
-        <h2 className="text-2xl font-semibold mb-6 text-gray-800 dark:text-slate-200">
+        <h2 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-slate-200">
           {t("edit-medicine.EditTitle")}
         </h2>
+
+        {errMsg && (
+          <div className="mb-4 rounded border border-red-200 bg-red-50 px-3 py-2 text-red-700">
+            {errMsg}
+          </div>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Barcode */}
@@ -221,6 +229,7 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
               onChange={handleNumberChange}
               placeholder={t("edit-medicine.PricePh")}
               className="w-full p-2 border rounded"
+              min={0}
             />
             <p className="text-xs text-gray-500">
               {t("edit-medicine.PriceDesc")}
@@ -280,56 +289,6 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
             </p>
           </div>
 
-          {/* Manufacturer */}
-          <div>
-            <label className="block font-medium">
-              {t("edit-medicine.Manufacturer")}
-            </label>
-            <input
-              name="manufacturer"
-              value={formData.manufacturer}
-              onChange={handleChange}
-              placeholder={t("edit-medicine.ManufacturerPh")}
-              className="w-full p-2 border rounded"
-            />
-          </div>
-
-          {/* Origin */}
-          <div>
-            <label className="block font-medium">
-              {t("edit-medicine.Origin")}
-            </label>
-            <input
-              name="origin"
-              value={formData.origin}
-              onChange={handleChange}
-              placeholder={t("edit-medicine.OriginPh")}
-              className="w-full p-2 border rounded"
-            />
-          </div>
-
-          {/* Status */}
-          <div>
-            <label className="block font-medium">
-              {t("edit-medicine.MedicineStatus")}
-            </label>
-            <select
-              name="medicine_status"
-              value={formData.medicine_status}
-              onChange={handleChange}
-              className="w-full p-2 border rounded"
-            >
-              <option value="">{t("edit-medicine.SelectStatus")}</option>
-              <option value="prescription">
-                {t("edit-medicine.Prescription")}
-              </option>
-              <option value="non-prescription">
-                {t("edit-medicine.NonPrescription")}
-              </option>
-              <option value="otc">{t("edit-medicine.OTC")}</option>
-            </select>
-          </div>
-
           {/* Image */}
           <div>
             <label className="block font-medium">
@@ -346,37 +305,11 @@ const EditMedicineModal = ({ isOpen, onClose, onSave, initialData }) => {
           </div>
         </div>
 
-        {/* Box only */}
-        {isBoxSelected() && (
-          <div className="grid grid-cols-2 gap-4 mt-4">
-            <div>
-              <label>{t("edit-medicine.TabletPerBox")}</label>
-              <input
-                type="number"
-                name="strips_per_box"
-                value={formData.strips_per_box}
-                onChange={handleNumberChange}
-                placeholder="e.g. 10"
-                className="w-full p-2 border rounded"
-              />
-            </div>
-            <div>
-              <label>{t("edit-medicine.CapsulePerBox")}</label>
-              <input
-                type="number"
-                name="tablets_per_box"
-                value={formData.tablets_per_box}
-                onChange={handleNumberChange}
-                placeholder="e.g. 100"
-                className="w-full p-2 border rounded"
-              />
-            </div>
-          </div>
-        )}
-
         {/* Detail */}
         <div className="mt-6">
-          <label>{t("edit-medicine.Detail")}</label>
+          <label className="block font-medium">
+            {t("edit-medicine.Detail")}
+          </label>
           <textarea
             name="medicine_detail"
             value={formData.medicine_detail}

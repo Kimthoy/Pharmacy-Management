@@ -34,9 +34,6 @@ const AddMedicine = () => {
     category_ids: [],
     unit_ids: [],
     image: null,
-    manufacturer: "",
-    origin: "",
-    purchase: "",
   });
 
   useEffect(() => {
@@ -187,9 +184,6 @@ const AddMedicine = () => {
         );
         formData.append("weight", medicine.weight || "");
         formData.append("medicine_detail", medicine.medicine_detail || "");
-        formData.append("manufacturer", medicine.manufacturer || "");
-        formData.append("origin", medicine.origin || "");
-        formData.append("purchase", medicine.purchase || "");
 
         medicine.category_ids.forEach((id) =>
           formData.append("category_ids[]", String(id))
@@ -216,9 +210,7 @@ const AddMedicine = () => {
           barcode: "",
           price: "",
           weight: "",
-          manufacturer: "",
-          origin: "",
-          purchase: "",
+
           category: "",
           unit_id: "",
           medicine_detail: "",
@@ -395,75 +387,9 @@ const AddMedicine = () => {
             </p>
           </div>
 
-          {/* Manufacturer */}
-          <div className="flex flex-col">
-            <label
-              htmlFor="manufacturer"
-              className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              {t("add-medicine.Manufacturer")}
-            </label>
-            <input
-              type="text"
-              id="manufacturer"
-              name="manufacturer"
-              value={medicine.manufacturer}
-              onChange={handleMedicineChange}
-              placeholder={t("add-medicine.ManufacturerPh")}
-              className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-100 transition"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              {t("add-medicine.ManufacturerHelp")}
-            </p>
-          </div>
-
-          {/* Origin */}
-          <div className="flex flex-col">
-            <label
-              htmlFor="origin"
-              className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              {t("add-medicine.Origin")}
-            </label>
-            <input
-              type="text"
-              id="origin"
-              name="origin"
-              value={medicine.origin}
-              onChange={handleMedicineChange}
-              placeholder={t("add-medicine.OriginPh")}
-              className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-100 transition"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              {t("add-medicine.OriginHelp")}
-            </p>
-          </div>
-
-          {/* Purchase */}
-          <div className="flex flex-col">
-            <label
-              htmlFor="purchase"
-              className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              {t("add-medicine.Purchase")}
-            </label>
-            <input
-              type="text"
-              id="purchase"
-              name="purchase"
-              value={medicine.purchase}
-              onChange={handleMedicineChange}
-              placeholder={t("add-medicine.PurchasePh")}
-              className="text-md border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-100 transition"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              {t("add-medicine.PurchaseHelp")}
-            </p>
-          </div>
-
           {/* Categories */}
           <div>
-            <label className="text-sm font-medium dark:text-slate-300">
+            <label className="text-sm font-medium dark:text-slate-300 ">
               {t("add-medicine.Category")}
             </label>
             <Select
@@ -476,7 +402,7 @@ const AddMedicine = () => {
               )}
               onChange={handleCategoryChange}
               isMulti
-              classNamePrefix="select"
+              classNamePrefix="select "
               className="mt-2"
               placeholder={t("add-medicine.CategoryPh")}
             />

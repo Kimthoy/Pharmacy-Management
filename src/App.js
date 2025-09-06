@@ -1,4 +1,3 @@
-// src/App.jsx
 import React, { Suspense, lazy, useState, useEffect, useContext } from "react";
 import { useLocation, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
@@ -20,12 +19,15 @@ const SettingPageForm = lazy(() =>
   import("./pages/setting/SystemSettingsForm")
 );
 const ExpireSoon = lazy(() => import("./pages/dashboard/ExpiringSoonList"));
+const Order = lazy(() => import("./pages/order/OrdersPage"));
+const OrderDetail = lazy(() => import("./pages/order/OrderDetail"));
 const AddSupply = lazy(() => import("./pages/stock/AddSupply"));
 const Login = lazy(() => import("./pages/auth/Login"));
 const CustomerList = lazy(() => import("./pages/customer/ListCustomer"));
 const InsertCustomer = lazy(() => import("./pages/customer/InsertCustomer"));
 const Dashboard = lazy(() => import("./pages/dashboard/Dashboard"));
 const Supplies = lazy(() => import("./pages/manufacturer/Supply"));
+const Supplier = lazy(() => import("./pages/manufacturer/ManufacturerList"));
 const SupplyItems = lazy(() => import("./pages/manufacturer/SupplyItem"));
 const SalesReport = lazy(() => import("./pages/sale/SalesReport"));
 const SellReport = lazy(() => import("./pages/report/ReportSell"));
@@ -40,29 +42,16 @@ const AddMedicine = lazy(() => import("./pages/medicine/AddMedicine"));
 const MedicineList = lazy(() => import("./pages/medicine/MedicineList"));
 const Category = lazy(() => import("./pages/medicine/Category"));
 const MedicineDetail = lazy(() => import("./pages/medicine/MedicineDetail"));
-const AddWastageReturn = lazy(() => import("./pages/return/AddWastageReturn"));
+
 const SaleDashboard = lazy(() => import("./pages/sale/Sale"));
 const RetailStock = lazy(() => import("./pages/stock/RetailStock"));
 const RetailMedicine = lazy(() => import("./pages/retail/RetailProduct"));
-const AddManufacturerReturn = lazy(() =>
-  import("./pages/return/AddManufacturerReturn")
-);
-const ManufacturerList = lazy(() =>
-  import("./pages/manufacturer/ManufacturerList")
-);
-const ManufacturerReturnList = lazy(() =>
-  import("./pages/return/ManufacturerReturnList")
-);
-const WastageReturnList = lazy(() =>
-  import("./pages/return/WastageReturnList")
-);
+
 const StaffList = lazy(() => import("./pages/staff/ManageStaff"));
 const ReturnsTable = lazy(() => import("./pages/return/ReturnsTable"));
 const Profile = lazy(() => import("./pages/profile/AboutUser"));
 const StockList = lazy(() => import("./pages/stock/StockList"));
 const Unit = lazy(() => import("./pages/medicine/Unit"));
-const SampleStock = lazy(() => import("./pages/sample/InventoryDashboard"));
-const AddStock = lazy(() => import("./pages/sample/InventoryForm"));
 const SaleRetail = lazy(() => import("./pages/retail/SaleRetail"));
 
 function RequireAuth() {
@@ -181,11 +170,11 @@ const App = () => {
                   <Route path="/" element={<Dashboard langCode={langCode} />} />
                   <Route path="/customerlist" element={<CustomerList />} />
                   <Route path="/insertcustomer" element={<InsertCustomer />} />
-                  <Route
-                    path="/manufacturerlist"
-                    element={<ManufacturerList />}
-                  />
+                  <Route path="/order" element={<Order />} />
+                  <Route path="/order/:id" element={<OrderDetail />} />
+
                   <Route path="/supplies" element={<Supplies />} />
+                  <Route path="/supplier" element={<Supplier />} />
                   <Route path="/setting-page" element={<SettingPage />} />
                   <Route
                     path="/setting-page-form"
@@ -219,22 +208,7 @@ const App = () => {
                   />
                   <Route path="/categoies" element={<Category />} />
                   <Route path="/units" element={<Unit />} />
-                  <Route
-                    path="/manufacturerreturnlist"
-                    element={<ManufacturerReturnList />}
-                  />
-                  <Route
-                    path="/addwastagereturn"
-                    element={<AddWastageReturn />}
-                  />
-                  <Route
-                    path="/addmanufacturerreturn"
-                    element={<AddManufacturerReturn />}
-                  />
-                  <Route
-                    path="/wastagereturnlist"
-                    element={<WastageReturnList />}
-                  />
+
                   <Route path="/listofstaff" element={<StaffList />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/expire-soon" element={<ExpireSoon />} />
@@ -243,11 +217,8 @@ const App = () => {
                     element={<ProfileDashboard />}
                   />
 
-                  {/* Your sale page (Sidebar will auto-hide for cashiers) */}
                   <Route path="/saledashboard" element={<SaleDashboard />} />
 
-                  <Route path="/samplestock" element={<SampleStock />} />
-                  <Route path="/addstock" element={<AddStock />} />
                   <Route path="/retailstock" element={<RetailStock />} />
                   <Route path="/add-supply" element={<AddSupply />} />
                 </Route>
